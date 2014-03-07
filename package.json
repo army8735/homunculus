@@ -1,0 +1,35 @@
+{
+  "name": "homunculus",
+  "version": "0.0.1",
+  "description": "",
+  "maintainers": [
+    {
+      "name": "army8735",
+      "email": "army8735@qq.com"
+    }
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/army8735/homunculus.git"
+  },
+  "keywords": [
+    "lexer",
+    "parser"
+  ],
+  "author": "army8735",
+  "license": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/addyosmani/es6-module-loader/blob/master/LICENSE-MIT"
+    }
+  ],
+  "dependencies": {},
+  "main": "./homunculus",
+  "engines": {
+    "node": ">= 0.10.0"
+  },
+  "readmeFilename": "README.md"
+}
