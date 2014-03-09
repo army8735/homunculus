@@ -1,7 +1,7 @@
 {
   "name": "homunculus",
   "version": "0.0.1",
-  "description": "",
+  "description": "A lexer&parser by Javascript",
   "maintainers": [
     {
       "name": "army8735",
@@ -17,7 +17,8 @@
   },
   "keywords": [
     "lexer",
-    "parser"
+    "parser",
+    "javascript"
   ],
   "author": "army8735",
   "license": [

@@ -1,0 +1,118 @@
+var Lexer = require('./src/lexer/Lexer');
+var CssLexer = requrie('./src/lexer/CssLexer');
+
+var EcmascriptRule = require('./src/lexer/rule/EcmascriptRule');
+var CssRule = requir('./src/lexer/rule/CssRule');
+var JavaRule = require('./src/lexer/rule/JavaRule');
+var CRule = require('./src/lexer/rule/CRule');
+
+var Token = require('./src/lexer/Token');
+
+var JsParser = require('./src/parser/js/Parser');
+var CssParser = require('./src/parser/css/Parser');
+
+var JsNode = require('./src/parser/js/Node');
+var CssNode = require('./src/parser/css/Node');
+
+exports.getClass = function(s) {
+  var ps = s.split(/[./\\]/);
+  var type = ps[0].toLowerCase();
+  var lan = ps[1].toLowerCase();
+  switch(type) {
+    case 'lexer':
+      switch(lan) {
+        case 'js':
+        case 'javascript':
+        case 'es':
+        case 'ecmascript':
+        case 'as':
+        case 'actionscript':
+          return Lexer;
+        case 'css':
+          return CssLexer;
+        default:
+          throw new Error('Unsupport Language Lexer: ' + lan);
+      }
+    break;
+    case 'parser':
+      switch(lan) {
+        case 'js':
+        case 'javascript':
+        case 'es':
+        case 'ecmascript':
+          return JsParser;
+        case 'css':
+          return CssParser;
+        default:
+          throw new Error('Unsupport Language Parser: ' + lan);
+      }
+    break;
+    case 'node':
+      switch(lan) {
+        case 'js':
+        case 'javascript':
+        case 'es':
+        case 'ecmascript':
+          return JsNode;
+        case 'css':
+          return CssNode;
+        default:
+          throw new Error('Unsupport Language Node: ' + lan);
+      }
+    break;
+    default:
+      throw new Error('Unsupport Class Type: ' + type);
+  }
+};
+
+exports.getLexer = function(lan) {
+  lan = lan.toLowerCase();
+  switch(lan) {
+    case 'js':
+    case 'javascript':
+    case 'es':
+    case 'ecmascript':
+      return new Lexer(new EcmascriptRule());
+    case 'css':
+      return new CssLexer(new CssRule());
+    case "java":
+      return new Lexer(new JavaRule());
+    case "c":
+    case "c++":
+    case "cpp":
+    case "cplusplus":
+      return new Lexer(new CRule());
+    default:
+      throw new Error('Unsupport Language Lexer: ' + lan);
+  }
+};
+
+exports.getParser = function(lan) {
+  lan = lan.toLowerCase();
+  switch(lan) {
+    case 'js':
+    case 'javascript':
+    case 'es':
+    case 'ecmascript':
+      return new JsParser(exports.getLexer(lan));
+    case 'css':
+      return new CssParser(exports.getLexer(lan));
+    default:
+      throw new Error('Unsupport Language Parser: ' + lan);
+  }
+};
+
+exports.getNode = function(lan) {
+  lan = lan.toLowerCase();
+  switch(lan) {
+    case 'js':
+    case 'javascript':
+    case 'es':
+    case 'ecmascript':
+      return JsNode;
+    case 'css':
+      return CssNode;
+    default:
+      throw new Error('Unsupport Language Parser: ' + lan);
+  }
+};
