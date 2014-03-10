@@ -1,8 +1,8 @@
 var Lexer = require('./src/lexer/Lexer');
-var CssLexer = requrie('./src/lexer/CssLexer');
+var CssLexer = require('./src/lexer/CssLexer');
 
 var EcmascriptRule = require('./src/lexer/rule/EcmascriptRule');
-var CssRule = requir('./src/lexer/rule/CssRule');
+var CssRule = require('./src/lexer/rule/CssRule');
 var JavaRule = require('./src/lexer/rule/JavaRule');
 var CRule = require('./src/lexer/rule/CRule');
 
@@ -14,10 +14,9 @@ var CssParser = require('./src/parser/css/Parser');
 var JsNode = require('./src/parser/js/Node');
 var CssNode = require('./src/parser/css/Node');
 
-exports.getClass = function(s) {
-  var ps = s.split(/[./\\]/);
-  var type = ps[0].toLowerCase();
-  var lan = ps[1].toLowerCase();
+exports.getClass = function(type, lan) {
+  type = type.toLowerCase();
+  lan = lan.toLowerCase();
   switch(type) {
     case 'lexer':
       switch(lan) {
