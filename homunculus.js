@@ -71,6 +71,8 @@ exports.getLexer = function(lan) {
     case 'javascript':
     case 'es':
     case 'ecmascript':
+    case 'as':
+    case 'actionscript':
       return new Lexer(new EcmascriptRule());
     case 'css':
       return new CssLexer(new CssRule());
