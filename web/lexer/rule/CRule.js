@@ -1,7 +1,7 @@
 define(function(require, exports, module) {
   var Rule = require('./Rule'),
     LineSearch = require('../match/LineSearch'),
-    CharacterSet = require('../match/CharacterSet'),
+    RegMatch = require('../match/RegMatch'),
     LineParse = require('../match/LineParse'),
     CompleteEqual = require('../match/CompleteEqual'),
     Token = require('../Token'),
@@ -14,21 +14,8 @@ define(function(require, exports, module) {
       self.addMatch(new LineSearch(Token.COMMENT, '/*', '*/', true));
       self.addMatch(new LineParse(Token.STRING, '"', '"'));
       self.addMatch(new LineParse(Token.STRING, "'", "'"));
-      self.addMatch(new CharacterSet(Token.ID, [
-        CharacterSet.LETTER,
-        CharacterSet.UNDERLINE
-      ], [
-        CharacterSet.LETTER,
-        CharacterSet.UNDERLINE,
-        CharacterSet.DIGIT
-      ]));
-      self.addMatch(new CharacterSet(Token.HEAD, [
-        CharacterSet.SHARP
-      ], [
-        CharacterSet.LETTER,
-        CharacterSet.UNDERLINE,
-        CharacterSet.DIGIT
-      ]));
+      self.addMatch(new RegMatch(Token.ID, /^[a-zA-Z_]\w*/));
+      self.addMatch(new RegMatch(Token.HEAD, /^#\w+/));
   
       ['~', '!', '%', '^', '&&', '&', '*', '(', ')', '--', '-', '++', '+', '===', '==', '=', '!==', '!=', '[', ']', '{', '}', '||', '|', '\\', '<<<', '>>>', '<<', '>>', '<', '>', '>=', '<=', ',', '...', '.', '?:', '?', ':', ';', '/'].forEach(function(o) {
         self.addMatch(new CompleteEqual(Token.SIGN, o));

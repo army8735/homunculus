@@ -1,5 +1,5 @@
 define(function(require, exports, module) {
-  var Class = require('../util/Class');
+  var Class = require('../../util/Class');
   var Node = Class(function(type, children) {
       this.type = type;
       if(type == Node.TOKEN) {
