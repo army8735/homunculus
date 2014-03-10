@@ -35,6 +35,7 @@
   "readmeFilename": "README.md",
   "devDependencies": {
     "mocha": "^1.17.1",
-    "gulp": "^3.5.5"
+    "gulp": "^3.5.5",
+    "gulp-clean": "^0.2.4"
   }
 }
