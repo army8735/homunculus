@@ -206,5 +206,5 @@ var Lexer = Class(function(rule) {
       return cmode;
     }
   }),
-  cmode = Lexer.LOOSE;
+  cmode = Lexer.STRICT;
 module.exports = Lexer;
