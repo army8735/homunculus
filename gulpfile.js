@@ -5,13 +5,11 @@ var transform = require('./transform');
 gulp.task('src2web', ['clean-web'], function() {
   transform.src2web();
 });
-gulp.task('web2src', function() {
-  gulp.src('./src')
-    .pipe(clean());
+gulp.task('web2src', ['clean-src'], function() {
   transform.web2src();
 });
 gulp.task('clean-web', function() {
-  gulp.src('./web/*')
+  gulp.src('./web/*', { read: false })
     .pipe(clean());
 })
 gulp.task('clean-src', function() {
