@@ -36,6 +36,7 @@
   "devDependencies": {
     "mocha": "^1.17.1",
     "gulp": "^3.5.5",
-    "gulp-clean": "^0.2.4"
+    "gulp-clean": "^0.2.4",
+    "expect.js": "^0.3.1"
   }
 }
