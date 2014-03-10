@@ -13,7 +13,7 @@ function web2src(dir) {
       web2src(f);
     }
     else if(stat.isFile()) {
-        console.log(f);
+        console.log(f, '->', target);
         var s = fs.readFileSync(f, { encoding: 'utf-8' });
         s = s.replace(/^define[^\n]*\n\t?/, '');
         s = s.replace(/\n\t/g, '\n');
@@ -36,7 +36,7 @@ function src2web(dir) {
       src2web(f);
     }
     else if(stat.isFile()) {
-      console.log(f);
+      console.log(f, '->', target);
       var s = fs.readFileSync(f, { encoding: 'utf-8' });
       s = 'define(function(require, module, exports) {\n  ' + s.replace(/\n/g, '\n  ') + '\n});';
       fs.writeFileSync(target, s, { encoding: 'utf-8' });
@@ -44,5 +44,9 @@ function src2web(dir) {
   });
 }
 
-//web2src('./web')
-src2web('./src')
+exports.web2src = function() {
+  web2src('./web');
+};
+exports.src2web = function() {
+  src2web('./src');
+};
