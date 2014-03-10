@@ -1,4 +1,4 @@
-define(function(require, module, exports) {
+define(function(require, exports, module) {
   exports.LINE = '\n';
   exports.ENTER = '\r';
   exports.BLANK = ' ';

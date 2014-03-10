@@ -1,4 +1,4 @@
-define(function(require, module, exports) {
+define(function(require, exports, module) {
   var Rule = require('./Rule'),
     LineSearch = require('../match/LineSearch'),
     LineParse = require('../match/LineParse'),

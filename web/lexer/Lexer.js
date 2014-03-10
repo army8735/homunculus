@@ -1,4 +1,4 @@
-define(function(require, module, exports) {
+define(function(require, exports, module) {
   var Class = require('../util/Class'),
     character = require('../util/character'),
     Token = require('./Token'),

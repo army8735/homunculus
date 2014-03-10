@@ -1,4 +1,4 @@
-define(function(require, module, exports) {
+define(function(require, exports, module) {
   var Lexer = require('./Lexer');
   var Token = require('./Token');
   var character = require('../util/character');

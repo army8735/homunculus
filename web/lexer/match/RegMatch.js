@@ -1,4 +1,4 @@
-define(function(require, module, exports) {
+define(function(require, exports, module) {
   var Match = require('./Match'),
     RegMatch = Match.extend(function(type, reg, valid, setPReg, special, parenthese) {
       if(typeof valid == 'number') {

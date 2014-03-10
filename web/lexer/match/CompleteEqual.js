@@ -1,4 +1,4 @@
-define(function(require, module, exports) {
+define(function(require, exports, module) {
   var Match = require('./Match'),
     Lexer = require('../Lexer'),
     character = require('../../util/character'),

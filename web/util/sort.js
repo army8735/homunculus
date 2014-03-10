@@ -1,4 +1,4 @@
-define(function(require, module, exports) {
+define(function(require, exports, module) {
   function quickSort(arr, begin, end, compare) {
     if(begin >= end) {
       return;

@@ -38,7 +38,7 @@ function src2web(dir) {
     else if(stat.isFile()) {
       console.log(f, '->', target);
       var s = fs.readFileSync(f, { encoding: 'utf-8' });
-      s = 'define(function(require, module, exports) {\n  ' + s.replace(/\n/g, '\n  ') + '\n});';
+      s = 'define(function(require, exports, module) {\n  ' + s.replace(/\n/g, '\n  ') + '\n});';
       fs.writeFileSync(target, s, { encoding: 'utf-8' });
     }
   });

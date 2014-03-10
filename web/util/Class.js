@@ -1,4 +1,4 @@
-define(function(require, module, exports) {
+define(function(require, exports, module) {
   function inheritPrototype(subType, superType) {
     var prototype = Object.create(superType.prototype);
     prototype.constructor = subType;

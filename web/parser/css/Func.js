@@ -1,4 +1,4 @@
-define(function(require, module, exports) {
+define(function(require, exports, module) {
   var character = require('../../util/character');
   var Class = require('../../util/Class');
   var Node = Class(function(id, params, body, fhash) {
