@@ -1,12 +1,12 @@
-var Rule = require('./Rule'),
-  LineSearch = require('../match/LineSearch'),
-  LineParse = require('../match/LineParse'),
-  CompleteEqual = require('../match/CompleteEqual'),
-  RegMatch = require('../match/RegMatch'),
-  Token = require('../Token'),
-  Lexer = require('../Lexer'),
-  character = require('../../util/character'),
-  EcmascriptRule = Rule.extend(function() {
+var Rule = require('./Rule');
+var LineSearch = require('../match/LineSearch');
+var LineParse = require('../match/LineParse');
+var CompleteEqual = require('../match/CompleteEqual');
+var RegMatch = require('../match/RegMatch');
+var Token = require('../Token');
+var Lexer = require('../Lexer');
+var character = require('../../util/character');
+var EcmascriptRule = Rule.extend(function() {
     var self = this;
     Rule.call(self, EcmascriptRule.KEYWORDS, true);
     

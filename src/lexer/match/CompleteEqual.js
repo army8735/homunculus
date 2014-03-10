@@ -1,7 +1,6 @@
-var Match = require('./Match'),
-  Lexer = require('../Lexer'),
-  character = require('../../util/character'),
-  CompleteEqual = Match.extend(function(type, result, setPReg) {
+var Match = require('./Match');
+var character = require('../../util/character');
+var CompleteEqual = Match.extend(function(type, result, setPReg) {
     Match.call(this, type, setPReg);
     this.result = result;
   }).methods({

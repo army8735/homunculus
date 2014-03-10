@@ -15,8 +15,8 @@ var JsNode = require('./src/parser/js/Node');
 var CssNode = require('./src/parser/css/Node');
 
 exports.getClass = function(type, lan) {
-  type = type.toLowerCase();
-  lan = lan.toLowerCase();
+  type = (type || '').toLowerCase();
+  lan = (lan || '').toLowerCase();
   switch(type) {
     case 'lexer':
       switch(lan) {
@@ -59,6 +59,8 @@ exports.getClass = function(type, lan) {
           throw new Error('Unsupport Language Node: ' + lan);
       }
     break;
+    case 'token':
+      return Token;
     default:
       throw new Error('Unsupport Class Type: ' + type);
   }
@@ -98,21 +100,6 @@ exports.getParser = function(lan) {
       return new JsParser(exports.getLexer(lan));
     case 'css':
       return new CssParser(exports.getLexer(lan));
-    default:
-      throw new Error('Unsupport Language Parser: ' + lan);
-  }
-};
-
-exports.getNode = function(lan) {
-  lan = lan.toLowerCase();
-  switch(lan) {
-    case 'js':
-    case 'javascript':
-    case 'es':
-    case 'ecmascript':
-      return JsNode;
-    case 'css':
-      return CssNode;
     default:
       throw new Error('Unsupport Language Parser: ' + lan);
   }

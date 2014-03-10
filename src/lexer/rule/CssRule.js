@@ -1,11 +1,11 @@
-var Rule = require('./Rule'),
-  LineSearch = require('../match/LineSearch'),
-  LineParse = require('../match/LineParse'),
-  CompleteEqual = require('../match/CompleteEqual'),
-  RegMatch = require('../match/RegMatch'),
-  Token = require('../Token'),
-  character = require('../../util/character'),
-  CssRule = Rule.extend(function() {
+var Rule = require('./Rule');
+var LineSearch = require('../match/LineSearch');
+var LineParse = require('../match/LineParse');
+var CompleteEqual = require('../match/CompleteEqual');
+var RegMatch = require('../match/RegMatch');
+var Token = require('../Token');
+var character = require('../../util/character');
+var CssRule = Rule.extend(function() {
     var self = this;
     Rule.call(self, CssRule.KEYWORDS);
 

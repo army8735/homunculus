@@ -1,11 +1,10 @@
-var Rule = require('./Rule'),
-  LineSearch = require('../match/LineSearch'),
-  LineParse = require('../match/LineParse'),
-  CompleteEqual = require('../match/CompleteEqual'),
-  RegMatch = require('../match/RegMatch'),
-  Token = require('../Token'),
-  Lexer = require('../Lexer'),
-  JavaRule = Rule.extend(function() {
+var Rule = require('./Rule');
+var LineSearch = require('../match/LineSearch');
+var LineParse = require('../match/LineParse');
+var CompleteEqual = require('../match/CompleteEqual');
+var RegMatch = require('../match/RegMatch');
+var Token = require('../Token');
+var JavaRule = Rule.extend(function() {
     var self = this;
     Rule.call(self, JavaRule.KEYWORDS);
     

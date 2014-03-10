@@ -8,6 +8,7 @@ var JsParser = require('../src/parser/js/Parser');
 var CssParser = require('../src/parser/css/Parser');
 var JsNode = require('../src/parser/js/Node');
 var CssNode = require('../src/parser/css/Node');
+var Token = require('../src/lexer/Token');
 
 describe('api of homunculus', function() {
   it('#getClass', function() {
@@ -26,6 +27,15 @@ describe('api of homunculus', function() {
     expect(homunculus.getClass('parser', 'ecmascript')).to.be(JsParser);
 
     expect(homunculus.getClass('parser', 'css')).to.be(CssParser);
+
+    expect(homunculus.getClass('node', 'js')).to.be(JsNode);
+    expect(homunculus.getClass('node', 'javascript')).to.be(JsNode);
+    expect(homunculus.getClass('node', 'es')).to.be(JsNode);
+    expect(homunculus.getClass('node', 'ecmascript')).to.be(JsNode);
+
+    expect(homunculus.getClass('node', 'css')).to.be(CssNode);
+
+    expect(homunculus.getClass('token')).to.be(Token);
   });
   it('#getLexer', function() {
     expect(homunculus.getLexer('js')).to.be.a(Lexer);
@@ -44,13 +54,5 @@ describe('api of homunculus', function() {
     expect(homunculus.getParser('ecmascript')).to.be.a(JsParser);
 
     expect(homunculus.getParser('css')).to.be.a(CssParser);
-  });
-  it('#getNode', function() {
-    expect(homunculus.getNode('js')).to.be(JsNode);
-    expect(homunculus.getNode('javascript')).to.be(JsNode);
-    expect(homunculus.getNode('es')).to.be(JsNode);
-    expect(homunculus.getNode('ecmascript')).to.be(JsNode);
-
-    expect(homunculus.getNode('css')).to.be(CssNode);
   });
 });

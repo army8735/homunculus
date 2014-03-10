@@ -1,8 +1,7 @@
-var Match = require('./Match'),
-  Lexer = require('../Lexer'),
-  Token = require('../Token'),
-  character = require('../../util/character'),
-  LineParse = Match.extend(function(type, begin, end, mutiline, setPReg) {
+var Match = require('./Match');
+var Token = require('../Token');
+var character = require('../../util/character');
+var LineParse = Match.extend(function(type, begin, end, mutiline, setPReg) {
     if(character.isUndefined(mutiline)) {
       mutiline = false;
     }
