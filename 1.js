@@ -1,2 +1,0 @@
-var mocha = require('mocha');
-
