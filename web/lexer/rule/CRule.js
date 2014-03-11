@@ -1,12 +1,11 @@
 define(function(require, exports, module) {
-  var Rule = require('./Rule'),
-    LineSearch = require('../match/LineSearch'),
-    RegMatch = require('../match/RegMatch'),
-    LineParse = require('../match/LineParse'),
-    CompleteEqual = require('../match/CompleteEqual'),
-    Token = require('../Token'),
-    Lexer = require('../Lexer'),
-    CRule = Rule.extend(function() {
+  var Rule = require('./Rule');
+  var LineSearch = require('../match/LineSearch');
+  var RegMatch = require('../match/RegMatch');
+  var LineParse = require('../match/LineParse');
+  var CompleteEqual = require('../match/CompleteEqual');
+  var Token = require('../Token');
+  var CRule = Rule.extend(function() {
       var self = this;
       Rule.call(self, CRule.KEYWORDS);
       

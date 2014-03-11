@@ -1,6 +1,6 @@
 define(function(require, exports, module) {
-  var Class = require('../../util/Class'),
-    Rule = Class(function(words, pReg) {
+  var Class = require('../../util/Class');
+  var Rule = Class(function(words, pReg) {
       var self = this;
       self.kw = {};
       words.forEach(function(o) {

@@ -1,7 +1,7 @@
 define(function(require, exports, module) {
-  var Class = require('../../util/Class'),
-    character = require('../../util/character'),
-    Lexer = require('../Lexer');
+  var Class = require('../../util/Class');
+  var character = require('../../util/character');
+  var Lexer = require('../Lexer');
   module.exports = Class(function(type, setPReg, special, parenthese) {
     this.type = type;
     if(character.isUndefined(setPReg)) {
@@ -9,6 +9,7 @@ define(function(require, exports, module) {
     }
     this.setPReg = setPReg;
     this.result = null;
+    //忽略0，是1，否2，特殊3
     if(setPReg) {
       if(character.isUndefined(special)) {
         special = function() {

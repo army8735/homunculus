@@ -1,13 +1,17 @@
 define(function(require, exports, module) {
   var Match = require('./Match');
   var character = require('../../util/character');
-  var CompleteEqual = Match.extend(function(type, result, setPReg) {
+  var CharacterSet = Match.extend(function(type, str, setPReg) {
     Match.call(this, type, setPReg);
-    this.result = result;
+    this.str = str;
   }).methods({
     match: function(c, code, index) {
-      return code.substr(--index, this.result.length) == this.result;
+      var isIn = this.str.indexOf(c) > -1;
+      if(isIn) {
+        this.result = c;
+      }
+      return isIn;
     }
   });
-  module.exports = CompleteEqual;
+  module.exports = CharacterSet;
 });

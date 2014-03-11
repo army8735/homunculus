@@ -1,26 +1,13 @@
 define(function(require, exports, module) {
-  var Class = require('../util/Class'),
-    character = require('../util/character'),
-    Token = require('./Token'),
-    Lexer = Class(function(rule) {
+  var Class = require('../util/Class');
+  var character = require('../util/character');
+  var Token = require('./Token');
+  var Lexer = Class(function(rule) {
       this.rule = rule; //当前语法规则
-      this.code; //要解析的代码
-      this.peek = ''; //向前看字符
-      this.index = 0; //向前看字符字符索引
-      this.isReg = Lexer.IS_REG; //当前/是否是perl风格正则表达式
-      this.lanDepth = 0; //生成最终结果时需要记录的行深度
-      this.tokenList = []; //结果的token列表
-      this.parentheseState = false; //(开始时标记之前终结符是否为if/for/while等关键字
-      this.parentheseStack = []; //圆括号深度记录当前是否为if/for/while等语句内部
-      this.cacheLine = 0; //行缓存值
-      this.totalLine = 1; //总行数
-      this.colNum = 0; //列
-      this.colMax = 0;
+      this.init();
     }).methods({
       parse: function(code, start) {
-        if(!character.isUndefined(code)) {
-          this.code = code;
-        }
+        this.code = code || '';
         if(!character.isUndefined(start)) {
           this.totalLine = start;
         }
@@ -32,9 +19,9 @@ define(function(require, exports, module) {
         return this.tokenList;
       },
       scan: function(temp) {
-        var perlReg = this.rule.perlReg(),
-          length = this.code.length,
-          count = 0;
+        var perlReg = this.rule.perlReg();
+        var length = this.code.length;
+        var count = 0;
         outer:
         while(this.index < length) {
           if(this.cacheLine > 0 && count >= this.cacheLine) {
@@ -106,11 +93,10 @@ define(function(require, exports, module) {
       },
       readch: function() {
         this.peek = this.code.charAt(this.index++);
-        //this.colNum++;
       },
       dealReg: function(temp, length) {
-        var lastIndex = this.index - 1,
-          res = false;
+        var lastIndex = this.index - 1;
+        var res = false;
         outer:
         do {
           this.readch();
@@ -137,6 +123,7 @@ define(function(require, exports, module) {
           else if(this.peek == character.SLASH) {
             res = true;
             var hash = {};
+            //正则的flag中又gim三种，大小写敏感且不能重复
             do {
               this.readch();
               if(character.isLetter(this.peek)) {
@@ -149,7 +136,7 @@ define(function(require, exports, module) {
               else {
                 break outer;
               }
-            } while(this.index < length);
+            } while(this.index <= length);
           }
         } while(this.index < length);
         if(!res) {
@@ -196,6 +183,19 @@ define(function(require, exports, module) {
           }
         }
         return this;
+      },
+      init: function() {
+        this.code = ''; //要解析的代码
+        this.peek = ''; //向前看字符
+        this.index = 0; //向前看字符字符索引
+        this.isReg = Lexer.IS_REG; //当前/是否是perl风格正则表达式
+        this.tokenList = []; //结果的token列表
+        this.parentheseState = false; //(开始时标记之前终结符是否为if/for/while等关键字
+        this.parentheseStack = []; //圆括号深度记录当前是否为if/for/while等语句内部
+        this.cacheLine = 0; //行缓存值
+        this.totalLine = 1; //总行数
+        this.colNum = 0; //列
+        this.colMax = 0; //最大列数
       }
     }).statics({
       IGNORE: 0,
@@ -211,6 +211,6 @@ define(function(require, exports, module) {
         return cmode;
       }
     }),
-    cmode = Lexer.LOOSE;
+    cmode = Lexer.STRICT;
   module.exports = Lexer;
 });
