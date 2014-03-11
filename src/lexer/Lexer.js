@@ -104,8 +104,8 @@ var Lexer = Class(function(rule) {
       this.peek = this.code.charAt(this.index++);
     },
     dealReg: function(temp, length) {
-      var lastIndex = this.index - 1,
-        res = false;
+      var lastIndex = this.index - 1;
+      var res = false;
       outer:
       do {
         this.readch();
@@ -132,6 +132,7 @@ var Lexer = Class(function(rule) {
         else if(this.peek == character.SLASH) {
           res = true;
           var hash = {};
+          //正则的flag中又gim三种，大小写敏感且不能重复
           do {
             this.readch();
             if(character.isLetter(this.peek)) {
@@ -144,7 +145,7 @@ var Lexer = Class(function(rule) {
             else {
               break outer;
             }
-          } while(this.index < length);
+          } while(this.index <= length);
         }
       } while(this.index < length);
       if(!res) {
