@@ -133,4 +133,13 @@ describe('jslexer', function() {
       expect(arr).to.eql(res);
     });
   });
+  describe('js lib test', function() {
+    var lexer = homunculus.getLexer('js');
+    var code = fs.readFileSync(path.join(__dirname, './jquery-1.11.0.js'), { encoding: 'utf-8' });
+    var tokens = lexer.parse(code);
+    var arr = tokens.map(function(token) {
+      return token.content();
+    });
+    expect(arr.join('')).to.eql(code);
+  });
 });

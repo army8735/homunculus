@@ -8,6 +8,7 @@ module.exports = Class(function(type, setPReg, special, parenthese) {
   }
   this.setPReg = setPReg;
   this.result = null;
+  //忽略0，是1，否2，特殊3
   if(setPReg) {
     if(character.isUndefined(special)) {
       special = function() {

@@ -3,17 +3,7 @@ var character = require('../util/character');
 var Token = require('./Token');
 var Lexer = Class(function(rule) {
     this.rule = rule; //当前语法规则
-    this.code; //要解析的代码
-    this.peek = ''; //向前看字符
-    this.index = 0; //向前看字符字符索引
-    this.isReg = Lexer.IS_REG; //当前/是否是perl风格正则表达式
-    this.tokenList = []; //结果的token列表
-    this.parentheseState = false; //(开始时标记之前终结符是否为if/for/while等关键字
-    this.parentheseStack = []; //圆括号深度记录当前是否为if/for/while等语句内部
-    this.cacheLine = 0; //行缓存值
-    this.totalLine = 1; //总行数
-    this.colNum = 0; //列
-    this.colMax = 0;
+    this.init();
   }).methods({
     parse: function(code, start) {
       this.code = code || '';
@@ -192,6 +182,19 @@ var Lexer = Class(function(rule) {
         }
       }
       return this;
+    },
+    init: function() {
+      this.code = ''; //要解析的代码
+      this.peek = ''; //向前看字符
+      this.index = 0; //向前看字符字符索引
+      this.isReg = Lexer.IS_REG; //当前/是否是perl风格正则表达式
+      this.tokenList = []; //结果的token列表
+      this.parentheseState = false; //(开始时标记之前终结符是否为if/for/while等关键字
+      this.parentheseStack = []; //圆括号深度记录当前是否为if/for/while等语句内部
+      this.cacheLine = 0; //行缓存值
+      this.totalLine = 1; //总行数
+      this.colNum = 0; //列
+      this.colMax = 0; //最大列数
     }
   }).statics({
     IGNORE: 0,
