@@ -49,6 +49,54 @@ describe('jslexer', function() {
       });
       expect(arr).to.eql(['/.*\d[^a-z]\\//gi']);
     });
+    it('perl style regular with no { in if stmt', function() {
+      var lexer = homunculus.getLexer('js');
+      var tokens = lexer.parse('if(true)/x/');
+      var arr = tokens.map(function(token) {
+        return token.content();
+      });
+      expect(arr).to.eql(['if', '(', 'true', ')', '/x/']);
+    });
+    it('perl style regular with expr in ()', function() {
+      var lexer = homunculus.getLexer('js');
+      var tokens = lexer.parse('(a)/b (a)/ /x/');
+      var arr = tokens.map(function(token) {
+        return token.content();
+      });
+      expect(arr).to.eql(['(', 'a', ')', '/', 'b', ' ', '(', 'a', ')', '/', ' ', '/x/']);
+    });
+    it('signle line comment', function() {
+      var lexer = homunculus.getLexer('js');
+      var tokens = lexer.parse('//comment\n//cc');
+      var arr = tokens.map(function(token) {
+        return token.content();
+      });
+      expect(arr).to.eql(['//comment', '\n', '//cc']);
+    });
+    it('multi line comment', function() {
+      var lexer = homunculus.getLexer('js');
+      var tokens = lexer.parse('/*comment\\*/ /*comment\ncc*/');
+      var arr = tokens.map(function(token) {
+        return token.content();
+      });
+      expect(arr).to.eql(['/*comment\\*/', ' ', '/*comment\ncc*/']);
+    });
+    it('template', function() {
+      var lexer = homunculus.getLexer('js');
+      var tokens = lexer.parse('`template`');
+      var arr = tokens.map(function(token) {
+        return token.content();
+      });
+      expect(arr).to.eql(['`template`']);
+    });
+    it('number', function() {
+      var lexer = homunculus.getLexer('js');
+      var tokens = lexer.parse('0.541 .32E+8 123E9 45.2E-10');
+      var arr = tokens.map(function(token) {
+        return token.content();
+      });
+      expect(arr).to.eql(['0.541', ' ', '.32E+8', ' ', '123E9', ' ', '45.2E-10']);
+    });
   });
   describe('complex test', function() {
     it('test 1', function() {
