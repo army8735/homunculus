@@ -123,11 +123,17 @@ define(function(require, exports, module) {
           else if(this.peek == character.SLASH) {
             res = true;
             var hash = {};
-            //正则的flag中又gim三种，大小写敏感且不能重复
+            var flag = {
+              'g': true,
+              'i': true,
+              'm': true,
+              'y': true
+            };
+            //正则的flag中有gimy4种，大小写敏感且不能重复
             do {
               this.readch();
               if(character.isLetter(this.peek)) {
-                if(hash[this.peek] || (this.peek != 'g' && this.peek != 'i' && this.peek != 'm')) {
+                if(hash.hasOwnProperty(this.peek) || !flag.hasOwnProperty(this.peek)) {
                   this.error('SyntaxError: invalid regular expression flag ' + this.peek, this.code.slice(lastIndex, this.index));
                   break outer;
                 }
