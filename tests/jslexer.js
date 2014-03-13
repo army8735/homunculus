@@ -6,9 +6,6 @@ var path = require('path');
 var os = require('os');
 var isWin = /win/i.test(os.type());
 
-var Lexer = require('../src/lexer/Lexer');
-var Token = require('../src/lexer/Token');
-
 describe('jslexer', function() {
   describe('simple test', function() {
     it('string literal with back_slash', function() {
@@ -150,15 +147,16 @@ describe('jslexer', function() {
       expect(arr).to.eql(res);
     });
   });
-  describe('js lib test', function() {
+  describe('js lib exec test', function() {
     it('jquery 1.11.0', function() {
       var lexer = homunculus.getLexer('js');
       var code = fs.readFileSync(path.join(__dirname, './jquery-1.11.0.js'), { encoding: 'utf-8' });
       var tokens = lexer.parse(code);
-      var arr = tokens.map(function(token) {
-        return token.content();
+      var str = '';
+      tokens.forEach(function(token) {
+        str += token.content();
       });
-      expect(arr.join('')).to.eql(code);
+      expect(str).to.eql(code);
     });
   });
 });
