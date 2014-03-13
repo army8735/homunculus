@@ -40,6 +40,7 @@ function recursion(node, ignore) {
 }
 
 function tree(node, arr) {
+  arr = arr || [];
   var isToken = node.name() == JsNode.TOKEN;
   var isVirtual = isToken && node.token().type() == Token.VIRTUAL;
   if(isToken) {
@@ -64,12 +65,12 @@ describe('jsparser', function() {
     it('varstmt no assign', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('var a;');
-      expect(tree(node, [])).to.eql([JsNode.PROGRAM, [JsNode.VARSTMT, ['var', [JsNode.VARDECL, ['a', ';']]]]]);
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.VARSTMT, ['var', [JsNode.VARDECL, ['a', ';']]]]]);
     });
     it('varstmt with assign', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('var a = 1;');
-      expect(tree(node, [])).to.eql([JsNode.PROGRAM, [JsNode.VARSTMT, ['var', [JsNode.VARDECL, ['a', '=', [JsNode.PRMREXPR, [1]], ';']]]]]);
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.VARSTMT, ['var', [JsNode.VARDECL, ['a', '=', [JsNode.PRMREXPR, [1]], ';']]]]]);
     });
   });
   describe('js lib exec test', function() {
