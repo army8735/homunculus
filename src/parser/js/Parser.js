@@ -9,21 +9,25 @@ S[Token.BLANK] = S[Token.TAB] = S[Token.COMMENT] = S[Token.LINE] = S[Token.ENTER
 SS[Token.BLANK] = SS[Token.TAB] = SS[Token.ENTER] = true;
 var Parser = Class(function(lexer) {
   this.lexer = lexer;
-  this.look = null;
-  this.tokens = null;
-  this.lastLine = 1;
-  this.lastCol = 1;
-  this.line = 1;
-  this.col = 1;
-  this.index = 0;
-  this.length = 0;
-  this.inFor = false;
-  this.ignores = {};
-  this.hasMoveLine = false;
+  this.init();
 }).methods({
   parse: function(code) {
     this.lexer.parse(code);
     return this.program();
+  },
+  init: function() {
+    this.look = null;
+    this.tokens = null;
+    this.lastLine = 1;
+    this.lastCol = 1;
+    this.line = 1;
+    this.col = 1;
+    this.index = 0;
+    this.length = 0;
+    this.inFor = false;
+    this.ignores = {};
+    this.hasMoveLine = false;
+    this.lexer.init();
   },
   program: function() {
     this.tokens = this.lexer.tokens();

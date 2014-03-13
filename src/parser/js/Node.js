@@ -42,7 +42,6 @@ var Node = Class(function(type, children) {
     LETSTMT: 'letstmt',
     VARSTMT: 'varstmt',
     VARDECL: 'vardecl',
-    VARDECLS: 'vardecls',
     FNBODY: 'fnbody',
     BLOCK: 'block',
     ITERSTMT: 'iterstmt',
