@@ -4,7 +4,6 @@ var expect = require('expect.js');
 var fs = require('fs');
 var path = require('path');
 var os = require('os');
-var isWin = /win/i.test(os.type());
 
 var Token = homunculus.getClass('token');
 var JsNode = homunculus.getClass('node', 'js');
