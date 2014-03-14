@@ -10,6 +10,7 @@ var Node = Class(function(type, children) {
   else {
     this.children = children ? [children] : [];
   }
+  this.p = null;
   return this;
 }).methods({
   name: function() {
@@ -22,17 +23,19 @@ var Node = Class(function(type, children) {
     var self = this;
     var args = Array.prototype.slice.call(arguments, 0);
     args.forEach(function(node) {
-      if(Array.isArray(node)) {
-        self.children = self.children.concat(node);
-      }
-      else {
-        self.children.push(node);
-      }
+      node.parent(self);
+      self.children.push(node);
     });
     return self;
   },
   token: function() {
     return this.children;
+  },
+  parent: function(p) {
+    if(p) {
+      this.p = p;
+    }
+    return this.p;
   }
 }).statics({
   PROGRAM: 'program',
