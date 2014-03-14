@@ -3,7 +3,6 @@ var homunculus = require('../homunculus');
 var expect = require('expect.js');
 var fs = require('fs');
 var path = require('path');
-var os = require('os');
 
 function join(tokens) {
   var arr = tokens.map(function(token) {

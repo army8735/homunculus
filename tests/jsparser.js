@@ -3,7 +3,6 @@ var homunculus = require('../homunculus');
 var expect = require('expect.js');
 var fs = require('fs');
 var path = require('path');
-var os = require('os');
 
 var Token = homunculus.getClass('token');
 var JsNode = homunculus.getClass('node', 'js');
@@ -65,12 +64,12 @@ describe('jsparser', function() {
     it('varstmt no assign', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('var a;');
-      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.VARSTMT, ['var', [JsNode.VARDECL, ['a', ';']]]]]);
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.VARSTMT, ['var', JsNode.VARDECL, ['a'], ';']]]);
     });
     it('varstmt with assign', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('var a = 1;');
-      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.VARSTMT, ['var', [JsNode.VARDECL, ['a', '=', [JsNode.PRMREXPR, [1]], ';']]]]]);
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.VARSTMT, ['var', JsNode.VARDECL, ['a', JsNode.ASSIGN, ['=', JsNode.PRMREXPR, [1]]], ';']]]);
     });
   });
   describe('js lib exec test', function() {
