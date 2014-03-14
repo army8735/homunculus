@@ -71,6 +71,11 @@ describe('jsparser', function() {
       var node = parser.parse('var a = 1;');
       expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.VARSTMT, ['var', JsNode.VARDECL, ['a', JsNode.ASSIGN, ['=', JsNode.PRMREXPR, [1]]], ';']]]);
     });
+    it('varstmt with multi', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('var a, b = 1;');
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.VARSTMT, ['var', JsNode.VARDECL, ['a'], ',', JsNode.VARDECL, ['b', JsNode.ASSIGN, ['=', JsNode.PRMREXPR, [1]]], ';']]]);
+    });
   });
   describe('js lib exec test', function() {
     it('jquery 1.11.0', function() {
