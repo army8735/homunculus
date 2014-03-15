@@ -76,6 +76,20 @@ describe('jsparser', function() {
       var node = parser.parse('var a, b = 1;');
       expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.VARSTMT, ['var', JsNode.VARDECL, ['a'], ',', JsNode.VARDECL, ['b', JsNode.ASSIGN, ['=', JsNode.PRMREXPR, [1]]], ';']]]);
     });
+    it('node parent,prev,next', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('var a, b;');
+      var varstmt = node.leaves()[0];
+      var children = varstmt.leaves();
+      var a = children[0];
+      var b = children[1];
+      expect(node.parent()).to.be(null);
+      expect(a.parent()).to.be(varstmt);
+      expect(b.parent()).to.be(varstmt);
+      expect(a.prev()).to.be(null);
+      expect(a.next()).to.be(b);
+      expect(b.prev()).to.be(a);
+    });
   });
   describe('js lib exec test', function() {
     it('jquery 1.11.0', function() {

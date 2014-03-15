@@ -11,6 +11,8 @@ var Node = Class(function(type, children) {
     this.children = children ? [children] : [];
   }
   this.p = null;
+  this.pr = null;
+  this.ne = null;
   return this;
 }).methods({
   name: function() {
@@ -24,6 +26,11 @@ var Node = Class(function(type, children) {
     var args = Array.prototype.slice.call(arguments, 0);
     args.forEach(function(node) {
       node.parent(self);
+      var last = self.children[self.children.length - 1];
+      if(last) {
+        last.next(node);
+        node.prev(last);
+      }
       self.children.push(node);
     });
     return self;
@@ -36,6 +43,18 @@ var Node = Class(function(type, children) {
       this.p = p;
     }
     return this.p;
+  },
+  prev: function(pr) {
+    if(pr) {
+      this.pr = pr;
+    }
+    return this.pr;
+  },
+  next: function(ne) {
+    if(ne) {
+      this.ne = ne;
+    }
+    return this.ne;
   }
 }).statics({
   PROGRAM: 'program',
