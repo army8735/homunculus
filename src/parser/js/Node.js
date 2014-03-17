@@ -125,7 +125,6 @@ var Node = Class(function(type, children) {
   PROPTSETS: 'propsets',
   ARGS: 'args',
   ARGLIST: 'arglist',
-  ASSIGNOPRT: 'assignoprt',
   IMPTSTMT: 'imptstmt'
 });
 module.exports = Node;

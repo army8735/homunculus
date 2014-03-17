@@ -1216,30 +1216,6 @@ var Parser = Class(function(lexer) {
     }
     return node;
   },
-  assignoprt: function() {
-    var node = new Node(Node.ASSIGNOPRT);
-    switch(this.look.content()) {
-      case '*=':
-      case '/=':
-      case '%=':
-      case '+=':
-      case '-=':
-      case '<<=':
-      case '>>=':
-      case '>>>=':
-      case '&=':
-      case '^=':
-      case '|=':
-        node.add(
-          this.match(),
-          this.assignexpr()
-        );
-      break;
-      default:
-        this.error();
-    }
-    return node;
-  },
   match: function(type, line, msg) {
     if(typeof type == 'boolean') {
       msg = line;
