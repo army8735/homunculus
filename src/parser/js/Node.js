@@ -114,8 +114,6 @@ var Node = Class(function(type, children) {
   ADDEXPR: 'addexpr',
   MTPLEXPR: 'mtplexpr',
   UNARYEXPR: 'unaryexpr',
-  CONSTOR: 'constor',
-  CONSCALL: 'conscall',
   MMBEXPR: 'mmbexpr',
   PRMREXPR: 'prmrexpr',
   ARRLTR: 'arrltr',
@@ -127,6 +125,7 @@ var Node = Class(function(type, children) {
   ARGLIST: 'arglist',
   IMPTSTMT: 'imptstmt',
   POSTFIXEXPR: 'postfixexpr',
-  NEWEXPR: 'newexpr'
+  NEWEXPR: 'newexpr',
+  CALLEXPR: 'callexpr'
 });
 module.exports = Node;

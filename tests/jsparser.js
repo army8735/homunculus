@@ -94,7 +94,47 @@ describe('jsparser', function() {
   describe('js lib exec test', function() {
     it('jquery 1.11.0', function() {
       var parser = homunculus.getParser('js');
-      var code = fs.readFileSync(path.join(__dirname, './jquery-1.11.0.js'), { encoding: 'utf-8' });
+      var code = fs.readFileSync(path.join(__dirname, './lib/jquery-1.11.0.js'), { encoding: 'utf-8' });
+      var node = parser.parse(code);
+      var ignore = parser.ignore();
+      var str = jion(node, ignore);
+      expect(str).to.eql(code);
+    });
+    it('backbone 1.1.0', function() {
+      var parser = homunculus.getParser('js');
+      var code = fs.readFileSync(path.join(__dirname, './lib/backbone.js'), { encoding: 'utf-8' });
+      var node = parser.parse(code);
+      var ignore = parser.ignore();
+      var str = jion(node, ignore);
+      expect(str).to.eql(code);
+    });
+    it('handlebars', function() {
+      var parser = homunculus.getParser('js');
+      var code = fs.readFileSync(path.join(__dirname, './lib/handlebars.js'), { encoding: 'utf-8' });
+      var node = parser.parse(code);
+      var ignore = parser.ignore();
+      var str = jion(node, ignore);
+      expect(str).to.eql(code);
+    });
+    it('bootstrap 3.0.0', function() {
+      var parser = homunculus.getParser('js');
+      var code = fs.readFileSync(path.join(__dirname, './lib/bootstrap.js'), { encoding: 'utf-8' });
+      var node = parser.parse(code);
+      var ignore = parser.ignore();
+      var str = jion(node, ignore);
+      expect(str).to.eql(code);
+    });
+    it('expect 0.1.2', function() {
+      var parser = homunculus.getParser('js');
+      var code = fs.readFileSync(path.join(__dirname, './lib/expect.js'), { encoding: 'utf-8' });
+      var node = parser.parse(code);
+      var ignore = parser.ignore();
+      var str = jion(node, ignore);
+      expect(str).to.eql(code);
+    });
+    it('html5shiv 3.6.1', function() {
+      var parser = homunculus.getParser('js');
+      var code = fs.readFileSync(path.join(__dirname, './lib/html5shiv.js'), { encoding: 'utf-8' });
       var node = parser.parse(code);
       var ignore = parser.ignore();
       var str = jion(node, ignore);

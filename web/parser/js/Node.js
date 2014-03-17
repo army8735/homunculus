@@ -115,8 +115,6 @@ define(function(require, exports, module) {
     ADDEXPR: 'addexpr',
     MTPLEXPR: 'mtplexpr',
     UNARYEXPR: 'unaryexpr',
-    CONSTOR: 'constor',
-    CONSCALL: 'conscall',
     MMBEXPR: 'mmbexpr',
     PRMREXPR: 'prmrexpr',
     ARRLTR: 'arrltr',
@@ -128,7 +126,8 @@ define(function(require, exports, module) {
     ARGLIST: 'arglist',
     IMPTSTMT: 'imptstmt',
     POSTFIXEXPR: 'postfixexpr',
-    NEWEXPR: 'newexpr'
+    NEWEXPR: 'newexpr',
+    CALLEXPR: 'callexpr'
   });
   module.exports = Node;
 });

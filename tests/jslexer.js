@@ -98,7 +98,37 @@ describe('jslexer', function() {
   describe('js lib exec test', function() {
     it('jquery 1.11.0', function() {
       var lexer = homunculus.getLexer('js');
-      var code = fs.readFileSync(path.join(__dirname, './jquery-1.11.0.js'), { encoding: 'utf-8' });
+      var code = fs.readFileSync(path.join(__dirname, './lib/jquery-1.11.0.js'), { encoding: 'utf-8' });
+      var tokens = lexer.parse(code);
+      var str = '';
+      tokens.forEach(function(token) {
+        str += token.content();
+      });
+      expect(str).to.eql(code);
+    });
+    it('backbone 1.1.0', function() {
+      var lexer = homunculus.getLexer('js');
+      var code = fs.readFileSync(path.join(__dirname, './lib/backbone.js'), { encoding: 'utf-8' });
+      var tokens = lexer.parse(code);
+      var str = '';
+      tokens.forEach(function(token) {
+        str += token.content();
+      });
+      expect(str).to.eql(code);
+    });
+    it('handlebars', function() {
+      var lexer = homunculus.getLexer('js');
+      var code = fs.readFileSync(path.join(__dirname, './lib/handlebars.js'), { encoding: 'utf-8' });
+      var tokens = lexer.parse(code);
+      var str = '';
+      tokens.forEach(function(token) {
+        str += token.content();
+      });
+      expect(str).to.eql(code);
+    });
+    it('Uri', function() {
+      var lexer = homunculus.getLexer('js');
+      var code = fs.readFileSync(path.join(__dirname, './lib/Uri.js'), { encoding: 'utf-8' });
       var tokens = lexer.parse(code);
       var str = '';
       tokens.forEach(function(token) {

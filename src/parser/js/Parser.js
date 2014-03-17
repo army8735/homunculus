@@ -957,53 +957,88 @@ var Parser = Class(function(lexer) {
       return this.newexpr();
     }
     else {
-      return this.mmbexpr();
+      return this.callexpr();
     }
   },
-  newexpr: function() {
+  newexpr: function(depth) {
+    depth = depth || 0;
     var node = new Node(Node.NEWEXPR);
-    node.add(
-      this.match(),
-      this.constor()
-    );
-    return node;
-  },
-  constor: function() {
-    var node = new Node(Node.CONSTOR);
+    node.add(this.match('new'));
     if(!this.look) {
       this.error();
     }
-    if(this.look.content() == 'this') {
-      node.add(
-        this.match(),
-        this.match('.')
-      );
+    if(this.look.content() == 'new') {
+      node.add(this.newexpr(depth + 1));
     }
     else {
-      return this.conscall();
+      node.add(this.mmbexpr());
     }
-    node.add(this.conscall());
-    return node;
-  },
-  conscall: function() {
-    var node = new Node(Node.CONSCALL);
-    node.add(this.match(Token.ID, this.look.content() + ' is not a constructor'));
-    if(this.look) {
-      if(this.look.content() == '(') {
-        node.add(this.args());
-      }
-      else if(this.look.content() == '.') {
-        node.add(
-          this.match(),
-          this.conscall()
-        );
-        while(this.look && this.look.content() == '.') {
-          node.add(
+    if(this.look && this.look.content() == '(') {
+      node.add(this.args());
+    }
+    if(this.look && ['.', '['].indexOf(this.look.content()) > -1) {
+      var mmb = new Node(Node.MMBEXPR);
+      mmb.add(node);
+      while(this.look) {
+        if(this.look.content() == '.') {
+          mmb.add(
             this.match(),
-            this.conscall()
+            this.match(Token.ID)
           );
         }
+        else if(this.look.content() == '[') {
+          mmb.add(
+            this.match(),
+            this.expr(),
+            this.match(']')
+          );
+        }
+        else {
+          break;
+        }
       }
+      if(depth == 0 && this.look && this.look.content() == '(') {
+        var callexpr = this.callexpr(mmb);
+        return callexpr;
+      }
+      return mmb;
+    }
+    return node;
+  },
+  callexpr: function(mmb) {
+    var node = new Node(Node.CALLEXPR);
+    mmb = mmb || this.mmbexpr();
+    if(this.look && this.look.content() == '(') {
+      node.add(
+        mmb,
+        this.args()
+      );
+      if(this.look && ['.', '[', '('].indexOf(this.look.content()) > -1) {
+        while(this.look) {
+          if(this.look.content() == '.') {
+            node.add(
+              this.match(),
+              this.match(Token.ID)
+            );
+          }
+          else if(this.look.content() == '[') {
+            node.add(
+              this.match(),
+              this.expr(),
+              this.match(']')
+            );
+          }
+          else if(this.look.content() == '(') {
+            node.add(this.args());
+          }
+          else {
+            break;
+          }
+        }
+      }
+    }
+    else {
+      return mmb;
     }
     return node;
   },
@@ -1012,11 +1047,21 @@ var Parser = Class(function(lexer) {
     if(!this.look) {
       this.error();
     }
-    var prmrexpr = this.prmrexpr();
-    function goOn() {
-      while(this.look && ['.', '[', '('].indexOf(this.look.content()) != -1) {
+    var mmb;
+    if(this.look.content() == 'function') {
+      mmb = this.fnexpr();
+    }
+    else {
+      mmb = this.prmrexpr();
+    }
+    if(this.look && ['.', '['].indexOf(this.look.content()) > -1) {
+      node.add(mmb);
+      while(this.look) {
         if(this.look.content() == '.') {
-          node.add(this.match(), this.mmbexpr());
+          node.add(
+            this.match(),
+            this.match(Token.ID)
+          );
         }
         else if(this.look.content() == '[') {
           node.add(
@@ -1026,38 +1071,12 @@ var Parser = Class(function(lexer) {
           );
         }
         else {
-          node.add(this.args());
+          break;
         }
       }
     }
-    if(this.look) {
-      if(this.look.content() == '.') {
-        node.add(
-          prmrexpr,
-          this.match(),
-          this.mmbexpr()
-        );
-        goOn.call(this);
-      }
-      else if(this.look.content() == '[') {
-        node.add(
-          prmrexpr,
-          this.match(),
-          this.expr(),
-          this.match(']')
-        );
-        goOn.call(this);
-      }
-      else if(this.look.content() == '(') {
-        node.add(prmrexpr, this.args());
-        goOn.call(this);
-      }
-      else {
-        return prmrexpr;
-      }
-    }
     else {
-      return prmrexpr;
+      return mmb;
     }
     return node;
   },
@@ -1076,8 +1095,6 @@ var Parser = Class(function(lexer) {
       break;
       default:
         switch(this.look.content()) {
-                          case 'function':
-                              return this.fnexpr();
           case 'this':
           case 'null':
           case 'true':
