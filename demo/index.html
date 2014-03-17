@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<title>demo</title>
+<style>
+body{margin:0;padding:10px;font:12px/1.25 arail;background-color:#fff;line-height:1.25;overflow-y:scroll;}
+.kineticjs-content{margin:10px 0;}
+textarea{position:absolute;top:24px;right:0;padding:5px;width:50%;height:300px;z-index:99;background:#252;border:1px solid #333;opacity:0.1;color:#FFF;font-size:13px;font-family:"宋体";border-radius:5px;}
+textarea:hover{opacity:0.8;}
+#btn{position:absolute;top:0;right:0;width:50px;z-index:99;}
+</style>
+</head>
+<body>
+<textarea id="ta" autocomplete="off"></textarea>
+<input id="btn" type="button" value="ok"/>
+<div id="ui" class="kineticjs-content"></div>
+<script src="Ai.js"></script>
+<script src="kinetic-v4.4.0.min.js"></script>
+<script>
+var w = 0, h = 0;
+function draw(ast) {
+  document.getElementById('ui').innerHTML = '';
+	w = h = 0;
+	if(typeof ast == 'string') {
+		return;
+	}
+	var stage = new Kinetic.Stage({
+			container: 'ui',
+			width: 0,
+			height: 0
+		}),
+		layer = new Kinetic.Layer();
+	drawNode(layer, ast, 0, 0, 0, 0);
+	stage.add(layer);
+	stage.setWidth(w);
+	stage.setHeight(h + 30);
+}
+function drawNode(layer, node, x, index, parent, sibling) {
+	if(index > 0) {
+		h += 24;
+	}
+	var isToken = node.name() == 'token',
+		isVirtual = isToken && node.leaves().type() == -1,
+		text = new Kinetic.Text({
+			x: x + 5,
+			y: h + 6,
+			text: isToken ? node.token().content() : node.name(),
+			width: 68,
+			height: 16,
+			align: 'center',
+			fill: isToken ? (isVirtual ? '#F33' : '#6CF') : '#F60',
+			fontSize: 12,
+			fontFamily: 'Tahoma'
+		}),
+		rect = new Kinetic.Rect({
+			x: x + 2,
+			y: h + 2,
+			width: 74,
+			height: 20,
+			fill: isToken ? (isVirtual ? '#FCC' : '#FFF') : '#F6F6F6',
+			stroke: isToken ? '#CCC' : '#F93',
+			cornerRadius: 10
+		});
+	layer.add(rect);
+	layer.add(text);
+	var x2 = x + 88;
+	if(parent) {
+		var line = new Kinetic.Line({
+			points: [x - 10, parent.getY() + 10, x + 2, rect.getY() + 10],
+			stroke: '#6F9',
+			strokeWidth: 1,
+			lineJion: 'round',
+			dashArray: [1, 1]
+		});
+		layer.add(line);
+	}
+	if(!isToken) {
+		var sib = null;
+		node.leaves().forEach(function(leaf, index) {
+			drawNode(layer, leaf, x2, index, rect, sib);
+			sib = leaf;
+		});
+	}
+	w = Math.max(w, x2);
+}
+require(['../web/parser/js/Parser', '../web/lexer/Lexer', '../web/lexer/rule/EcmascriptRule'], function(Parser, Lexer, EcmascriptRule) {
+	var ta = document.getElementById('ta');
+	var input = document.getElementById('btn');
+	input.onclick = function() {
+		var s = ta.value;
+    var parser = new Parser(new Lexer(new EcmascriptRule()));
+    var ast = parser.parse(s);
+    draw(ast);
+	}
+});
+</script>
+</body>
+</html>

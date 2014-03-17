@@ -931,22 +931,42 @@ define(function(require, exports, module) {
             this.unaryexpr()
           );
         break;
-        case 'new':
-          node.add(
-            this.match(),
-            this.constor()
-          );
-        break;
         default:
-          var mmbexpr = this.mmbexpr();
-          if(this.look && ['++', '--'].indexOf(this.look.content()) != -1) {
-            node.add(mmbexpr, this.match());
-            return node;
-          }
-          else {
-            return mmbexpr;
-          }
+          return this.postfixexpr();
       }
+      return node;
+    },
+    postfixexpr: function() {
+      var node = new Node(Node.POSTFIXEXPR);
+      var leftexpr = this.leftexpr();
+      if(this.look && ['++', '--'].indexOf(this.look.content()) > -1 && !this.hasMoveLine) {
+        node.add(leftexpr);
+        while(this.look && ['++', '--'].indexOf(this.look.content()) > -1) {
+          node.add(this.match(undefined, true));
+        }
+      }
+      else {
+        return leftexpr;
+      }
+      return node;
+    },
+    leftexpr: function() {
+      if(!this.look) {
+        this.error();
+      }
+      if(this.look.content() == 'new') {
+        return this.newexpr();
+      }
+      else {
+        return this.mmbexpr();
+      }
+    },
+    newexpr: function() {
+      var node = new Node(Node.NEWEXPR);
+      node.add(
+        this.match(),
+        this.constor()
+      );
       return node;
     },
     constor: function() {
@@ -1214,30 +1234,6 @@ define(function(require, exports, module) {
       node.add(this.assignexpr());
       while(this.look && this.look.content() == ',') {
         node.add(this.match(), this.assignexpr());
-      }
-      return node;
-    },
-    assignoprt: function() {
-      var node = new Node(Node.ASSIGNOPRT);
-      switch(this.look.content()) {
-        case '*=':
-        case '/=':
-        case '%=':
-        case '+=':
-        case '-=':
-        case '<<=':
-        case '>>=':
-        case '>>>=':
-        case '&=':
-        case '^=':
-        case '|=':
-          node.add(
-            this.match(),
-            this.assignexpr()
-          );
-        break;
-        default:
-          this.error();
       }
       return node;
     },

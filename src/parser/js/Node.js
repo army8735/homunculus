@@ -125,6 +125,8 @@ var Node = Class(function(type, children) {
   PROPTSETS: 'propsets',
   ARGS: 'args',
   ARGLIST: 'arglist',
-  IMPTSTMT: 'imptstmt'
+  IMPTSTMT: 'imptstmt',
+  POSTFIXEXPR: 'postfixexpr',
+  NEWEXPR: 'newexpr'
 });
 module.exports = Node;
