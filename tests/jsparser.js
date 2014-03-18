@@ -76,6 +76,31 @@ describe('jsparser', function() {
       var node = parser.parse('var a, b = 1;');
       expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.VARSTMT, ['var', JsNode.VARDECL, ['a'], ',', JsNode.VARDECL, ['b', JsNode.ASSIGN, ['=', JsNode.PRMREXPR, [1]]], ';']]]);
     });
+    it('newexpr 1', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('new A');
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.NEWEXPR, ['new', JsNode.PRMREXPR, ['A']]]]]);
+    });
+    it('newexpr 2', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('new A()');
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.NEWEXPR, ['new', JsNode.PRMREXPR, ['A'], JsNode.ARGS, ['(', ')']]]]]);
+    });
+    it('newexpr 3', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('new A().f');
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.MMBEXPR, [JsNode.NEWEXPR, ['new', JsNode.PRMREXPR, ['A'], JsNode.ARGS, ['(', ')']], '.', 'f']]]]);
+    });
+    it('newexpr 4', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('new A().f()');
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.CALLEXPR, [JsNode.MMBEXPR, [JsNode.NEWEXPR, ['new', JsNode.PRMREXPR, ['A'], JsNode.ARGS, ['(', ')']], '.', 'f'], JsNode.ARGS, ['(', ')']]]]]);
+    });
+    it('newexpr 5', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('new new A().f()');
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.NEWEXPR, ['new', JsNode.MMBEXPR, [JsNode.NEWEXPR, ['new', JsNode.PRMREXPR, ['A'], JsNode.ARGS, ['(', ')']], '.', 'f'], JsNode.ARGS, ['(', ')']]]]]);
+    });
     it('node parent,prev,next', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('var a, b;');
