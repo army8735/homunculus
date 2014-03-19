@@ -73,6 +73,7 @@ describe('jslexer', function() {
     it('test 1', function() {
       var lexer = homunculus.getLexer('js');
       var code = fs.readFileSync(path.join(__dirname, './jslexer/1.js'), { encoding: 'utf-8' });
+      code = code.replace(/\r\n/g, '\n');
       var tokens = lexer.parse(code);
       var res = fs.readFileSync(path.join(__dirname, './jslexer/1.txt'), { encoding: 'utf-8' });
       res = JSON.parse(res);
@@ -81,6 +82,7 @@ describe('jslexer', function() {
     it('test 2', function() {
       var lexer = homunculus.getLexer('js');
       var code = fs.readFileSync(path.join(__dirname, './jslexer/2.js'), { encoding: 'utf-8' });
+      code = code.replace(/\r\n/g, '\n');
       var tokens = lexer.parse(code);
       var res = fs.readFileSync(path.join(__dirname, './jslexer/2.txt'), { encoding: 'utf-8' });
       res = JSON.parse(res);
@@ -89,6 +91,7 @@ describe('jslexer', function() {
     it('test 3', function() {
       var lexer = homunculus.getLexer('js');
       var code = fs.readFileSync(path.join(__dirname, './jslexer/3.js'), { encoding: 'utf-8' });
+      code = code.replace(/\r\n/g, '\n');
       var tokens = lexer.parse(code);
       var res = fs.readFileSync(path.join(__dirname, './jslexer/3.txt'), { encoding: 'utf-8' });
       res = JSON.parse(res);
