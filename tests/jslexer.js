@@ -98,6 +98,37 @@ describe('jslexer', function() {
       expect(join(tokens)).to.eql(res);
     });
   });
+  describe('index test', function() {
+    var lexer = homunculus.getLexer('js');
+    var tokens = lexer.parse('var a = /reg/;var b=/**/2;');
+    it('tokens length', function() {
+      expect(tokens.length).to.eql(15);
+    });
+    it('tokens index 1', function() {
+      expect(tokens[0].index()).to.eql(0);
+    });
+    it('tokens index 2', function() {
+      expect(tokens[1].index()).to.eql(1);
+    });
+    it('tokens index 3', function() {
+      expect(tokens[6].index()).to.eql(6);
+    });
+    it('tokens index 4', function() {
+      expect(tokens[13].index()).to.eql(13);
+    });
+    it('tokens sIndex 1', function() {
+      expect(tokens[0].sIndex()).to.eql(0);
+    });
+    it('tokens sIndex 2', function() {
+      expect(tokens[1].sIndex()).to.eql(3);
+    });
+    it('tokens sIndex 3', function() {
+      expect(tokens[6].sIndex()).to.eql(8);
+    });
+    it('tokens sIndex 4', function() {
+      expect(tokens[13].sIndex()).to.eql(24);
+    });
+  });
   describe('js lib exec test', function() {
     it('jquery 1.11.0', function() {
       var lexer = homunculus.getLexer('js');

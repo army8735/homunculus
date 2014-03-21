@@ -42,9 +42,9 @@ var Lexer = Class(function(rule) {
         for(var i = 0, matches = this.rule.matches(), len = matches.length; i < len; i++) {
           var match = matches[i];
           if(match.match(this.peek, this.code, this.index)) {
-            var token = new Token(match.tokenType(), match.content(), match.val()),
-              error = match.error(),
-              matchLen = match.content().length;
+            var token = new Token(match.tokenType(), match.content(), match.val(), this.sIndex++, this.index - 1);
+            var error = match.error();
+            var matchLen = match.content().length;
             if(token.type() == Token.ID && this.rule.keyWords().hasOwnProperty(token.content())) {
               token.type(Token.KEYWORD);
             }
@@ -55,10 +55,10 @@ var Lexer = Class(function(rule) {
             count += n;
             this.totalLine += n;
             if(n) {
-              var i = match.content().indexOf(character.LINE),
-                j = match.content().lastIndexOf(character.LINE);
-              this.colMax = Math.max(this.colMax, this.colNum + i);
-              this.colNum = match.content().length - j;
+              var j = match.content().indexOf(character.LINE);
+              var k = match.content().lastIndexOf(character.LINE);
+              this.colMax = Math.max(this.colMax, this.colNum + j);
+              this.colNum = match.content().length - k;
             }
             else {
               this.colNum += matchLen;
@@ -152,7 +152,7 @@ var Lexer = Class(function(rule) {
     if(!res) {
       this.error('SyntaxError: unterminated regular expression literal', this.code.slice(lastIndex, this.index - 1));
     }
-    var token = new Token(Token.REG, this.code.slice(lastIndex, --this.index));
+    var token = new Token(Token.REG, this.code.slice(lastIndex, --this.index), this.sIndex++, lastIndex);
     temp.push(token);
     this.tokenList.push(token);
     this.colNum += this.index - lastIndex;
@@ -206,6 +206,7 @@ var Lexer = Class(function(rule) {
     this.totalLine = 1; //总行数
     this.colNum = 0; //列
     this.colMax = 0; //最大列数
+    this.sIndex = 0; //token的索引
   }
 }).statics({
   IGNORE: 0,

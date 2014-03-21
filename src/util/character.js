@@ -44,6 +44,12 @@ exports.count = function(s, c) {
 exports.isUndefined = function(s) {
   return typeof s == 'undefined';
 };
+exports.isString = function(s) {
+  return Object.prototype.toString.call(s) == "[object String]";
+};
+exports.isNumber = function(s) {
+  return Object.prototype.toString.call(s) == "[object Number]";
+};
 exports.escapeHTML = function(str) {
   var xmlchar = {
     '&': '&amp;',
