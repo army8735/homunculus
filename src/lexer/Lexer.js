@@ -42,7 +42,7 @@ var Lexer = Class(function(rule) {
         for(var i = 0, matches = this.rule.matches(), len = matches.length; i < len; i++) {
           var match = matches[i];
           if(match.match(this.peek, this.code, this.index)) {
-            var token = new Token(match.tokenType(), match.content(), match.val(), this.sIndex++, this.index - 1);
+            var token = new Token(match.tokenType(), match.content(), match.val(), this.index - 1);
             var error = match.error();
             var matchLen = match.content().length;
             if(token.type() == Token.ID && this.rule.keyWords().hasOwnProperty(token.content())) {
@@ -152,7 +152,7 @@ var Lexer = Class(function(rule) {
     if(!res) {
       this.error('SyntaxError: unterminated regular expression literal', this.code.slice(lastIndex, this.index - 1));
     }
-    var token = new Token(Token.REG, this.code.slice(lastIndex, --this.index), this.sIndex++, lastIndex);
+    var token = new Token(Token.REG, this.code.slice(lastIndex, --this.index), lastIndex);
     temp.push(token);
     this.tokenList.push(token);
     this.colNum += this.index - lastIndex;
@@ -206,7 +206,6 @@ var Lexer = Class(function(rule) {
     this.totalLine = 1; //总行数
     this.colNum = 0; //列
     this.colMax = 0; //最大列数
-    this.sIndex = 0; //token的索引
   }
 }).statics({
   IGNORE: 0,

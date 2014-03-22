@@ -105,16 +105,16 @@ describe('jslexer', function() {
       expect(tokens.length).to.eql(15);
     });
     it('tokens index 1', function() {
-      expect(tokens[0].index()).to.eql(0);
+      expect(tokens[0].tid()).to.eql(0);
     });
     it('tokens index 2', function() {
-      expect(tokens[1].index()).to.eql(1);
+      expect(tokens[1].tid()).to.eql(1);
     });
     it('tokens index 3', function() {
-      expect(tokens[6].index()).to.eql(6);
+      expect(tokens[6].tid()).to.eql(6);
     });
     it('tokens index 4', function() {
-      expect(tokens[13].index()).to.eql(13);
+      expect(tokens[13].tid()).to.eql(13);
     });
     it('tokens sIndex 1', function() {
       expect(tokens[0].sIndex()).to.eql(0);
