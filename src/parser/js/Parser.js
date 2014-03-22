@@ -432,7 +432,10 @@ var Parser = Class(function(lexer) {
       this.expr(),
       this.match(':')
     );
-    while(this.look && this.look.content() != 'case' && this.look.content() != 'default' && this.look.content() != '}') {
+    while(this.look
+      && this.look.content() != 'case'
+      && this.look.content() != 'default'
+      && this.look.content() != '}') {
       node.add(this.stmt());
     }
     return node;
@@ -715,7 +718,20 @@ var Parser = Class(function(lexer) {
   assignexpr: function(noIn) {
     var node = new Node(Node.ASSIGNEXPR),
       cndt = this.cndtexpr(noIn);
-    if(this.look && ['*=', '/=', '%=', '+=', '-=', '<<=', '>>=', '>>>=', '&=', '^=', '|=', '='].indexOf(this.look.content()) != -1) {
+    if(this.look && {
+      '*=': true,
+      '/=': true,
+      '%=': true,
+      '+=': true,
+      '-=': true,
+      '<<=': true,
+      '>>=': true,
+      '>>>=': true,
+      '&=': true,
+      '^=': true,
+      '|=': true,
+      '=': true
+    }.hasOwnProperty(this.look.content())) {
       node.add(cndt, this.match(), this.assignexpr(noIn));
     }
     else {
@@ -828,9 +844,19 @@ var Parser = Class(function(lexer) {
   eqexpr: function(noIn) {
     var node = new Node(Node.EQEXPR),
       reltexpr = this.reltexpr(noIn);
-    if(this.look && ['==', '===', '!==', '!='].indexOf(this.look.content()) != -1) {
+    if(this.look && {
+      '==': true,
+      '===': true,
+      '!==': true,
+      '!=': true
+    }.hasOwnProperty(this.look.content())) {
       node.add(reltexpr);
-      while(this.look && ['==', '===', '!==', '!='].indexOf(this.look.content()) != -1) {
+      while(this.look && {
+        '==': true,
+        '===': true,
+        '!==': true,
+        '!=': true
+      }.hasOwnProperty(this.look.content())) {
         node.add(
           this.match(),
           this.reltexpr(noIn)
@@ -845,9 +871,21 @@ var Parser = Class(function(lexer) {
   reltexpr: function(noIn) {
     var node = new Node(Node.RELTEXPR),
       shiftexpr = this.shiftexpr();
-    if(this.look && (['<', '>', '>=', '<=', 'instanceof'].indexOf(this.look.content()) != -1 || (!noIn && this.look.content() == 'in'))) {
+    if(this.look && ({
+      '<': true,
+      '>': true,
+      '>=': true,
+      '<=': true,
+      'instanceof': true
+    }.hasOwnProperty(this.look.content()) || (!noIn && this.look.content() == 'in'))) {
       node.add(shiftexpr);
-      while(this.look && (['<', '>', '>=', '<=', 'instanceof'].indexOf(this.look.content()) != -1 || (!noIn && this.look.content() == 'in'))) {
+      while(this.look && ({
+        '<': true,
+        '>': true,
+        '>=': true,
+        '<=': true,
+        'instanceof': true
+      }.hasOwnProperty(this.look.content()) || (!noIn && this.look.content() == 'in'))) {
         node.add(
           this.match(),
           this.shiftexpr()
@@ -1277,7 +1315,13 @@ var Parser = Class(function(lexer) {
     //或者根据token的type或者content匹配
     else if(typeof type == 'string') {
       //特殊处理，不匹配有换行或者末尾时自动补全，还有受限行
-      if(type == ';' && !this.inFor && (!this.look || (this.look.content() != type && this.hasMoveLine) || this.look.content() == '}' || this.look.type() == Token.LINE)) {
+      if(type == ';'
+        && !this.inFor
+        && (!this.look
+          || (this.look.content() != type && this.hasMoveLine)
+          || this.look.content() == '}'
+          || this.look.type() == Token.LINE)
+      ) {
         if(this.look && this.look.type() == Token.LINE) {
           this.move();
         }
