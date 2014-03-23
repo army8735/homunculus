@@ -146,6 +146,16 @@ describe('jsparser', function() {
       var node = parser.parse('a/*\n*/b++');
       expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.PRMREXPR, ['a']], JsNode.STMT, [JsNode.POSTFIXEXPR, [JsNode.PRMREXPR, ['b'], '++']]]]);
     });
+    it('fndecl', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('function a() {}');
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.FNDECL, ['function', 'a', '(', ')', '{', JsNode.FNBODY, [], '}']]]);
+    });
+    it('fndecl with params', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('function a(b, c = 1, ...d) {}');
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.FNDECL, ['function', 'a', '(', JsNode.FNPARAMS, ['b', ',', 'c', JsNode.BINDELEMENT, ['=', JsNode.PRMREXPR, ['1']], ',', JsNode.RESTPARAM, ['...', 'd']], ')', '{', JsNode.FNBODY, [], '}']]]);
+    });
     it('node parent,prev,next', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('var a, b;');

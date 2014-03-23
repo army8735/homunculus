@@ -44,8 +44,8 @@ describe('jscontext', function() {
       var env = context.parse('function a(b, c = 1, ...d){}');
       var a = env.getChild('a');
       expect(a.hasParam('b')).to.be(true);
-//      expect(a.hasParam('c')).to.be(true);
-//      expect(a.hasParam('d')).to.be(true);
+      expect(a.hasParam('c')).to.be(true);
+      expect(a.hasParam('d')).to.be(true);
     });
   });
 });

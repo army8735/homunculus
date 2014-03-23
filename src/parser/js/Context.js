@@ -102,16 +102,11 @@ function fnexpr(node, env) {
 //支持es6
 function addParam(params, child) {
   params.leaves().forEach(function(leaf, i) {
-    if(i % 2 == 0) {
-      if(leaf.name() == JsNode.TOKEN) {
-        child.addParam(leaf.token().content());
-      }
-      else if(leaf.name() == JsNode.RESTPARAM) {
-        child.addParam(leaf.leaves()[1].token().content());
-      }
-      else if(leaf.name() == JsNode.BINDELEMENT) {
-        child.addParam(leaf.leaves()[1].leaves().token().content());
-      }
+    if(leaf.name() == JsNode.TOKEN && leaf.token().content() != ',') {
+      child.addParam(leaf.token().content());
+    }
+    else if(leaf.name() == JsNode.RESTPARAM) {
+      child.addParam(leaf.leaves()[1].token().content());
     }
   });
 }
