@@ -1,21 +1,21 @@
 define(function(require, exports, module) {
   var Class = require('../util/Class');
   var character = require('../util/character');
+  var tid = 0;
   var types;
-  var Token = Class(function(type, content, val, index, sIndex) {
+  var Token = Class(function(type, content, val, sIndex) {
     this.t = type; //token类型
     this.c = content; //token的字面内容，string包括头尾的引号
     if(character.isNumber(val)) {
-      sIndex = index;
-      index = val;
+      sIndex = val;
       val = content;
     }
     else if(character.isUndefined(val)) {
       val = content;
-      index = sIndex = -1;
+      sIndex = -1;
     }
     this.v = val; //token的值，一般情况下等于content，特殊如string情况下值是不加头尾的引号
-    this.i = index; //token的索引
+    this.id = tid++; //token的索引
     this.si = sIndex; //token在源码字符串中的索引
   }).methods({
     type: function(t) {
@@ -42,11 +42,11 @@ define(function(require, exports, module) {
       }
       return Token.type(this.t);
     },
-    index: function(i) {
-      if(!character.isUndefined(i)) {
-        this.i = i;
+    tid: function(id) {
+      if(!character.isUndefined(id)) {
+        this.id = id;
       }
-      return this.i;
+      return this.id;
     },
     sIndex: function(si) {
       if(!character.isUndefined(si)) {

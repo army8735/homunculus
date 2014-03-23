@@ -6,6 +6,19 @@ define(function(require, exports, module) {
     this.rule = rule; //当前语法规则
     this.init();
   }).methods({
+    init: function() {
+      this.code = ''; //要解析的代码
+      this.peek = ''; //向前看字符
+      this.index = 0; //向前看字符字符索引
+      this.isReg = Lexer.IS_REG; //当前/是否是perl风格正则表达式
+      this.tokenList = []; //结果的token列表
+      this.parentheseState = false; //(开始时标记之前终结符是否为if/for/while等关键字
+      this.parentheseStack = []; //圆括号深度记录当前是否为if/for/while等语句内部
+      this.cacheLine = 0; //行缓存值
+      this.totalLine = 1; //总行数
+      this.colNum = 0; //列
+      this.colMax = 0; //最大列数
+    },
     parse: function(code, start) {
       this.code = code || '';
       if(!character.isUndefined(start)) {
@@ -43,7 +56,7 @@ define(function(require, exports, module) {
           for(var i = 0, matches = this.rule.matches(), len = matches.length; i < len; i++) {
             var match = matches[i];
             if(match.match(this.peek, this.code, this.index)) {
-              var token = new Token(match.tokenType(), match.content(), match.val(), this.sIndex++, this.index - 1);
+              var token = new Token(match.tokenType(), match.content(), match.val(), this.index - 1);
               var error = match.error();
               var matchLen = match.content().length;
               if(token.type() == Token.ID && this.rule.keyWords().hasOwnProperty(token.content())) {
@@ -153,7 +166,7 @@ define(function(require, exports, module) {
       if(!res) {
         this.error('SyntaxError: unterminated regular expression literal', this.code.slice(lastIndex, this.index - 1));
       }
-      var token = new Token(Token.REG, this.code.slice(lastIndex, --this.index), this.sIndex++, lastIndex);
+      var token = new Token(Token.REG, this.code.slice(lastIndex, --this.index), lastIndex);
       temp.push(token);
       this.tokenList.push(token);
       this.colNum += this.index - lastIndex;
@@ -194,20 +207,6 @@ define(function(require, exports, module) {
         }
       }
       return this;
-    },
-    init: function() {
-      this.code = ''; //要解析的代码
-      this.peek = ''; //向前看字符
-      this.index = 0; //向前看字符字符索引
-      this.isReg = Lexer.IS_REG; //当前/是否是perl风格正则表达式
-      this.tokenList = []; //结果的token列表
-      this.parentheseState = false; //(开始时标记之前终结符是否为if/for/while等关键字
-      this.parentheseStack = []; //圆括号深度记录当前是否为if/for/while等语句内部
-      this.cacheLine = 0; //行缓存值
-      this.totalLine = 1; //总行数
-      this.colNum = 0; //列
-      this.colMax = 0; //最大列数
-      this.sIndex = 0; //token的索引
     }
   }).statics({
     IGNORE: 0,

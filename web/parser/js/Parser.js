@@ -5,9 +5,7 @@ define(function(require, exports, module) {
   var Token = require('../../lexer/Token');
   var Node = require('./Node');
   var S = {};
-  var SS = {};
   S[Token.BLANK] = S[Token.TAB] = S[Token.COMMENT] = S[Token.LINE] = S[Token.ENTER] = true;
-  SS[Token.BLANK] = SS[Token.TAB] = SS[Token.ENTER] = true;
   var Parser = Class(function(lexer) {
     this.lexer = lexer;
     this.init(true);
@@ -374,8 +372,11 @@ define(function(require, exports, module) {
     retstmt: function() {
       var node = new Node(Node.RETSTMT);
       node.add(this.match('return', true));
+      //return后换行视作省略;，包括多行注释的换行
       if(this.look) {
-        if(this.look.content() == ';' || this.look.type() == Token.LINE) {
+        if(this.look.content() == ';'
+          || this.look.type() == Token.LINE
+          || this.look.type() == Token.COMMENT) {
           node.add(this.match(';'));
         }
         else {
@@ -433,7 +434,10 @@ define(function(require, exports, module) {
         this.expr(),
         this.match(':')
       );
-      while(this.look && this.look.content() != 'case' && this.look.content() != 'default' && this.look.content() != '}') {
+      while(this.look
+        && this.look.content() != 'case'
+        && this.look.content() != 'default'
+        && this.look.content() != '}') {
         node.add(this.stmt());
       }
       return node;
@@ -716,7 +720,20 @@ define(function(require, exports, module) {
     assignexpr: function(noIn) {
       var node = new Node(Node.ASSIGNEXPR),
         cndt = this.cndtexpr(noIn);
-      if(this.look && ['*=', '/=', '%=', '+=', '-=', '<<=', '>>=', '>>>=', '&=', '^=', '|=', '='].indexOf(this.look.content()) != -1) {
+      if(this.look && {
+        '*=': true,
+        '/=': true,
+        '%=': true,
+        '+=': true,
+        '-=': true,
+        '<<=': true,
+        '>>=': true,
+        '>>>=': true,
+        '&=': true,
+        '^=': true,
+        '|=': true,
+        '=': true
+      }.hasOwnProperty(this.look.content())) {
         node.add(cndt, this.match(), this.assignexpr(noIn));
       }
       else {
@@ -829,9 +846,19 @@ define(function(require, exports, module) {
     eqexpr: function(noIn) {
       var node = new Node(Node.EQEXPR),
         reltexpr = this.reltexpr(noIn);
-      if(this.look && ['==', '===', '!==', '!='].indexOf(this.look.content()) != -1) {
+      if(this.look && {
+        '==': true,
+        '===': true,
+        '!==': true,
+        '!=': true
+      }.hasOwnProperty(this.look.content())) {
         node.add(reltexpr);
-        while(this.look && ['==', '===', '!==', '!='].indexOf(this.look.content()) != -1) {
+        while(this.look && {
+          '==': true,
+          '===': true,
+          '!==': true,
+          '!=': true
+        }.hasOwnProperty(this.look.content())) {
           node.add(
             this.match(),
             this.reltexpr(noIn)
@@ -846,9 +873,21 @@ define(function(require, exports, module) {
     reltexpr: function(noIn) {
       var node = new Node(Node.RELTEXPR),
         shiftexpr = this.shiftexpr();
-      if(this.look && (['<', '>', '>=', '<=', 'instanceof'].indexOf(this.look.content()) != -1 || (!noIn && this.look.content() == 'in'))) {
+      if(this.look && ({
+        '<': true,
+        '>': true,
+        '>=': true,
+        '<=': true,
+        'instanceof': true
+      }.hasOwnProperty(this.look.content()) || (!noIn && this.look.content() == 'in'))) {
         node.add(shiftexpr);
-        while(this.look && (['<', '>', '>=', '<=', 'instanceof'].indexOf(this.look.content()) != -1 || (!noIn && this.look.content() == 'in'))) {
+        while(this.look && ({
+          '<': true,
+          '>': true,
+          '>=': true,
+          '<=': true,
+          'instanceof': true
+        }.hasOwnProperty(this.look.content()) || (!noIn && this.look.content() == 'in'))) {
           node.add(
             this.match(),
             this.shiftexpr()
@@ -1254,6 +1293,9 @@ define(function(require, exports, module) {
       }
       return node;
     },
+    virtual: function(s) {
+      return new Node(Node.TOKEN, new Token(Token.VIRTUAL, s));
+    },
     match: function(type, line, msg) {
       if(typeof type == 'boolean') {
         msg = line;
@@ -1264,7 +1306,7 @@ define(function(require, exports, module) {
         line = false;
         msg = line;
       }
-      //未定义为所有
+      //未定义为所有非空白token
       if(character.isUndefined(type)) {
         if(this.look) {
           var l = this.look;
@@ -1277,12 +1319,17 @@ define(function(require, exports, module) {
       }
       //或者根据token的type或者content匹配
       else if(typeof type == 'string') {
-        //特殊处理，不匹配有换行或者末尾时自动补全，还有受限行
-        if(type == ';' && !this.inFor && (!this.look || (this.look.content() != type && this.hasMoveLine) || this.look.content() == '}' || this.look.type() == Token.LINE)) {
-          if(this.look && this.look.type() == Token.LINE) {
+        //特殊处理;，不匹配但有换行或者末尾时自动补全，还有受限行
+        if(type == ';'
+          && !this.inFor
+          && (!this.look
+            || (this.look.content() != type && this.hasMoveLine)
+            || this.look.content() == '}')
+        ) {
+          if(this.look && S[this.look.type()]) {
             this.move();
           }
-          return new Node(Node.TOKEN, new Token(Token.VIRTUAL, ';'));
+          return this.virtual(';');
         }
         else if(this.look && this.look.content() == type) {
           var l = this.look;
@@ -1318,40 +1365,31 @@ define(function(require, exports, module) {
         if(S[this.look.type()]) {
           this.ignores[this.index - 1] = this.look;
         }
-        //包括line
-        if(line && this.look.type() == Token.LINE) {
+        //包括line的情况下要跳出
+        if(this.look.type() == Token.LINE) {
           this.line++;
           this.col = 1;
-          break;
-        }
-        if(line && this.look.type() == Token.COMMENT) {
-          var s = this.look.content(),
-            n = character.count(this.look.content(), character.LINE);
-          if(n > 0) {
-            this.line += n;
-            var i = s.lastIndexOf(character.LINE);
-            this.col += s.length - i - 1;
+          this.hasMoveLine = true;
+          if(line) {
             break;
           }
         }
-        if(this.look.type() == Token.LINE) {
-          this.hasMoveLine = true;
-          this.line++;
-          this.col = 1;
-        }
         else if(this.look.type() == Token.COMMENT) {
-          var s = this.look.content(),
-            n = character.count(this.look.content(), character.LINE);
+          var s = this.look.content();
+          var n = character.count(this.look.content(), character.LINE);
           if(n > 0) {
-            this.hasMoveLine = true;
             this.line += n;
             var i = s.lastIndexOf(character.LINE);
             this.col += s.length - i - 1;
+            this.hasMoveLine = true;
+            if(line) {
+              break;
+            }
           }
         }
         else {
           this.col += this.look.content().length;
-          if(!SS[this.look.type()]) {
+          if(!S[this.look.type()]) {
             break;
           }
         }
