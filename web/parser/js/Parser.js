@@ -977,7 +977,7 @@ define(function(require, exports, module) {
     },
     postfixexpr: function() {
       var node = new Node(Node.POSTFIXEXPR);
-      var leftexpr = this.leftexpr();
+      var leftexpr = this.leftexpr();console.log(this.look, this.hasMoveLine)
       if(this.look && ['++', '--'].indexOf(this.look.content()) > -1 && !this.hasMoveLine) {
         node.add(leftexpr);
         while(this.look && ['++', '--'].indexOf(this.look.content()) > -1) {
