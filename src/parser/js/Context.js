@@ -1,8 +1,4 @@
 var Class = require('../../util/Class');
-var character = require('../../util/character');
-var Lexer = require('../../lexer/Lexer');
-var Token = require('../../lexer/Token');
-var Node = require('./Node');
 var cid = 0;
 var Context = Class(function(parent, name) {
   this.cid = cid++;

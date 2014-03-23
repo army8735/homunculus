@@ -6,14 +6,17 @@ var Node = require('./Node');
 var S = {};
 S[Token.BLANK] = S[Token.TAB] = S[Token.COMMENT] = S[Token.LINE] = S[Token.ENTER] = true;
 var Parser = Class(function(lexer) {
-  this.lexer = lexer;
-  this.init(true);
+  this.init(lexer);
 }).methods({
   parse: function(code) {
     this.lexer.parse(code);
-    return this.program();
+    this.tree = this.program();
+    return this.tree;
   },
-  init: function(first) {
+  ast: function() {
+    return this.tree;
+  },
+  init: function(lexer) {
     this.look = null;
     this.tokens = null;
     this.lastLine = 1;
@@ -25,7 +28,11 @@ var Parser = Class(function(lexer) {
     this.inFor = false;
     this.ignores = {};
     this.hasMoveLine = false;
-    if(!first) {
+    this.tree = {};
+    if(lexer) {
+      this.lexer = lexer;
+    }
+    else {
       this.lexer.init();
     }
   },
