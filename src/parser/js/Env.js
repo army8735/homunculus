@@ -1,7 +1,7 @@
 var Class = require('../../util/Class');
-var cid = 0;
-var Context = Class(function(parent, name) {
-  this.cid = cid++;
+var id = 0;
+var Env = Class(function(parent, name) {
+  this.id = id++;
   this.parent = parent || null; //父上下文，如果是全局则为空
   this.name = name || null; //上下文名称，即函数名，函数表达式为空，全局也为空
   this.thisIs = null; //上下文环境中this的值，函数表达式中可能会赋值
@@ -20,8 +20,8 @@ var Context = Class(function(parent, name) {
     this.parent.addChild(this);
   }
 }).methods({
-    getCid: function() {
-      return this.cid;
+    getId: function() {
+      return this.id;
     },
     getName: function() {
       return this.name;
@@ -144,4 +144,4 @@ var Context = Class(function(parent, name) {
       return this.vids;
     }
   });
-module.exports = Context;
+module.exports = Env;
