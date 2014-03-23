@@ -14,6 +14,9 @@ var CssParser = require('./src/parser/css/Parser');
 var JsNode = require('./src/parser/js/Node');
 var CssNode = require('./src/parser/css/Node');
 
+var JsContext = require('./src/parser/js/Context');
+var JsEnv = require('./src/parser/js/Env');
+
 exports.getClass = function(type, lan) {
   type = (type || '').toLowerCase();
   lan = (lan || '').toLowerCase();
@@ -59,6 +62,28 @@ exports.getClass = function(type, lan) {
           throw new Error('Unsupport Language Node: ' + lan);
       }
     break;
+    case 'context':
+      switch(lan) {
+        case 'js':
+        case 'javascript':
+        case 'es':
+        case 'ecmascript':
+          return JsContext;
+        default:
+          throw new Error('Unsupport Language Context: ' + lan);
+      }
+    break;
+    case 'env':
+      switch(lan) {
+        case 'js':
+        case 'javascript':
+        case 'es':
+        case 'ecmascript':
+          return JsEnv;
+        default:
+          throw new Error('Unsupport Language Env: ' + lan);
+      }
+      break;
     case 'token':
       return Token;
     default:
@@ -102,5 +127,18 @@ exports.getParser = function(lan) {
       return new CssParser(exports.getLexer(lan));
     default:
       throw new Error('Unsupport Language Parser: ' + lan);
+  }
+};
+
+exports.getContext = function(lan) {
+  lan = lan.toLowerCase();
+  switch(lan) {
+    case 'js':
+    case 'javascript':
+    case 'es':
+    case 'ecmascript':
+      return new JsContext(exports.getParser(lan));
+    default:
+      throw new Error('Unsupport Language Context: ' + lan);
   }
 };
