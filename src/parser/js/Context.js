@@ -1,5 +1,7 @@
 var Class = require('../../util/Class');
 var Env = require('./Env');
+var JsNode = require('./Node');
+var Token = require('../../lexer/Token');
 var Context = Class(function(parser) {
   this.env = new Env();
   this.parser = parser;
@@ -121,7 +123,7 @@ function addAParam(params, child) {
   });
 }
 function prmrexpr(node, env) {
-  console.log(node)
+  //console.log(node)
 }
 
 module.exports = Context;

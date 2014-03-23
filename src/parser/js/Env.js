@@ -7,8 +7,8 @@ var Env = Class(function(parent, name) {
   this.thisIs = null; //上下文环境中this的值，函数表达式中可能会赋值
   this.children = []; //函数声明或函数表达式所产生的上下文
   this.childrenMap = {}; //键是函数名，值是上下文，匿名函数表达式键为cid
-  this.variables = []; //变量var声明
-  this.variablesMap = {}; //键为id字面量，值是它的token的节点
+  this.vars = []; //变量var声明
+  this.varsMap = {}; //键为id字面量，值是它的token的节点
   this.params = []; //形参，函数上下文才有，即全局无
   this.paramsMap = {}; //键为id字面量，值是它的token的节点
   this.aParams = []; //实参，函数表达式才有
@@ -93,10 +93,10 @@ var Env = Class(function(parent, name) {
       return this;
     },
     hasVar: function(v) {
-      return this.variablesMap.hasOwnProperty(v);
+      return this.varsMap.hasOwnProperty(v);
     },
     addVar: function(node, assign) {
-      var v = node.token().content();
+      var v = node.leaves()[0].token().content();
       //赋值拥有最高优先级，会覆盖掉之前的函数声明和var
       if(assign) {
         this.delVar(v);
@@ -106,20 +106,20 @@ var Env = Class(function(parent, name) {
       else if(this.hasVar(v) || this.hasChild(v)) {
         return this;
       }
-      this.variablesMap[v] = true;
-      this.variables.push(node);
+      this.varsMap[v] = node;
+      this.vars.push(node);
       return this;
     },
     delVar: function(v) {
       if(this.hasVar(v)) {
-        var i = this.variables.indexOf(this.variablesMap[v]);
-        this.variables.splice(i, 1);
-        delete this.variablesMap[v];
+        var i = this.vars.indexOf(this.varsMap[v]);
+        this.vars.splice(i, 1);
+        delete this.varsMap[v];
       }
       return this;
     },
     getVars: function() {
-      return this.variables;
+      return this.vars;
     },
     addReturn: function(node) {
       this.returns.push(node);

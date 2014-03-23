@@ -1,5 +1,16 @@
 src2web:
 	@gulp src2web
 
-test:
-	@mocha tests/api.js tests/jslexer.js tests/jsparser.js tests/jscontext.js
+test: test_api test_jslexer test_jsparser test_jscontext
+
+test_api:
+	@mocha tests/api.js
+
+test_jslexer:
+	@mocha tests/jslexer.js
+
+test_jsparser:
+	@mocha tests/jsparser.js
+
+test_jscontext:
+	@mocha tests/jscontext.js
