@@ -52,7 +52,7 @@ function fndecl(node, env) {
   var v = node.leaves()[1].leaves().content();
   var child = new Env(env, v);
   var params = node.leaves()[3];
-  if(params.name() == JsNode.PARAMS) {
+  if(params.name() == JsNode.FNPARAMS) {
     addParam(params, child);
   }
   return child;
@@ -69,7 +69,7 @@ function fnexpr(node, env) {
   else {
     params = node.leaves()[2];
   }
-  if(params.name() == JsNode.PARAMS) {
+  if(params.name() == JsNode.FNPARAMS) {
     addParam(params, child);
   }
   //匿名函数检查实参传入情况

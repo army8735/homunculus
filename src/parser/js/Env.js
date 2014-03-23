@@ -65,6 +65,9 @@ var Env = Class(function(parent, name) {
       this.aParams.push(ap);
       return this;
     },
+    getChild: function(name) {
+      return this.childrenMap[name];
+    },
     getChildren: function() {
       return this.children;
     },
@@ -74,9 +77,12 @@ var Env = Class(function(parent, name) {
     },
     addChild: function(child) {
       var name = child.getName();
-      //函数表达式名字为空无法删除
+      //函数表达式名字为空用id删除
       if(name) {
         this.delChild(name);
+      }
+      else {
+        this.delChild(child.getId());
       }
       name = name || this.getCid();
       this.childrenMap[name] = child;
