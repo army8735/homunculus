@@ -118,7 +118,13 @@ function addAParam(params, child) {
   });
 }
 function prmrexpr(node, env) {
-  //console.log(node)
+  var first = node.leaves()[0];
+  if(first.name() == JsNode.TOKEN) {
+    var token = first.token();
+    if(token.type() == Token.ID) {
+      env.addVid(first);
+    }
+  }
 }
 
 module.exports = Context;
