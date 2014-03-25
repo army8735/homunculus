@@ -170,7 +170,42 @@ describe('jsparser', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('label:;');
       expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.LABSTMT, ['label', ':', JsNode.EMPTSTMT, [';']]]]);
-    })
+    });
+    it('prmrexpr 1', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('a');
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.PRMREXPR, ['a']]]]);
+    });
+    it('prmrexpr 2', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('true');
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.PRMREXPR, ['true']]]]);
+    });
+    it('prmrexpr 3', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('null');
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.PRMREXPR, ['null']]]]);
+    });
+    it('prmrexpr 4', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('this');
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.PRMREXPR, ['this']]]]);
+    });
+    it('prmrexpr 5', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('false');
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.PRMREXPR, ['false']]]]);
+    });
+    it('prmrexpr 6', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('[]');
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.PRMREXPR, [JsNode.ARRLTR, ['[', ']']]]]]);
+    });
+    it('prmrexpr 7', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('!{}');
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.UNARYEXPR, ['!', JsNode.PRMREXPR, [JsNode.OBJLTR, ['{', '}']]]]]]);
+    });
     it('node parent,prev,next', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('var a, b;');

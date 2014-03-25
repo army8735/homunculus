@@ -1143,16 +1143,16 @@ define(function(require, exports, module) {
             case 'null':
             case 'true':
             case 'false':
-              return this.match();
+              node.add(this.match());
             break;
             case '(':
               node.add(this.match(), this.expr(), this.match(')'));
             break;
             case '[':
-              return this.arrltr();
+              node.add(this.arrltr());
             break;
             case '{':
-              return this.objltr();
+              node.add(this.objltr());
             break;
             default:
               this.error();
