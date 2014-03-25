@@ -54,5 +54,11 @@ describe('jscontext', function() {
       expect(env.hasVid('b')).to.be(true);
       expect(env.hasVid('c')).to.be(true);
     });
+    it('vid 2', function() {
+      var context = homunculus.getContext('js');
+      var env = context.parse('var a = b = 1;');
+      expect(env.hasVid('a')).to.be(false);
+      expect(env.hasVid('b')).to.be(true);
+    });
   });
 });
