@@ -71,7 +71,7 @@ var Env = Class(function(parent, name) {
     getChildren: function() {
       return this.children;
     },
-    //仅支持有name的函数声明，表达式无法查找
+    //通过name查找函数声明，id查找表达式
     hasChild: function(name) {
       return this.childrenMap.hasOwnProperty(name);
     },
@@ -84,12 +84,12 @@ var Env = Class(function(parent, name) {
       else {
         this.delChild(child.getId());
       }
-      name = name || this.getCid();
+      name = name || child.getId();
       this.childrenMap[name] = child;
       this.children.push(child);
       return this;
     },
-    //仅支持有name的函数声明，表达式无法删除
+    //name函数声明，id表达式
     delChild: function(name) {
       if(this.hasChild(name)) {
         var i = this.children.indexOf(this.childrenMap[name]);

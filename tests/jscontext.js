@@ -47,6 +47,15 @@ describe('jscontext', function() {
       expect(a.hasParam('c')).to.be(true);
       expect(a.hasParam('d')).to.be(true);
     });
+    it('fnexpr', function() {
+      var context = homunculus.getContext('js');
+      var env = context.parse('~function(){var a = 1;}()');
+      expect(env.hasVar('a')).to.be(false);
+      expect(env.getChildren().length).to.be(1);
+      var first = env.getChildren()[0];
+      var cid = first.getId();
+      expect(env.getChild(cid)).to.equal(first);
+    });
     it('vid 1', function() {
       var context = homunculus.getContext('js');
       var env = context.parse('var a = 1, b = {};c;b.a = 1;');
@@ -59,6 +68,12 @@ describe('jscontext', function() {
       var env = context.parse('var a = b = 1;');
       expect(env.hasVid('a')).to.be(false);
       expect(env.hasVid('b')).to.be(true);
+    });
+    it('vid 3', function() {
+      var context = homunculus.getContext('js');
+      var env = context.parse('~function(){var a = 1;b;}()');
+      expect(env.hasVid('a')).to.be(false);
+      expect(env.hasVid('b')).to.be(false);
     });
   });
 });
