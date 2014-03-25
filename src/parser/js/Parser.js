@@ -121,16 +121,13 @@ var Parser = Class(function(lexer) {
         if(this.look.type() == Token.ID) {
           for(var i = this.index; i < this.length; i++) {
             var token = this.tokens[i];
-            if(S[token.type()]) {
+            if(!S[token.type()]) {
               if(token.content() == ':') {
                 return this.labstmt();
               }
               else {
                 break;
               }
-            }
-            else {
-              break;
             }
           }
         }

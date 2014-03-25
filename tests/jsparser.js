@@ -166,6 +166,11 @@ describe('jsparser', function() {
       var node = parser.parse('(function() {})()');
       expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.CALLEXPR, [JsNode.PRMREXPR, ['(', JsNode.FNEXPR, ['function', '(', ')', '{', JsNode.FNBODY, [], '}'], ')'], JsNode.ARGS, ['(', ')']]]]]);
     });
+    it('labelstmt', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('label:;');
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.LABSTMT, ['label', ':', JsNode.EMPTSTMT, [';']]]]);
+    })
     it('node parent,prev,next', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('var a, b;');

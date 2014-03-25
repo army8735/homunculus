@@ -7,14 +7,17 @@ define(function(require, exports, module) {
   var S = {};
   S[Token.BLANK] = S[Token.TAB] = S[Token.COMMENT] = S[Token.LINE] = S[Token.ENTER] = true;
   var Parser = Class(function(lexer) {
-    this.lexer = lexer;
-    this.init(true);
+    this.init(lexer);
   }).methods({
     parse: function(code) {
       this.lexer.parse(code);
-      return this.program();
+      this.tree = this.program();
+      return this.tree;
     },
-    init: function(first) {
+    ast: function() {
+      return this.tree;
+    },
+    init: function(lexer) {
       this.look = null;
       this.tokens = null;
       this.lastLine = 1;
@@ -26,7 +29,11 @@ define(function(require, exports, module) {
       this.inFor = false;
       this.ignores = {};
       this.hasMoveLine = false;
-      if(!first) {
+      this.tree = {};
+      if(lexer) {
+        this.lexer = lexer;
+      }
+      else {
         this.lexer.init();
       }
     },
@@ -115,16 +122,13 @@ define(function(require, exports, module) {
           if(this.look.type() == Token.ID) {
             for(var i = this.index; i < this.length; i++) {
               var token = this.tokens[i];
-              if(S[token.type()]) {
+              if(!S[token.type()]) {
                 if(token.content() == ':') {
                   return this.labstmt();
                 }
                 else {
                   break;
                 }
-              }
-              else {
-                break;
               }
             }
           }
@@ -977,7 +981,7 @@ define(function(require, exports, module) {
     },
     postfixexpr: function() {
       var node = new Node(Node.POSTFIXEXPR);
-      var leftexpr = this.leftexpr();console.log(this.look, this.hasMoveLine)
+      var leftexpr = this.leftexpr();
       if(this.look && ['++', '--'].indexOf(this.look.content()) > -1 && !this.hasMoveLine) {
         node.add(leftexpr);
         while(this.look && ['++', '--'].indexOf(this.look.content()) > -1) {
