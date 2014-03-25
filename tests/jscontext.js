@@ -76,5 +76,22 @@ describe('jscontext', function() {
       expect(first.hasVid('a')).to.be(false);
       expect(first.hasVid('b')).to.be(true);
     });
+    it('return 1', function() {
+      var context = homunculus.getContext('js');
+      var env = context.parse('return a;');
+      expect(env.getReturns().length).to.be(1);
+    });
+    it('return 2', function() {
+      var context = homunculus.getContext('js');
+      var env = context.parse('function a() {return;}');
+      var first = env.getChild('a');
+      expect(first.getReturns().length).to.be(1);
+    });
+    it('return 3', function() {
+      var context = homunculus.getContext('js');
+      var env = context.parse('~function() {return;}()');
+      var first = env.getChildren()[0];
+      expect(first.getReturns().length).to.be(1);
+    })
   });
 });
