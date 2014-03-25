@@ -72,8 +72,9 @@ describe('jscontext', function() {
     it('vid 3', function() {
       var context = homunculus.getContext('js');
       var env = context.parse('~function(){var a = 1;b;}()');
-      expect(env.hasVid('a')).to.be(false);
-      expect(env.hasVid('b')).to.be(false);
+      var first = env.getChildren()[0];
+      expect(first.hasVid('a')).to.be(false);
+      expect(first.hasVid('b')).to.be(true);
     });
   });
 });
