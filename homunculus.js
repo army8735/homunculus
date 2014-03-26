@@ -137,7 +137,7 @@ exports.getContext = function(lan) {
     case 'javascript':
     case 'es':
     case 'ecmascript':
-      return new JsContext(exports.getParser(lan));
+      return new JsContext();
     default:
       throw new Error('Unsupport Language Context: ' + lan);
   }

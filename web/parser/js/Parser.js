@@ -2,6 +2,7 @@ define(function(require, exports, module) {
   var Class = require('../../util/Class');
   var character = require('../../util/character');
   var Lexer = require('../../lexer/Lexer');
+  var Rule = require('../../lexer/rule/EcmascriptRule');
   var Token = require('../../lexer/Token');
   var Node = require('./Node');
   var S = {};
@@ -33,8 +34,11 @@ define(function(require, exports, module) {
       if(lexer) {
         this.lexer = lexer;
       }
-      else {
+      else if(this.lexer) {
         this.lexer.init();
+      }
+      else {
+        this.lexer = new Lexer(new Rule());
       }
     },
     program: function() {
