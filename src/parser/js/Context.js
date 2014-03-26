@@ -24,7 +24,13 @@ var Context = Class(function(parent, name) {
   }
 }).methods({
   parse: function(code) {
-    var ast = this.parser.parse(code);
+    var ast;
+    if(code instanceof  JsNode) {
+      ast = code;
+    }
+    else {
+      ast = this.parser.parse(code);
+    }
     recursion(ast, this);
     return this;
   },
