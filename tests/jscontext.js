@@ -92,6 +92,11 @@ describe('jscontext', function() {
       var env = context.parse('~function() {return;}()');
       var first = env.getChildren()[0];
       expect(first.getReturns().length).to.be(1);
-    })
+    });
+    it('return 4', function() {
+      var context = homunculus.getContext('js');
+      var env = context.parse('if(a)return true;else return false;');
+      expect(env.getReturns().length).to.be(2);
+    });
   });
 });
