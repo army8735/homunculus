@@ -56,6 +56,12 @@ describe('jscontext', function() {
       var cid = first.getId();
       expect(env.getChild(cid)).to.equal(first);
     });
+    it('fnexpr actual param', function() {
+      var context = homunculus.getContext('js');
+      var env = context.parse('~function(){}(a, this, 3);');
+      var first = env.getChildren()[0];
+      expect(first.getAParams().length).to.be(3);
+    });
     it('vid 1', function() {
       var context = homunculus.getContext('js');
       var env = context.parse('var a = 1, b = {};c;b.a = 1;');

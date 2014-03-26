@@ -12,7 +12,6 @@ var Env = Class(function(parent, name) {
   this.params = []; //形参，函数上下文才有，即全局无
   this.paramsMap = {}; //键为id字面量，值是它的token的节点
   this.aParams = []; //实参，函数表达式才有
-  this.aParamsMap = {}; //键为id字面量，值是它的token的节点
   this.vids = []; //上下文环境里用到的变量id
   this.vidsMap = {}; //键为id字面量，值是它的token的节点
   this.returns = []; //上下文环境里return语句
@@ -58,10 +57,6 @@ var Env = Class(function(parent, name) {
       return this.aParams;
     },
     addAParam: function(ap) {
-      //只记录单字面量参数和this，其它传入null占位
-      if(ap !== null) {
-        this.aParamsMap[ap] = this.aParams.length;
-      }
       this.aParams.push(ap);
       return this;
     },
