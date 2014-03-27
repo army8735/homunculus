@@ -231,6 +231,16 @@ describe('jsparser', function() {
       var node = parser.parse('new A().f()');
       expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.CALLEXPR, [JsNode.MMBEXPR, [JsNode.NEWEXPR, ['new', JsNode.PRMREXPR, ['A'], JsNode.ARGS, ['(', ')']], '.', 'f'], JsNode.ARGS, ['(', ')']]]]])
     });
+    it('unaryexpr 1', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('typeof a');
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.UNARYEXPR, ['typeof', JsNode.PRMREXPR, ['a']]]]]);
+    });
+    it('unaryexpr 2', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('!!0');
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.UNARYEXPR, ['!', JsNode.UNARYEXPR, ['!', JsNode.PRMREXPR, ['0']]]]]]);
+    });
     it('node parent,prev,next', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('var a, b;');
