@@ -26,7 +26,6 @@ var Parser = Class(function(lexer) {
     this.col = 1;
     this.index = 0;
     this.length = 0;
-    this.inFor = false;
     this.ignores = {};
     this.hasMoveLine = false;
     this.tree = {};
@@ -273,7 +272,6 @@ var Parser = Class(function(lexer) {
         );
       break;
       case 'for':
-        this.inFor = true;
         node.add(
           this.match(),
           this.match('(')
@@ -333,6 +331,10 @@ var Parser = Class(function(lexer) {
             if(this.look.content() != ';') {
               node.add(this.expr());
             }
+            //for的;不能省略，强制判断
+            if(!this.look || this.look.content() != ';') {
+              this.error('missing ;')
+            }
             node.add(this.match(';'));
             if(!this.look) {
               this.error();
@@ -340,8 +342,8 @@ var Parser = Class(function(lexer) {
             if(this.look.content() != ';') {
               node.add(this.expr());
             }
-            if(!this.look) {
-              this.error();
+            if(!this.look || this.look.content() != ';') {
+              this.error('missing ;')
             }
             node.add(this.match(';'));
             if(!this.look) {
@@ -352,7 +354,6 @@ var Parser = Class(function(lexer) {
             }
           }
         }
-        this.inFor = false;
         node.add(this.match(')'));
         node.add(this.stmt());
     }
@@ -1328,7 +1329,6 @@ var Parser = Class(function(lexer) {
     else if(typeof type == 'string') {
       //特殊处理;，不匹配但有换行或者末尾时自动补全，还有受限行
       if(type == ';'
-        && !this.inFor
         && (!this.look
           || (this.look.content() != type && this.hasMoveLine)
           || this.look.content() == '}')
@@ -1404,7 +1404,7 @@ var Parser = Class(function(lexer) {
   },
   error: function(msg) {
     msg = 'SyntaxError: ' + (msg || ' syntax error');
-    throw new Error(msg + ' line ' + this.lastLine + ' col ' + this.lastCol);
+    throw new Error(msg + ' line ' + this.lastLine + ' col ' + this.lastCol + ' index ' + this.look.sIndex());
   },
   ignore: function() {
     return this.ignores;
