@@ -383,6 +383,7 @@ var Parser = Class(function(lexer) {
     //return后换行视作省略;，包括多行注释的换行
     if(this.look) {
       if(this.look.content() == ';'
+        || this.look.content() == '}'
         || this.look.type() == Token.LINE
         || this.look.type() == Token.COMMENT) {
         node.add(this.match(';'));

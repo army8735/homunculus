@@ -27,7 +27,6 @@ define(function(require, exports, module) {
       this.col = 1;
       this.index = 0;
       this.length = 0;
-      this.inFor = false;
       this.ignores = {};
       this.hasMoveLine = false;
       this.tree = {};
@@ -274,7 +273,6 @@ define(function(require, exports, module) {
           );
         break;
         case 'for':
-          this.inFor = true;
           node.add(
             this.match(),
             this.match('(')
@@ -334,6 +332,10 @@ define(function(require, exports, module) {
               if(this.look.content() != ';') {
                 node.add(this.expr());
               }
+              //for的;不能省略，强制判断
+              if(!this.look || this.look.content() != ';') {
+                this.error('missing ;')
+              }
               node.add(this.match(';'));
               if(!this.look) {
                 this.error();
@@ -341,8 +343,8 @@ define(function(require, exports, module) {
               if(this.look.content() != ';') {
                 node.add(this.expr());
               }
-              if(!this.look) {
-                this.error();
+              if(!this.look || this.look.content() != ';') {
+                this.error('missing ;')
               }
               node.add(this.match(';'));
               if(!this.look) {
@@ -353,7 +355,6 @@ define(function(require, exports, module) {
               }
             }
           }
-          this.inFor = false;
           node.add(this.match(')'));
           node.add(this.stmt());
       }
@@ -383,6 +384,7 @@ define(function(require, exports, module) {
       //return后换行视作省略;，包括多行注释的换行
       if(this.look) {
         if(this.look.content() == ';'
+          || this.look.content() == '}'
           || this.look.type() == Token.LINE
           || this.look.type() == Token.COMMENT) {
           node.add(this.match(';'));
@@ -1329,7 +1331,6 @@ define(function(require, exports, module) {
       else if(typeof type == 'string') {
         //特殊处理;，不匹配但有换行或者末尾时自动补全，还有受限行
         if(type == ';'
-          && !this.inFor
           && (!this.look
             || (this.look.content() != type && this.hasMoveLine)
             || this.look.content() == '}')
@@ -1405,7 +1406,7 @@ define(function(require, exports, module) {
     },
     error: function(msg) {
       msg = 'SyntaxError: ' + (msg || ' syntax error');
-      throw new Error(msg + ' line ' + this.lastLine + ' col ' + this.lastCol);
+      throw new Error(msg + ' line ' + this.lastLine + ' col ' + this.lastCol + ' index ' + this.look.sIndex());
     },
     ignore: function() {
       return this.ignores;

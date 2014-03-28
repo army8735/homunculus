@@ -128,6 +128,16 @@ describe('jslexer', function() {
       });
       expect(str).to.eql(code);
     });
+    it('jquery 1.11.0 min', function() {
+      var lexer = homunculus.getLexer('js');
+      var code = fs.readFileSync(path.join(__dirname, './lib/jquery-1.11.0.min.js'), { encoding: 'utf-8' });
+      var tokens = lexer.parse(code);
+      var str = '';
+      tokens.forEach(function(token) {
+        str += token.content();
+      });
+      expect(str).to.eql(code);
+    });
     it('backbone 1.1.0', function() {
       var lexer = homunculus.getLexer('js');
       var code = fs.readFileSync(path.join(__dirname, './lib/backbone.js'), { encoding: 'utf-8' });

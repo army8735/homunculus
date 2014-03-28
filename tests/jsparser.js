@@ -265,6 +265,14 @@ describe('jsparser', function() {
       var str = jion(node, ignore);
       expect(str).to.eql(code);
     });
+    it('jquery 1.11.0 min', function() {
+      var parser = homunculus.getParser('js');
+      var code = fs.readFileSync(path.join(__dirname, './lib/jquery-1.11.0.min.js'), { encoding: 'utf-8' });
+      var node = parser.parse(code);
+      var ignore = parser.ignore();
+      var str = jion(node, ignore);
+      expect(str).to.eql(code);
+    });
     it('backbone 1.1.0', function() {
       var parser = homunculus.getParser('js');
       var code = fs.readFileSync(path.join(__dirname, './lib/backbone.js'), { encoding: 'utf-8' });
