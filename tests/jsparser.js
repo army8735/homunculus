@@ -131,6 +131,11 @@ describe('jsparser', function() {
       var node = parser.parse('return a\nreturn');
       expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.RETSTMT, ['return', JsNode.PRMREXPR, ['a']], JsNode.RETSTMT, ['return']]]);
     });
+    it('returnstmt 5', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('{return}');
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.BLOCK, ['{', JsNode.RETSTMT, ['return'], '}']]]);
+    });
     it('postfixexpr 1', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('a++ + b');
