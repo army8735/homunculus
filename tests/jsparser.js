@@ -281,6 +281,21 @@ describe('jsparser', function() {
       var node = parser.parse('a*b>>>c/d<<--e');
       expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.SHIFTEXPR, [JsNode.MTPLEXPR, [JsNode.PRMREXPR, ["a"], "*", JsNode.PRMREXPR, ["b"]], ">>>", JsNode.MTPLEXPR, [JsNode.PRMREXPR, ["c"], "/", JsNode.PRMREXPR, ["d"]], "<<", JsNode.UNARYEXPR, ["--", JsNode.PRMREXPR, ["e"]]]]]]);
     });
+    it('reltexpr 1', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('a > b');
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.RELTEXPR, [JsNode.PRMREXPR, ["a"], ">", JsNode.PRMREXPR, ["b"]]]]]);
+    });
+    it('reltexpr 2', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('a <= b+1');
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.RELTEXPR, [JsNode.PRMREXPR, ["a"], "<=", JsNode.ADDEXPR, [JsNode.PRMREXPR, ["b"], "+", JsNode.PRMREXPR, ["1"]]]]]]);
+    });
+    it('reltexpr 3', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('a instanceof new A()');
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.RELTEXPR, [JsNode.PRMREXPR, ["a"], "instanceof", JsNode.NEWEXPR, ["new", JsNode.PRMREXPR, ["A"], JsNode.ARGS, ["(", ")"]]]]]]);
+    });
     it('node parent,prev,next', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('var a, b;');
