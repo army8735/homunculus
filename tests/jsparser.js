@@ -326,6 +326,16 @@ describe('jsparser', function() {
       var node = parser.parse('++b | -a');
       expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.BITOREXPR, [JsNode.UNARYEXPR, ["++", JsNode.PRMREXPR, ["b"]], "|", JsNode.UNARYEXPR, ["-", JsNode.PRMREXPR, ["a"]]]]]]);
     });
+    it('logandexpr', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('a.b && c >> 1');
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.LOGANDEXPR, [JsNode.MMBEXPR, [JsNode.PRMREXPR, ["a"], ".", "b"], "&&", JsNode.SHIFTEXPR, [JsNode.PRMREXPR, ["c"], ">>", JsNode.PRMREXPR, ["1"]]]]]]);
+    });
+    it('logorexpr', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('a || b && c || d && f');
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.LOGOREXPR, [JsNode.PRMREXPR, ["a"], "||", JsNode.LOGANDEXPR, [JsNode.PRMREXPR, ["b"], "&&", JsNode.PRMREXPR, ["c"]], "||", JsNode.LOGANDEXPR, [JsNode.PRMREXPR, ["d"], "&&", JsNode.PRMREXPR, ["f"]]]]]]);
+    });
     it('node parent,prev,next', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('var a, b;');
