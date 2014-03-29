@@ -351,6 +351,16 @@ describe('jsparser', function() {
       var node = parser.parse('a += b %= c');
       expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.ASSIGNEXPR, [JsNode.PRMREXPR, ["a"], "+=", JsNode.ASSIGNEXPR, [JsNode.PRMREXPR, ["b"], "%=", JsNode.PRMREXPR, ["c"]]]]]]);
     });
+    it('expr 1', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('(1)');
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.PRMREXPR, ["(", JsNode.PRMREXPR, ["1"], ")"]]]]);
+    });
+    it('expr 2', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('(a, !b, c+d)');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.STMT,[JsNode.PRMREXPR,["(",JsNode.EXPR,[JsNode.PRMREXPR,["a"],",",JsNode.UNARYEXPR,["!",JsNode.PRMREXPR,["b"]],",",JsNode.ADDEXPR,[JsNode.PRMREXPR,["c"],"+",JsNode.PRMREXPR,["d"]]],")"]]]]);
+    });
     it('node parent,prev,next', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('var a, b;');

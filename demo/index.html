@@ -98,7 +98,7 @@ function(Parser, Lexer, EcmascriptRule, JsNode, Token) {
     var ast = parser.parse(s);
     draw(ast);
     var s = JSON.stringify(tree(ast));
-    s = s.replace(/(['"])(JsNode\.\w+)\1/g, '$2').replace(/,/g, ', ');
+    s = s.replace(/(['"])(JsNode\.\w+)\1/g, '$2');
     console.log(s);
     function tree(node, arr) {
       arr = arr || [];
