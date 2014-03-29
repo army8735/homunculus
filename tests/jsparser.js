@@ -246,6 +246,21 @@ describe('jsparser', function() {
       var node = parser.parse('!!0');
       expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.UNARYEXPR, ['!', JsNode.UNARYEXPR, ['!', JsNode.PRMREXPR, ['0']]]]]]);
     });
+    it('mtplexpr 1', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('a * b');
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.MTPLEXPR, [JsNode.PRMREXPR, ['a'], '*', JsNode.PRMREXPR, ['b']]]]]);
+    });
+    it('mtplexpr 2', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('a() * b[0]');
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.MTPLEXPR, [JsNode.CALLEXPR, [JsNode.PRMREXPR, ['a'], JsNode.ARGS, ['(', ')']], '*', JsNode.MMBEXPR, [JsNode.PRMREXPR, ['b'], '[', JsNode.PRMREXPR, ['0'], ']']]]]]);
+    });
+    it('mtplexpr 3', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('!a * b--');
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.MTPLEXPR, [JsNode.UNARYEXPR, ['!', JsNode.PRMREXPR, ['a']], '*', JsNode.POSTFIXEXPR, [JsNode.PRMREXPR, ['b'], '--']]]]]);
+    });
     it('node parent,prev,next', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('var a, b;');
