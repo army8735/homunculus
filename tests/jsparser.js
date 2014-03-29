@@ -436,6 +436,36 @@ describe('jsparser', function() {
       var node = parser.parse('for(var k in {}){}');
       expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.ITERSTMT,["for","(",JsNode.VARSTMT,["var",JsNode.VARDECL,["k"]],"in",JsNode.PRMREXPR,[JsNode.OBJLTR,["{","}"]],")",JsNode.BLOCK,["{","}"]]]]);
     });
+    it('cntnstmt 1', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('while(false){continue;}');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.ITERSTMT,["while","(",JsNode.PRMREXPR,["false"],")",JsNode.BLOCK,["{",JsNode.CNTNSTMT,["continue",";"],"}"]]]]);
+    });
+    it('cntnstmt 2', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('while(false){continue a;}');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.ITERSTMT,["while","(",JsNode.PRMREXPR,["false"],")",JsNode.BLOCK,["{",JsNode.CNTNSTMT,["continue","a",";"],"}"]]]]);
+    });
+    it('cntnstmt 3', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('while(false){continue\na;}');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.ITERSTMT,["while","(",JsNode.PRMREXPR,["false"],")",JsNode.BLOCK,["{",JsNode.CNTNSTMT,["continue"],JsNode.STMT,[JsNode.PRMREXPR,["a"],";"],"}"]]]]);
+    });
+    it('brkstmt 1', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('while(false){break;}');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.ITERSTMT,["while","(",JsNode.PRMREXPR,["false"],")",JsNode.BLOCK,["{",JsNode.BRKSTMT,["break",";"],"}"]]]]);
+    });
+    it('brkstmt 2', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('while(false){break a;}');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.ITERSTMT,["while","(",JsNode.PRMREXPR,["false"],")",JsNode.BLOCK,["{",JsNode.BRKSTMT,["break","a",";"],"}"]]]]);
+    });
+    it('brkstmt 3', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('while(false){break\na;}');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.ITERSTMT,["while","(",JsNode.PRMREXPR,["false"],")",JsNode.BLOCK,["{",JsNode.BRKSTMT,["break"],JsNode.STMT,[JsNode.PRMREXPR,["a"],";"],"}"]]]]);
+    });
     it('node parent,prev,next', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('var a, b;');
