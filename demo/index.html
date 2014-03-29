@@ -84,7 +84,12 @@ function drawNode(layer, node, x, index, parent, sibling) {
 	}
 	w = Math.max(w, x2);
 }
-require(['../web/parser/js/Parser', '../web/lexer/Lexer', '../web/lexer/rule/EcmascriptRule'], function(Parser, Lexer, EcmascriptRule) {
+require(['../web/parser/js/Parser',
+  '../web/lexer/Lexer',
+  '../web/lexer/rule/EcmascriptRule',
+  '../web/parser/js/Node',
+  '../web/lexer/Token'],
+function(Parser, Lexer, EcmascriptRule, JsNode, Token) {
 	var ta = document.getElementById('ta');
 	var input = document.getElementById('btn');
 	input.onclick = function() {
@@ -92,6 +97,29 @@ require(['../web/parser/js/Parser', '../web/lexer/Lexer', '../web/lexer/rule/Ecm
     var parser = new Parser(new Lexer(new EcmascriptRule()));
     var ast = parser.parse(s);
     draw(ast);
+    var s = JSON.stringify(tree(ast));
+    s = s.replace(/(['"])(JsNode\.\w+)\1/g, '$2').replace(/,/g, ', ');
+    console.log(s);
+    function tree(node, arr) {
+      arr = arr || [];
+      var isToken = node.name() == JsNode.TOKEN;
+      var isVirtual = isToken && node.token().type() == Token.VIRTUAL;
+      if(isToken) {
+        if(!isVirtual) {
+          var token = node.token();
+          arr.push(token.content());
+        }
+      }
+      else {
+        arr.push("JsNode." + JsNode.getKey(node.name()));
+        var childs = [];
+        arr.push(childs);
+        node.leaves().forEach(function(leaf, i) {
+          tree(leaf, childs);
+        });
+      }
+      return arr;
+    }
 	}
 });
 </script>

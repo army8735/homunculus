@@ -261,6 +261,16 @@ describe('jsparser', function() {
       var node = parser.parse('!a * b--');
       expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.MTPLEXPR, [JsNode.UNARYEXPR, ['!', JsNode.PRMREXPR, ['a']], '*', JsNode.POSTFIXEXPR, [JsNode.PRMREXPR, ['b'], '--']]]]]);
     });
+    it('addexpr 1', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('a + b * 2 - c');
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.ADDEXPR, [JsNode.PRMREXPR, ["a"], "+", JsNode.MTPLEXPR, [JsNode.PRMREXPR, ["b"], "*", JsNode.PRMREXPR, ["2"]], "-", JsNode.PRMREXPR, ["c"]]]]]);
+    });
+    it('addexpr 2', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('~a + a++ + ++a');
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.ADDEXPR, [JsNode.UNARYEXPR, ["~", JsNode.PRMREXPR, ["a"]], "+", JsNode.POSTFIXEXPR, [JsNode.PRMREXPR, ["a"], "++"], "+", JsNode.UNARYEXPR, ["++", JsNode.PRMREXPR, ["a"]]]]]]);
+    });
     it('node parent,prev,next', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('var a, b;');

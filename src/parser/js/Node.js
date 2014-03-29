@@ -126,6 +126,18 @@ var Node = Class(function(type, children) {
   IMPTSTMT: 'imptstmt',
   POSTFIXEXPR: 'postfixexpr',
   NEWEXPR: 'newexpr',
-  CALLEXPR: 'callexpr'
+  CALLEXPR: 'callexpr',
+  getKey: function(s) {
+    if(!keys) {
+      var self = this;
+      keys = {};
+      Object.keys(this).forEach(function(k) {
+        var v = self[k];
+        keys[v] = k;
+      });
+    }
+    return keys[s];
+  }
 });
+var keys;
 module.exports = Node;
