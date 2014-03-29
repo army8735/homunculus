@@ -29,8 +29,8 @@
   },
   "readmeFilename": "README.md",
   "devDependencies": {
-    "mocha": "^1.17.1",
-    "gulp": "^3.5.5",
+    "mocha": "^1.18.2",
+    "gulp": "^3.6.0",
     "expect.js": "^0.3.1"
   }
 }
