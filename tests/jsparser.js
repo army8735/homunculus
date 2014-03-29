@@ -311,6 +311,21 @@ describe('jsparser', function() {
       var node = parser.parse('a !== b >>> 4');
       expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.EQEXPR, [JsNode.PRMREXPR, ["a"], "!==", JsNode.SHIFTEXPR, [JsNode.PRMREXPR, ["b"], ">>>", JsNode.PRMREXPR, ["4"]]]]]]);
     });
+    it('bitandexpr', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('void a & --b');
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.BITANDEXPR, [JsNode.UNARYEXPR, ["void", JsNode.PRMREXPR, ["a"]], "&", JsNode.UNARYEXPR, ["--", JsNode.PRMREXPR, ["b"]]]]]]);
+    });
+    it('bitxorexpr', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('a>1 & b--');
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.BITANDEXPR, [JsNode.RELTEXPR, [JsNode.PRMREXPR, ["a"], ">", JsNode.PRMREXPR, ["1"]], "&", JsNode.POSTFIXEXPR, [JsNode.PRMREXPR, ["b"], "--"]]]]]);
+    });
+    it('bitorexpr', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('++b | -a');
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.BITOREXPR, [JsNode.UNARYEXPR, ["++", JsNode.PRMREXPR, ["b"]], "|", JsNode.UNARYEXPR, ["-", JsNode.PRMREXPR, ["a"]]]]]]);
+    });
     it('node parent,prev,next', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('var a, b;');
