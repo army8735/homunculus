@@ -336,6 +336,11 @@ describe('jsparser', function() {
       var node = parser.parse('a || b && c || d && f');
       expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.LOGOREXPR, [JsNode.PRMREXPR, ["a"], "||", JsNode.LOGANDEXPR, [JsNode.PRMREXPR, ["b"], "&&", JsNode.PRMREXPR, ["c"]], "||", JsNode.LOGANDEXPR, [JsNode.PRMREXPR, ["d"], "&&", JsNode.PRMREXPR, ["f"]]]]]]);
     });
+    it('condexpr', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('a && b ? false || true : typeof null');
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.CNDTEXPR, [JsNode.LOGANDEXPR, [JsNode.PRMREXPR, ["a"], "&&", JsNode.PRMREXPR, ["b"]], "?", JsNode.LOGOREXPR, [JsNode.PRMREXPR, ["false"], "||", JsNode.PRMREXPR, ["true"]], ":", JsNode.UNARYEXPR, ["typeof", JsNode.PRMREXPR, ["null"]]]]]]);
+    });
     it('node parent,prev,next', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('var a, b;');
