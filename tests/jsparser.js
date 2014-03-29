@@ -341,6 +341,16 @@ describe('jsparser', function() {
       var node = parser.parse('a && b ? false || true : typeof null');
       expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.CNDTEXPR, [JsNode.LOGANDEXPR, [JsNode.PRMREXPR, ["a"], "&&", JsNode.PRMREXPR, ["b"]], "?", JsNode.LOGOREXPR, [JsNode.PRMREXPR, ["false"], "||", JsNode.PRMREXPR, ["true"]], ":", JsNode.UNARYEXPR, ["typeof", JsNode.PRMREXPR, ["null"]]]]]]);
     });
+    it('assignexpr 1', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('a = b = c');
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.ASSIGNEXPR, [JsNode.PRMREXPR, ["a"], "=", JsNode.ASSIGNEXPR, [JsNode.PRMREXPR, ["b"], "=", JsNode.PRMREXPR, ["c"]]]]]]);
+    });
+    it('assignexpr 2', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('a += b %= c');
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.ASSIGNEXPR, [JsNode.PRMREXPR, ["a"], "+=", JsNode.ASSIGNEXPR, [JsNode.PRMREXPR, ["b"], "%=", JsNode.PRMREXPR, ["c"]]]]]]);
+    });
     it('node parent,prev,next', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('var a, b;');
