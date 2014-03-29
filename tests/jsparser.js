@@ -296,6 +296,21 @@ describe('jsparser', function() {
       var node = parser.parse('a instanceof new A()');
       expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.RELTEXPR, [JsNode.PRMREXPR, ["a"], "instanceof", JsNode.NEWEXPR, ["new", JsNode.PRMREXPR, ["A"], JsNode.ARGS, ["(", ")"]]]]]]);
     });
+    it('eqexpr 1', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('a == 3');
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.EQEXPR, [JsNode.PRMREXPR, ["a"], "==", JsNode.PRMREXPR, ["3"]]]]]);
+    });
+    it('eqexpr 2', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('a == b + 3');
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.EQEXPR, [JsNode.PRMREXPR, ["a"], "==", JsNode.ADDEXPR, [JsNode.PRMREXPR, ["b"], "+", JsNode.PRMREXPR, ["3"]]]]]]);
+    });
+    it('eqexpr 3', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('a !== b >>> 4');
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.EQEXPR, [JsNode.PRMREXPR, ["a"], "!==", JsNode.SHIFTEXPR, [JsNode.PRMREXPR, ["b"], ">>>", JsNode.PRMREXPR, ["4"]]]]]]);
+    });
     it('node parent,prev,next', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('var a, b;');
