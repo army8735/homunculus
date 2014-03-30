@@ -11,6 +11,11 @@
   "scripts": {
     "test": "make test"
   },
+  "config": {
+    "blanket": {
+      "pattern": "src"
+    }
+  },
   "repository": {
     "type": "git",
     "url": "git://github.com/army8735/homunculus.git"
@@ -31,6 +36,9 @@
   "devDependencies": {
     "mocha": "^1.18.2",
     "gulp": "^3.6.0",
-    "expect.js": "^0.3.1"
+    "expect.js": "^0.3.1",
+    "blanket": "^1.1.6",
+    "coveralls": "^2.10.0",
+    "mocha-lcov-reporter": "0.0.1"
   }
 }
