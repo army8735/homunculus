@@ -466,6 +466,41 @@ describe('jsparser', function() {
       var node = parser.parse('while(false){break\na;}');
       expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.ITERSTMT,["while","(",JsNode.PRMREXPR,["false"],")",JsNode.BLOCK,["{",JsNode.BRKSTMT,["break"],JsNode.STMT,[JsNode.PRMREXPR,["a"],";"],"}"]]]]);
     });
+    it('withstmt', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('with(a){}');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.WITHSTMT,["with","(",JsNode.PRMREXPR,["a"],")",JsNode.BLOCK,["{","}"]]]]);
+    });
+    it('swchstmt', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('switch(a){case 1:case 2:;break;default:;}');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.SWCHSTMT,["switch","(",JsNode.PRMREXPR,["a"],")",JsNode.CASEBLOCK,["{",JsNode.CASECLAUSE,["case",JsNode.PRMREXPR,["1"],":"],JsNode.CASECLAUSE,["case",JsNode.PRMREXPR,["2"],":",JsNode.EMPTSTMT,[";"],JsNode.BRKSTMT,["break",";"]],JsNode.DFTCLAUSE,["default",":",JsNode.EMPTSTMT,[";"]],"}"]]]]);
+    });
+    it('labstmt', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('label:;');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.LABSTMT,["label",":",JsNode.EMPTSTMT,[";"]]]]);
+    });
+    it('thrstmt', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('throw e;');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.THRSTMT,["throw",JsNode.PRMREXPR,["e"],";"]]]);
+    });
+    it('trystmt', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('try{}catch(e){}finally{}');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.TRYSTMT,["try",JsNode.BLOCK,["{","}"],JsNode.CACH,["catch","(","e",")",JsNode.BLOCK,["{","}"]],JsNode.FINL,["finally",JsNode.BLOCK,["{","}"]]]]]);
+    });
+    it('debstmt', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('debugger;');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.DEBSTMT,["debugger",";"]]]);
+    });
+    it('fndecl', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('function a(b, c = 1, ...d){}');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.FNDECL,["function","a","(",JsNode.FNPARAMS,["b",",","c",JsNode.BINDELEMENT,["=",JsNode.PRMREXPR,["1"]],",",JsNode.RESTPARAM,["...","d"]],")","{",JsNode.FNBODY,[],"}"]]]);
+    });
     it('node parent,prev,next', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('var a, b;');
