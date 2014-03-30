@@ -98,6 +98,7 @@ define(function(require, exports, module) {
     THRSTMT: 'thrstmt',
     TRYSTMT: 'trystmt',
     DEBSTMT: 'debstmt',
+    EXPRSTMT: 'exprstmt',
     CACH: 'cach',
     FINL: 'finl',
     FNDECL: 'fndecl',

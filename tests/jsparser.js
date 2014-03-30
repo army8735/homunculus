@@ -79,37 +79,37 @@ describe('jsparser', function() {
     it('newexpr 1', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('new A');
-      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.NEWEXPR, ['new', JsNode.PRMREXPR, ['A']]]]]);
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.EXPRSTMT, [JsNode.NEWEXPR, ['new', JsNode.PRMREXPR, ['A']]]]]);
     });
     it('newexpr 2', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('new A()');
-      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.NEWEXPR, ['new', JsNode.PRMREXPR, ['A'], JsNode.ARGS, ['(', ')']]]]]);
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.EXPRSTMT, [JsNode.NEWEXPR, ['new', JsNode.PRMREXPR, ['A'], JsNode.ARGS, ['(', ')']]]]]);
     });
     it('newexpr 3', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('new A().f');
-      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.MMBEXPR, [JsNode.NEWEXPR, ['new', JsNode.PRMREXPR, ['A'], JsNode.ARGS, ['(', ')']], '.', 'f']]]]);
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.EXPRSTMT, [JsNode.MMBEXPR, [JsNode.NEWEXPR, ['new', JsNode.PRMREXPR, ['A'], JsNode.ARGS, ['(', ')']], '.', 'f']]]]);
     });
     it('newexpr 4', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('new A().f()');
-      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.CALLEXPR, [JsNode.MMBEXPR, [JsNode.NEWEXPR, ['new', JsNode.PRMREXPR, ['A'], JsNode.ARGS, ['(', ')']], '.', 'f'], JsNode.ARGS, ['(', ')']]]]]);
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.EXPRSTMT, [JsNode.CALLEXPR, [JsNode.MMBEXPR, [JsNode.NEWEXPR, ['new', JsNode.PRMREXPR, ['A'], JsNode.ARGS, ['(', ')']], '.', 'f'], JsNode.ARGS, ['(', ')']]]]]);
     });
     it('newexpr 5', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('new new A().f()');
-      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.NEWEXPR, ['new', JsNode.MMBEXPR, [JsNode.NEWEXPR, ['new', JsNode.PRMREXPR, ['A'], JsNode.ARGS, ['(', ')']], '.', 'f'], JsNode.ARGS, ['(', ')']]]]]);
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.EXPRSTMT, [JsNode.NEWEXPR, ['new', JsNode.MMBEXPR, [JsNode.NEWEXPR, ['new', JsNode.PRMREXPR, ['A'], JsNode.ARGS, ['(', ')']], '.', 'f'], JsNode.ARGS, ['(', ')']]]]]);
     });
     it('mmbexpr 1', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('a.b.c');
-      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.MMBEXPR, [JsNode.PRMREXPR, ['a'], '.', 'b', '.', 'c']]]]);
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.EXPRSTMT, [JsNode.MMBEXPR, [JsNode.PRMREXPR, ['a'], '.', 'b', '.', 'c']]]]);
     });
     it('mmbexpr 2', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('a.b[c]');
-      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.MMBEXPR, [JsNode.PRMREXPR, ['a'], '.', 'b', '[', JsNode.PRMREXPR, ['c'], ']']]]]);
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.EXPRSTMT, [JsNode.MMBEXPR, [JsNode.PRMREXPR, ['a'], '.', 'b', '[', JsNode.PRMREXPR, ['c'], ']']]]]);
     });
     it('returnstmt 1', function() {
       var parser = homunculus.getParser('js');
@@ -119,12 +119,12 @@ describe('jsparser', function() {
     it('returnstmt 2', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('return\na');
-      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.RETSTMT, ['return'], JsNode.STMT, [JsNode.PRMREXPR, ['a']]]]);
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.RETSTMT, ['return'], JsNode.EXPRSTMT, [JsNode.PRMREXPR, ['a']]]]);
     });
     it('returnstmt 3', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('return/*\n*/a');
-      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.RETSTMT, ['return'], JsNode.STMT, [JsNode.PRMREXPR, ['a']]]]);
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.RETSTMT, ['return'], JsNode.EXPRSTMT, [JsNode.PRMREXPR, ['a']]]]);
     });
     it('returnstmt 4', function() {
       var parser = homunculus.getParser('js');
@@ -139,17 +139,17 @@ describe('jsparser', function() {
     it('postfixexpr 1', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('a++ + b');
-      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.ADDEXPR, [JsNode.POSTFIXEXPR, [JsNode.PRMREXPR, ['a'], '++'], '+', JsNode.PRMREXPR, ['b']]]]]);
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.EXPRSTMT, [JsNode.ADDEXPR, [JsNode.POSTFIXEXPR, [JsNode.PRMREXPR, ['a'], '++'], '+', JsNode.PRMREXPR, ['b']]]]]);
     });
     it('postfixexpr 2', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('a\nb++');
-      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.PRMREXPR, ['a']], JsNode.STMT, [JsNode.POSTFIXEXPR, [JsNode.PRMREXPR, ['b'], '++']]]]);
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.EXPRSTMT, [JsNode.PRMREXPR, ['a']], JsNode.EXPRSTMT, [JsNode.POSTFIXEXPR, [JsNode.PRMREXPR, ['b'], '++']]]]);
     });
     it('postfixexpr 3', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('a/*\n*/b++');
-      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.PRMREXPR, ['a']], JsNode.STMT, [JsNode.POSTFIXEXPR, [JsNode.PRMREXPR, ['b'], '++']]]]);
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.EXPRSTMT, [JsNode.PRMREXPR, ['a']], JsNode.EXPRSTMT, [JsNode.POSTFIXEXPR, [JsNode.PRMREXPR, ['b'], '++']]]]);
     });
     it('fndecl', function() {
       var parser = homunculus.getParser('js');
@@ -164,12 +164,12 @@ describe('jsparser', function() {
     it('fnexpr 1', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('~function() {}()');
-      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.UNARYEXPR, ['~', JsNode.CALLEXPR, [JsNode.FNEXPR, ['function', '(', ')', '{', JsNode.FNBODY, [], '}'], JsNode.ARGS, ['(', ')']]]]]]);
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.EXPRSTMT, [JsNode.UNARYEXPR, ['~', JsNode.CALLEXPR, [JsNode.FNEXPR, ['function', '(', ')', '{', JsNode.FNBODY, [], '}'], JsNode.ARGS, ['(', ')']]]]]]);
     });
     it('fnexpr 2', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('(function() {})()');
-      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.CALLEXPR, [JsNode.PRMREXPR, ['(', JsNode.FNEXPR, ['function', '(', ')', '{', JsNode.FNBODY, [], '}'], ')'], JsNode.ARGS, ['(', ')']]]]]);
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.EXPRSTMT, [JsNode.CALLEXPR, [JsNode.PRMREXPR, ['(', JsNode.FNEXPR, ['function', '(', ')', '{', JsNode.FNBODY, [], '}'], ')'], JsNode.ARGS, ['(', ')']]]]]);
     });
     it('labelstmt', function() {
       var parser = homunculus.getParser('js');
@@ -179,187 +179,187 @@ describe('jsparser', function() {
     it('prmrexpr 1', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('a');
-      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.PRMREXPR, ['a']]]]);
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.EXPRSTMT, [JsNode.PRMREXPR, ['a']]]]);
     });
     it('prmrexpr 2', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('true');
-      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.PRMREXPR, ['true']]]]);
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.EXPRSTMT, [JsNode.PRMREXPR, ['true']]]]);
     });
     it('prmrexpr 3', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('null');
-      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.PRMREXPR, ['null']]]]);
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.EXPRSTMT, [JsNode.PRMREXPR, ['null']]]]);
     });
     it('prmrexpr 4', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('this');
-      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.PRMREXPR, ['this']]]]);
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.EXPRSTMT, [JsNode.PRMREXPR, ['this']]]]);
     });
     it('prmrexpr 5', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('false');
-      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.PRMREXPR, ['false']]]]);
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.EXPRSTMT, [JsNode.PRMREXPR, ['false']]]]);
     });
     it('prmrexpr 6', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('[]');
-      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.PRMREXPR, [JsNode.ARRLTR, ['[', ']']]]]]);
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.EXPRSTMT, [JsNode.PRMREXPR, [JsNode.ARRLTR, ['[', ']']]]]]);
     });
     it('prmrexpr 7', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('!{}');
-      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.UNARYEXPR, ['!', JsNode.PRMREXPR, [JsNode.OBJLTR, ['{', '}']]]]]]);
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.EXPRSTMT, [JsNode.UNARYEXPR, ['!', JsNode.PRMREXPR, [JsNode.OBJLTR, ['{', '}']]]]]]);
     });
     it('mmbexpr 1', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('a.b');
-      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.MMBEXPR, [JsNode.PRMREXPR, ['a'], '.', 'b']]]]);
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.EXPRSTMT, [JsNode.MMBEXPR, [JsNode.PRMREXPR, ['a'], '.', 'b']]]]);
     });
     it('mmbexpr 2', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('a[2]');
-      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.MMBEXPR, [JsNode.PRMREXPR, ['a'], '[', JsNode.PRMREXPR, ['2'], ']']]]]);
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.EXPRSTMT, [JsNode.MMBEXPR, [JsNode.PRMREXPR, ['a'], '[', JsNode.PRMREXPR, ['2'], ']']]]]);
     });
     it('callexpr 1', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('a()');
-      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.CALLEXPR, [JsNode.PRMREXPR, ['a'], JsNode.ARGS, ['(', ')']]]]])
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.EXPRSTMT, [JsNode.CALLEXPR, [JsNode.PRMREXPR, ['a'], JsNode.ARGS, ['(', ')']]]]])
     });
     it('callexpr 2', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('a.b()');
-      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.CALLEXPR, [JsNode.MMBEXPR, [JsNode.PRMREXPR, ['a'], '.', 'b'], JsNode.ARGS, ['(', ')']]]]])
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.EXPRSTMT, [JsNode.CALLEXPR, [JsNode.MMBEXPR, [JsNode.PRMREXPR, ['a'], '.', 'b'], JsNode.ARGS, ['(', ')']]]]])
     });
     it('callexpr 3', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('new A().f()');
-      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.CALLEXPR, [JsNode.MMBEXPR, [JsNode.NEWEXPR, ['new', JsNode.PRMREXPR, ['A'], JsNode.ARGS, ['(', ')']], '.', 'f'], JsNode.ARGS, ['(', ')']]]]])
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.EXPRSTMT, [JsNode.CALLEXPR, [JsNode.MMBEXPR, [JsNode.NEWEXPR, ['new', JsNode.PRMREXPR, ['A'], JsNode.ARGS, ['(', ')']], '.', 'f'], JsNode.ARGS, ['(', ')']]]]])
     });
     it('unaryexpr 1', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('typeof a');
-      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.UNARYEXPR, ['typeof', JsNode.PRMREXPR, ['a']]]]]);
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.EXPRSTMT, [JsNode.UNARYEXPR, ['typeof', JsNode.PRMREXPR, ['a']]]]]);
     });
     it('unaryexpr 2', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('!!0');
-      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.UNARYEXPR, ['!', JsNode.UNARYEXPR, ['!', JsNode.PRMREXPR, ['0']]]]]]);
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.EXPRSTMT, [JsNode.UNARYEXPR, ['!', JsNode.UNARYEXPR, ['!', JsNode.PRMREXPR, ['0']]]]]]);
     });
     it('mtplexpr 1', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('a * b');
-      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.MTPLEXPR, [JsNode.PRMREXPR, ['a'], '*', JsNode.PRMREXPR, ['b']]]]]);
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.EXPRSTMT, [JsNode.MTPLEXPR, [JsNode.PRMREXPR, ['a'], '*', JsNode.PRMREXPR, ['b']]]]]);
     });
     it('mtplexpr 2', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('a() * b[0]');
-      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.MTPLEXPR, [JsNode.CALLEXPR, [JsNode.PRMREXPR, ['a'], JsNode.ARGS, ['(', ')']], '*', JsNode.MMBEXPR, [JsNode.PRMREXPR, ['b'], '[', JsNode.PRMREXPR, ['0'], ']']]]]]);
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.EXPRSTMT, [JsNode.MTPLEXPR, [JsNode.CALLEXPR, [JsNode.PRMREXPR, ['a'], JsNode.ARGS, ['(', ')']], '*', JsNode.MMBEXPR, [JsNode.PRMREXPR, ['b'], '[', JsNode.PRMREXPR, ['0'], ']']]]]]);
     });
     it('mtplexpr 3', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('!a * b--');
-      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.MTPLEXPR, [JsNode.UNARYEXPR, ['!', JsNode.PRMREXPR, ['a']], '*', JsNode.POSTFIXEXPR, [JsNode.PRMREXPR, ['b'], '--']]]]]);
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.EXPRSTMT, [JsNode.MTPLEXPR, [JsNode.UNARYEXPR, ['!', JsNode.PRMREXPR, ['a']], '*', JsNode.POSTFIXEXPR, [JsNode.PRMREXPR, ['b'], '--']]]]]);
     });
     it('addexpr 1', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('a + b * 2 - c');
-      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.ADDEXPR, [JsNode.PRMREXPR, ["a"], "+", JsNode.MTPLEXPR, [JsNode.PRMREXPR, ["b"], "*", JsNode.PRMREXPR, ["2"]], "-", JsNode.PRMREXPR, ["c"]]]]]);
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.EXPRSTMT, [JsNode.ADDEXPR, [JsNode.PRMREXPR, ["a"], "+", JsNode.MTPLEXPR, [JsNode.PRMREXPR, ["b"], "*", JsNode.PRMREXPR, ["2"]], "-", JsNode.PRMREXPR, ["c"]]]]]);
     });
     it('addexpr 2', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('~a + a++ + ++a');
-      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.ADDEXPR, [JsNode.UNARYEXPR, ["~", JsNode.PRMREXPR, ["a"]], "+", JsNode.POSTFIXEXPR, [JsNode.PRMREXPR, ["a"], "++"], "+", JsNode.UNARYEXPR, ["++", JsNode.PRMREXPR, ["a"]]]]]]);
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.EXPRSTMT, [JsNode.ADDEXPR, [JsNode.UNARYEXPR, ["~", JsNode.PRMREXPR, ["a"]], "+", JsNode.POSTFIXEXPR, [JsNode.PRMREXPR, ["a"], "++"], "+", JsNode.UNARYEXPR, ["++", JsNode.PRMREXPR, ["a"]]]]]]);
     });
     it('shiftexpr 1', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('a>>a+1');
-      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.SHIFTEXPR, [JsNode.PRMREXPR, ["a"], ">>", JsNode.ADDEXPR, [JsNode.PRMREXPR, ["a"], "+", JsNode.PRMREXPR, ["1"]]]]]]);
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.EXPRSTMT, [JsNode.SHIFTEXPR, [JsNode.PRMREXPR, ["a"], ">>", JsNode.ADDEXPR, [JsNode.PRMREXPR, ["a"], "+", JsNode.PRMREXPR, ["1"]]]]]]);
     });
     it('shiftexpr 2', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('a*b>>>c/d<<--e');
-      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.SHIFTEXPR, [JsNode.MTPLEXPR, [JsNode.PRMREXPR, ["a"], "*", JsNode.PRMREXPR, ["b"]], ">>>", JsNode.MTPLEXPR, [JsNode.PRMREXPR, ["c"], "/", JsNode.PRMREXPR, ["d"]], "<<", JsNode.UNARYEXPR, ["--", JsNode.PRMREXPR, ["e"]]]]]]);
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.EXPRSTMT, [JsNode.SHIFTEXPR, [JsNode.MTPLEXPR, [JsNode.PRMREXPR, ["a"], "*", JsNode.PRMREXPR, ["b"]], ">>>", JsNode.MTPLEXPR, [JsNode.PRMREXPR, ["c"], "/", JsNode.PRMREXPR, ["d"]], "<<", JsNode.UNARYEXPR, ["--", JsNode.PRMREXPR, ["e"]]]]]]);
     });
     it('reltexpr 1', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('a > b');
-      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.RELTEXPR, [JsNode.PRMREXPR, ["a"], ">", JsNode.PRMREXPR, ["b"]]]]]);
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.EXPRSTMT, [JsNode.RELTEXPR, [JsNode.PRMREXPR, ["a"], ">", JsNode.PRMREXPR, ["b"]]]]]);
     });
     it('reltexpr 2', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('a <= b+1');
-      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.RELTEXPR, [JsNode.PRMREXPR, ["a"], "<=", JsNode.ADDEXPR, [JsNode.PRMREXPR, ["b"], "+", JsNode.PRMREXPR, ["1"]]]]]]);
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.EXPRSTMT, [JsNode.RELTEXPR, [JsNode.PRMREXPR, ["a"], "<=", JsNode.ADDEXPR, [JsNode.PRMREXPR, ["b"], "+", JsNode.PRMREXPR, ["1"]]]]]]);
     });
     it('reltexpr 3', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('a instanceof new A()');
-      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.RELTEXPR, [JsNode.PRMREXPR, ["a"], "instanceof", JsNode.NEWEXPR, ["new", JsNode.PRMREXPR, ["A"], JsNode.ARGS, ["(", ")"]]]]]]);
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.EXPRSTMT, [JsNode.RELTEXPR, [JsNode.PRMREXPR, ["a"], "instanceof", JsNode.NEWEXPR, ["new", JsNode.PRMREXPR, ["A"], JsNode.ARGS, ["(", ")"]]]]]]);
     });
     it('eqexpr 1', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('a == 3');
-      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.EQEXPR, [JsNode.PRMREXPR, ["a"], "==", JsNode.PRMREXPR, ["3"]]]]]);
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.EXPRSTMT, [JsNode.EQEXPR, [JsNode.PRMREXPR, ["a"], "==", JsNode.PRMREXPR, ["3"]]]]]);
     });
     it('eqexpr 2', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('a == b + 3');
-      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.EQEXPR, [JsNode.PRMREXPR, ["a"], "==", JsNode.ADDEXPR, [JsNode.PRMREXPR, ["b"], "+", JsNode.PRMREXPR, ["3"]]]]]]);
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.EXPRSTMT, [JsNode.EQEXPR, [JsNode.PRMREXPR, ["a"], "==", JsNode.ADDEXPR, [JsNode.PRMREXPR, ["b"], "+", JsNode.PRMREXPR, ["3"]]]]]]);
     });
     it('eqexpr 3', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('a !== b >>> 4');
-      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.EQEXPR, [JsNode.PRMREXPR, ["a"], "!==", JsNode.SHIFTEXPR, [JsNode.PRMREXPR, ["b"], ">>>", JsNode.PRMREXPR, ["4"]]]]]]);
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.EXPRSTMT, [JsNode.EQEXPR, [JsNode.PRMREXPR, ["a"], "!==", JsNode.SHIFTEXPR, [JsNode.PRMREXPR, ["b"], ">>>", JsNode.PRMREXPR, ["4"]]]]]]);
     });
     it('bitandexpr', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('void a & --b');
-      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.BITANDEXPR, [JsNode.UNARYEXPR, ["void", JsNode.PRMREXPR, ["a"]], "&", JsNode.UNARYEXPR, ["--", JsNode.PRMREXPR, ["b"]]]]]]);
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.EXPRSTMT, [JsNode.BITANDEXPR, [JsNode.UNARYEXPR, ["void", JsNode.PRMREXPR, ["a"]], "&", JsNode.UNARYEXPR, ["--", JsNode.PRMREXPR, ["b"]]]]]]);
     });
     it('bitxorexpr', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('a>1 & b--');
-      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.BITANDEXPR, [JsNode.RELTEXPR, [JsNode.PRMREXPR, ["a"], ">", JsNode.PRMREXPR, ["1"]], "&", JsNode.POSTFIXEXPR, [JsNode.PRMREXPR, ["b"], "--"]]]]]);
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.EXPRSTMT, [JsNode.BITANDEXPR, [JsNode.RELTEXPR, [JsNode.PRMREXPR, ["a"], ">", JsNode.PRMREXPR, ["1"]], "&", JsNode.POSTFIXEXPR, [JsNode.PRMREXPR, ["b"], "--"]]]]]);
     });
     it('bitorexpr', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('++b | -a');
-      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.BITOREXPR, [JsNode.UNARYEXPR, ["++", JsNode.PRMREXPR, ["b"]], "|", JsNode.UNARYEXPR, ["-", JsNode.PRMREXPR, ["a"]]]]]]);
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.EXPRSTMT, [JsNode.BITOREXPR, [JsNode.UNARYEXPR, ["++", JsNode.PRMREXPR, ["b"]], "|", JsNode.UNARYEXPR, ["-", JsNode.PRMREXPR, ["a"]]]]]]);
     });
     it('logandexpr', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('a.b && c >> 1');
-      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.LOGANDEXPR, [JsNode.MMBEXPR, [JsNode.PRMREXPR, ["a"], ".", "b"], "&&", JsNode.SHIFTEXPR, [JsNode.PRMREXPR, ["c"], ">>", JsNode.PRMREXPR, ["1"]]]]]]);
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.EXPRSTMT, [JsNode.LOGANDEXPR, [JsNode.MMBEXPR, [JsNode.PRMREXPR, ["a"], ".", "b"], "&&", JsNode.SHIFTEXPR, [JsNode.PRMREXPR, ["c"], ">>", JsNode.PRMREXPR, ["1"]]]]]]);
     });
     it('logorexpr', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('a || b && c || d && f');
-      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.LOGOREXPR, [JsNode.PRMREXPR, ["a"], "||", JsNode.LOGANDEXPR, [JsNode.PRMREXPR, ["b"], "&&", JsNode.PRMREXPR, ["c"]], "||", JsNode.LOGANDEXPR, [JsNode.PRMREXPR, ["d"], "&&", JsNode.PRMREXPR, ["f"]]]]]]);
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.EXPRSTMT, [JsNode.LOGOREXPR, [JsNode.PRMREXPR, ["a"], "||", JsNode.LOGANDEXPR, [JsNode.PRMREXPR, ["b"], "&&", JsNode.PRMREXPR, ["c"]], "||", JsNode.LOGANDEXPR, [JsNode.PRMREXPR, ["d"], "&&", JsNode.PRMREXPR, ["f"]]]]]]);
     });
     it('condexpr', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('a && b ? false || true : typeof null');
-      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.CNDTEXPR, [JsNode.LOGANDEXPR, [JsNode.PRMREXPR, ["a"], "&&", JsNode.PRMREXPR, ["b"]], "?", JsNode.LOGOREXPR, [JsNode.PRMREXPR, ["false"], "||", JsNode.PRMREXPR, ["true"]], ":", JsNode.UNARYEXPR, ["typeof", JsNode.PRMREXPR, ["null"]]]]]]);
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.EXPRSTMT, [JsNode.CNDTEXPR, [JsNode.LOGANDEXPR, [JsNode.PRMREXPR, ["a"], "&&", JsNode.PRMREXPR, ["b"]], "?", JsNode.LOGOREXPR, [JsNode.PRMREXPR, ["false"], "||", JsNode.PRMREXPR, ["true"]], ":", JsNode.UNARYEXPR, ["typeof", JsNode.PRMREXPR, ["null"]]]]]]);
     });
     it('assignexpr 1', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('a = b = c');
-      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.ASSIGNEXPR, [JsNode.PRMREXPR, ["a"], "=", JsNode.ASSIGNEXPR, [JsNode.PRMREXPR, ["b"], "=", JsNode.PRMREXPR, ["c"]]]]]]);
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.EXPRSTMT, [JsNode.ASSIGNEXPR, [JsNode.PRMREXPR, ["a"], "=", JsNode.ASSIGNEXPR, [JsNode.PRMREXPR, ["b"], "=", JsNode.PRMREXPR, ["c"]]]]]]);
     });
     it('assignexpr 2', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('a += b %= c');
-      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.ASSIGNEXPR, [JsNode.PRMREXPR, ["a"], "+=", JsNode.ASSIGNEXPR, [JsNode.PRMREXPR, ["b"], "%=", JsNode.PRMREXPR, ["c"]]]]]]);
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.EXPRSTMT, [JsNode.ASSIGNEXPR, [JsNode.PRMREXPR, ["a"], "+=", JsNode.ASSIGNEXPR, [JsNode.PRMREXPR, ["b"], "%=", JsNode.PRMREXPR, ["c"]]]]]]);
     });
     it('expr 1', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('(1)');
-      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.STMT, [JsNode.PRMREXPR, ["(", JsNode.PRMREXPR, ["1"], ")"]]]]);
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.EXPRSTMT, [JsNode.PRMREXPR, ["(", JsNode.PRMREXPR, ["1"], ")"]]]]);
     });
     it('expr 2', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('(a, !b, c+d)');
-      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.STMT,[JsNode.PRMREXPR,["(",JsNode.EXPR,[JsNode.PRMREXPR,["a"],",",JsNode.UNARYEXPR,["!",JsNode.PRMREXPR,["b"]],",",JsNode.ADDEXPR,[JsNode.PRMREXPR,["c"],"+",JsNode.PRMREXPR,["d"]]],")"]]]]);
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.EXPRSTMT,[JsNode.PRMREXPR,["(",JsNode.EXPR,[JsNode.PRMREXPR,["a"],",",JsNode.UNARYEXPR,["!",JsNode.PRMREXPR,["b"]],",",JsNode.ADDEXPR,[JsNode.PRMREXPR,["c"],"+",JsNode.PRMREXPR,["d"]]],")"]]]]);
     });
     it('block', function() {
       var parser = homunculus.getParser('js');
@@ -449,7 +449,7 @@ describe('jsparser', function() {
     it('cntnstmt 3', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('while(false){continue\na;}');
-      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.ITERSTMT,["while","(",JsNode.PRMREXPR,["false"],")",JsNode.BLOCK,["{",JsNode.CNTNSTMT,["continue"],JsNode.STMT,[JsNode.PRMREXPR,["a"],";"],"}"]]]]);
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.ITERSTMT,["while","(",JsNode.PRMREXPR,["false"],")",JsNode.BLOCK,["{",JsNode.CNTNSTMT,["continue"],JsNode.EXPRSTMT,[JsNode.PRMREXPR,["a"],";"],"}"]]]]);
     });
     it('brkstmt 1', function() {
       var parser = homunculus.getParser('js');
@@ -464,7 +464,7 @@ describe('jsparser', function() {
     it('brkstmt 3', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('while(false){break\na;}');
-      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.ITERSTMT,["while","(",JsNode.PRMREXPR,["false"],")",JsNode.BLOCK,["{",JsNode.BRKSTMT,["break"],JsNode.STMT,[JsNode.PRMREXPR,["a"],";"],"}"]]]]);
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.ITERSTMT,["while","(",JsNode.PRMREXPR,["false"],")",JsNode.BLOCK,["{",JsNode.BRKSTMT,["break"],JsNode.EXPRSTMT,[JsNode.PRMREXPR,["a"],";"],"}"]]]]);
     });
     it('withstmt', function() {
       var parser = homunculus.getParser('js');

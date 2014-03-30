@@ -63,7 +63,6 @@ var Parser = Class(function(lexer) {
     }
   },
   stmt: function(allowSuper) {
-    var node = new Node(Node.STMT);
     if(!this.look) {
       this.error();
     }
@@ -129,13 +128,17 @@ var Parser = Class(function(lexer) {
                 return this.labstmt();
               }
               else {
-                break;
+                return this.exprstmt();
               }
             }
           }
         }
-        node.add(this.expr(), this.match(';'));
+        return this.exprstmt();
     }
+  },
+  exprstmt: function() {
+    var node = new Node(Node.EXPRSTMT);
+    node.add(this.expr(), this.match(';'));
     return node;
   },
   cststmt: function(noSem) {

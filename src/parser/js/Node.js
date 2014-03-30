@@ -97,6 +97,7 @@ var Node = Class(function(type, children) {
   THRSTMT: 'thrstmt',
   TRYSTMT: 'trystmt',
   DEBSTMT: 'debstmt',
+  EXPRSTMT: 'exprstmt',
   CACH: 'cach',
   FINL: 'finl',
   FNDECL: 'fndecl',
