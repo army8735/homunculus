@@ -16,7 +16,4 @@ test_jscontext:
 	@mocha tests/jscontext.js -R spec
 
 coveralls:
-	@mocha tests/api.js --require blanket --reporter mocha-lcov-reporter | @node ./node_modules/coveralls/bin/coveralls.js
-	@mocha tests/jslexer.js --require blanket --reporter mocha-lcov-reporter | @node ./node_modules/coveralls/bin/coveralls.js
-	@mocha tests/jsparser.js --require blanket --reporter mocha-lcov-reporter | @node ./node_modules/coveralls/bin/coveralls.js
-	@mocha tests/jscontext.js --require blanket --reporter mocha-lcov-reporter | @node ./node_modules/coveralls/bin/coveralls.js
+	@mocha tests/api.js tests/jslexer.js tests/jsparser.js tests/jscontext.js --require blanket --reporter mocha-lcov-reporter | ./node_modules/coveralls/bin/coveralls.js
