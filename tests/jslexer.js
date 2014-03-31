@@ -4,6 +4,8 @@ var expect = require('expect.js');
 var fs = require('fs');
 var path = require('path');
 
+var Token = homunculus.getClass('token', 'js');
+
 function join(tokens) {
   var arr = tokens.map(function(token) {
     return token.content();
