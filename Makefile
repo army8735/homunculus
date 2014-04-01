@@ -10,7 +10,7 @@ test-jslexer:
 	@mocha tests/jslexer.js -R spec
 
 test-jsparser:
-	@mocha tests/jsparser.js
+	@mocha tests/jsparser.js -R spec
 
 test-jscontext:
 	@mocha tests/jscontext.js -R spec

@@ -13,7 +13,13 @@
   },
   "config": {
     "blanket": {
-      "pattern": "src"
+      "pattern": ["src/lexer/Lexer",
+        "src/lexer/Token",
+        "src/lexer/match",
+        "src/lexer/rule/Rule",
+        "src/lexer/rule/EcmascriptRule",
+        "src/parser/js",
+        "src/util"]
     }
   },
   "repository": {
