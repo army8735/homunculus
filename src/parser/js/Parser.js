@@ -237,9 +237,6 @@ var Parser = Class(function(lexer) {
   },
   iterstmt: function() {
     var node = new Node(Node.ITERSTMT);
-    if(!this.look) {
-      this.error();
-    }
     switch(this.look.content()) {
       case 'do':
         node.add(
@@ -989,9 +986,6 @@ var Parser = Class(function(lexer) {
     return node;
   },
   leftexpr: function() {
-    if(!this.look) {
-      this.error();
-    }
     if(this.look.content() == 'new') {
       return this.newexpr();
     }
@@ -1083,9 +1077,6 @@ var Parser = Class(function(lexer) {
   },
   mmbexpr: function() {
     var node = new Node(Node.MMBEXPR);
-    if(!this.look) {
-      this.error();
-    }
     var mmb;
     if(this.look.content() == 'function') {
       mmb = this.fnexpr();
@@ -1121,9 +1112,6 @@ var Parser = Class(function(lexer) {
   },
   prmrexpr: function() {
     var node = new Node(Node.PRMREXPR);
-    if(!this.look) {
-      this.error();
-    }
     switch(this.look.type()) {
       case Token.ID:
       case Token.NUMBER:
