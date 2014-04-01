@@ -665,6 +665,74 @@ describe('jsparser', function() {
       var node = parser.parse();
       expect(tree(node)).to.eql([JsNode.PROGRAM,[]]);
     });
+    it('letstmt 1', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('let a');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.LETSTMT,["let",JsNode.VARDECL,["a"]]]]);
+    });
+    it('letstmt 2', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('let a, b = 1');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.LETSTMT,["let",JsNode.VARDECL,["a"],",",JsNode.VARDECL,["b",JsNode.ASSIGN,["=",JsNode.PRMREXPR,["1"]]]]]]);
+    });
+    it('cststmt 1', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('const a');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.CSTSTMT,["const",JsNode.VARDECL,["a"]]]]);
+    });
+    it('cststmt 2', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('const a, b = 1');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.CSTSTMT,["const",JsNode.VARDECL,["a"],",",JsNode.VARDECL,["b",JsNode.ASSIGN,["=",JsNode.PRMREXPR,["1"]]]]]]);
+    });
+    it('class decl', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('class A{;}');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.CLASSDECL,["class","A","{",JsNode.CLASSBODY,[';'],"}"]]]);
+    });
+    it('class extend', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('class A{}class B extends A{}');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.CLASSDECL,["class","A","{",JsNode.CLASSBODY,[],"}"],JsNode.CLASSDECL,["class","B",JsNode.HERITAGE,["extends","A"],"{",JsNode.CLASSBODY,[],"}"]]]);
+    });
+    it('class method', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('class A{ method(param){} }');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.CLASSDECL,["class","A","{",JsNode.CLASSBODY,[JsNode.METHOD,["method","(",JsNode.FNPARAMS,["param"],")","{",JsNode.FNBODY,[],"}"]],"}"]]]);
+    });
+    it('class static method', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('class A{ static method(){} }');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.CLASSDECL,["class","A","{",JsNode.CLASSBODY,["static",JsNode.METHOD,["method","(",")","{",JsNode.FNBODY,[],"}"]],"}"]]]);
+    });
+    it('class error', function() {
+      var parser = homunculus.getParser('js');
+      expect(function() {
+        parser.parse('class A');
+      }).to.throwError();
+    });
+    it('class method error', function() {
+      var parser = homunculus.getParser('js');
+      expect(function() {
+        parser.parse('class A{ method');
+      }).to.throwError();
+    });
+    it('class method duplicate error', function() {
+      var parser = homunculus.getParser('js');
+      expect(function() {
+        parser.parse('class A{ A(){} A(){} }');
+      }).to.throwError();
+    });
+    it('set', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('class A{set a(p){}}');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.CLASSDECL,["class","A","{",JsNode.CLASSBODY,[JsNode.METHOD,["set",JsNode.SETFN,[JsNode.PROPTNAME,["a"],"(",JsNode.PROPTSETS,["p"],")","{",JsNode.FNBODY,[],"}"]]],"}"]]]);
+    });
+    it('get', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('class A{get a(){}}');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.CLASSDECL,["class","A","{",JsNode.CLASSBODY,[JsNode.METHOD,["get",JsNode.GETFN,[JsNode.PROPTNAME,["a"],"(",")","{",JsNode.FNBODY,[],"}"]]],"}"]]]);
+    });
   });
   describe('js lib exec test', function() {
     it('jquery 1.11.0', function() {
