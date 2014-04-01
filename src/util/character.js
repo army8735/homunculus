@@ -50,13 +50,3 @@ exports.isString = function(s) {
 exports.isNumber = function(s) {
   return Object.prototype.toString.call(s) == "[object Number]";
 };
-exports.escapeHTML = function(str) {
-  var xmlchar = {
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;'
-  };
-  return str.replace(/[<>&]/g, function($1){
-    return xmlchar[$1];
-  });
-};

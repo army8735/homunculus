@@ -753,5 +753,11 @@ describe('jsparser', function() {
         parser.init();
       }).to.not.throwError();
     });
+    it('JsNode#getKey', function() {
+      expect(JsNode.getKey('program')).to.eql('PROGRAM');
+      expect(function() {
+        JsNode.getKey('');
+      }).to.throwError();
+    });
   });
 });

@@ -5,6 +5,7 @@ var fs = require('fs');
 var path = require('path');
 
 var Token = homunculus.getClass('token', 'js');
+var Lexer = homunculus.getClass('lexer', 'js');
 
 function join(tokens) {
   var arr = tokens.map(function(token) {
@@ -24,6 +25,12 @@ describe('jslexer', function() {
       var lexer = homunculus.getLexer('js');
       var tokens = lexer.parse('"string\\\\""str"');
       expect(join(tokens)).to.eql(['"string\\\\"', '"str"']);
+    });
+    it('string literal no end', function() {
+      var lexer = homunculus.getLexer('js');
+      expect(function() {
+        lexer.parse('"sdfsdf');
+      }).to.throwError();
     });
     it('id and sign in var stmt', function() {
       var lexer = homunculus.getLexer('js');
@@ -50,6 +57,18 @@ describe('jslexer', function() {
       var tokens = lexer.parse('(a)/b (a)/ /x/');
       expect(join(tokens)).to.eql(['(', 'a', ')', '/', 'b', ' ', '(', 'a', ')', '/', ' ', '/x/']);
     });
+    it('perl style regular with unknow flag', function() {
+      var lexer = homunculus.getLexer('js');
+      expect(function() {
+        lexer.parse('/reg/op;');
+      }).to.throwError();
+    });
+    it('perl style regular no end 2', function() {
+      var lexer = homunculus.getLexer('js');
+      expect(function() {
+        lexer.parse('/reg');
+      }).to.throwError();
+    });
     it('signle line comment', function() {
       var lexer = homunculus.getLexer('js');
       var tokens = lexer.parse('//comment\n//cc');
@@ -69,6 +88,12 @@ describe('jslexer', function() {
       var lexer = homunculus.getLexer('js');
       var tokens = lexer.parse('0.541 .32E+8 123E9 45.2E-10');
       expect(join(tokens)).to.eql(['0.541', ' ', '.32E+8', ' ', '123E9', ' ', '45.2E-10']);
+    });
+    it('unknow token', function() {
+      var lexer = homunculus.getLexer('js');
+      expect(function() {
+        lexer.parse('€');
+      }).to.throwError();
     });
   });
   describe('complex test', function() {
@@ -169,6 +194,66 @@ describe('jslexer', function() {
         str += token.content();
       });
       expect(str).to.eql(code);
+    });
+  });
+  describe('other tests', function() {
+    it('Token#type', function() {
+      expect(Token.type(18)).to.eql('IMPORTANT');
+    });
+    it('Token#content', function() {
+      var token = new Token(Token.STRING, '', 0);
+      token.content('a');
+      expect(token.content()).eql('a');
+    });
+    it('Token#val', function() {
+      var token = new Token(Token.STRING, '', 0);
+      token.val('a');
+      expect(token.val()).eql('a');
+    });
+    it('Token#tag', function() {
+      var token = new Token(Token.NUMBER, '', 0);
+      token.tag(Token.STRING);
+      expect(token.tag()).eql('STRING');
+    });
+    it('Token#tid', function() {
+      var token = new Token(Token.NUMBER, '', 0);
+      token.tid(0);
+      expect(token.tid()).eql(0);
+    });
+    it('Token#sIndex', function() {
+      var token = new Token(Token.NUMBER, '', 0);
+      token.sIndex(1);
+      expect(token.sIndex()).eql(1);
+    });
+    it('cache parse', function() {
+      var lexer = homunculus.getLexer('js');
+      lexer.cache(1);
+      lexer.parse('var a;\nvar b;');
+      expect(lexer.finish()).to.not.ok();
+      expect(lexer.line()).to.be(2);
+      lexer.parseOn();
+      expect(lexer.finish()).to.ok();
+      expect(lexer.col()).to.be(7);
+    });
+    it('mode test', function() {
+      expect(Lexer.mode()).to.eql(Lexer.STRICT);
+      Lexer.mode(Lexer.LOOSE);
+      expect(Lexer.mode()).to.eql(Lexer.LOOSE);
+      Lexer.mode(Lexer.STRICT);
+    });
+    it('mode error in strict', function() {
+      var lexer = homunculus.getLexer('js');
+      expect(function() {
+        lexer.parse('0.3E');
+      }).to.throwError();
+    });
+    it('mode console in loose', function() {
+      var lexer = homunculus.getLexer('js');
+      Lexer.mode(Lexer.LOOSE);
+      expect(function() {
+        lexer.parse('0.3E');
+      }).to.not.throwError();
+      Lexer.mode(Lexer.STRICT);
     });
   });
 });

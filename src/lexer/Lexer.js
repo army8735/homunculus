@@ -18,11 +18,8 @@ var Lexer = Class(function(rule) {
     this.colNum = 0; //列
     this.colMax = 0; //最大列数
   },
-  parse: function(code, start) {
+  parse: function(code) {
     this.code = code || '';
-    if(!character.isUndefined(start)) {
-      this.totalLine = start;
-    }
     var temp = [];
     this.scan(temp);
     return temp;
@@ -194,15 +191,9 @@ var Lexer = Class(function(rule) {
     if(Lexer.mode() === Lexer.STRICT) {
       throw new Error(s + ', line ' + this.line() + ' col ' + this.colNum + '\n' + str);
     }
-    else if(Lexer.mode() === Lexer.LOOSE && window.console) {
+    else if(Lexer.mode() === Lexer.LOOSE && !character.isUndefined(console)) {
       if(console.warn) {
         console.warn(s + ', line ' + this.line() + ' col ' + this.colNum + '\n' + str);
-      }
-      else if(console.error) {
-        console.error(s + ', line ' + this.line() + ' col ' + this.colNum + '\n' + str);
-      }
-      else if(console.log) {
-        console.log(s + ', line ' + this.line() + ' col ' + this.colNum + '\n' + str);
       }
     }
     return this;

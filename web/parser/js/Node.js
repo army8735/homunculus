@@ -130,6 +130,9 @@ define(function(require, exports, module) {
     NEWEXPR: 'newexpr',
     CALLEXPR: 'callexpr',
     getKey: function(s) {
+      if(!s) {
+        throw new Error('empty value');
+      }
       if(!keys) {
         var self = this;
         keys = {};
