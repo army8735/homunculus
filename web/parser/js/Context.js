@@ -9,7 +9,6 @@ define(function(require, exports, module) {
     this.parser = new Parser();
     this.parent = parent || null; //父上下文，如果是全局则为空
     this.name = name || null; //上下文名称，即函数名，函数表达式为空，全局也为空
-    this.thisIs = null; //上下文环境中this的值，函数表达式中可能会赋值
     this.children = []; //函数声明或函数表达式所产生的上下文
     this.childrenMap = {}; //键是函数名，值是上下文，匿名函数表达式键为cid
     this.vars = []; //变量var声明
@@ -20,6 +19,7 @@ define(function(require, exports, module) {
     this.vids = []; //上下文环境里用到的变量id
     this.vidsMap = {}; //键为id字面量，值是它的token的节点
     this.returns = []; //上下文环境里return语句
+    this.node = null; //对应的ast的节点
     if(!this.isTop()) {
       this.parent.addChild(this);
     }
@@ -43,13 +43,6 @@ define(function(require, exports, module) {
     },
     getParent: function() {
       return this.parent;
-    },
-    getThis: function() {
-      return this.thisIs;
-    },
-    setThis: function(t) {
-      this.thisIs = t;
-      return this;
     },
     isTop: function() {
       return !this.parent;
@@ -159,6 +152,13 @@ define(function(require, exports, module) {
     },
     getVids: function() {
       return this.vids;
+    },
+    getNode: function() {
+      return this.node;
+    },
+    setNode: function(n) {
+      this.node = n;
+      return this;
     }
   });
   
@@ -200,6 +200,7 @@ define(function(require, exports, module) {
   function fndecl(node, context) {
     var v = node.leaves()[1].leaves().content();
     var child = new Context(context, v);
+    child.setNode(node);
     var params = node.leaves()[3];
     if(params.name() == JsNode.FNPARAMS) {
       addParam(params, child);
@@ -209,10 +210,11 @@ define(function(require, exports, module) {
   function fnexpr(node, context) {
     //函数表达式name为空
     var child = new Context(context);
+    child.setNode(node);
     //记录形参
     var params;
     var v = node.leaves()[1];
-    if(v.name() == JsNode.TOKEN) {
+    if(v.token().content() != '(') {
       params = node.leaves()[3];
     }
     else {

@@ -62,6 +62,41 @@ describe('jscontext', function() {
       var first = context.getChildren()[0];
       expect(first.getAParams().length).to.be(3);
     });
+    it('fnexpr with name', function() {
+      var context = homunculus.getContext('js');
+      context.parse('~function a(){}();');
+      var first = context.getChildren()[0];
+      expect(first.getName()).to.be(null);
+    });
+    it('fnexpr with params', function() {
+      var context = homunculus.getContext('js');
+      context.parse('~function a(b){}();');
+      var first = context.getChildren()[0];
+      expect(first.hasParam('b')).to.ok();
+    });
+    it('fnexpr in ()', function() {
+      var context = homunculus.getContext('js');
+      context.parse('(function a(){})();');
+      expect(context.getChildren().length).to.be(1);
+    });
+    it('fnexpr in () with params', function() {
+      var context = homunculus.getContext('js');
+      context.parse('(function(b){})(0);');
+      var first = context.getChildren()[0];
+      expect(first.hasParam('b')).to.ok();
+    });
+    it('fnexpr in () with params & with name', function() {
+      var context = homunculus.getContext('js');
+      context.parse('(function a(b){})();');
+      var first = context.getChildren()[0];
+      expect(first.hasParam('b')).to.ok();
+    });
+    it('isFnexpr', function() {
+      var context = homunculus.getContext('js');
+      context.parse('~function(){}();');
+      var first = context.getChildren()[0];
+      expect(first.isFnexpr()).to.ok();
+    });
     it('vid 1', function() {
       var context = homunculus.getContext('js');
       context.parse('var a = 1, b = {};c;b.a = 1;');
@@ -103,6 +138,38 @@ describe('jscontext', function() {
       var context = homunculus.getContext('js');
       context.parse('if(a)return true;else return false;');
       expect(context.getReturns().length).to.be(2);
+    });
+    it('#getParent top', function() {
+      var context = homunculus.getContext('js');
+      context.parse('function a(){}');
+      var first = context.getChild('a');
+      expect(context.getParent()).to.be(null);
+    });
+    it('#getParent child', function() {
+      var context = homunculus.getContext('js');
+      context.parse('function a(){}');
+      var first = context.getChild('a');
+      expect(first.getParent()).to.be(context);
+    });
+    it('#getNode', function() {
+      var context = homunculus.getContext('js');
+      context.parse('function a(){}');
+      var first = context.getChild('a');
+      var ast = context.parser.ast();
+      expect(first.getNode()).to.be(ast.leaves()[0]);
+    });
+    it('parse ast', function() {
+      var Context = homunculus.getClass('context', 'js');
+      var parser = homunculus.getParser('js');
+      parser.parse('function a(){}');
+      var context = new Context();
+      context.parse(parser.ast());
+      expect(context.hasChild('a')).to.ok();
+    });
+    it('#addVid duplicate', function() {
+      var context = homunculus.getContext('js');
+      context.parse('a.b = 1;a = 2;');
+      expect(context.getVids().length).to.be(1);
     });
   });
 });
