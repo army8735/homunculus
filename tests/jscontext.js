@@ -120,7 +120,7 @@ describe('jscontext', function() {
     it('#getVid', function() {
       var context = homunculus.getContext('js');
       context.parse('a = 1');
-      expect(context.getVid('a')).to.be(context.getVids()[0]);
+      expect(context.getVid('a')[0]).to.be(context.getVids()[0]);
     });
     it('return 1', function() {
       var context = homunculus.getContext('js');
@@ -174,7 +174,7 @@ describe('jscontext', function() {
     it('#addVid duplicate', function() {
       var context = homunculus.getContext('js');
       context.parse('a.b = 1;a = 2;');
-      expect(context.getVids().length).to.be(1);
+      expect(context.getVids().length).to.be(2);
     });
   });
 });

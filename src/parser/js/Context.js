@@ -145,11 +145,9 @@ var Context = Class(function(parent, name) {
   },
   addVid: function(node) {
     var v = node.token().content();
-    if(this.vidsMap.hasOwnProperty(v)) {
-      return;
-    }
     this.vids.push(node);
-    this.vidsMap[v] = node;
+    this.vidsMap[v] = this.vidsMap[v] || [];
+    this.vidsMap[v].push(node);
     return this;
   },
   getVids: function() {
