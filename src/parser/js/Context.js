@@ -140,6 +140,9 @@ var Context = Class(function(parent, name) {
   hasVid: function(v) {
     return this.vidsMap.hasOwnProperty(v);
   },
+  getVid: function(v) {
+    return this.vidsMap[v];
+  },
   addVid: function(node) {
     var v = node.token().content();
     if(this.vidsMap.hasOwnProperty(v)) {
