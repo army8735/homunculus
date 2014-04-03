@@ -50,14 +50,14 @@ var Context = Class(function(parent, name) {
     return !this.isTop() && !this.name;
   },
   hasParam: function(p) {
-    return !!this.paramsMap[p];
+    return p in this.paramsMap;
   },
   getParams: function() {
     return this.params;
   },
   addParam: function(p) {
     //形参不可能重复，无需判断
-    this.paramsMap[p] = true;
+    this.paramsMap[p] = this.params.length;
     this.params.push(p);
     return this;
   },
@@ -76,7 +76,7 @@ var Context = Class(function(parent, name) {
   },
   //通过name查找函数声明，id查找表达式
   hasChild: function(name) {
-    return !!this.childrenMap[name];
+    return name in this.childrenMap;
   },
   addChild: function(child) {
     var name = child.getName();
@@ -102,7 +102,7 @@ var Context = Class(function(parent, name) {
     return this;
   },
   hasVar: function(v) {
-    return !!this.varsMap[v];
+    return v in this.varsMap;
   },
   addVar: function(node, assign) {
     var v = node.leaves()[0].token().content();
@@ -138,7 +138,7 @@ var Context = Class(function(parent, name) {
     return this.returns;
   },
   hasVid: function(v) {
-    return !!this.vidsMap[v];
+    return v in this.vidsMap;
   },
   getVid: function(v) {
     return this.vidsMap[v];
