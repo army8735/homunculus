@@ -117,6 +117,11 @@ describe('jscontext', function() {
       expect(first.hasVid('a')).to.be(false);
       expect(first.hasVid('b')).to.be(true);
     });
+    it('vid toString', function() {
+      var context = homunculus.getContext('js');
+      context.parse('toString.call(this)');
+      expect(context.hasVid('toString')).to.be(true);
+    });
     it('#getVid', function() {
       var context = homunculus.getContext('js');
       context.parse('a = 1');
