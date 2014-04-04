@@ -116,6 +116,7 @@ define(function(require, exports, module) {
       do {
         this.readch();
         if(this.peek == character.LINE) {
+          this.error('SyntaxError: unterminated regular expression literal ' + this.peek, this.code.slice(lastIndex, this.index));
           break;
         }
         else if(this.peek == character.BACK_SLASH) {
@@ -125,6 +126,7 @@ define(function(require, exports, module) {
           do {
             this.readch();
             if(this.peek == character.LINE) {
+              this.error('SyntaxError: unterminated regular expression literal ' + this.peek, this.code.slice(lastIndex, this.index));
               break outer;
             }
             else if(this.peek == character.BACK_SLASH) {

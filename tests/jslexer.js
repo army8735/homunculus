@@ -32,6 +32,11 @@ describe('jslexer', function() {
         lexer.parse('"sdfsdf');
       }).to.throwError();
     });
+    it('string multiline', function() {
+      var lexer = homunculus.getLexer('js');
+      var tokens = lexer.parse('"string\\\r\n""str"');
+      expect(join(tokens)).to.eql(['"string\\\r\n"', '"str"']);
+    });
     it('id and sign in var stmt', function() {
       var lexer = homunculus.getLexer('js');
       var tokens = lexer.parse('var a = 1;var b');
@@ -63,11 +68,47 @@ describe('jslexer', function() {
         lexer.parse('/reg/op;');
       }).to.throwError();
     });
-    it('perl style regular no end 2', function() {
+    it('perl style regular with unknow flag in loose mode', function() {
+      var lexer = homunculus.getLexer('js');
+      Lexer.mode(Lexer.LOOSE);
+      expect(function() {
+        lexer.parse('/reg/op;');
+      }).to.not.throwError();
+      Lexer.mode(Lexer.STRICT);
+    });
+    it('perl style regular no end', function() {
       var lexer = homunculus.getLexer('js');
       expect(function() {
         lexer.parse('/reg');
       }).to.throwError();
+    });
+    it('perl style regular cross line', function() {
+      var lexer = homunculus.getLexer('js');
+      expect(function() {
+        lexer.parse('/reg\n/');
+      }).to.throwError();
+    });
+    it('perl style regular cross line in loose mode', function() {
+      var lexer = homunculus.getLexer('js');
+      Lexer.mode(Lexer.LOOSE);
+      expect(function() {
+        lexer.parse('/reg\n/');
+      }).to.not.throwError();
+      Lexer.mode(Lexer.STRICT);
+    });
+    it('perl style regular cross line in []', function() {
+      var lexer = homunculus.getLexer('js');
+      expect(function() {
+        lexer.parse('/reg[\n]/');
+      }).to.throwError();
+    });
+    it('perl style regular cross line in [] in loose mode', function() {
+      var lexer = homunculus.getLexer('js');
+      Lexer.mode(Lexer.LOOSE);
+      expect(function() {
+        lexer.parse('/reg[\n]/');
+      }).to.not.throwError();
+      Lexer.mode(Lexer.STRICT);
     });
     it('signle line comment', function() {
       var lexer = homunculus.getLexer('js');

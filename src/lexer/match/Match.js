@@ -38,7 +38,7 @@ module.exports = Class(function(type, setPReg, special, parenthese) {
   },
   match: function(c, code, index) {
     //需被实现
-    return false;
+    throw new Error('match needs to be implement');
   },
   error: function() {
     return false;
