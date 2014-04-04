@@ -49,7 +49,7 @@ define(function(require, exports, module) {
   
     self.addMatch(new CharacterSet(Token.BLANK, '\u00a0\f\u000b\u200b\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000'));
   }).statics({
-    KEYWORDS: 'abstract boolean break byte case catch char class const continue debugger default delete do double else enum export extends false final finally float for function goto if implements import in instanceof int interface let long native new null package private protected public return short static super switch synchronized this throw throws transient true try typeof var void volatile while with'.split(' ')
+    KEYWORDS: 'abstract boolean break byte case catch class const continue debugger default delete do double else enum export extends false final finally float for function goto if implements import in instanceof int interface let long native new null package private protected public return short static super switch synchronized this throw throws transient true try typeof var void volatile while with'.split(' ')
   });
   module.exports = EcmascriptRule;
 });

@@ -10,14 +10,14 @@ define(function(require, exports, module) {
     this.parent = parent || null; //父上下文，如果是全局则为空
     this.name = name || null; //上下文名称，即函数名，函数表达式为空，全局也为空
     this.children = []; //函数声明或函数表达式所产生的上下文
-    this.childrenMap = {}; //键是函数名，值是上下文，匿名函数表达式键为cid
+    this.childrenMap = Object.create(null); //键是函数名，值是上下文，匿名函数表达式键为cid
     this.vars = []; //变量var声明
-    this.varsMap = {}; //键为id字面量，值是它的token的节点
+    this.varsMap = Object.create(null); //键为id字面量，值是它的token的节点
     this.params = []; //形参，函数上下文才有，即全局无
-    this.paramsMap = {}; //键为id字面量，值是它的token的节点
+    this.paramsMap = Object.create(null); //键为id字面量，值是它的token的节点
     this.aParams = []; //实参，函数表达式才有
     this.vids = []; //上下文环境里用到的变量id
-    this.vidsMap = {}; //键为id字面量，值是它的token的节点
+    this.vidsMap = Object.create(null); //键为id字面量，值是它的token的节点
     this.returns = []; //上下文环境里return语句
     this.node = null; //对应的ast的节点
     if(!this.isTop()) {
@@ -51,7 +51,7 @@ define(function(require, exports, module) {
       return !this.isTop() && !this.name;
     },
     hasParam: function(p) {
-      return this.paramsMap.hasOwnProperty(p);
+      return p in this.paramsMap;
     },
     getParams: function() {
       return this.params;
@@ -77,7 +77,7 @@ define(function(require, exports, module) {
     },
     //通过name查找函数声明，id查找表达式
     hasChild: function(name) {
-      return this.childrenMap.hasOwnProperty(name);
+      return name in this.childrenMap;
     },
     addChild: function(child) {
       var name = child.getName();
@@ -103,7 +103,7 @@ define(function(require, exports, module) {
       return this;
     },
     hasVar: function(v) {
-      return this.varsMap.hasOwnProperty(v);
+      return v in this.varsMap;
     },
     addVar: function(node, assign) {
       var v = node.leaves()[0].token().content();
@@ -139,15 +139,16 @@ define(function(require, exports, module) {
       return this.returns;
     },
     hasVid: function(v) {
-      return this.vidsMap.hasOwnProperty(v);
+      return v in this.vidsMap;
+    },
+    getVid: function(v) {
+      return this.vidsMap[v];
     },
     addVid: function(node) {
       var v = node.token().content();
-      if(this.vidsMap.hasOwnProperty(v)) {
-        return;
-      }
       this.vids.push(node);
-      this.vidsMap[v] = node;
+      this.vidsMap[v] = this.vidsMap[v] || [];
+      this.vidsMap[v].push(node);
       return this;
     },
     getVids: function() {

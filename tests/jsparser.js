@@ -791,6 +791,14 @@ describe('jsparser', function() {
       var str = jion(node, ignore);
       expect(str).to.eql(code);
     });
+    it('formatter', function() {
+      var parser = homunculus.getParser('js');
+      var code = fs.readFileSync(path.join(__dirname, './lib/formatter.js'), { encoding: 'utf-8' });
+      var node = parser.parse(code);
+      var ignore = parser.ignore();
+      var str = jion(node, ignore);
+      expect(str).to.eql(code);
+    });
   });
   describe('other test', function() {
     it('node parent,prev,next', function() {
