@@ -13,6 +13,7 @@ define(function(require, exports, module) {
     this.childrenMap = Object.create(null); //键是函数名，值是上下文，匿名函数表达式键为cid
     this.vars = []; //变量var声明
     this.varsMap = Object.create(null); //键为id字面量，值是它的token的节点
+    this.vardeclMap = Object.create(null); //var赋值记录，优先级vardecl > fndecl > varnodecl
     this.params = []; //形参，函数上下文才有，即全局无
     this.paramsMap = Object.create(null); //键为id字面量，值是它的token的节点
     this.aParams = []; //实参，函数表达式才有
@@ -83,6 +84,10 @@ define(function(require, exports, module) {
       var name = child.getName();
       //函数表达式名字为空用id删除
       if(name) {
+        if(name in this.vardeclMap) {
+          return this;
+        }
+        this.delVar(name);
         this.delChild(name);
       }
       else {
@@ -111,6 +116,7 @@ define(function(require, exports, module) {
       if(assign) {
         this.delVar(v);
         this.delChild(v);
+        this.vardeclMap[v] = true;
       }
       //仅仅是var声明无赋值，且已有过声明或函数，忽略之
       else if(this.hasVar(v) || this.hasChild(v)) {

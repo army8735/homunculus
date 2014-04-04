@@ -18,6 +18,23 @@ describe('jscontext', function() {
       expect(context.getVars().length).to.be(1);
       expect(context.hasVar('a')).to.be(true);
     });
+    it('var duplicate', function() {
+      var context = homunculus.getContext('js');
+      context.parse('var a = 1;var a = 2;');
+      expect(context.getVars().length).to.be(1);
+    });
+    it('var replace with fn', function() {
+      var context = homunculus.getContext('js');
+      context.parse('var a;function a(){}');
+      expect(context.hasVar('a')).to.be(false);
+      expect(context.hasChild('a')).to.be(true);
+    });
+    it('vardecl replace with fn', function() {
+      var context = homunculus.getContext('js');
+      context.parse('var a = 1;function a(){}');
+      expect(context.hasVar('a')).to.be(true);
+      expect(context.hasChild('a')).to.be(false);
+    });
     it('fndecl 1', function() {
       var context = homunculus.getContext('js');
       context.parse('function a(){}var a;function b(){}');
@@ -73,6 +90,7 @@ describe('jscontext', function() {
       context.parse('~function a(b){}();');
       var first = context.getChildren()[0];
       expect(first.hasParam('b')).to.ok();
+      expect(first.getParams().length).to.be(1);
     });
     it('fnexpr in ()', function() {
       var context = homunculus.getContext('js');
