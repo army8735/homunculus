@@ -1,6 +1,6 @@
 {
   "name": "homunculus",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A lexer&parser by Javascript",
   "maintainers": [
     {
@@ -34,7 +34,7 @@
   "author": "army8735",
   "license": "MIT",
   "dependencies": {},
-  "main": "./homunculus",
+  "main": "./index",
   "engines": {
     "node": ">= 0.10.0"
   },
