@@ -1,4 +1,4 @@
-var homunculus = require('../homunculus');
+var homunculus = require('../');
 
 var expect = require('expect.js');
 var fs = require('fs');
@@ -721,6 +721,22 @@ describe('jsparser', function() {
       var parser = homunculus.getParser('js');
       expect(function() {
         parser.parse('class A{ A(){} A(){} }');
+      }).to.throwError();
+    });
+    it('super in class', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('class A extends B{constructor(){super()}}')
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.CLASSDECL,["class","A",JsNode.HERITAGE,["extends","B"],"{",JsNode.CLASSBODY,[JsNode.METHOD,["constructor","(",")","{",JsNode.FNBODY,[JsNode.SUPERSTMT,["super",JsNode.ARGS,["(",")"]]],"}"]],"}"]]]);
+    });
+    it('super recursion', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('class A extends B{method(){super.super.a()}}');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.CLASSDECL,["class","A",JsNode.HERITAGE,["extends","B"],"{",JsNode.CLASSBODY,[JsNode.METHOD,["method","(",")","{",JsNode.FNBODY,[JsNode.SUPERSTMT,["super",".","super",".","a",JsNode.ARGS,["(",")"]]],"}"]],"}"]]]);
+    });
+    it('super out class', function() {
+      var parser = homunculus.getParser('js');
+      expect(function() {
+        parser.parse('super()');
       }).to.throwError();
     });
     it('set', function() {

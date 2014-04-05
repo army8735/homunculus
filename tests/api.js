@@ -1,4 +1,4 @@
-var homunculus = require('../homunculus');
+var homunculus = require('../');
 
 var expect = require('expect.js');
 

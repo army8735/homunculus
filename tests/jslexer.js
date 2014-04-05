@@ -1,4 +1,4 @@
-var homunculus = require('../homunculus');
+var homunculus = require('../');
 
 var expect = require('expect.js');
 var fs = require('fs');
@@ -36,6 +36,12 @@ describe('jslexer', function() {
       var lexer = homunculus.getLexer('js');
       var tokens = lexer.parse('"string\\\r\n""str"');
       expect(join(tokens)).to.eql(['"string\\\r\n"', '"str"']);
+    });
+    it('string multiline without back_slash', function() {
+      var lexer = homunculus.getLexer('js');
+      expect(function() {
+        lexer.parse('"string\n"');
+      }).to.throwError();
     });
     it('id and sign in var stmt', function() {
       var lexer = homunculus.getLexer('js');
@@ -119,6 +125,12 @@ describe('jslexer', function() {
       var lexer = homunculus.getLexer('js');
       var tokens = lexer.parse('/*comment\\*/ /*comment\ncc*/');
       expect(join(tokens)).to.eql(['/*comment\\*/', ' ', '/*comment\ncc*/']);
+    });
+    it('multi line comment no end', function() {
+      var lexer = homunculus.getLexer('js');
+      expect(function() {
+        lexer.parse('/*cc');
+      }).to.throwError();
     });
     it('template', function() {
       var lexer = homunculus.getLexer('js');
