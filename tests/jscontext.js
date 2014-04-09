@@ -92,6 +92,20 @@ describe('jscontext', function() {
       expect(first.hasParam('b')).to.ok();
       expect(first.getParams().length).to.be(1);
     });
+    it('fnexpr call this', function() {
+      var context = homunculus.getContext('js');
+      context.parse('~function a(b){}.call(this, 1);');
+      var first = context.getChildren()[0];
+      expect(first.getAParams().length).to.be(1);
+      expect(first.getThis().leaves()[0].token().content()).to.be('this');
+    });
+    it('fnexpr apply this', function() {
+      var context = homunculus.getContext('js');
+      context.parse('~function a(b){}.apply(this, [1, 2]);');
+      var first = context.getChildren()[0];
+      expect(first.getAParams().length).to.be(2);
+      expect(first.getThis().leaves()[0].token().content()).to.be('this');
+    });
     it('fnexpr in ()', function() {
       var context = homunculus.getContext('js');
       context.parse('(function a(){})();');
@@ -108,6 +122,18 @@ describe('jscontext', function() {
       context.parse('(function a(b){})();');
       var first = context.getChildren()[0];
       expect(first.hasParam('b')).to.ok();
+    });
+    it('fnexpr in () with call', function() {
+      var context = homunculus.getContext('js');
+      context.parse('(function(a){}).call(this, 1);');
+      var first = context.getChildren()[0];
+      expect(first.getThis().leaves()[0].token().content()).to.be('this');
+    });
+    it('fnexpr in () with apply', function() {
+      var context = homunculus.getContext('js');
+      context.parse('(function(a){}).apply(this, [1]);');
+      var first = context.getChildren()[0];
+      expect(first.getAParams().length).to.be(1);
     });
     it('isFnexpr', function() {
       var context = homunculus.getContext('js');

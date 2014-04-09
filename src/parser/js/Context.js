@@ -20,6 +20,7 @@ var Context = Class(function(parent, name) {
   this.vidsMap = Object.create(null); //键为id字面量，值是它的token的节点
   this.returns = []; //上下文环境里return语句
   this.node = null; //对应的ast的节点
+  this.thisIs = null; //this指向，仅函数表达式call或apply执行时有用
   if(!this.isTop()) {
     this.parent.addChild(this);
   }
@@ -165,6 +166,13 @@ var Context = Class(function(parent, name) {
   setNode: function(n) {
     this.node = n;
     return this;
+  },
+  setThis: function(t) {
+    this.thisIs = t;
+    return this;
+  },
+  getThis: function() {
+    return this.thisIs;
   }
 });
 
@@ -229,7 +237,7 @@ function fnexpr(node, context) {
   if(params.name() == JsNode.FNPARAMS) {
     addParam(params, child);
   }
-  //匿名函数检查实参传入情况
+  //匿名函数检查实参传入情况，包括call和apply设置this
   var next = node.next();
   //!function(){}()形式
   if(next && next.name() == JsNode.ARGS) {
@@ -239,17 +247,66 @@ function fnexpr(node, context) {
       addAParam(leaves[1], child);
     }
   }
+  //call或applay
+  else if(next
+    && next.name() == JsNode.TOKEN
+    && next.token().content() == '.'
+    && next.next()
+    && next.next().name() == JsNode.TOKEN
+    && ['call', 'apply'].indexOf(next.next().token().content()) > -1) {
+    var mmb = node.parent();
+    if(mmb.name() == JsNode.MMBEXPR) {
+      var callexpr = mmb.parent();
+      if(callexpr.name() == JsNode.CALLEXPR) {
+        var isApply = next.next().token().content() == 'apply';
+        next = mmb.next();
+        if(next && next.name() == JsNode.ARGS) {
+          var leaves = next.leaves();
+          //长度2为()空参数，长度3有参数，第2个节点
+          if(leaves.length == 3) {
+            isApply ? addApplyAParam(leaves[1], child) : addCallAParam(leaves[1], child);
+          }
+        }
+      }
+    }
+  }
   //(function(){})()形式
   else {
     var prmr = node.parent();
     var prev = node.prev();
-    if(prmr.name() == JsNode.PRMREXPR && prev && prev.name() == JsNode.TOKEN && prev.token().content() == '(') {
+    if(prmr.name() == JsNode.PRMREXPR
+      && prev
+      && prev.name() == JsNode.TOKEN
+      && prev.token().content() == '(') {
       next = prmr.next();
       if(next && next.name() == JsNode.ARGS) {
         var leaves = next.leaves();
         //长度2为()空参数，长度3有参数，第2个节点
         if(leaves.length == 3) {
           addAParam(leaves[1], child);
+        }
+      }
+      //(function(){}).call()形式
+      else if(next
+        && next.name() == JsNode.TOKEN
+        && next.token().content() == '.'
+        && next.next()
+        && next.next().name() == JsNode.TOKEN
+        && ['call', 'apply'].indexOf(next.next().token().content()) > -1) {
+        var mmb = prmr.parent();
+        if(mmb.name() == JsNode.MMBEXPR) {
+          var callexpr = mmb.parent();
+          if(callexpr.name() == JsNode.CALLEXPR) {
+            var isApply = next.next().token().content() == 'apply';
+            next = mmb.next();
+            if(next && next.name() == JsNode.ARGS) {
+              var leaves = next.leaves();
+              //长度2为()空参数，长度3有参数，第2个节点
+              if(leaves.length == 3) {
+                isApply ? addApplyAParam(leaves[1], child) : addCallAParam(leaves[1], child);
+              }
+            }
+          }
         }
       }
     }
@@ -270,6 +327,24 @@ function addParam(params, child) {
 function addAParam(params, child) {
   params.leaves().forEach(function(leaf, i) {
     if(i % 2 == 0) {
+      child.addAParam(leaf);
+    }
+  });
+}
+function addCallAParam(params, child) {
+  params.leaves().forEach(function(leaf, i) {
+    if(i == 0) {
+      child.setThis(leaf);
+    }
+    else if(i % 2 == 1) {
+      child.addAParam(leaf);
+    }
+  });
+}
+function addApplyAParam(params, child) {
+  child.setThis(params.leaves()[0]);
+  params.leaves()[2].leaves()[0].leaves().forEach(function(leaf, i) {
+    if(i % 2 == 1) {
       child.addAParam(leaf);
     }
   });

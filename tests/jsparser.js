@@ -179,6 +179,12 @@ describe('jsparser', function() {
       var node = parser.parse('function a(b, c = 1, ...d) {}');
       expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.FNDECL, ['function', 'a', '(', JsNode.FNPARAMS, ['b', ',', 'c', JsNode.BINDELEMENT, ['=', JsNode.PRMREXPR, ['1']], ',', JsNode.RESTPARAM, ['...', 'd']], ')', '{', JsNode.FNBODY, [], '}']]]);
     });
+    it('fndecl error 1', function() {
+      var parser = homunculus.getParser('js');
+      expect(function() {
+        parser.parse('function a(');
+      }).to.throwError();
+    });
     it('fnexpr 1', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('~function() {}()');
@@ -721,6 +727,12 @@ describe('jsparser', function() {
       var parser = homunculus.getParser('js');
       expect(function() {
         parser.parse('class A{ A(){} A(){} }');
+      }).to.throwError();
+    });
+    it('class static error', function() {
+      var parser = homunculus.getParser('js');
+      expect(function() {
+        parser.parse('class A{ static');
       }).to.throwError();
     });
     it('super in class', function() {
