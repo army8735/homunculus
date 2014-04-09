@@ -354,7 +354,7 @@ define(function(require, exports, module) {
     var first = node.leaves()[0];
     if(first.name() == JsNode.TOKEN) {
       var token = first.token();
-      if(token.type() == Token.ID) {
+      if(token.type() == Token.ID || token.content() == 'this') {
         context.addVid(first);
       }
     }
