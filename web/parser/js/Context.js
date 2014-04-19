@@ -306,6 +306,9 @@ define(function(require, exports, module) {
                 if(leaves.length == 3) {
                   isApply ? addApplyAParam(leaves[1], child) : addCallAParam(leaves[1], child);
                 }
+                else {
+                  child.setThis(undefined);
+                }
               }
             }
           }
@@ -344,11 +347,13 @@ define(function(require, exports, module) {
   }
   function addApplyAParam(params, child) {
     child.setThis(params.leaves()[0]);
-    params.leaves()[2].leaves()[0].leaves().forEach(function(leaf, i) {
-      if(i % 2 == 1) {
-        child.addAParam(leaf);
-      }
-    });
+    if(params.leaves()[2]) {
+      params.leaves()[2].leaves()[0].leaves().forEach(function(leaf, i) {
+        if(i % 2 == 1) {
+          child.addAParam(leaf);
+        }
+      });
+    }
   }
   function prmrexpr(node, context) {
     var first = node.leaves()[0];

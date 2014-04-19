@@ -15,18 +15,33 @@ define(function(require, exports, module) {
     match: function(c, code, index) {
       this.msg = null;
       if(this.begin == code.substr(--index, this.begin.length)) {
-        var i = code.indexOf(this.end, index + this.begin.length);
-        if(i == -1) {
-          if(this.contain) {
-            this.msg = 'SyntaxError: unterminated ' + Token.type(this.type).toLowerCase();
+        //支持多个end匹配时不支持包含选项
+        if(!this.contain && Array.isArray(this.end)) {
+          for(var j = 0, len = this.end.length; j < len; j++) {
+            var i = code.indexOf(this.end[j], index + this.begin.length);
+            if(i != -1) {
+              this.result = code.slice(index, i);
+              return true;
+            }
           }
-          i = code.length;
+          //都不匹配时到末尾
+          this.result = code.slice(index);
+          return true;
         }
-        else if(this.contain) {
-          i += this.end.length;
+        else {
+          var i = code.indexOf(this.end, index + this.begin.length);
+          if(i == -1) {
+            if(this.contain) {
+              this.msg = 'SyntaxError: unterminated ' + Token.type(this.type).toLowerCase();
+            }
+            i = code.length;
+          }
+          else if(this.contain) {
+            i += this.end.length;
+          }
+          this.result = code.slice(index, i);
+          return true;
         }
-        this.result = code.slice(index, i);
-        return true;
       }
       return false;
     },

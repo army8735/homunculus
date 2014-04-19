@@ -14,10 +14,11 @@ define(function(require, exports, module) {
   
     self.addMatch(new CompleteEqual(Token.BLANK, character.BLANK));
     self.addMatch(new CompleteEqual(Token.TAB, character.TAB));
-    self.addMatch(new CompleteEqual(Token.ENTER, character.ENTER));
+    self.addMatch(new CompleteEqual(Token.LINE, character.ENTER + character.LINE));
+    self.addMatch(new CompleteEqual(Token.LINE, character.ENTER));
     self.addMatch(new CompleteEqual(Token.LINE, character.LINE));
   
-    self.addMatch(new LineSearch(Token.COMMENT, '//', '\n'));
+    self.addMatch(new LineSearch(Token.COMMENT, '//', [character.ENTER + character.LINE, character.ENTER, character.LINE]));
     self.addMatch(new LineSearch(Token.COMMENT, '/*', '*/', true));
     self.addMatch(new LineParse(Token.STRING, '"', '"', false, Lexer.IS_REG));
     self.addMatch(new LineParse(Token.STRING, "'", "'", false, Lexer.IS_REG));
@@ -35,7 +36,7 @@ define(function(require, exports, module) {
   
     self.addMatch(new CompleteEqual(Token.SIGN, ']', Lexer.NOT_REG));
   
-    ['*=', '/=', '+=', '-=', '%=', '^=', '&=', '|=', '&&', '--', '++', '===', '==', '!==', '!=', '||', '>>>=', '<<<=', '<<<', '>>>', '>>=', '<<=', '<<', '>>', '>=', '<=', '...', '?:'].forEach(function(o) {
+    ['*=', '/=', '+=', '-=', '%=', '^=', '&=', '|=', '&&', '--', '++', '===', '==', '!==', '!=', '||', '>>>=', '<<<=', '<<<', '>>>', '>>=', '<<=', '<<', '>>', '>=', '<=', '...', '?:', '=>'].forEach(function(o) {
       self.addMatch(new CompleteEqual(Token.SIGN, o, Lexer.IS_REG));
     });
     self.addMatch(new CharacterSet(Token.SIGN, ':;/?.,[]{}~!^|%=-+*()~><&\\', Lexer.IS_REG));
@@ -47,9 +48,11 @@ define(function(require, exports, module) {
       'SyntaxError: missing exponent': /E[+-]?$/i
     }, Lexer.NOT_REG));
   
-    self.addMatch(new CharacterSet(Token.BLANK, '\u00a0\f\u000b\u200b\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000'));
+    self.addMatch(new CompleteEqual(Token.LINE, '\u2028'));
+    self.addMatch(new CompleteEqual(Token.LINE, '\u2029'));
+    self.addMatch(new CharacterSet(Token.BLANK, '\f\u000b\u00A0\uFEFF\u200b\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000'));
   }).statics({
-    KEYWORDS: 'abstract boolean break byte case catch class const continue debugger default delete do double else enum export extends false final finally float for function goto if implements import in instanceof int interface let long native new null package private protected public return short static super switch synchronized this throw throws transient true try typeof var void volatile while with'.split(' ')
+    KEYWORDS: 'boolean break case catch class const continue debugger default delete do else enum export extends false finally for function if implements import in instanceof interface let new null package private protected public return static super switch this throw throws true try typeof var void while with'.split(' ')
   });
   module.exports = EcmascriptRule;
 });
