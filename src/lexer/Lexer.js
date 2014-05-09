@@ -99,7 +99,7 @@ var Lexer = Class(function(rule) {
             continue outer;
           }
         }
-        //如果有未匹配的，说明规则不完整，加入other类型并抛出警告
+        //如果有未匹配的，说明规则不完整，加入other类型并抛出错误
         this.error('unknow token');
       }
     }
