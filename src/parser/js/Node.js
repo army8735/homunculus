@@ -128,6 +128,10 @@ var Node = Class(function(type, children) {
   POSTFIXEXPR: 'postfixexpr',
   NEWEXPR: 'newexpr',
   CALLEXPR: 'callexpr',
+  BINDPAT: 'bindpat',
+  ARRBINDPAT: 'arrbindpat',
+  OBJBINDPAT: 'objbindpat',
+  BINDPROPT: 'bindpropt',
   getKey: function(s) {
     if(!s) {
       throw new Error('empty value');

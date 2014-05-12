@@ -185,13 +185,97 @@ define(function(require, exports, module) {
       if(!this.look) {
         this.error('missing variable name');
       }
-      if(this.look.content() == '[') {
-        node.add(this.arrltr());
+      if(['[', '{'].indexOf(this.look.content()) > -1) {
+        node.add(this.bindpat());
       }
       else {
         node.add(this.match(Token.ID, 'missing variable name'));
       }
       if(this.look && this.look.content() == '=') {
+        node.add(this.assign());
+      }
+      return node;
+    },
+    bindpat: function() {
+      var node = new Node(Node.BINDPAT);
+      if(this.look.content() == '[') {
+        node.add(this.arrbindpat());
+      }
+      else if(this.look.content() == '{') {
+        node.add(this.objbindpat());
+      }
+      return node;
+    },
+    arrbindpat: function() {
+      var node = new Node(Node.ARRBINDPAT);
+      node.add(this.match('['));
+      while(this.look && this.look.content() != ']') {
+        if(this.look.content() == ',') {
+          node.add(this.match());
+        }
+        else if(['[', '{'].indexOf(this.look.content()) > -1) {
+          node.add(this.bindpat());
+          if(this.look && this.look.content() == '=') {
+            node.add(this.assign());
+          }
+        }
+        else if(this.look.content() == '...') {
+          break;
+        }
+        else {
+          node.add(this.match(Token.ID));
+          if(this.look && this.look.content() == '=') {
+            node.add(this.assign());
+          }
+        }
+      }
+      if(this.look.content() == '...') {
+        node.add(this.match());
+        node.add(this.match(Token.ID));
+      }
+      node.add(this.match(']', 'missing ] after element list'));
+      return node;
+    },
+    objbindpat: function() {
+      var node = new Node(Node.OBJBINDPAT);
+      node.add(this.match('{'));
+      while(this.look && this.look.content() != '}') {
+        node.add(this.bindpropt());
+        if(this.look && this.look.content() == ',') {
+          node.add(this.match());
+        }
+      }
+      node.add(this.match('}'));
+      return node;
+    },
+    bindpropt: function() {
+      var node = new Node(Node.BINDPROPT);
+      var isId = false;
+      switch(this.look.type()) {
+        case Token.ID:
+        case Token.STRING:
+        case Token.NUMBER:
+          node.add(this.match());
+        break;
+        default:
+          this.error('invalid property id');
+      }
+      if(!this.look) {
+        this.error('missing : after property id');
+      }
+      if(this.look.content() == ':') {
+        node.add(this.match());
+        if(['[', '{'].indexOf(this.look.content()) > -1) {
+          node.add(this.bindpat());
+        }
+        else {
+          node.add(this.match(Token.ID, 'missing variable name'));
+        }
+        if(this.look && this.look.content() == '=') {
+          node.add(this.assign());
+        }
+      }
+      else if(this.look.content() == '=') {
         node.add(this.assign());
       }
       return node;
@@ -1155,7 +1239,7 @@ define(function(require, exports, module) {
           node.add(this.assignexpr());
         }
       }
-      node.add(this.match(']'));
+      node.add(this.match(']', 'missing ] after element list'));
       return node;
     },
     objltr: function() {
