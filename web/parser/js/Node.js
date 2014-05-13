@@ -133,6 +133,7 @@ define(function(require, exports, module) {
     ARRBINDPAT: 'arrbindpat',
     OBJBINDPAT: 'objbindpat',
     BINDPROPT: 'bindpropt',
+    SINGLENAME: 'singlename',
     getKey: function(s) {
       if(!s) {
         throw new Error('empty value');

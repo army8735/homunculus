@@ -223,10 +223,7 @@ define(function(require, exports, module) {
           break;
         }
         else {
-          node.add(this.match(Token.ID));
-          if(this.look && this.look.content() == '=') {
-            node.add(this.assign());
-          }
+          node.add(this.singlename());
         }
       }
       if(this.look.content() == '...') {
@@ -234,6 +231,14 @@ define(function(require, exports, module) {
         node.add(this.match(Token.ID));
       }
       node.add(this.match(']', 'missing ] after element list'));
+      return node;
+    },
+    singlename: function() {
+      var node = new Node(Node.SINGLENAME);
+      node.add(this.match(Token.ID));
+      if(this.look && this.look.content() == '=') {
+        node.add(this.assign());
+      }
       return node;
     },
     objbindpat: function() {
@@ -245,12 +250,11 @@ define(function(require, exports, module) {
           node.add(this.match());
         }
       }
-      node.add(this.match('}'));
+      node.add(this.match('}', 'missing } after property list'));
       return node;
     },
     bindpropt: function() {
       var node = new Node(Node.BINDPROPT);
-      var isId = false;
       switch(this.look.type()) {
         case Token.ID:
         case Token.STRING:
@@ -1251,7 +1255,7 @@ define(function(require, exports, module) {
           node.add(this.match());
         }
       }
-      node.add(this.match('}'));
+      node.add(this.match('}', 'missing } after property list'));
       return node;
     },
     proptassign: function() {
@@ -1290,7 +1294,7 @@ define(function(require, exports, module) {
           case Token.NUMBER:
             node.add(
               this.match(),
-              this.match(':'),
+              this.match(':', 'missing : after property id'),
               this.assignexpr()
             );
           break;
