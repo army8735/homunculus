@@ -761,6 +761,62 @@ describe('jsparser', function() {
       var node = parser.parse('class A{get a(){}}');
       expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.CLASSDECL,["class","A","{",JsNode.CLASSBODY,[JsNode.METHOD,["get",JsNode.GETFN,[JsNode.PROPTNAME,["a"],"(",")","{",JsNode.FNBODY,[],"}"]]],"}"]]]);
     });
+    it('destructuring array', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('var [a] = [1]');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.VARSTMT,["var",JsNode.VARDECL,[JsNode.ARRBINDPAT,["[",JsNode.SINGLENAME,["a"],"]"],JsNode.ASSIGN,["=",JsNode.PRMREXPR,[JsNode.ARRLTR,["[",JsNode.PRMREXPR,["1"],"]"]]]]]]]);
+    });
+    it('destructuring with restparam', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('let [a, ...b] = [1, 2, 3]');
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.LETSTMT, ["let", JsNode.VARDECL, [JsNode.ARRBINDPAT, ["[", JsNode.SINGLENAME, ["a"], ",", JsNode.RESTPARAM, ["...", "b"], "]"], JsNode.ASSIGN, ["=", JsNode.PRMREXPR, [JsNode.ARRLTR, ["[", JsNode.PRMREXPR, ["1"], ",", JsNode.PRMREXPR, ["2"], ",", JsNode.PRMREXPR, ["3"], "]"]]]]]]]);
+    });
+    it('destructuring with default value', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('const [a = 1, [b] = [2]] = [, []]');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.CSTSTMT,["const",JsNode.VARDECL,[JsNode.ARRBINDPAT,["[",JsNode.SINGLENAME,["a",JsNode.ASSIGN,["=",JsNode.PRMREXPR,["1"]]],",",JsNode.BINDELEM,[JsNode.ARRBINDPAT,["[",JsNode.SINGLENAME,["b"],"]"],JsNode.ASSIGN,["=",JsNode.PRMREXPR,[JsNode.ARRLTR,["[",JsNode.PRMREXPR,["2"],"]"]]]],"]"],JsNode.ASSIGN,["=",JsNode.PRMREXPR,[JsNode.ARRLTR,["[",",",JsNode.PRMREXPR,[JsNode.ARRLTR,["[","]"]],"]"]]]]]]]);
+    });
+    it('destructuring object', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('var {x, y = 1, "f": [z]} = {}');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.VARSTMT,["var",JsNode.VARDECL,[JsNode.OBJBINDPAT,["{",JsNode.BINDPROPT,[JsNode.SINGLENAME,["x"]],",",JsNode.BINDPROPT,[JsNode.SINGLENAME,["y",JsNode.ASSIGN,["=",JsNode.PRMREXPR,["1"]]]],",",JsNode.BINDPROPT,["\"f\"",":",JsNode.BINDELEM,[JsNode.ARRBINDPAT,["[",JsNode.SINGLENAME,["z"],"]"]]],"}"],JsNode.ASSIGN,["=",JsNode.PRMREXPR,[JsNode.OBJLTR,["{","}"]]]]]]]);
+    });
+    it('destructuring complex', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('var [x, {"a":[y=1,{z=2},...o]}] = []');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.VARSTMT,["var",JsNode.VARDECL,[JsNode.ARRBINDPAT,["[",JsNode.SINGLENAME,["x"],",",JsNode.BINDELEM,[JsNode.OBJBINDPAT,["{",JsNode.BINDPROPT,["\"a\"",":",JsNode.BINDELEM,[JsNode.ARRBINDPAT,["[",JsNode.SINGLENAME,["y",JsNode.ASSIGN,["=",JsNode.PRMREXPR,["1"]]],",",JsNode.BINDELEM,[JsNode.OBJBINDPAT,["{",JsNode.BINDPROPT,[JsNode.SINGLENAME,["z",JsNode.ASSIGN,["=",JsNode.PRMREXPR,["2"]]]],"}"]],",",JsNode.RESTPARAM,["...","o"],"]"]]],"}"]],"]"],JsNode.ASSIGN,["=",JsNode.PRMREXPR,[JsNode.ARRLTR,["[","]"]]]]]]]);
+    });
+    it('destructuring without assign should throw error', function() {
+      var parser = homunculus.getParser('js');
+      expect(function() {
+        parser.parse('var [a];');
+      }).to.throwError();
+    });
+    it('destructuring object error 1', function() {
+      var parser = homunculus.getParser('js');
+      expect(function() {
+        parser.parse('var {');
+      }).to.throwError();
+    });
+    it('destructuring object error 2', function() {
+      var parser = homunculus.getParser('js');
+      expect(function() {
+        parser.parse('var {a');
+      }).to.throwError();
+    });
+    it('destructuring object error 3', function() {
+      var parser = homunculus.getParser('js');
+      expect(function() {
+        parser.parse('var {!');
+      }).to.throwError();
+    });
+
+    it('destructuring object error 4', function() {
+      var parser = homunculus.getParser('js');
+      expect(function() {
+        parser.parse('var {a ');
+      }).to.throwError();
+    });
   });
   describe('js lib exec test', function() {
     it('jquery 1.11.0', function() {

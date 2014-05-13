@@ -274,9 +274,6 @@ var Parser = Class(function(lexer) {
     //还是SingleNameBinding [?Yield, ?GeneratorParameter]
     for(var i = this.index; i < this.length; i++) {
       var next = this.tokens[i];
-      if(!next) {
-        this.error('missing : after property id');
-      }
       if(!S[next.tag()]) {
         if(next.content() == ':') {
           node.add(this.match(), this.match());
@@ -285,10 +282,10 @@ var Parser = Class(function(lexer) {
         else {
           node.add(this.singlename());
         }
-        break;
+        return node;
       }
     }
-    return node;
+    this.error('missing : after property id');
   },
   assign: function() {
     var node = new Node(Node.ASSIGN);
