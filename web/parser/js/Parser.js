@@ -223,8 +223,7 @@ define(function(require, exports, module) {
         }
       }
       if(this.look.content() == '...') {
-        node.add(this.match());
-        node.add(this.match(Token.ID));
+        node.add(this.restparam());
       }
       node.add(this.match(']', 'missing ] after element list'));
       return node;
