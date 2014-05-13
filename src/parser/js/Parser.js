@@ -186,24 +186,26 @@ var Parser = Class(function(lexer) {
     }
     if(['[', '{'].indexOf(this.look.content()) > -1) {
       node.add(this.bindpat());
+      if(!this.look || this.look.content() != '=') {
+        this.error('missing = in destructuring declaration');
+      }
+      node.add(this.assign());
     }
     else {
       node.add(this.match(Token.ID, 'missing variable name'));
-    }
-    if(this.look && this.look.content() == '=') {
-      node.add(this.assign());
+      if(this.look && this.look.content() == '=') {
+        node.add(this.assign());
+      }
     }
     return node;
   },
   bindpat: function() {
-    var node = new Node(Node.BINDPAT);
     if(this.look.content() == '[') {
-      node.add(this.arrbindpat());
+      return this.arrbindpat();
     }
     else if(this.look.content() == '{') {
-      node.add(this.objbindpat());
+      return this.objbindpat();
     }
-    return node;
   },
   arrbindpat: function() {
     var node = new Node(Node.ARRBINDPAT);
@@ -212,17 +214,11 @@ var Parser = Class(function(lexer) {
       if(this.look.content() == ',') {
         node.add(this.match());
       }
-      else if(['[', '{'].indexOf(this.look.content()) > -1) {
-        node.add(this.bindpat());
-        if(this.look && this.look.content() == '=') {
-          node.add(this.assign());
-        }
-      }
       else if(this.look.content() == '...') {
         break;
       }
       else {
-        node.add(this.singlename());
+        node.add(this.bindelem());
       }
     }
     if(this.look.content() == '...') {
@@ -230,6 +226,19 @@ var Parser = Class(function(lexer) {
       node.add(this.match(Token.ID));
     }
     node.add(this.match(']', 'missing ] after element list'));
+    return node;
+  },
+  bindelem: function() {
+    var node = new Node(Node.BINDELEM);
+    if(['[', '{'].indexOf(this.look.content()) > -1) {
+      node.add(this.bindpat());
+      if(this.look && this.look.content() == '=') {
+        node.add(this.assign());
+      }
+    }
+    else {
+      return this.singlename();
+    }
     return node;
   },
   singlename: function() {
@@ -258,28 +267,27 @@ var Parser = Class(function(lexer) {
       case Token.ID:
       case Token.STRING:
       case Token.NUMBER:
-        node.add(this.match());
       break;
       default:
         this.error('invalid property id');
     }
-    if(!this.look) {
-      this.error('missing : after property id');
-    }
-    if(this.look.content() == ':') {
-      node.add(this.match());
-      if(['[', '{'].indexOf(this.look.content()) > -1) {
-        node.add(this.bindpat());
+    //根据LL2分辨是PropertyName[?Yield, ?GeneratorParameter] : BindingElement[?Yield, ?GeneratorParameter]
+    //还是SingleNameBinding [?Yield, ?GeneratorParameter]
+    for(var i = this.index; i < this.length; i++) {
+      var next = this.tokens[i];
+      if(!next) {
+        this.error('missing : after property id');
       }
-      else {
-        node.add(this.match(Token.ID, 'missing variable name'));
+      if(!S[next.tag()]) {
+        if(next.content() == ':') {
+          node.add(this.match(), this.match());
+          node.add(this.bindelem());
+        }
+        else {
+          node.add(this.singlename());
+        }
+        break;
       }
-      if(this.look && this.look.content() == '=') {
-        node.add(this.assign());
-      }
-    }
-    else if(this.look.content() == '=') {
-      node.add(this.assign());
     }
     return node;
   },

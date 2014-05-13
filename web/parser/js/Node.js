@@ -129,11 +129,11 @@ define(function(require, exports, module) {
     POSTFIXEXPR: 'postfixexpr',
     NEWEXPR: 'newexpr',
     CALLEXPR: 'callexpr',
-    BINDPAT: 'bindpat',
     ARRBINDPAT: 'arrbindpat',
     OBJBINDPAT: 'objbindpat',
     BINDPROPT: 'bindpropt',
     SINGLENAME: 'singlename',
+    BINDELEM: 'bindelem',
     getKey: function(s) {
       if(!s) {
         throw new Error('empty value');
