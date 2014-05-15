@@ -139,6 +139,7 @@ var Node = Class(function(type, children) {
   BINDPROPT: 'bindpropt',
   SINGLENAME: 'singlename',
   BINDELEM: 'bindelem',
+  BINDID: 'bindid',
   getKey: function(s) {
     if(!s) {
       throw new Error('empty value');

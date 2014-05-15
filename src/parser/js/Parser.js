@@ -1235,6 +1235,11 @@ var Parser = Class(function(lexer) {
     }
     return node;
   },
+  bindid: function() {
+    var node = new Node(Node.BINDID);
+    node.add(this.match('...'), this.assignexpr());
+    return node;
+  },
   arrltr: function() {
     var node = new Node(Node.ARRLTR);
     node.add(this.match('['));
@@ -1366,9 +1371,14 @@ var Parser = Class(function(lexer) {
   },
   arglist: function() {
     var node = new Node(Node.ARGLIST);
-    node.add(this.assignexpr());
-    while(this.look && this.look.content() == ',') {
-      node.add(this.match(), this.assignexpr());
+    while(this.look && this.look.content() != ')' && this.look.content() != '...') {
+      node.add(this.assignexpr());
+      if(this.look && this.look.content() == ',') {
+        node.add(this.match());
+      }
+    }
+    if(this.look && this.look.content() == '...') {
+      node.add(this.bindid());
     }
     return node;
   },

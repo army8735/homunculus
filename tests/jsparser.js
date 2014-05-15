@@ -810,12 +810,16 @@ describe('jsparser', function() {
         parser.parse('var {!');
       }).to.throwError();
     });
-
     it('destructuring object error 4', function() {
       var parser = homunculus.getParser('js');
       expect(function() {
         parser.parse('var {a ');
       }).to.throwError();
+    });
+    it('binding id in call', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('Math.max(...[1, 2])');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.EXPRSTMT,[JsNode.CALLEXPR,[JsNode.MMBEXPR,[JsNode.PRMREXPR,["Math"],".","max"],JsNode.ARGS,["(",JsNode.ARGLIST,[JsNode.BINDID,["...",JsNode.PRMREXPR,[JsNode.ARRLTR,["[",JsNode.PRMREXPR,["1"],",",JsNode.PRMREXPR,["2"],"]"]]]],")"]]]]]);
     });
   });
   describe('js lib exec test', function() {

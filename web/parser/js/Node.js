@@ -140,6 +140,7 @@ define(function(require, exports, module) {
     BINDPROPT: 'bindpropt',
     SINGLENAME: 'singlename',
     BINDELEM: 'bindelem',
+    BINDID: 'bindid',
     getKey: function(s) {
       if(!s) {
         throw new Error('empty value');
