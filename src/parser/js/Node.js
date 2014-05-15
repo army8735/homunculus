@@ -21,6 +21,12 @@ var Node = Class(function(type, children) {
   leaves: function() {
     return this.children;
   },
+  leaf: function(i) {
+    return this.children[i];
+  },
+  number: function() {
+    return this.children.length;
+  },
   add: function() {
     var self = this;
     var args = Array.prototype.slice.call(arguments, 0);

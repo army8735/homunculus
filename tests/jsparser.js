@@ -885,7 +885,7 @@ describe('jsparser', function() {
     });
   });
   describe('other test', function() {
-    it('node parent,prev,next', function() {
+    it('node #parent,#prev,#next', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('var a, b;');
       var varstmt = node.leaves()[0];
@@ -898,6 +898,13 @@ describe('jsparser', function() {
       expect(a.prev()).to.be(null);
       expect(a.next()).to.be(b);
       expect(b.prev()).to.be(a);
+    });
+    it('node #leaf,#number,#leaves', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('var a');
+      var varstmt = node.leaf(0);
+      expect(varstmt.name()).to.be(JsNode.VARSTMT);
+      expect(varstmt.number()).to.be(3);
     });
     it('#ast should return as parse return', function() {
       var parser = homunculus.getParser('js');
