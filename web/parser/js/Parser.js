@@ -684,24 +684,25 @@ define(function(require, exports, module) {
     },
     fnparams: function() {
       var node = new Node(Node.FNPARAMS);
-      node.add(this.match(Token.ID, 'missing formal parameter'));
-      while(this.look && this.look.content() == ',') {
-        node.add(this.match());
-        if(!this.look) {
-          this.error('missing formal parameter');
-        }
-        if(this.look.type() == Token.ID) {
-          node.add(this.match());
-          if(this.look && this.look.content() == '=') {
+      while(this.look && this.look.content() != ')' && this.look.content() != '...') {
+        node.add(this.match(Token.ID, 'missing formal parameter'));
+        if(this.look) {
+          if(this.look.content() == ',') {
+            node.add(this.match());
+          }
+          else if(this.look.content() == '=') {
             node.add(this.bindelement());
+            if(this.look && this.look.content() == ',') {
+              node.add(this.match());
+            }
           }
         }
-        else if(this.look.content() == '...') {
-          node.add(this.restparam());
-        }
-        else {
-          this.error('missing formal parameter');
-        }
+      }
+      if(!this.look) {
+        this.error('missing ) after formal parameters');
+      }
+      if(this.look.content() == '...') {
+        node.add(this.restparam());
       }
       return node;
     },
