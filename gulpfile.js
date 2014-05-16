@@ -5,27 +5,6 @@ var util = require('gulp-util');
 var fs = require('fs');
 var path = require('path');
 
-function clean(dir, includeSelf) {
-  if(!fs.existsSync(dir)) {
-    return;
-  }
-  fs.readdirSync(dir).forEach(function(f) {
-    f = dir + path.sep + f;
-    if(!fs.existsSync(f)) {
-      return;
-    }
-    var stat = fs.statSync(f);
-    if(stat.isDirectory()) {
-      clean(f, true);
-    }
-    else if(stat.isFile()) {
-      fs.unlinkSync(f);
-    }
-  });
-  if(includeSelf) {
-    fs.rmdirSync(dir);
-  }
-}
 function web2src(dir) {
   fs.readdirSync(dir).forEach(function(f) {
     f = dir + path.sep + f;
