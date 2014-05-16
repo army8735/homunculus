@@ -13,13 +13,15 @@
   },
   "config": {
     "blanket": {
-      "pattern": ["src/lexer/Lexer",
+      "pattern": [
+        "src/lexer/Lexer",
         "src/lexer/Token",
         "src/lexer/match",
         "src/lexer/rule/Rule",
         "src/lexer/rule/EcmascriptRule",
         "src/parser/js",
-        "src/util"]
+        "src/util"
+      ]
     }
   },
   "repository": {
@@ -40,11 +42,13 @@
   },
   "readmeFilename": "README.md",
   "devDependencies": {
-    "mocha": "^1.18.2",
-    "gulp": "^3.6.0",
-    "expect.js": "^0.3.1",
     "blanket": "^1.1.6",
     "coveralls": "^2.10.0",
+    "expect.js": "^0.3.1",
+    "gulp": "^3.6.0",
+    "gulp-clean": "^0.2.4",
+    "gulp-util": "^2.2.14",
+    "mocha": "^1.18.2",
     "mocha-lcov-reporter": "0.0.1"
   }
 }

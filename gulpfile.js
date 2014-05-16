@@ -1,4 +1,6 @@
 var gulp = require('gulp');
+var clean = require('gulp-clean');
+var util = require('gulp-util');
 
 var fs = require('fs');
 var path = require('path');
@@ -36,7 +38,7 @@ function web2src(dir) {
       web2src(f);
     }
     else if(stat.isFile()) {
-      console.log(f, '->', target);
+      util.log(f, '->', target);
       var s = fs.readFileSync(f, { encoding: 'utf-8' });
       s = s.replace(/^define[^\n]*\n\t?/, '');
       s = s.replace(/\n\t/g, '\n');
@@ -58,7 +60,7 @@ function src2web(dir) {
       src2web(f);
     }
     else if(stat.isFile()) {
-      console.log(f, '->', target);
+      util.log(f, '->', target);
       var s = fs.readFileSync(f, { encoding: 'utf-8' });
       s = 'define(function(require, exports, module) {\n  ' + s.replace(/\n/g, '\n  ') + '\n});';
       fs.writeFileSync(target, s, { encoding: 'utf-8' });
@@ -73,10 +75,14 @@ gulp.task('web2src', ['clean-src'], function() {
   web2src('./web');
 });
 gulp.task('clean-web', function() {
-  clean('./web');
+  return gulp.src('./web/*')
+    .pipe(clean());
 });
 gulp.task('clean-src', function() {
-  clean('./src');
+  return gulp.src('./src/*')
+    .pipe(clean());
 });
 
-gulp.task('default', ['src2web']);
+gulp.task('default', ['clean-web'], function() {
+  src2web('./src');
+});
