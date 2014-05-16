@@ -47,12 +47,6 @@ function src2web(dir) {
   });
 }
 
-gulp.task('src2web', ['clean-web'], function() {
-  src2web('./src');
-});
-gulp.task('web2src', ['clean-src'], function() {
-  web2src('./web');
-});
 gulp.task('clean-web', function() {
   return gulp.src('./web/*')
     .pipe(clean());
