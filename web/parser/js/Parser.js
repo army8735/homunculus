@@ -1245,15 +1245,26 @@ define(function(require, exports, module) {
     arrltr: function() {
       var node = new Node(Node.ARRLTR);
       node.add(this.match('['));
-      while(this.look && this.look.content() != ']') {
+      while(this.look && this.look.content() != ']' && this.look.content() != '...') {
         if(this.look.content() == ',') {
           node.add(this.match());
         }
         else {
           node.add(this.assignexpr());
+          if(this.look && this.look.content() == ',') {
+            node.add(this.match());
+          }
         }
       }
+      if(this.look.content() == '...') {
+        node.add(this.spread());
+      }
       node.add(this.match(']', 'missing ] after element list'));
+      return node;
+    },
+    spread: function() {
+      var node = new Node(Node.SPREAD);
+      node.add(this.match('...'), this.assignexpr());
       return node;
     },
     objltr: function() {

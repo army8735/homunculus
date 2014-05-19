@@ -280,6 +280,16 @@ describe('jsparser', function() {
         parser.parse('.');
       }).to.throwError();
     });
+    it('array spread in prmrexpr', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('[1, 2, ...gen()]');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.EXPRSTMT,[JsNode.PRMREXPR,[JsNode.ARRLTR,["[",JsNode.PRMREXPR,["1"],",",JsNode.PRMREXPR,["2"],",",JsNode.SPREAD,["...",JsNode.CALLEXPR,[JsNode.PRMREXPR,["gen"],JsNode.ARGS,["(",")"]]],"]"]]]]]);
+    });
+    it('arrltr', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('[,,,2,3,]');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.EXPRSTMT,[JsNode.PRMREXPR,[JsNode.ARRLTR,["[",",",",",",",JsNode.PRMREXPR,["2"],",",JsNode.PRMREXPR,["3"],",","]"]]]]]);
+    });
     it('mmbexpr 1', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('a.b');

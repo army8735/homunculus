@@ -140,6 +140,7 @@ var Node = Class(function(type, children) {
   SINGLENAME: 'singlename',
   BINDELEM: 'bindelem',
   BINDID: 'bindid',
+  SPREAD: 'spread',
   getKey: function(s) {
     if(!s) {
       throw new Error('empty value');
