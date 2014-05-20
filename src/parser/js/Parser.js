@@ -1225,7 +1225,7 @@ var Parser = Class(function(lexer) {
             node.add(this.match(), this.expr(), this.match(')'));
           break;
           case '[':
-            node.add(this.arrltr());
+            node.add(this.arrinit());
           break;
           case '{':
             node.add(this.objltr());
@@ -1239,6 +1239,34 @@ var Parser = Class(function(lexer) {
   bindid: function() {
     var node = new Node(Node.BINDID);
     node.add(this.match('...'), this.assignexpr());
+    return node;
+  },
+  arrinit: function() {
+    //根据LL2分辨是arrltr还是arrcmph
+    //[assignexpr or [for
+    for(var i = this.index; i < this.length; i++) {
+      var next = this.tokens[i];
+      if(!S[next.tag()]) {
+        if(next.content() == 'for') {
+          return this.arrcmph();
+        }
+        else {
+          return this.arrltr();
+        }
+      }
+    }
+    this.error();
+  },
+  arrcmph: function() {
+    var node = new Node(Node.ARRCMPH);
+    node.add(this.match('['));
+    node.add(this.cmphfor());
+    node.add(this.match(']', 'missing ] after element list'));
+    return node;
+  },
+  cmphfor: function() {
+    var node = new Node(Node.CMPHFOR);
+    node.add(this.match('for'));
     return node;
   },
   arrltr: function() {

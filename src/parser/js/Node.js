@@ -139,8 +139,11 @@ var Node = Class(function(type, children) {
   BINDPROPT: 'bindpropt',
   SINGLENAME: 'singlename',
   BINDELEM: 'bindelem',
+  BINDREST: 'bindrest',
   BINDID: 'bindid',
   SPREAD: 'spread',
+  ARRCMPH: 'arrcmph',
+  CMPHFOR: 'cmphfor',
   getKey: function(s) {
     if(!s) {
       throw new Error('empty value');
