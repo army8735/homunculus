@@ -30,9 +30,10 @@ gulp.task('default', ['clean-web'], function() {
         var target = file.path.replace('/src/', '/web/');
         mkdir(path.dirname(target));
         util.log(path.relative(file.cwd, file.path), '->', path.relative(file.cwd, target));
-        var s = fs.readFileSync(file.path, { encoding: 'utf-8' });
-        s = 'define(function(require, exports, module) {\n  ' + s.replace(/\n/g, '\n  ') + '\n});';
-        fs.writeFileSync(target, s, { encoding: 'utf-8' });
+        var content = file._contents;
+        content = content.toString('utf-8', 0, content.length);
+        content = 'define(function(require, exports, module) {\n  ' + content.replace(/\n/g, '\n  ') + '\n});';
+        fs.writeFileSync(target, content, { encoding: 'utf-8' });
         cb(null, file);
       });
     }());
