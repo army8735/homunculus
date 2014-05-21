@@ -51,6 +51,6 @@ var EcmascriptRule = Rule.extend(function() {
   self.addMatch(new CompleteEqual(Token.LINE, '\u2029'));
   self.addMatch(new CharacterSet(Token.BLANK, '\f\u000b\u00A0\uFEFF\u200b\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000'));
 }).statics({
-  KEYWORDS: 'boolean break case catch class const continue debugger default delete do else enum export extends false finally for function if implements import in instanceof interface let new null package private protected public return static super switch this throw true try typeof var void while with yield'.split(' ')
+  KEYWORDS: 'break case catch class const continue debugger default delete do else enum export extends false finally for function if implements import in instanceof interface let new null package private protected public return static super switch this throw true try typeof var void while with yield'.split(' ')
 });
 module.exports = EcmascriptRule;
