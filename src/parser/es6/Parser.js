@@ -55,6 +55,9 @@ var Parser = Class(function(lexer) {
     if(this.look.content() == 'function') {
       return this.fndecl();
     }
+    else if(this.look.content() == 'class') {
+      return this.classdecl();
+    }
     else {
       return this.stmt(allowSuper);
     }
@@ -64,6 +67,10 @@ var Parser = Class(function(lexer) {
       this.error();
     }
     switch(this.look.content()) {
+      case 'let':
+        return this.letstmt();
+      case 'const':
+        return this.cststmt();
       case 'var':
         return this.varstmt();
       case '{':
@@ -92,6 +99,13 @@ var Parser = Class(function(lexer) {
         return this.trystmt();
       case 'debugger':
         return this.debstmt();
+      case 'super':
+        if(!allowSuper) {
+          this.error('super must in a class');
+        }
+        return this.superstmt();
+      case 'import':
+        return this.imptstmt();
       default:
         if(this.look.type() == Token.ID) {
           for(var i = this.index; i < this.length; i++) {
@@ -112,6 +126,40 @@ var Parser = Class(function(lexer) {
   exprstmt: function() {
     var node = new Node(Node.EXPRSTMT);
     node.add(this.expr(), this.match(';'));
+    return node;
+  },
+  cststmt: function(noSem) {
+    var node = new Node(Node.CSTSTMT);
+    node.add(
+      this.match('const'),
+      this.vardecl()
+    );
+    while(this.look && this.look.content() == ',') {
+      node.add(
+        this.match(),
+        this.vardecl()
+      );
+    }
+    if(!noSem) {
+      node.add(this.match(';'));
+    }
+    return node;
+  },
+  letstmt: function(noSem) {
+    var node = new Node(Node.LETSTMT);
+    node.add(
+      this.match('let'),
+      this.vardecl()
+    );
+    while(this.look && this.look.content() == ',') {
+      node.add(
+        this.match(),
+        this.vardecl()
+      );
+    }
+    if(!noSem) {
+      node.add(this.match(';'));
+    }
     return node;
   },
   varstmt: function(noSem) {
@@ -136,11 +184,108 @@ var Parser = Class(function(lexer) {
     if(!this.look) {
       this.error('missing variable name');
     }
-    node.add(this.match(Token.ID, 'missing variable name'));
+    if(['[', '{'].indexOf(this.look.content()) > -1) {
+      node.add(this.bindpat());
+      if(!this.look || this.look.content() != '=') {
+        this.error('missing = in destructuring declaration');
+      }
+      node.add(this.assign());
+    }
+    else {
+      node.add(this.match(Token.ID, 'missing variable name'));
+      if(this.look && this.look.content() == '=') {
+        node.add(this.assign());
+      }
+    }
+    return node;
+  },
+  bindpat: function() {
+    if(this.look.content() == '[') {
+      return this.arrbindpat();
+    }
+    else if(this.look.content() == '{') {
+      return this.objbindpat();
+    }
+  },
+  arrbindpat: function() {
+    var node = new Node(Node.ARRBINDPAT);
+    node.add(this.match('['));
+    while(this.look && this.look.content() != ']') {
+      if(this.look.content() == ',') {
+        node.add(this.match());
+      }
+      else if(this.look.content() == '...') {
+        break;
+      }
+      else {
+        node.add(this.bindelem());
+      }
+    }
+    if(this.look.content() == '...') {
+      node.add(this.restparam());
+    }
+    node.add(this.match(']', 'missing ] after element list'));
+    return node;
+  },
+  bindelem: function() {
+    var node = new Node(Node.BINDELEM);
+    if(['[', '{'].indexOf(this.look.content()) > -1) {
+      node.add(this.bindpat());
+      if(this.look && this.look.content() == '=') {
+        node.add(this.assign());
+      }
+    }
+    else {
+      return this.singlename();
+    }
+    return node;
+  },
+  singlename: function() {
+    var node = new Node(Node.SINGLENAME);
+    node.add(this.match(Token.ID));
     if(this.look && this.look.content() == '=') {
       node.add(this.assign());
     }
     return node;
+  },
+  objbindpat: function() {
+    var node = new Node(Node.OBJBINDPAT);
+    node.add(this.match('{'));
+    while(this.look && this.look.content() != '}') {
+      node.add(this.bindpropt());
+      if(this.look && this.look.content() == ',') {
+        node.add(this.match());
+      }
+    }
+    node.add(this.match('}', 'missing } after property list'));
+    return node;
+  },
+  bindpropt: function() {
+    var node = new Node(Node.BINDPROPT);
+    switch(this.look.type()) {
+      case Token.ID:
+      case Token.STRING:
+      case Token.NUMBER:
+      break;
+      default:
+        this.error('invalid property id');
+    }
+    //根据LL2分辨是PropertyName[?Yield, ?GeneratorParameter] : BindingElement[?Yield, ?GeneratorParameter]
+    //还是SingleNameBinding [?Yield, ?GeneratorParameter]
+    for(var i = this.index; i < this.length; i++) {
+      var next = this.tokens[i];
+      if(!S[next.tag()]) {
+        if(next.content() == ':') {
+          node.add(this.match(), this.match());
+          node.add(this.bindelem());
+        }
+        else {
+          node.add(this.singlename());
+        }
+        return node;
+      }
+    }
+    this.error('missing : after property id');
   },
   assign: function() {
     var node = new Node(Node.ASSIGN);
@@ -455,6 +600,42 @@ var Parser = Class(function(lexer) {
     );
     return node;
   },
+  superstmt: function() {
+    var node = new Node(Node.SUPERSTMT);
+    node.add(this.match('super'));
+    if(!this.look) {
+      this.error();
+    }
+    if(this.look.content() == '.') {
+      while(this.look && this.look.content() == '.') {
+        node.add(this.match());
+        if(!this.look) {
+          this.error();
+        }
+        if(this.look.content() == 'super') {
+          node.add(this.match());
+        }
+        else {
+          break;
+        }
+      }
+      if(this.look.content() != '(') {
+        node.add(this.match(Token.ID));
+        while(this.look && this.look.content() == '.') {
+          node.add(this.match(), this.match(Token.ID));
+        }
+      }
+    }
+    node.add(
+      this.args(),
+      this.match(';')
+    );
+    return node;
+  },
+  imptstmt: function() {
+    var node = new Node(Node.IMPTSTMT);
+    return node;
+  },
   fndecl: function() {
     var node = new Node(Node.FNDECL);
     node.add(
@@ -502,18 +683,112 @@ var Parser = Class(function(lexer) {
   },
   fnparams: function() {
     var node = new Node(Node.FNPARAMS);
-    while(this.look && this.look.content() != ')') {
+    while(this.look && this.look.content() != ')' && this.look.content() != '...') {
       node.add(this.match(Token.ID, 'missing formal parameter'));
-      if(this.look && this.look.content() == ',') {
-        node.add(this.match());
+      if(this.look) {
+        if(this.look.content() == ',') {
+          node.add(this.match());
+        }
+        else if(this.look.content() == '=') {
+          node.add(this.bindelement());
+          if(this.look && this.look.content() == ',') {
+            node.add(this.match());
+          }
+        }
       }
     }
+    if(!this.look) {
+      this.error('missing ) after formal parameters');
+    }
+    if(this.look.content() == '...') {
+      node.add(this.restparam());
+    }
+    return node;
+  },
+  bindelement: function() {
+    var node = new Node(Node.BINDELEMENT);
+    node.add(this.match('='), this.assignexpr());
+    return node;
+  },
+  restparam: function() {
+    var node = new Node(Node.RESTPARAM);
+    node.add(this.match('...'), this.match(Token.ID));
     return node;
   },
   fnbody: function(allowSuper) {
     var node = new Node(Node.FNBODY);
     while(this.look && this.look.content() != '}') {
       node.add(this.element(allowSuper));
+    }
+    return node;
+  },
+  classdecl: function() {
+    var node = new Node(Node.CLASSDECL);
+    node.add(this.match('class'), this.match(Token.ID));
+    if(!this.look) {
+      this.error();
+    }
+    if(this.look.content() == 'extends') {
+      node.add(this.heratige());
+    }
+    node.add(
+      this.match('{'),
+      this.classbody(),
+      this.match('}')
+    );
+    return node;
+  },
+  heratige: function() {
+    var node = new Node(Node.HERITAGE);
+    node.add(this.match('extends'), this.match(Token.ID));
+    return node;
+  },
+  classbody: function() {
+    var node = new Node(Node.CLASSBODY),
+      methods = {},
+      hasStatic = false;
+    while(this.look && this.look.content() != '}') {
+      if(this.look.content() == ';') {
+        node.add(this.match());
+        continue;
+      }
+      hasStatic = false;
+      if(this.look.content() == 'static') {
+        node.add(this.match());
+        hasStatic = true;
+      }
+      if(!this.look) {
+        this.error();
+      }
+      node.add(this.method(hasStatic, methods));
+    }
+    return node;
+  },
+  method: function(hasStatic, methods, statics) {
+    var node = new Node(Node.METHOD);
+    if(this.look.content() == 'get') {
+      node.add(this.match(), this.getfn());
+    }
+    else if(this.look.content() == 'set') {
+      node.add(this.match(), this.setfn());
+    }
+    else {
+      node.add(this.match(Token.ID));
+      var id = node.leaves()[0].token().content();
+      if(methods.hasOwnProperty(id)) {
+        this.error('duplicate method decl in class');
+      }
+      methods[id] = true;
+      node.add(this.match('('));
+      if(this.look.content() != ')') {
+        node.add(this.fnparams());
+      }
+      node.add(
+        this.match(')'),
+        this.match('{'),
+        this.fnbody(true),
+        this.match('}', 'missing } in compound statement')
+      );
     }
     return node;
   },
@@ -950,7 +1225,7 @@ var Parser = Class(function(lexer) {
             node.add(this.match(), this.expr(), this.match(')'));
           break;
           case '[':
-            node.add(this.arrltr());
+            node.add(this.arrinit());
           break;
           case '{':
             node.add(this.objltr());
@@ -961,18 +1236,62 @@ var Parser = Class(function(lexer) {
     }
     return node;
   },
+  bindid: function() {
+    var node = new Node(Node.BINDID);
+    node.add(this.match('...'), this.assignexpr());
+    return node;
+  },
+  arrinit: function() {
+    //根据LL2分辨是arrltr还是arrcmph
+    //[assignexpr or [for
+    for(var i = this.index; i < this.length; i++) {
+      var next = this.tokens[i];
+      if(!S[next.tag()]) {
+        if(next.content() == 'for') {
+          return this.arrcmph();
+        }
+        else {
+          return this.arrltr();
+        }
+      }
+    }
+    this.error();
+  },
+  arrcmph: function() {
+    var node = new Node(Node.ARRCMPH);
+    node.add(this.match('['));
+    node.add(this.cmphfor());
+    node.add(this.match(']', 'missing ] after element list'));
+    return node;
+  },
+  cmphfor: function() {
+    var node = new Node(Node.CMPHFOR);
+    node.add(this.match('for'));
+    return node;
+  },
   arrltr: function() {
     var node = new Node(Node.ARRLTR);
     node.add(this.match('['));
-    while(this.look && this.look.content() != ']') {
+    while(this.look && this.look.content() != ']' && this.look.content() != '...') {
       if(this.look.content() == ',') {
         node.add(this.match());
       }
       else {
         node.add(this.assignexpr());
+        if(this.look && this.look.content() == ',') {
+          node.add(this.match());
+        }
       }
     }
+    if(this.look.content() == '...') {
+      node.add(this.spread());
+    }
     node.add(this.match(']', 'missing ] after element list'));
+    return node;
+  },
+  spread: function() {
+    var node = new Node(Node.SPREAD);
+    node.add(this.match('...'), this.assignexpr());
     return node;
   },
   objltr: function() {
@@ -989,19 +1308,93 @@ var Parser = Class(function(lexer) {
   },
   proptassign: function() {
     var node = new Node(Node.PROPTASSIGN);
-    switch(this.look.type()) {
-      case Token.ID:
-      case Token.STRING:
-      case Token.NUMBER:
-        node.add(
-          this.match(),
-          this.match(':', 'missing : after property id'),
-          this.assignexpr()
-        );
-      break;
-      default:
-        this.error('invalid property id');
+    if(!this.look) {
+      this.error();
     }
+    if(this.look.content() == 'get') {
+      node.add(this.match());
+      if(!this.look) {
+        this.error();
+      }
+      if(this.look.content() == ':') {
+        node.add(this.match(), this.assignexpr());
+      }
+      else {
+        node.add(this.getfn());
+      }
+    }
+    else if(this.look.content() == 'set') {
+      node.add(this.match());
+      if(!this.look) {
+        this.error();
+      }
+      if(this.look.content() == ':') {
+        node.add(this.match(), this.assignexpr());
+      }
+      else {
+        node.add(this.setfn());
+      }
+    }
+    else {
+      switch(this.look.type()) {
+        case Token.ID:
+        case Token.STRING:
+        case Token.NUMBER:
+          node.add(
+            this.match(),
+            this.match(':', 'missing : after property id'),
+            this.assignexpr()
+          );
+        break;
+        default:
+          this.error('invalid property id');
+      }
+    }
+    return node;
+  },
+  getfn: function() {
+    var node = new Node(Node.GETFN);
+    node.add(
+      this.proptname(),
+      this.match('('),
+      this.match(')'),
+      this.match('{'),
+      this.fnbody(),
+      this.match('}')
+    );
+    return node;
+  },
+  setfn: function() {
+    var node = new Node(Node.SETFN);
+    node.add(
+      this.proptname(),
+      this.match('('),
+      this.propsets(),
+      this.match(')'),
+      this.match('{'),
+      this.fnbody(),
+      this.match('}')
+    );
+    return node;
+  },
+  proptname: function() {
+    var node = new Node(Node.PROPTNAME);
+    if(this.look) {
+      switch(this.look.type()) {
+        case Token.ID:
+        case Token.NUMBER:
+        case Token.STRING:
+          node.add(this.match());
+        break;
+        default:
+          this.error('missing name after . operator');
+      }
+    }
+    return node;
+  },
+  propsets: function() {
+    var node = new Node(Node.PROPTSETS);
+    node.add(this.match(Token.ID, 'setter functions must have one argument'));
     return node;
   },
   args: function() {
@@ -1018,11 +1411,14 @@ var Parser = Class(function(lexer) {
   },
   arglist: function() {
     var node = new Node(Node.ARGLIST);
-    while(this.look && this.look.content() != ')') {
+    while(this.look && this.look.content() != ')' && this.look.content() != '...') {
       node.add(this.assignexpr());
       if(this.look && this.look.content() == ',') {
         node.add(this.match());
       }
+    }
+    if(this.look && this.look.content() == '...') {
+      node.add(this.bindid());
     }
     return node;
   },

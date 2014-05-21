@@ -58,7 +58,7 @@ describe('jscontext', function() {
     });
     it('fndecl params', function() {
       var context = homunculus.getContext('js');
-      context.parse('function a(b, c = 1, ...d){}');
+      context.parse('function a(b, c, d){}');
       var a = context.getChild('a');
       expect(a.hasParam('b')).to.be(true);
       expect(a.hasParam('c')).to.be(true);

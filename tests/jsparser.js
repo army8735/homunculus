@@ -176,24 +176,24 @@ describe('jsparser', function() {
     });
     it('fndecl with params', function() {
       var parser = homunculus.getParser('js');
-      var node = parser.parse('function a(b, c = 1, ...d) {}');
-      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.FNDECL, ['function', 'a', '(', JsNode.FNPARAMS, ['b', ',', 'c', JsNode.BINDELEMENT, ['=', JsNode.PRMREXPR, ['1']], ',', JsNode.RESTPARAM, ['...', 'd']], ')', '{', JsNode.FNBODY, [], '}']]]);
+      var node = parser.parse('function a(b,c) {}');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.FNDECL,["function","a","(",JsNode.FNPARAMS,["b",",","c"],")","{",JsNode.FNBODY,[],"}"]]]);
     });
-    it('fndecl bindelem', function() {
-      var parser = homunculus.getParser('js');
-      var node = parser.parse('function a(b, c = 1, ...d){}');
-      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.FNDECL,["function","a","(",JsNode.FNPARAMS,["b",",","c",JsNode.BINDELEMENT,["=",JsNode.PRMREXPR,["1"]],",",JsNode.RESTPARAM,["...","d"]],")","{",JsNode.FNBODY,[],"}"]]]);
-    });
-    it('fndecl bindelem 2', function() {
-      var parser = homunculus.getParser('js');
-      var node = parser.parse('function a(b, c = fn(...c)){}');
-      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.FNDECL,["function","a","(",JsNode.FNPARAMS,["b",",","c",JsNode.BINDELEMENT,["=",JsNode.CALLEXPR,[JsNode.PRMREXPR,["fn"],JsNode.ARGS,["(",JsNode.ARGLIST,[JsNode.BINDID,["...",JsNode.PRMREXPR,["c"]]],")"]]]],")","{",JsNode.FNBODY,[],"}"]]]);
-    });
-    it('fndecl rest', function() {
-      var parser = homunculus.getParser('js');
-      var node = parser.parse('function a(...b){}');
-      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.FNDECL,["function","a","(",JsNode.FNPARAMS,[JsNode.RESTPARAM,["...","b"]],")","{",JsNode.FNBODY,[],"}"]]])
-    });
+//    it('fndecl bindelem', function() {
+//      var parser = homunculus.getParser('js');
+//      var node = parser.parse('function a(b, c = 1, ...d){}');
+//      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.FNDECL,["function","a","(",JsNode.FNPARAMS,["b",",","c",JsNode.BINDELEMENT,["=",JsNode.PRMREXPR,["1"]],",",JsNode.RESTPARAM,["...","d"]],")","{",JsNode.FNBODY,[],"}"]]]);
+//    });
+//    it('fndecl bindelem 2', function() {
+//      var parser = homunculus.getParser('js');
+//      var node = parser.parse('function a(b, c = fn(...c)){}');
+//      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.FNDECL,["function","a","(",JsNode.FNPARAMS,["b",",","c",JsNode.BINDELEMENT,["=",JsNode.CALLEXPR,[JsNode.PRMREXPR,["fn"],JsNode.ARGS,["(",JsNode.ARGLIST,[JsNode.BINDID,["...",JsNode.PRMREXPR,["c"]]],")"]]]],")","{",JsNode.FNBODY,[],"}"]]]);
+//    });
+//    it('fndecl rest', function() {
+//      var parser = homunculus.getParser('js');
+//      var node = parser.parse('function a(...b){}');
+//      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.FNDECL,["function","a","(",JsNode.FNPARAMS,[JsNode.RESTPARAM,["...","b"]],")","{",JsNode.FNBODY,[],"}"]]])
+//    });
     it('fndecl error 1', function() {
       var parser = homunculus.getParser('js');
       expect(function() {
@@ -280,15 +280,32 @@ describe('jsparser', function() {
         parser.parse('.');
       }).to.throwError();
     });
-    it('array spread in prmrexpr', function() {
-      var parser = homunculus.getParser('js');
-      var node = parser.parse('[1, 2, ...gen()]');
-      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.EXPRSTMT,[JsNode.PRMREXPR,[JsNode.ARRLTR,["[",JsNode.PRMREXPR,["1"],",",JsNode.PRMREXPR,["2"],",",JsNode.SPREAD,["...",JsNode.CALLEXPR,[JsNode.PRMREXPR,["gen"],JsNode.ARGS,["(",")"]]],"]"]]]]]);
-    });
+//    it('array spread in prmrexpr', function() {
+//      var parser = homunculus.getParser('js');
+//      var node = parser.parse('[1, 2, ...gen()]');
+//      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.EXPRSTMT,[JsNode.PRMREXPR,[JsNode.ARRLTR,["[",JsNode.PRMREXPR,["1"],",",JsNode.PRMREXPR,["2"],",",JsNode.SPREAD,["...",JsNode.CALLEXPR,[JsNode.PRMREXPR,["gen"],JsNode.ARGS,["(",")"]]],"]"]]]]]);
+//    });
     it('arrltr', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('[,,,2,3,]');
       expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.EXPRSTMT,[JsNode.PRMREXPR,[JsNode.ARRLTR,["[",",",",",",",JsNode.PRMREXPR,["2"],",",JsNode.PRMREXPR,["3"],",","]"]]]]]);
+    });
+    it('arrltr error', function() {
+      var parser = homunculus.getParser('js');
+      expect(function() {
+        parser.parse('[,,,2,3,');
+      }).to.throwError();
+    });
+    it('objltr', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('var o = {a: [], "b": 3, 5: {}}');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.VARSTMT,["var",JsNode.VARDECL,["o",JsNode.ASSIGN,["=",JsNode.PRMREXPR,[JsNode.OBJLTR,["{",JsNode.PROPTASSIGN,["a",":",JsNode.PRMREXPR,[JsNode.ARRLTR,["[","]"]]],",",JsNode.PROPTASSIGN,["\"b\"",":",JsNode.PRMREXPR,["3"]],",",JsNode.PROPTASSIGN,["5",":",JsNode.PRMREXPR,[JsNode.OBJLTR,["{","}"]]],"}"]]]]]]]);
+    });
+    it('objltr error', function() {
+      var parser = homunculus.getParser('js');
+      expect(function() {
+        parser.parse('var o = {+');
+      }).to.throwError();
     });
     it('mmbexpr 1', function() {
       var parser = homunculus.getParser('js');
@@ -691,156 +708,156 @@ describe('jsparser', function() {
       var node = parser.parse();
       expect(tree(node)).to.eql([JsNode.PROGRAM,[]]);
     });
-    it('letstmt 1', function() {
-      var parser = homunculus.getParser('js');
-      var node = parser.parse('let a');
-      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.LETSTMT,["let",JsNode.VARDECL,["a"]]]]);
-    });
-    it('letstmt 2', function() {
-      var parser = homunculus.getParser('js');
-      var node = parser.parse('let a, b = 1');
-      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.LETSTMT,["let",JsNode.VARDECL,["a"],",",JsNode.VARDECL,["b",JsNode.ASSIGN,["=",JsNode.PRMREXPR,["1"]]]]]]);
-    });
-    it('cststmt 1', function() {
-      var parser = homunculus.getParser('js');
-      var node = parser.parse('const a');
-      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.CSTSTMT,["const",JsNode.VARDECL,["a"]]]]);
-    });
-    it('cststmt 2', function() {
-      var parser = homunculus.getParser('js');
-      var node = parser.parse('const a, b = 1');
-      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.CSTSTMT,["const",JsNode.VARDECL,["a"],",",JsNode.VARDECL,["b",JsNode.ASSIGN,["=",JsNode.PRMREXPR,["1"]]]]]]);
-    });
-    it('class decl', function() {
-      var parser = homunculus.getParser('js');
-      var node = parser.parse('class A{;}');
-      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.CLASSDECL,["class","A","{",JsNode.CLASSBODY,[';'],"}"]]]);
-    });
-    it('class extend', function() {
-      var parser = homunculus.getParser('js');
-      var node = parser.parse('class A{}class B extends A{}');
-      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.CLASSDECL,["class","A","{",JsNode.CLASSBODY,[],"}"],JsNode.CLASSDECL,["class","B",JsNode.HERITAGE,["extends","A"],"{",JsNode.CLASSBODY,[],"}"]]]);
-    });
-    it('class method', function() {
-      var parser = homunculus.getParser('js');
-      var node = parser.parse('class A{ method(param){} }');
-      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.CLASSDECL,["class","A","{",JsNode.CLASSBODY,[JsNode.METHOD,["method","(",JsNode.FNPARAMS,["param"],")","{",JsNode.FNBODY,[],"}"]],"}"]]]);
-    });
-    it('class static method', function() {
-      var parser = homunculus.getParser('js');
-      var node = parser.parse('class A{ static method(){} }');
-      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.CLASSDECL,["class","A","{",JsNode.CLASSBODY,["static",JsNode.METHOD,["method","(",")","{",JsNode.FNBODY,[],"}"]],"}"]]]);
-    });
-    it('class error', function() {
-      var parser = homunculus.getParser('js');
-      expect(function() {
-        parser.parse('class A');
-      }).to.throwError();
-    });
-    it('class method error', function() {
-      var parser = homunculus.getParser('js');
-      expect(function() {
-        parser.parse('class A{ method');
-      }).to.throwError();
-    });
-    it('class method duplicate error', function() {
-      var parser = homunculus.getParser('js');
-      expect(function() {
-        parser.parse('class A{ A(){} A(){} }');
-      }).to.throwError();
-    });
-    it('class static error', function() {
-      var parser = homunculus.getParser('js');
-      expect(function() {
-        parser.parse('class A{ static');
-      }).to.throwError();
-    });
-    it('super in class', function() {
-      var parser = homunculus.getParser('js');
-      var node = parser.parse('class A extends B{constructor(){super()}}')
-      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.CLASSDECL,["class","A",JsNode.HERITAGE,["extends","B"],"{",JsNode.CLASSBODY,[JsNode.METHOD,["constructor","(",")","{",JsNode.FNBODY,[JsNode.SUPERSTMT,["super",JsNode.ARGS,["(",")"]]],"}"]],"}"]]]);
-    });
-    it('super recursion', function() {
-      var parser = homunculus.getParser('js');
-      var node = parser.parse('class A extends B{method(){super.super.a()}}');
-      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.CLASSDECL,["class","A",JsNode.HERITAGE,["extends","B"],"{",JsNode.CLASSBODY,[JsNode.METHOD,["method","(",")","{",JsNode.FNBODY,[JsNode.SUPERSTMT,["super",".","super",".","a",JsNode.ARGS,["(",")"]]],"}"]],"}"]]]);
-    });
-    it('super out class', function() {
-      var parser = homunculus.getParser('js');
-      expect(function() {
-        parser.parse('super()');
-      }).to.throwError();
-    });
-    it('set', function() {
-      var parser = homunculus.getParser('js');
-      var node = parser.parse('class A{set a(p){}}');
-      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.CLASSDECL,["class","A","{",JsNode.CLASSBODY,[JsNode.METHOD,["set",JsNode.SETFN,[JsNode.PROPTNAME,["a"],"(",JsNode.PROPTSETS,["p"],")","{",JsNode.FNBODY,[],"}"]]],"}"]]]);
-    });
-    it('get', function() {
-      var parser = homunculus.getParser('js');
-      var node = parser.parse('class A{get a(){}}');
-      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.CLASSDECL,["class","A","{",JsNode.CLASSBODY,[JsNode.METHOD,["get",JsNode.GETFN,[JsNode.PROPTNAME,["a"],"(",")","{",JsNode.FNBODY,[],"}"]]],"}"]]]);
-    });
-    it('destructuring array', function() {
-      var parser = homunculus.getParser('js');
-      var node = parser.parse('var [a] = [1]');
-      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.VARSTMT,["var",JsNode.VARDECL,[JsNode.ARRBINDPAT,["[",JsNode.SINGLENAME,["a"],"]"],JsNode.ASSIGN,["=",JsNode.PRMREXPR,[JsNode.ARRLTR,["[",JsNode.PRMREXPR,["1"],"]"]]]]]]]);
-    });
-    it('destructuring with restparam', function() {
-      var parser = homunculus.getParser('js');
-      var node = parser.parse('let [a, ...b] = [1, 2, 3]');
-      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.LETSTMT, ["let", JsNode.VARDECL, [JsNode.ARRBINDPAT, ["[", JsNode.SINGLENAME, ["a"], ",", JsNode.RESTPARAM, ["...", "b"], "]"], JsNode.ASSIGN, ["=", JsNode.PRMREXPR, [JsNode.ARRLTR, ["[", JsNode.PRMREXPR, ["1"], ",", JsNode.PRMREXPR, ["2"], ",", JsNode.PRMREXPR, ["3"], "]"]]]]]]]);
-    });
-    it('destructuring with default value', function() {
-      var parser = homunculus.getParser('js');
-      var node = parser.parse('const [a = 1, [b] = [2]] = [, []]');
-      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.CSTSTMT,["const",JsNode.VARDECL,[JsNode.ARRBINDPAT,["[",JsNode.SINGLENAME,["a",JsNode.ASSIGN,["=",JsNode.PRMREXPR,["1"]]],",",JsNode.BINDELEM,[JsNode.ARRBINDPAT,["[",JsNode.SINGLENAME,["b"],"]"],JsNode.ASSIGN,["=",JsNode.PRMREXPR,[JsNode.ARRLTR,["[",JsNode.PRMREXPR,["2"],"]"]]]],"]"],JsNode.ASSIGN,["=",JsNode.PRMREXPR,[JsNode.ARRLTR,["[",",",JsNode.PRMREXPR,[JsNode.ARRLTR,["[","]"]],"]"]]]]]]]);
-    });
-    it('destructuring object', function() {
-      var parser = homunculus.getParser('js');
-      var node = parser.parse('var {x, y = 1, "f": [z]} = {}');
-      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.VARSTMT,["var",JsNode.VARDECL,[JsNode.OBJBINDPAT,["{",JsNode.BINDPROPT,[JsNode.SINGLENAME,["x"]],",",JsNode.BINDPROPT,[JsNode.SINGLENAME,["y",JsNode.ASSIGN,["=",JsNode.PRMREXPR,["1"]]]],",",JsNode.BINDPROPT,["\"f\"",":",JsNode.BINDELEM,[JsNode.ARRBINDPAT,["[",JsNode.SINGLENAME,["z"],"]"]]],"}"],JsNode.ASSIGN,["=",JsNode.PRMREXPR,[JsNode.OBJLTR,["{","}"]]]]]]]);
-    });
-    it('destructuring complex', function() {
-      var parser = homunculus.getParser('js');
-      var node = parser.parse('var [x, {"a":[y=1,{z=2},...o]}] = []');
-      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.VARSTMT,["var",JsNode.VARDECL,[JsNode.ARRBINDPAT,["[",JsNode.SINGLENAME,["x"],",",JsNode.BINDELEM,[JsNode.OBJBINDPAT,["{",JsNode.BINDPROPT,["\"a\"",":",JsNode.BINDELEM,[JsNode.ARRBINDPAT,["[",JsNode.SINGLENAME,["y",JsNode.ASSIGN,["=",JsNode.PRMREXPR,["1"]]],",",JsNode.BINDELEM,[JsNode.OBJBINDPAT,["{",JsNode.BINDPROPT,[JsNode.SINGLENAME,["z",JsNode.ASSIGN,["=",JsNode.PRMREXPR,["2"]]]],"}"]],",",JsNode.RESTPARAM,["...","o"],"]"]]],"}"]],"]"],JsNode.ASSIGN,["=",JsNode.PRMREXPR,[JsNode.ARRLTR,["[","]"]]]]]]]);
-    });
-    it('destructuring without assign should throw error', function() {
-      var parser = homunculus.getParser('js');
-      expect(function() {
-        parser.parse('var [a];');
-      }).to.throwError();
-    });
-    it('destructuring object error 1', function() {
-      var parser = homunculus.getParser('js');
-      expect(function() {
-        parser.parse('var {');
-      }).to.throwError();
-    });
-    it('destructuring object error 2', function() {
-      var parser = homunculus.getParser('js');
-      expect(function() {
-        parser.parse('var {a');
-      }).to.throwError();
-    });
-    it('destructuring object error 3', function() {
-      var parser = homunculus.getParser('js');
-      expect(function() {
-        parser.parse('var {!');
-      }).to.throwError();
-    });
-    it('destructuring object error 4', function() {
-      var parser = homunculus.getParser('js');
-      expect(function() {
-        parser.parse('var {a ');
-      }).to.throwError();
-    });
-    it('binding id in call', function() {
-      var parser = homunculus.getParser('js');
-      var node = parser.parse('Math.max(...[1, 2])');
-      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.EXPRSTMT,[JsNode.CALLEXPR,[JsNode.MMBEXPR,[JsNode.PRMREXPR,["Math"],".","max"],JsNode.ARGS,["(",JsNode.ARGLIST,[JsNode.BINDID,["...",JsNode.PRMREXPR,[JsNode.ARRLTR,["[",JsNode.PRMREXPR,["1"],",",JsNode.PRMREXPR,["2"],"]"]]]],")"]]]]]);
-    });
+//    it('letstmt 1', function() {
+//      var parser = homunculus.getParser('js');
+//      var node = parser.parse('let a');
+//      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.LETSTMT,["let",JsNode.VARDECL,["a"]]]]);
+//    });
+//    it('letstmt 2', function() {
+//      var parser = homunculus.getParser('js');
+//      var node = parser.parse('let a, b = 1');
+//      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.LETSTMT,["let",JsNode.VARDECL,["a"],",",JsNode.VARDECL,["b",JsNode.ASSIGN,["=",JsNode.PRMREXPR,["1"]]]]]]);
+//    });
+//    it('cststmt 1', function() {
+//      var parser = homunculus.getParser('js');
+//      var node = parser.parse('const a');
+//      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.CSTSTMT,["const",JsNode.VARDECL,["a"]]]]);
+//    });
+//    it('cststmt 2', function() {
+//      var parser = homunculus.getParser('js');
+//      var node = parser.parse('const a, b = 1');
+//      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.CSTSTMT,["const",JsNode.VARDECL,["a"],",",JsNode.VARDECL,["b",JsNode.ASSIGN,["=",JsNode.PRMREXPR,["1"]]]]]]);
+//    });
+//    it('class decl', function() {
+//      var parser = homunculus.getParser('js');
+//      var node = parser.parse('class A{;}');
+//      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.CLASSDECL,["class","A","{",JsNode.CLASSBODY,[';'],"}"]]]);
+//    });
+//    it('class extend', function() {
+//      var parser = homunculus.getParser('js');
+//      var node = parser.parse('class A{}class B extends A{}');
+//      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.CLASSDECL,["class","A","{",JsNode.CLASSBODY,[],"}"],JsNode.CLASSDECL,["class","B",JsNode.HERITAGE,["extends","A"],"{",JsNode.CLASSBODY,[],"}"]]]);
+//    });
+//    it('class method', function() {
+//      var parser = homunculus.getParser('js');
+//      var node = parser.parse('class A{ method(param){} }');
+//      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.CLASSDECL,["class","A","{",JsNode.CLASSBODY,[JsNode.METHOD,["method","(",JsNode.FNPARAMS,["param"],")","{",JsNode.FNBODY,[],"}"]],"}"]]]);
+//    });
+//    it('class static method', function() {
+//      var parser = homunculus.getParser('js');
+//      var node = parser.parse('class A{ static method(){} }');
+//      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.CLASSDECL,["class","A","{",JsNode.CLASSBODY,["static",JsNode.METHOD,["method","(",")","{",JsNode.FNBODY,[],"}"]],"}"]]]);
+//    });
+//    it('class error', function() {
+//      var parser = homunculus.getParser('js');
+//      expect(function() {
+//        parser.parse('class A');
+//      }).to.throwError();
+//    });
+//    it('class method error', function() {
+//      var parser = homunculus.getParser('js');
+//      expect(function() {
+//        parser.parse('class A{ method');
+//      }).to.throwError();
+//    });
+//    it('class method duplicate error', function() {
+//      var parser = homunculus.getParser('js');
+//      expect(function() {
+//        parser.parse('class A{ A(){} A(){} }');
+//      }).to.throwError();
+//    });
+//    it('class static error', function() {
+//      var parser = homunculus.getParser('js');
+//      expect(function() {
+//        parser.parse('class A{ static');
+//      }).to.throwError();
+//    });
+//    it('super in class', function() {
+//      var parser = homunculus.getParser('js');
+//      var node = parser.parse('class A extends B{constructor(){super()}}')
+//      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.CLASSDECL,["class","A",JsNode.HERITAGE,["extends","B"],"{",JsNode.CLASSBODY,[JsNode.METHOD,["constructor","(",")","{",JsNode.FNBODY,[JsNode.SUPERSTMT,["super",JsNode.ARGS,["(",")"]]],"}"]],"}"]]]);
+//    });
+//    it('super recursion', function() {
+//      var parser = homunculus.getParser('js');
+//      var node = parser.parse('class A extends B{method(){super.super.a()}}');
+//      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.CLASSDECL,["class","A",JsNode.HERITAGE,["extends","B"],"{",JsNode.CLASSBODY,[JsNode.METHOD,["method","(",")","{",JsNode.FNBODY,[JsNode.SUPERSTMT,["super",".","super",".","a",JsNode.ARGS,["(",")"]]],"}"]],"}"]]]);
+//    });
+//    it('super out class', function() {
+//      var parser = homunculus.getParser('js');
+//      expect(function() {
+//        parser.parse('super()');
+//      }).to.throwError();
+//    });
+//    it('set', function() {
+//      var parser = homunculus.getParser('js');
+//      var node = parser.parse('class A{set a(p){}}');
+//      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.CLASSDECL,["class","A","{",JsNode.CLASSBODY,[JsNode.METHOD,["set",JsNode.SETFN,[JsNode.PROPTNAME,["a"],"(",JsNode.PROPTSETS,["p"],")","{",JsNode.FNBODY,[],"}"]]],"}"]]]);
+//    });
+//    it('get', function() {
+//      var parser = homunculus.getParser('js');
+//      var node = parser.parse('class A{get a(){}}');
+//      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.CLASSDECL,["class","A","{",JsNode.CLASSBODY,[JsNode.METHOD,["get",JsNode.GETFN,[JsNode.PROPTNAME,["a"],"(",")","{",JsNode.FNBODY,[],"}"]]],"}"]]]);
+//    });
+//    it('destructuring array', function() {
+//      var parser = homunculus.getParser('js');
+//      var node = parser.parse('var [a] = [1]');
+//      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.VARSTMT,["var",JsNode.VARDECL,[JsNode.ARRBINDPAT,["[",JsNode.SINGLENAME,["a"],"]"],JsNode.ASSIGN,["=",JsNode.PRMREXPR,[JsNode.ARRLTR,["[",JsNode.PRMREXPR,["1"],"]"]]]]]]]);
+//    });
+//    it('destructuring with restparam', function() {
+//      var parser = homunculus.getParser('js');
+//      var node = parser.parse('let [a, ...b] = [1, 2, 3]');
+//      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.LETSTMT, ["let", JsNode.VARDECL, [JsNode.ARRBINDPAT, ["[", JsNode.SINGLENAME, ["a"], ",", JsNode.RESTPARAM, ["...", "b"], "]"], JsNode.ASSIGN, ["=", JsNode.PRMREXPR, [JsNode.ARRLTR, ["[", JsNode.PRMREXPR, ["1"], ",", JsNode.PRMREXPR, ["2"], ",", JsNode.PRMREXPR, ["3"], "]"]]]]]]]);
+//    });
+//    it('destructuring with default value', function() {
+//      var parser = homunculus.getParser('js');
+//      var node = parser.parse('const [a = 1, [b] = [2]] = [, []]');
+//      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.CSTSTMT,["const",JsNode.VARDECL,[JsNode.ARRBINDPAT,["[",JsNode.SINGLENAME,["a",JsNode.ASSIGN,["=",JsNode.PRMREXPR,["1"]]],",",JsNode.BINDELEM,[JsNode.ARRBINDPAT,["[",JsNode.SINGLENAME,["b"],"]"],JsNode.ASSIGN,["=",JsNode.PRMREXPR,[JsNode.ARRLTR,["[",JsNode.PRMREXPR,["2"],"]"]]]],"]"],JsNode.ASSIGN,["=",JsNode.PRMREXPR,[JsNode.ARRLTR,["[",",",JsNode.PRMREXPR,[JsNode.ARRLTR,["[","]"]],"]"]]]]]]]);
+//    });
+//    it('destructuring object', function() {
+//      var parser = homunculus.getParser('js');
+//      var node = parser.parse('var {x, y = 1, "f": [z]} = {}');
+//      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.VARSTMT,["var",JsNode.VARDECL,[JsNode.OBJBINDPAT,["{",JsNode.BINDPROPT,[JsNode.SINGLENAME,["x"]],",",JsNode.BINDPROPT,[JsNode.SINGLENAME,["y",JsNode.ASSIGN,["=",JsNode.PRMREXPR,["1"]]]],",",JsNode.BINDPROPT,["\"f\"",":",JsNode.BINDELEM,[JsNode.ARRBINDPAT,["[",JsNode.SINGLENAME,["z"],"]"]]],"}"],JsNode.ASSIGN,["=",JsNode.PRMREXPR,[JsNode.OBJLTR,["{","}"]]]]]]]);
+//    });
+//    it('destructuring complex', function() {
+//      var parser = homunculus.getParser('js');
+//      var node = parser.parse('var [x, {"a":[y=1,{z=2},...o]}] = []');
+//      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.VARSTMT,["var",JsNode.VARDECL,[JsNode.ARRBINDPAT,["[",JsNode.SINGLENAME,["x"],",",JsNode.BINDELEM,[JsNode.OBJBINDPAT,["{",JsNode.BINDPROPT,["\"a\"",":",JsNode.BINDELEM,[JsNode.ARRBINDPAT,["[",JsNode.SINGLENAME,["y",JsNode.ASSIGN,["=",JsNode.PRMREXPR,["1"]]],",",JsNode.BINDELEM,[JsNode.OBJBINDPAT,["{",JsNode.BINDPROPT,[JsNode.SINGLENAME,["z",JsNode.ASSIGN,["=",JsNode.PRMREXPR,["2"]]]],"}"]],",",JsNode.RESTPARAM,["...","o"],"]"]]],"}"]],"]"],JsNode.ASSIGN,["=",JsNode.PRMREXPR,[JsNode.ARRLTR,["[","]"]]]]]]]);
+//    });
+//    it('destructuring without assign should throw error', function() {
+//      var parser = homunculus.getParser('js');
+//      expect(function() {
+//        parser.parse('var [a];');
+//      }).to.throwError();
+//    });
+//    it('destructuring object error 1', function() {
+//      var parser = homunculus.getParser('js');
+//      expect(function() {
+//        parser.parse('var {');
+//      }).to.throwError();
+//    });
+//    it('destructuring object error 2', function() {
+//      var parser = homunculus.getParser('js');
+//      expect(function() {
+//        parser.parse('var {a');
+//      }).to.throwError();
+//    });
+//    it('destructuring object error 3', function() {
+//      var parser = homunculus.getParser('js');
+//      expect(function() {
+//        parser.parse('var {!');
+//      }).to.throwError();
+//    });
+//    it('destructuring object error 4', function() {
+//      var parser = homunculus.getParser('js');
+//      expect(function() {
+//        parser.parse('var {a ');
+//      }).to.throwError();
+//    });
+//    it('binding id in call', function() {
+//      var parser = homunculus.getParser('js');
+//      var node = parser.parse('Math.max(...[1, 2])');
+//      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.EXPRSTMT,[JsNode.CALLEXPR,[JsNode.MMBEXPR,[JsNode.PRMREXPR,["Math"],".","max"],JsNode.ARGS,["(",JsNode.ARGLIST,[JsNode.BINDID,["...",JsNode.PRMREXPR,[JsNode.ARRLTR,["[",JsNode.PRMREXPR,["1"],",",JsNode.PRMREXPR,["2"],"]"]]]],")"]]]]]);
+//    });
   });
   describe('js lib exec test', function() {
     it('jquery 1.11.0', function() {
