@@ -675,6 +675,27 @@ define(function(require, exports, module) {
       );
       return node;
     },
+    fnexpr: function() {
+      var node = new Node(Node.FNEXPR);
+      node.add(
+        this.match('function')
+      );
+      if(!this.look) {
+        this.error('missing formal parameter');
+      }
+      if(this.look.type() == Token.ID) {
+        node.add(this.bindid());
+      }
+      node.add(
+        this.match('(', 'missing ( before formal parameters'),
+        this.fmparams(),
+        this.match(')', 'missing ) after formal parameters'),
+        this.match('{'),
+        this.fnbody(),
+        this.match('}', 'missing } after function body')
+      );
+      return node;
+    },
     fmparams: function() {
       var node = new Node(Node.FMPARAMS);
       if(!this.look) {
@@ -697,64 +718,6 @@ define(function(require, exports, module) {
       if(this.look.content() == '...') {
         node.add(this.bindrest());
       }
-      return node;
-    },
-    fnexpr: function() {
-      var node = new Node(Node.FNEXPR);
-      node.add(this.match('function'));
-      if(!this.look) {
-        this.error('missing formal parameter');
-      }
-      if(this.look.type() == Token.ID) {
-        node.add(this.match());
-      }
-      node.add(this.match('('));
-      if(!this.look) {
-        this.error();
-      }
-      if(this.look.content() != ')') {
-        node.add(this.fnparams());
-      }
-      node.add(
-        this.match(')'),
-        this.match('{'),
-        this.fnbody(),
-        this.match('}', 'missing } in compound statement')
-      );
-      return node;
-    },
-    fnparams: function() {
-      var node = new Node(Node.FNPARAMS);
-      while(this.look && this.look.content() != ')' && this.look.content() != '...') {
-        node.add(this.match(Token.ID, 'missing formal parameter'));
-        if(this.look) {
-          if(this.look.content() == ',') {
-            node.add(this.match());
-          }
-          else if(this.look.content() == '=') {
-            node.add(this.bindelement());
-            if(this.look && this.look.content() == ',') {
-              node.add(this.match());
-            }
-          }
-        }
-      }
-      if(!this.look) {
-        this.error('missing ) after formal parameters');
-      }
-      if(this.look.content() == '...') {
-        node.add(this.restparam());
-      }
-      return node;
-    },
-    bindelement: function() {
-      var node = new Node(Node.BINDELEMENT);
-      node.add(this.match('='), this.assignexpr());
-      return node;
-    },
-    restparam: function() {
-      var node = new Node(Node.RESTPARAM);
-      node.add(this.match('...'), this.match(Token.ID));
       return node;
     },
     fnbody: function(allowSuper) {

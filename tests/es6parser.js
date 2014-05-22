@@ -207,5 +207,39 @@ describe('es6parser', function() {
         parser.parse('function a() {');
       }).to.throwError();
     });
+    it('fnexpr 1', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('~function() {}()');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.EXPRSTMT,[JsNode.UNARYEXPR,["~",JsNode.CALLEXPR,[JsNode.FNEXPR,["function","(",JsNode.FMPARAMS,[],")","{",JsNode.FNBODY,[],"}"],JsNode.ARGS,["(",")"]]]]]]);
+    });
+    it('fnexpr 2', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('(function a() {})()');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.EXPRSTMT,[JsNode.CALLEXPR,[JsNode.PRMREXPR,["(",JsNode.FNEXPR,["function",JsNode.BINDID,["a"],"(",JsNode.FMPARAMS,[],")","{",JsNode.FNBODY,[],"}"],")"],JsNode.ARGS,["(",")"]]]]]);
+    });
+    it('fnexpr error 1', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('(function');
+      }).to.throwError();
+    });
+    it('fnexpr error 2', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('(function(');
+      }).to.throwError();
+    });
+    it('fnexpr error 3', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('(function(a,');
+      }).to.throwError();
+    });
+    it('fnexpr error 4', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('(function(a,1');
+      }).to.throwError();
+    });
   });
 });
