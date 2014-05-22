@@ -317,14 +317,11 @@ define(function(require, exports, module) {
     }
     return child;
   }
-  //支持es6
+  
   function addParam(params, child) {
     params.leaves().forEach(function(leaf, i) {
       if(leaf.name() == JsNode.TOKEN && leaf.token().content() != ',') {
         child.addParam(leaf.token().content());
-      }
-      else if(leaf.name() == JsNode.RESTPARAM) {
-        child.addParam(leaf.leaves()[1].token().content());
       }
     });
   }

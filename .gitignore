@@ -215,3 +215,4 @@ pip-log.txt
 .mr.developer.cfg
 .idea/
 node_modules/
+tests/covrage.html

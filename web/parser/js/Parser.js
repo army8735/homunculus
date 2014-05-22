@@ -137,18 +137,9 @@ define(function(require, exports, module) {
       if(!this.look) {
         this.error('missing variable name');
       }
-      if(['[', '{'].indexOf(this.look.content()) > -1) {
-        node.add(this.bindpat());
-        if(!this.look || this.look.content() != '=') {
-          this.error('missing = in destructuring declaration');
-        }
+      node.add(this.match(Token.ID, 'missing variable name'));
+      if(this.look && this.look.content() == '=') {
         node.add(this.assign());
-      }
-      else {
-        node.add(this.match(Token.ID, 'missing variable name'));
-        if(this.look && this.look.content() == '=') {
-          node.add(this.assign());
-        }
       }
       return node;
     },
@@ -974,19 +965,13 @@ define(function(require, exports, module) {
     arrltr: function() {
       var node = new Node(Node.ARRLTR);
       node.add(this.match('['));
-      while(this.look && this.look.content() != ']' && this.look.content() != '...') {
+      while(this.look && this.look.content() != ']') {
         if(this.look.content() == ',') {
           node.add(this.match());
         }
         else {
           node.add(this.assignexpr());
-          if(this.look && this.look.content() == ',') {
-            node.add(this.match());
-          }
         }
-      }
-      if(this.look.content() == '...') {
-        node.add(this.spread());
       }
       node.add(this.match(']', 'missing ] after element list'));
       return node;
@@ -1005,47 +990,18 @@ define(function(require, exports, module) {
     },
     proptassign: function() {
       var node = new Node(Node.PROPTASSIGN);
-      if(!this.look) {
-        this.error();
-      }
-      if(this.look.content() == 'get') {
-        node.add(this.match());
-        if(!this.look) {
-          this.error();
-        }
-        if(this.look.content() == ':') {
-          node.add(this.match(), this.assignexpr());
-        }
-        else {
-          node.add(this.getfn());
-        }
-      }
-      else if(this.look.content() == 'set') {
-        node.add(this.match());
-        if(!this.look) {
-          this.error();
-        }
-        if(this.look.content() == ':') {
-          node.add(this.match(), this.assignexpr());
-        }
-        else {
-          node.add(this.setfn());
-        }
-      }
-      else {
-        switch(this.look.type()) {
-          case Token.ID:
-          case Token.STRING:
-          case Token.NUMBER:
-            node.add(
-              this.match(),
-              this.match(':', 'missing : after property id'),
-              this.assignexpr()
-            );
-          break;
-          default:
-            this.error('invalid property id');
-        }
+      switch(this.look.type()) {
+        case Token.ID:
+        case Token.STRING:
+        case Token.NUMBER:
+          node.add(
+            this.match(),
+            this.match(':', 'missing : after property id'),
+            this.assignexpr()
+          );
+        break;
+        default:
+          this.error('invalid property id');
       }
       return node;
     },
