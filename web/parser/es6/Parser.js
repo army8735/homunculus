@@ -665,21 +665,38 @@ define(function(require, exports, module) {
       var node = new Node(Node.FNDECL);
       node.add(
         this.match('function'),
-        this.match(Token.ID, 'function statement requires a name'),
-        this.match('(')
+        this.bindid(),
+        this.match('(', 'missing ( before formal parameters'),
+        this.fmparams(),
+        this.match(')', 'missing ) after formal parameters'),
+        this.match('{'),
+        this.fnbody(),
+        this.match('}', 'missing } after function body')
       );
+      return node;
+    },
+    fmparams: function() {
+      var node = new Node(Node.FMPARAMS);
       if(!this.look) {
         this.error('missing formal parameter');
       }
-      if(this.look.content() != ')') {
-        node.add(this.fnparams());
+      while(this.look && this.look.content() != ')') {
+        if(this.look.content() == '...') {
+          break;
+        }
+        else {
+          node.add(this.bindelem());
+          if(this.look && this.look.content() == ',') {
+            node.add(this.match());
+          }
+        }
       }
-      node.add(
-        this.match(')'),
-        this.match('{'),
-        this.fnbody(),
-        this.match('}')
-      );
+      if(!this.look) {
+        this.error('missing ) after formal parameters');
+      }
+      if(this.look.content() == '...') {
+        node.add(this.bindrest());
+      }
       return node;
     },
     fnexpr: function() {

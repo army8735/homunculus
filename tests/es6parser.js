@@ -152,5 +152,60 @@ describe('es6parser', function() {
       var node = parser.parse('const a, b = 1');
       expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.LEXDECL,["const",JsNode.LEXBIND,[JsNode.BINDID,["a"]],",",JsNode.LEXBIND,[JsNode.BINDID,["b"],JsNode.INITLZ,["=",JsNode.PRMREXPR,["1"]]]]]]);
     });
+    it('fndecl', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('function a() {}');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.FNDECL,["function",JsNode.BINDID,["a"],"(",JsNode.FMPARAMS,[],")","{",JsNode.FNBODY,[],"}"]]]);
+    });
+    it('fndecl with params', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('function a(b,c) {}');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.FNDECL,["function",JsNode.BINDID,["a"],"(",JsNode.FMPARAMS,[JsNode.SINGLENAME,[JsNode.BINDID,["b"]],",",JsNode.SINGLENAME,[JsNode.BINDID,["c"]]],")","{",JsNode.FNBODY,[],"}"]]]);
+    });
+    it('fndecl bindelem', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('function a(b, c = 1, ...d){}');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.FNDECL,["function",JsNode.BINDID,["a"],"(",JsNode.FMPARAMS,[JsNode.SINGLENAME,[JsNode.BINDID,["b"]],",",JsNode.SINGLENAME,[JsNode.BINDID,["c"],JsNode.INITLZ,["=",JsNode.PRMREXPR,["1"]]],",",JsNode.BINDREST,["...",JsNode.BINDID,["d"]]],")","{",JsNode.FNBODY,[],"}"]]]);
+    });
+    it('fndecl bindelem 2', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('function a(b, c = d*2){}');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.FNDECL,["function",JsNode.BINDID,["a"],"(",JsNode.FMPARAMS,[JsNode.SINGLENAME,[JsNode.BINDID,["b"]],",",JsNode.SINGLENAME,[JsNode.BINDID,["c"],JsNode.INITLZ,["=",JsNode.MTPLEXPR,[JsNode.PRMREXPR,["d"],"*",JsNode.PRMREXPR,["2"]]]]],")","{",JsNode.FNBODY,[],"}"]]]);
+    });
+    it('fndecl rest', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('function a(...b){}');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.FNDECL,["function",JsNode.BINDID,["a"],"(",JsNode.FMPARAMS,[JsNode.BINDREST,["...",JsNode.BINDID,["b"]]],")","{",JsNode.FNBODY,[],"}"]]]);
+    });
+    it('fndecl error 1', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('function');
+      }).to.throwError();
+    });
+    it('fndecl error 2', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('function a');
+      }).to.throwError();
+    });
+    it('fndecl error 3', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('function a(');
+      }).to.throwError();
+    });
+    it('fndecl error 4', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('function a()');
+      }).to.throwError();
+    });
+    it('fndecl error 5', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('function a() {');
+      }).to.throwError();
+    });
   });
 });

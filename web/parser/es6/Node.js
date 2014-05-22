@@ -151,6 +151,7 @@ define(function(require, exports, module) {
     CMPTPROPT: 'cmptpropt',
     LEXDECL: 'lexdecl',
     LEXBIND: 'lexbind',
+    FMPARAMS: 'fmparams',
     getKey: function(s) {
       if(!s) {
         throw new Error('empty value');
