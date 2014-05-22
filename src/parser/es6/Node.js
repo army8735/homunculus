@@ -133,8 +133,6 @@ var Node = Class(function(type, children) {
   POSTFIXEXPR: 'postfixexpr',
   NEWEXPR: 'newexpr',
   CALLEXPR: 'callexpr',
-  BINDPROPT: 'bindpropt',
-  SINGLENAME: 'singlename',
   SPREAD: 'spread',
   ARRCMPH: 'arrcmph',
   CMPHFOR: 'cmphfor',
@@ -146,8 +144,12 @@ var Node = Class(function(type, children) {
   BINDELEM: 'bindelem',
   BINDREST: 'bindrest',
   PROPTNAME: 'proptname',
+  SINGLENAME: 'singlename',
+  BINDPROPT: 'bindpropt',
   LTRPROPT: 'ltrpropt',
   CMPTPROPT: 'cmptpropt',
+  LEXDECL: 'lexdecl',
+  LEXBIND: 'lexbind',
   getKey: function(s) {
     if(!s) {
       throw new Error('empty value');

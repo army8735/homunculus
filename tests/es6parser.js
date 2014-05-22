@@ -109,28 +109,48 @@ describe('es6parser', function() {
       }).to.throwError();
     });
     it('destructuring object error 1', function() {
-      var parser = homunculus.getParser('js');
+      var parser = homunculus.getParser('es6');
       expect(function() {
         parser.parse('var {');
       }).to.throwError();
     });
     it('destructuring object error 2', function() {
-      var parser = homunculus.getParser('js');
+      var parser = homunculus.getParser('es6');
       expect(function() {
         parser.parse('var {a');
       }).to.throwError();
     });
     it('destructuring object error 3', function() {
-      var parser = homunculus.getParser('js');
+      var parser = homunculus.getParser('es6');
       expect(function() {
         parser.parse('var {!');
       }).to.throwError();
     });
     it('destructuring object error 4', function() {
-      var parser = homunculus.getParser('js');
+      var parser = homunculus.getParser('es6');
       expect(function() {
         parser.parse('var {a ');
       }).to.throwError();
+    });
+    it('letstmt 1', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('let a');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.LEXDECL,["let",JsNode.LEXBIND,[JsNode.BINDID,["a"]]]]]);
+    });
+    it('letstmt 2', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('let a, b = 1');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.LEXDECL,["let",JsNode.LEXBIND,[JsNode.BINDID,["a"]],",",JsNode.LEXBIND,[JsNode.BINDID,["b"],JsNode.INITLZ,["=",JsNode.PRMREXPR,["1"]]]]]]);
+    });
+    it('cststmt 1', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('const a');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.LEXDECL,["const",JsNode.LEXBIND,[JsNode.BINDID,["a"]]]]]);
+    });
+    it('cststmt 2', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('const a, b = 1');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.LEXDECL,["const",JsNode.LEXBIND,[JsNode.BINDID,["a"]],",",JsNode.LEXBIND,[JsNode.BINDID,["b"],JsNode.INITLZ,["=",JsNode.PRMREXPR,["1"]]]]]]);
     });
   });
 });
