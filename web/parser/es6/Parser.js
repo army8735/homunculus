@@ -190,14 +190,19 @@ define(function(require, exports, module) {
         if(!this.look || this.look.content() != '=') {
           this.error('missing = in destructuring declaration');
         }
-        node.add(this.assign());
+        node.add(this.initlz());
       }
       else {
-        node.add(this.match(Token.ID, 'missing variable name'));
+        node.add(this.bindid());
         if(this.look && this.look.content() == '=') {
-          node.add(this.assign());
+          node.add(this.initlz());
         }
       }
+      return node;
+    },
+    bindid: function() {
+      var node = new Node(Node.BINDID);
+      node.add(this.match(Token.ID, 'missing variable name'));
       return node;
     },
     bindpat: function() {
@@ -206,6 +211,9 @@ define(function(require, exports, module) {
       }
       else if(this.look.content() == '{') {
         return this.objbindpat();
+      }
+      else {
+        this.error();
       }
     },
     arrbindpat: function() {
@@ -223,7 +231,7 @@ define(function(require, exports, module) {
         }
       }
       if(this.look.content() == '...') {
-        node.add(this.restparam());
+        node.add(this.bindrest());
       }
       node.add(this.match(']', 'missing ] after element list'));
       return node;
@@ -233,7 +241,7 @@ define(function(require, exports, module) {
       if(['[', '{'].indexOf(this.look.content()) > -1) {
         node.add(this.bindpat());
         if(this.look && this.look.content() == '=') {
-          node.add(this.assign());
+          node.add(this.initlz());
         }
       }
       else {
@@ -243,10 +251,18 @@ define(function(require, exports, module) {
     },
     singlename: function() {
       var node = new Node(Node.SINGLENAME);
-      node.add(this.match(Token.ID));
+      node.add(this.bindid());
       if(this.look && this.look.content() == '=') {
-        node.add(this.assign());
+        node.add(this.initlz());
       }
+      return node;
+    },
+    bindrest: function() {
+      var node = new Node(Node.BINDREST);
+      node.add(
+        this.match('...'),
+        this.bindid()
+      );
       return node;
     },
     objbindpat: function() {
@@ -263,22 +279,37 @@ define(function(require, exports, module) {
     },
     bindpropt: function() {
       var node = new Node(Node.BINDPROPT);
+      //只能是singlename或者properyname
       switch(this.look.type()) {
         case Token.ID:
         case Token.STRING:
         case Token.NUMBER:
         break;
         default:
-          this.error('invalid property id');
+          if(this.look.content() != '[') {
+            this.error('invalid property id');
+          }
+      }
+      //[为PropertyName左推导
+      if(this.look.content() == '[') {
+        node.add(
+          this.proptname(),
+          this.match(':'),
+          this.bindelem()
+        );
+        return node;
       }
       //根据LL2分辨是PropertyName[?Yield, ?GeneratorParameter] : BindingElement[?Yield, ?GeneratorParameter]
-      //还是SingleNameBinding [?Yield, ?GeneratorParameter]
+      //还是SingleNameBinding[?Yield, ?GeneratorParameter]
       for(var i = this.index; i < this.length; i++) {
         var next = this.tokens[i];
         if(!S[next.tag()]) {
           if(next.content() == ':') {
-            node.add(this.match(), this.match());
-            node.add(this.bindelem());
+            node.add(
+              this.proptname(),
+              this.match(':'),
+              this.bindelem()
+            );
           }
           else {
             node.add(this.singlename());
@@ -807,6 +838,14 @@ define(function(require, exports, module) {
       }
       return node;
     },
+    initlz: function(noIn) {
+      var node = new Node(Node.INITLZ);
+      node.add(
+        this.match('='),
+        this.assignexpr(noIn)
+      );
+      return node;
+    },
     assignexpr: function(noIn) {
       var node = new Node(Node.ASSIGNEXPR),
         cndt = this.cndtexpr(noIn);
@@ -1237,11 +1276,6 @@ define(function(require, exports, module) {
       }
       return node;
     },
-    bindid: function() {
-      var node = new Node(Node.BINDID);
-      node.add(this.match('...'), this.assignexpr());
-      return node;
-    },
     arrinit: function() {
       //根据LL2分辨是arrltr还是arrcmph
       //[assignexpr or [for
@@ -1380,17 +1414,36 @@ define(function(require, exports, module) {
     },
     proptname: function() {
       var node = new Node(Node.PROPTNAME);
-      if(this.look) {
-        switch(this.look.type()) {
-          case Token.ID:
-          case Token.NUMBER:
-          case Token.STRING:
-            node.add(this.match());
-          break;
-          default:
-            this.error('missing name after . operator');
-        }
+      if(!this.look) {
+        this.error('invalid property id');
       }
+      if(this.look.content() == '[') {
+        node.add(this.cmptpropt());
+      }
+      else {
+        node.add(this.ltrpropt());
+      }
+      return node;
+    },
+    ltrpropt: function() {
+      var node = new Node(Node.LTRPROPT);
+      switch(this.look.type()) {
+        case Token.ID:
+        case Token.NUMBER:
+        case Token.STRING:
+          node.add(this.match());
+          return node;
+        default:
+          this.error('invalid property id');
+      }
+    },
+    cmptpropt: function() {
+      var node = new Node(Node.CMPTPROPT);
+      node.add(
+        this.match('['),
+        this.assignexpr(),
+        this.match(']')
+      );
       return node;
     },
     propsets: function() {
@@ -1418,9 +1471,9 @@ define(function(require, exports, module) {
           node.add(this.match());
         }
       }
-      if(this.look && this.look.content() == '...') {
-        node.add(this.bindid());
-      }
+  //    if(this.look && this.look.content() == '...') {
+  //      node.add(this.bindid());
+  //    }
       return node;
     },
     virtual: function(s) {

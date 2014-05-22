@@ -5,8 +5,10 @@ var expect = require('expect.js');
 var Lexer = require('../src/lexer/Lexer');
 var CssLexer = require('../src/lexer/CssLexer');
 var JsParser = require('../src/parser/js/Parser');
+var Es6Parser = require('../src/parser/es6/Parser');
 var CssParser = require('../src/parser/css/Parser');
 var JsNode = require('../src/parser/js/Node');
+var Es6Node = require('../src/parser/es6/Node');
 var CssNode = require('../src/parser/css/Node');
 var Token = require('../src/lexer/Token');
 var JsContext = require('../src/parser/js/Context');
@@ -17,6 +19,7 @@ describe('api of homunculus', function() {
     expect(homunculus.getClass('lexer', 'javascript')).to.be(Lexer);
     expect(homunculus.getClass('lexer', 'es')).to.be(Lexer);
     expect(homunculus.getClass('lexer', 'ecmascript')).to.be(Lexer);
+    expect(homunculus.getClass('lexer', 'es6')).to.be(Lexer);
     expect(homunculus.getClass('lexer', 'as')).to.be(Lexer);
     expect(homunculus.getClass('lexer', 'actionscript')).to.be(Lexer);
 
@@ -26,6 +29,7 @@ describe('api of homunculus', function() {
     expect(homunculus.getClass('parser', 'javascript')).to.be(JsParser);
     expect(homunculus.getClass('parser', 'es')).to.be(JsParser);
     expect(homunculus.getClass('parser', 'ecmascript')).to.be(JsParser);
+    expect(homunculus.getClass('parser', 'es6')).to.be(Es6Parser);
 
     expect(homunculus.getClass('parser', 'css')).to.be(CssParser);
 
@@ -33,6 +37,7 @@ describe('api of homunculus', function() {
     expect(homunculus.getClass('node', 'javascript')).to.be(JsNode);
     expect(homunculus.getClass('node', 'es')).to.be(JsNode);
     expect(homunculus.getClass('node', 'ecmascript')).to.be(JsNode);
+    expect(homunculus.getClass('node', 'es6')).to.be(Es6Node);
 
     expect(homunculus.getClass('node', 'css')).to.be(CssNode);
 
@@ -48,6 +53,7 @@ describe('api of homunculus', function() {
     expect(homunculus.getLexer('javascript')).to.be.a(Lexer);
     expect(homunculus.getLexer('es')).to.be.a(Lexer);
     expect(homunculus.getLexer('ecmascript')).to.be.a(Lexer);
+    expect(homunculus.getLexer('es6')).to.be.a(Lexer);
     expect(homunculus.getLexer('as')).to.be.a(Lexer);
     expect(homunculus.getLexer('actionscript')).to.be.a(Lexer);
 
@@ -58,6 +64,7 @@ describe('api of homunculus', function() {
     expect(homunculus.getParser('javascript')).to.be.a(JsParser);
     expect(homunculus.getParser('es')).to.be.a(JsParser);
     expect(homunculus.getParser('ecmascript')).to.be.a(JsParser);
+    expect(homunculus.getParser('es6')).to.be.a(Es6Parser);
 
     expect(homunculus.getParser('css')).to.be.a(CssParser);
   });

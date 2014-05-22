@@ -9,9 +9,11 @@ var CRule = require('./src/lexer/rule/CRule');
 var Token = require('./src/lexer/Token');
 
 var JsParser = require('./src/parser/js/Parser');
+var Es6Parser = require('./src/parser/es6/Parser');
 var CssParser = require('./src/parser/css/Parser');
 
 var JsNode = require('./src/parser/js/Node');
+var Es6Node = require('./src/parser/es6/Node');
 var CssNode = require('./src/parser/css/Node');
 
 var JsContext = require('./src/parser/js/Context');
@@ -26,6 +28,7 @@ exports.getClass = function(type, lan) {
         case 'javascript':
         case 'es':
         case 'ecmascript':
+        case 'es6':
         case 'as':
         case 'actionscript':
           return Lexer;
@@ -42,6 +45,8 @@ exports.getClass = function(type, lan) {
         case 'es':
         case 'ecmascript':
           return JsParser;
+        case 'es6':
+          return Es6Parser;
         case 'css':
           return CssParser;
         default:
@@ -55,6 +60,8 @@ exports.getClass = function(type, lan) {
         case 'es':
         case 'ecmascript':
           return JsNode;
+        case 'es6':
+          return Es6Node;
         case 'css':
           return CssNode;
         default:
@@ -86,6 +93,7 @@ exports.getLexer = function(lan) {
     case 'javascript':
     case 'es':
     case 'ecmascript':
+    case 'es6':
     case 'as':
     case 'actionscript':
       return new Lexer(new EcmascriptRule());
@@ -111,6 +119,8 @@ exports.getParser = function(lan) {
     case 'es':
     case 'ecmascript':
       return new JsParser(exports.getLexer(lan));
+    case 'es6':
+      return new Es6Parser(exports.getLexer(lan));
     case 'css':
       return new CssParser(exports.getLexer(lan));
     default:
