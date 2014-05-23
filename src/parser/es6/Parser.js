@@ -1268,12 +1268,52 @@ var Parser = Class(function(lexer) {
     var node = new Node(Node.ARRCMPH);
     node.add(this.match('['));
     node.add(this.cmphfor());
+    while(this.look && this.look.content() != ']') {
+      if(this.look.content() == 'for') {
+        node.add(this.cmphfor());
+      }
+      else if(this.look.content() == 'if') {
+        node.add(this.cmphif());
+      }
+      else {
+        node.add(this.assignexpr());
+        break;
+      }
+    }
     node.add(this.match(']', 'missing ] after element list'));
     return node;
   },
   cmphfor: function() {
     var node = new Node(Node.CMPHFOR);
-    node.add(this.match('for'));
+    node.add(
+      this.match('for'),
+      this.match('('),
+      this.forbind(),
+      this.match('of'),
+      this.assignexpr(),
+      this.match(')')
+    );
+    return node;
+  },
+  forbind: function() {
+    if(!this.look) {
+      this.error();
+    }
+    if(['[', '{'].indexOf(this.look.content()) > -1) {
+      return this.bindpat();
+    }
+    else {
+      return this.bindid();
+    }
+  },
+  cmphif: function() {
+    var node = new Node(Node.CMPHIF);
+    node.add(
+      this.match('if'),
+      this.match('('),
+      this.assignexpr(),
+      this.match(')')
+    );
     return node;
   },
   arrltr: function() {

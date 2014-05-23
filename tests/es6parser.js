@@ -241,5 +241,113 @@ describe('es6parser', function() {
         parser.parse('(function(a,1');
       }).to.throwError();
     });
+    it('arrinit error', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('[');
+      }).to.throwError();
+    });
+    it('arrltr', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('[,,,2,3,]');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.EXPRSTMT,[JsNode.PRMREXPR,[JsNode.ARRLTR,["[",",",",",",",JsNode.PRMREXPR,["2"],",",JsNode.PRMREXPR,["3"],",","]"]]]]]);
+    });
+    it('arrltr spread', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('[...a]');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.EXPRSTMT,[JsNode.PRMREXPR,[JsNode.ARRLTR,["[",JsNode.SPREAD,["...",JsNode.PRMREXPR,["a"]],"]"]]]]]);
+    });
+    it('arrltr error', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('[,,,2,3,');
+      }).to.throwError();
+    });
+    it('arrcmph no if', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('[for(a of b)a]');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.EXPRSTMT,[JsNode.PRMREXPR,[JsNode.ARRCMPH,["[",JsNode.CMPHFOR,["for","(",JsNode.BINDID,["a"],"of",JsNode.PRMREXPR,["b"],")"],JsNode.PRMREXPR,["a"],"]"]]]]]);
+    });
+    it('arrcmph with if', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('[for(a of b)if(a>1)a]');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.EXPRSTMT,[JsNode.PRMREXPR,[JsNode.ARRCMPH,["[",JsNode.CMPHFOR,["for","(",JsNode.BINDID,["a"],"of",JsNode.PRMREXPR,["b"],")"],JsNode.CMPHIF,["if","(",JsNode.RELTEXPR,[JsNode.PRMREXPR,["a"],">",JsNode.PRMREXPR,["1"]],")"],JsNode.PRMREXPR,["a"],"]"]]]]]);
+    });
+    it('arrcmph recursion', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('[for(a of b)if(true)for(c of a)if(false)c]');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.EXPRSTMT,[JsNode.PRMREXPR,[JsNode.ARRCMPH,["[",JsNode.CMPHFOR,["for","(",JsNode.BINDID,["a"],"of",JsNode.PRMREXPR,["b"],")"],JsNode.CMPHIF,["if","(",JsNode.PRMREXPR,["true"],")"],JsNode.CMPHFOR,["for","(",JsNode.BINDID,["c"],"of",JsNode.PRMREXPR,["a"],")"],JsNode.CMPHIF,["if","(",JsNode.PRMREXPR,["false"],")"],JsNode.PRMREXPR,["c"],"]"]]]]]);
+    });
+    it('arrcmph forbindpat', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('[for([a,b] of c)a+b]');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.EXPRSTMT,[JsNode.PRMREXPR,[JsNode.ARRCMPH,["[",JsNode.CMPHFOR,["for","(",JsNode.ARRBINDPAT,["[",JsNode.SINGLENAME,[JsNode.BINDID,["a"]],",",JsNode.SINGLENAME,[JsNode.BINDID,["b"]],"]"],"of",JsNode.PRMREXPR,["c"],")"],JsNode.ADDEXPR,[JsNode.PRMREXPR,["a"],"+",JsNode.PRMREXPR,["b"]],"]"]]]]]);
+    });
+    it('arrcmph error 1', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('[for');
+      }).to.throwError();
+    });
+    it('arrcmph error 2', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('[for(');
+      }).to.throwError();
+    });
+    it('arrcmph error 3', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('[for(a');
+      }).to.throwError();
+    });
+    it('arrcmph error 4', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('[for(a of');
+      }).to.throwError();
+    });
+    it('arrcmph error 5', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('[for(a of b');
+      }).to.throwError();
+    });
+    it('arrcmph error 6', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('[for(a of b)');
+      }).to.throwError();
+    });
+    it('arrcmph error 7', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('[for(a of b)if');
+      }).to.throwError();
+    });
+    it('arrcmph error 8', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('[for(a of b)if(');
+      }).to.throwError();
+    });
+    it('arrcmph error 9', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('[for(a of b)if(true');
+      }).to.throwError();
+    });
+    it('arrcmph error 10', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('[for(a of b)if(true)');
+      }).to.throwError();
+    });
+    it('arrcmph error 11', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('[for(a of b)if(true)a');
+      }).to.throwError();
+    });
   });
 });
