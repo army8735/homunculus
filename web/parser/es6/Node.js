@@ -64,11 +64,8 @@ define(function(require, exports, module) {
       return this.ne;
     }
   }).statics({
-    PROGRAM: 'program',
-    ELEMS: 'elems',
-    ELEM: 'elem',
-    CSTSTMT: 'cststmt',
-    LETSTMT: 'letstmt',
+    SCRIPT: 'script',
+    SCRIPTBODY: 'scriptbody',
     VARSTMT: 'varstmt',
     VARDECL: 'vardecl',
     FNBODY: 'fnbody',
@@ -137,7 +134,7 @@ define(function(require, exports, module) {
     SPREAD: 'spread',
     ARRCMPH: 'arrcmph',
     CMPHFOR: 'cmphfor',
-  
+
     INITLZ: 'initlz',
     BINDID: 'bindid',
     ARRBINDPAT: 'arrbindpat',

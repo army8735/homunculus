@@ -12,7 +12,7 @@ define(function(require, exports, module) {
   }).methods({
     parse: function(code) {
       this.lexer.parse(code);
-      this.tree = this.program();
+      this.tree = this.script();
       return this.tree;
     },
     ast: function() {
@@ -40,30 +40,34 @@ define(function(require, exports, module) {
         this.lexer = new Lexer(new Rule());
       }
     },
-    program: function() {
+    script: function() {
       this.tokens = this.lexer.tokens();
       this.length = this.tokens.length;
       if(this.tokens.length) {
         this.move();
       }
-      var node = new Node(Node.PROGRAM);
-      while(this.look) {
-        node.add(this.element());
+      var node = new Node(Node.SCRIPT);
+      if(this.look) {
+        node.add(this.scriptbody());
       }
       return node;
     },
-    element: function(allowSuper) {
-      if(this.look.content() == 'function') {
-        return this.fndecl();
+    scriptbody: function() {
+      var node = new Node(Node.SCRIPTBODY);
+      while(this.look) {
+        node.add(this.stmtlitem());
       }
-      else if(this.look.content() == 'class') {
-        return this.classdecl();
+      return node;
+    },
+    stmtlitem: function() {
+      if(['function', 'class', 'let', 'const'].indexOf(this.look.content()) > -1) {
+        return this.decl();
       }
       else {
-        return this.stmt(allowSuper);
+        return this.stmt();
       }
     },
-    stmt: function(allowSuper) {
+    decl: function() {
       if(!this.look) {
         this.error();
       }
@@ -71,6 +75,17 @@ define(function(require, exports, module) {
         case 'let':
         case 'const':
           return this.lexdecl();
+        case 'function':
+          return this.fndecl();
+        case 'class':
+          return this.classdecl();
+      }
+    },
+    stmt: function() {
+      if(!this.look) {
+        this.error();
+      }
+      switch(this.look.content()) {
         case 'var':
           return this.varstmt();
         case '{':
@@ -99,13 +114,13 @@ define(function(require, exports, module) {
           return this.trystmt();
         case 'debugger':
           return this.debstmt();
-        case 'super':
-          if(!allowSuper) {
-            this.error('super must in a class');
-          }
-          return this.superstmt();
-        case 'import':
-          return this.imptstmt();
+  //      case 'super':
+  //        if(!allowSuper) {
+  //          this.error('super must in a class');
+  //        }
+  //        return this.superstmt();
+  //      case 'import':
+  //        return this.imptstmt();
         default:
           if(this.look.type() == Token.ID) {
             for(var i = this.index; i < this.length; i++) {
@@ -150,10 +165,10 @@ define(function(require, exports, module) {
     },
     lexbind: function() {
       var node = new Node(Node.LEXBIND);
-      this.decl(node);
+      this.declnode(node);
       return node;
     },
-    decl: function(node) {
+    declnode: function(node) {
       if(!this.look) {
         this.error('missing variable name');
       }
@@ -190,7 +205,7 @@ define(function(require, exports, module) {
     },
     vardecl: function() {
       var node = new Node(Node.VARDECL);
-      this.decl(node);
+      this.declnode(node);
       return node;
     },
     bindid: function() {
@@ -720,10 +735,10 @@ define(function(require, exports, module) {
       }
       return node;
     },
-    fnbody: function(allowSuper) {
+    fnbody: function() {
       var node = new Node(Node.FNBODY);
       while(this.look && this.look.content() != '}') {
-        node.add(this.element(allowSuper));
+        node.add(this.stmtlitem());
       }
       return node;
     },

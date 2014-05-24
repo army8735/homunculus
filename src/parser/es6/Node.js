@@ -64,10 +64,7 @@ var Node = Class(function(type, children) {
   }
 }).statics({
   SCRIPT: 'script',
-  ELEMS: 'elems',
-  ELEM: 'elem',
-  CSTSTMT: 'cststmt',
-  LETSTMT: 'letstmt',
+  SCRIPTBODY: 'scriptbody',
   VARSTMT: 'varstmt',
   VARDECL: 'vardecl',
   FNBODY: 'fnbody',

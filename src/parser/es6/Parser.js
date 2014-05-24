@@ -46,23 +46,27 @@ var Parser = Class(function(lexer) {
       this.move();
     }
     var node = new Node(Node.SCRIPT);
+    if(this.look) {
+      node.add(this.scriptbody());
+    }
+    return node;
+  },
+  scriptbody: function() {
+    var node = new Node(Node.SCRIPTBODY);
     while(this.look) {
       node.add(this.stmtlitem());
     }
     return node;
   },
-  stmtlitem: function(allowSuper) {
-    if(this.look.content() == 'function') {
-      return this.fndecl();
-    }
-    else if(this.look.content() == 'class') {
-      return this.classdecl();
+  stmtlitem: function() {
+    if(['function', 'class', 'let', 'const'].indexOf(this.look.content()) > -1) {
+      return this.decl();
     }
     else {
-      return this.stmt(allowSuper);
+      return this.stmt();
     }
   },
-  stmt: function(allowSuper) {
+  decl: function() {
     if(!this.look) {
       this.error();
     }
@@ -70,6 +74,17 @@ var Parser = Class(function(lexer) {
       case 'let':
       case 'const':
         return this.lexdecl();
+      case 'function':
+        return this.fndecl();
+      case 'class':
+        return this.classdecl();
+    }
+  },
+  stmt: function() {
+    if(!this.look) {
+      this.error();
+    }
+    switch(this.look.content()) {
       case 'var':
         return this.varstmt();
       case '{':
@@ -98,13 +113,13 @@ var Parser = Class(function(lexer) {
         return this.trystmt();
       case 'debugger':
         return this.debstmt();
-      case 'super':
-        if(!allowSuper) {
-          this.error('super must in a class');
-        }
-        return this.superstmt();
-      case 'import':
-        return this.imptstmt();
+//      case 'super':
+//        if(!allowSuper) {
+//          this.error('super must in a class');
+//        }
+//        return this.superstmt();
+//      case 'import':
+//        return this.imptstmt();
       default:
         if(this.look.type() == Token.ID) {
           for(var i = this.index; i < this.length; i++) {
@@ -149,10 +164,10 @@ var Parser = Class(function(lexer) {
   },
   lexbind: function() {
     var node = new Node(Node.LEXBIND);
-    this.decl(node);
+    this.declnode(node);
     return node;
   },
-  decl: function(node) {
+  declnode: function(node) {
     if(!this.look) {
       this.error('missing variable name');
     }
@@ -189,7 +204,7 @@ var Parser = Class(function(lexer) {
   },
   vardecl: function() {
     var node = new Node(Node.VARDECL);
-    this.decl(node);
+    this.declnode(node);
     return node;
   },
   bindid: function() {
@@ -719,10 +734,10 @@ var Parser = Class(function(lexer) {
     }
     return node;
   },
-  fnbody: function(allowSuper) {
+  fnbody: function() {
     var node = new Node(Node.FNBODY);
     while(this.look && this.look.content() != '}') {
-      node.add(this.element(allowSuper));
+      node.add(this.stmtlitem());
     }
     return node;
   },
