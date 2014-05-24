@@ -337,7 +337,12 @@ var Parser = Class(function(lexer) {
   },
   blockstmt: function() {
     var node = new Node(Node.BLOCKSTMT);
-    node.add(this.match('{'));
+    node.add(this.block());
+    return node;
+  },
+  block: function(msg) {
+    var node = new Node(Node.BLOCK);
+    node.add(this.match('{', msg));
     while(this.look && this.look.content() != '}') {
       node.add(this.stmtlitem());
     }
@@ -602,7 +607,7 @@ var Parser = Class(function(lexer) {
     var node = new Node(Node.TRYSTMT);
     node.add(
       this.match('try'),
-      this.blockstmt()
+      this.block('missing { before try block')
     );
     if(this.look && this.look.content() == 'catch') {
       node.add(this.cach());
@@ -627,7 +632,7 @@ var Parser = Class(function(lexer) {
       this.match('(', 'missing ( before catch'),
       this.cachparam(),
       this.match(')', 'missing ) after catch'),
-      this.blockstmt()
+      this.block('missing { before catch block')
     );
     return node;
   },
@@ -645,7 +650,7 @@ var Parser = Class(function(lexer) {
     var node = new Node(Node.FINL);
     node.add(
       this.match('finally'),
-      this.blockstmt()
+      this.block('missing { before finally block')
     );
     return node;
   },
