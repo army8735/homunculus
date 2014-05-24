@@ -113,6 +113,8 @@ var Parser = Class(function(lexer) {
         return this.trystmt();
       case 'debugger':
         return this.debstmt();
+      case 'yield':
+        return this.labstmt();
 //      case 'super':
 //        if(!allowSuper) {
 //          this.error('super must in a class');
@@ -587,8 +589,13 @@ var Parser = Class(function(lexer) {
   },
   labstmt: function() {
     var node = new Node(Node.LABSTMT);
+    if(this.look.content() == 'yield') {
+      node.add(this.match());
+    }
+    else {
+      node.add(this.match(Token.ID));
+    }
     node.add(
-      this.match(Token.ID),
       this.match(':'),
       this.stmt()
     );
