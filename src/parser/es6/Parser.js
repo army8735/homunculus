@@ -518,10 +518,10 @@ var Parser = Class(function(lexer) {
   withstmt: function() {
     var node = new Node(Node.WITHSTMT);
     node.add(
-      this.match('with'),
+      this.match('with', 'missing ( before with-statement object'),
       this.match('('),
       this.expr(),
-      this.match(')'),
+      this.match(')', 'missing ) after with-statement object'),
       this.stmt()
     );
     return node;
