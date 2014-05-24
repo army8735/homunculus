@@ -68,7 +68,7 @@ var Node = Class(function(type, children) {
   VARSTMT: 'varstmt',
   VARDECL: 'vardecl',
   FNBODY: 'fnbody',
-  BLOCK: 'block',
+  BLOCKSTMT: 'blockstmt',
   ITERSTMT: 'iterstmt',
   TOKEN: 'token',
   FNPARAMS: 'fnparams',

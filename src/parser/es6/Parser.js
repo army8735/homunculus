@@ -88,7 +88,7 @@ var Parser = Class(function(lexer) {
       case 'var':
         return this.varstmt();
       case '{':
-        return this.block();
+        return this.blockstmt();
       case ';':
         return this.emptstmt();
       case 'if':
@@ -335,11 +335,11 @@ var Parser = Class(function(lexer) {
     node.add(this.assignexpr());
     return node;
   },
-  block: function() {
-    var node = new Node(Node.BLOCK);
+  blockstmt: function() {
+    var node = new Node(Node.BLOCKSTMT);
     node.add(this.match('{'));
     while(this.look && this.look.content() != '}') {
-      node.add(this.stmt());
+      node.add(this.stmtlitem());
     }
     node.add(this.match('}', 'missing } in compound statement'));
     return node;
@@ -602,7 +602,7 @@ var Parser = Class(function(lexer) {
     var node = new Node(Node.TRYSTMT);
     node.add(
       this.match('try'),
-      this.block()
+      this.blockstmt()
     );
     if(this.look && this.look.content() == 'catch') {
       node.add(this.cach());
@@ -627,7 +627,7 @@ var Parser = Class(function(lexer) {
       this.match('('),
       this.match(Token.ID, 'missing identifier in catch'),
       this.match(')'),
-      this.block()
+      this.blockstmt()
     );
     return node;
   },
@@ -635,7 +635,7 @@ var Parser = Class(function(lexer) {
     var node = new Node(Node.FINL);
     node.add(
       this.match('finally'),
-      this.block()
+      this.blockstmt()
     );
     return node;
   },
