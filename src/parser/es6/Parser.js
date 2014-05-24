@@ -179,7 +179,7 @@ var Parser = Class(function(lexer) {
       node.add(this.initlz());
     }
     else {
-      node.add(this.bindid());
+      node.add(this.bindid('missing variable name'));
       if(this.look && this.look.content() == '=') {
         node.add(this.initlz());
       }
@@ -207,9 +207,9 @@ var Parser = Class(function(lexer) {
     this.declnode(node);
     return node;
   },
-  bindid: function() {
+  bindid: function(msg) {
     var node = new Node(Node.BINDID);
-    node.add(this.match(Token.ID, 'missing variable name'));
+    node.add(this.match(Token.ID, msg));
     return node;
   },
   bindpat: function() {
@@ -268,7 +268,7 @@ var Parser = Class(function(lexer) {
     var node = new Node(Node.BINDREST);
     node.add(
       this.match('...'),
-      this.bindid()
+      this.bindid('no parameter name after ...')
     );
     return node;
   },
@@ -623,12 +623,22 @@ var Parser = Class(function(lexer) {
   cach: function() {
     var node = new Node(Node.CACH);
     node.add(
-      this.match('catch'),
-      this.match('('),
-      this.match(Token.ID, 'missing identifier in catch'),
-      this.match(')'),
+      this.match('catch', 'missing catch or finally after try'),
+      this.match('(', 'missing ( before catch'),
+      this.cachparam(),
+      this.match(')', 'missing ) after catch'),
       this.blockstmt()
     );
+    return node;
+  },
+  cachparam: function() {
+    var node = new Node(Node.CACHPARAM);
+    if(['[', '{'].indexOf(this.look.content()) > -1) {
+      node.add(this.bindpat());
+    }
+    else {
+      node.add(this.bindid('missing identifier in catch'));
+    }
     return node;
   },
   finl: function() {
@@ -679,7 +689,7 @@ var Parser = Class(function(lexer) {
     var node = new Node(Node.FNDECL);
     node.add(
       this.match('function'),
-      this.bindid(),
+      this.bindid('function statement requires a name'),
       this.match('(', 'missing ( before formal parameters'),
       this.fmparams(),
       this.match(')', 'missing ) after formal parameters'),
