@@ -11,7 +11,7 @@ var Parser = Class(function(lexer) {
 }).methods({
   parse: function(code) {
     this.lexer.parse(code);
-    this.tree = this.program();
+    this.tree = this.script();
     return this.tree;
   },
   ast: function() {
@@ -39,19 +39,19 @@ var Parser = Class(function(lexer) {
       this.lexer = new Lexer(new Rule());
     }
   },
-  program: function() {
+  script: function() {
     this.tokens = this.lexer.tokens();
     this.length = this.tokens.length;
     if(this.tokens.length) {
       this.move();
     }
-    var node = new Node(Node.PROGRAM);
+    var node = new Node(Node.SCRIPT);
     while(this.look) {
-      node.add(this.element());
+      node.add(this.stmtlitem());
     }
     return node;
   },
-  element: function(allowSuper) {
+  stmtlitem: function(allowSuper) {
     if(this.look.content() == 'function') {
       return this.fndecl();
     }

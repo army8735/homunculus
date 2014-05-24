@@ -63,7 +63,7 @@ var Node = Class(function(type, children) {
     return this.ne;
   }
 }).statics({
-  PROGRAM: 'program',
+  SCRIPT: 'script',
   ELEMS: 'elems',
   ELEM: 'elem',
   CSTSTMT: 'cststmt',
