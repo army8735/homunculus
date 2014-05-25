@@ -856,8 +856,23 @@ var Parser = Class(function(lexer) {
     return node;
   },
   assignexpr: function(noIn) {
-    var node = new Node(Node.ASSIGNEXPR),
-      cndt = this.cndtexpr(noIn);
+    var node = new Node(Node.ASSIGNEXPR);
+    var cndt = this.cndtexpr(noIn);
+    var noCndt = {};
+    noCndt[Node.CNDTEXPR]
+      = noCndt[Node.LOGOREXPR]
+      = noCndt[Node.LOGANDEXPR]
+      = noCndt[Node.BITOREXPR]
+      = noCndt[Node.BITXOREXPR]
+      = noCndt[Node.BITANDEXPR]
+      = noCndt[Node.EQEXPR]
+      = noCndt[Node.RELTEXPR]
+      = noCndt[Node.SHIFTEXPR]
+      = noCndt[Node.ADDEXPR]
+      = noCndt[Node.MTPLEXPR]
+      = noCndt[Node.UNARYEXPR]
+      = noCndt[Node.POSTFIXEXPR]
+      = true;
     if(this.look && {
       '*=': true,
       '/=': true,
@@ -871,7 +886,7 @@ var Parser = Class(function(lexer) {
       '^=': true,
       '|=': true,
       '=': true
-    }.hasOwnProperty(this.look.content())) {
+    }.hasOwnProperty(this.look.content()) && !noCndt.hasOwnProperty(cndt.name())) {
       node.add(cndt, this.match(), this.assignexpr(noIn));
     }
     else {
