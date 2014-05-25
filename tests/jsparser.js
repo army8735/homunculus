@@ -459,6 +459,12 @@ describe('jsparser', function() {
       var node = parser.parse('a += b %= c');
       expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.EXPRSTMT, [JsNode.ASSIGNEXPR, [JsNode.PRMREXPR, ["a"], "+=", JsNode.ASSIGNEXPR, [JsNode.PRMREXPR, ["b"], "%=", JsNode.PRMREXPR, ["c"]]]]]]);
     });
+    it('assignexpr error', function() {
+      var parser = homunculus.getParser('js');
+      expect(function() {
+        parser.parse('a + b = c');
+      }).to.throwError();
+    });
     it('expr 1', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('(1)');
