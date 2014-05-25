@@ -12,7 +12,7 @@ npm install homunculus
 
 ## API
 * getClass(type:String, lan:String):class
- * tyep: lexer parser node context token
+ * type: lexer parser node context token
  * lan: js javascript es ecmascript as actionscript css
 * getLexer(lan:String):object
  * lan: js javascript es ecmascript as actionscript css java c++ cpp cplusplus
