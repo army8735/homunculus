@@ -849,7 +849,7 @@ var Parser = Class(function(lexer) {
         if(this.look.content() == '.') {
           mmb.add(
             this.match(),
-            this.match(Token.ID)
+            this.match(Token.ID, 'missing name after . operator')
           );
         }
         else if(this.look.content() == '[') {
@@ -884,7 +884,7 @@ var Parser = Class(function(lexer) {
           if(this.look.content() == '.') {
             node.add(
               this.match(),
-              this.match(Token.ID)
+              this.match(Token.ID, 'missing name after . operator')
             );
           }
           else if(this.look.content() == '[') {
@@ -923,7 +923,7 @@ var Parser = Class(function(lexer) {
         if(this.look.content() == '.') {
           node.add(
             this.match(),
-            this.match(Token.ID)
+            this.match(Token.ID, 'missing name after . operator')
           );
         }
         else if(this.look.content() == '[') {
