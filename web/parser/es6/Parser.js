@@ -7,6 +7,21 @@ define(function(require, exports, module) {
   var Node = require('./Node');
   var S = {};
   S[Token.BLANK] = S[Token.TAB] = S[Token.COMMENT] = S[Token.LINE] = S[Token.ENTER] = true;
+  var NOASSIGN = {};
+  NOASSIGN[Node.CNDTEXPR]
+    = NOASSIGN[Node.LOGOREXPR]
+    = NOASSIGN[Node.LOGANDEXPR]
+    = NOASSIGN[Node.BITOREXPR]
+    = NOASSIGN[Node.BITXOREXPR]
+    = NOASSIGN[Node.BITANDEXPR]
+    = NOASSIGN[Node.EQEXPR]
+    = NOASSIGN[Node.RELTEXPR]
+    = NOASSIGN[Node.SHIFTEXPR]
+    = NOASSIGN[Node.ADDEXPR]
+    = NOASSIGN[Node.MTPLEXPR]
+    = NOASSIGN[Node.UNARYEXPR]
+    = NOASSIGN[Node.POSTFIXEXPR]
+    = true;
   var Parser = Class(function(lexer) {
     this.init(lexer);
   }).methods({
@@ -89,7 +104,7 @@ define(function(require, exports, module) {
         case 'var':
           return this.varstmt();
         case '{':
-          return this.block();
+          return this.blockstmt();
         case ';':
           return this.emptstmt();
         case 'if':
@@ -114,6 +129,8 @@ define(function(require, exports, module) {
           return this.trystmt();
         case 'debugger':
           return this.debstmt();
+        case 'yield':
+          return this.labstmt();
   //      case 'super':
   //        if(!allowSuper) {
   //          this.error('super must in a class');
@@ -180,7 +197,7 @@ define(function(require, exports, module) {
         node.add(this.initlz());
       }
       else {
-        node.add(this.bindid());
+        node.add(this.bindid('missing variable name'));
         if(this.look && this.look.content() == '=') {
           node.add(this.initlz());
         }
@@ -208,9 +225,9 @@ define(function(require, exports, module) {
       this.declnode(node);
       return node;
     },
-    bindid: function() {
+    bindid: function(msg) {
       var node = new Node(Node.BINDID);
-      node.add(this.match(Token.ID, 'missing variable name'));
+      node.add(this.match(Token.ID, msg));
       return node;
     },
     bindpat: function() {
@@ -269,7 +286,7 @@ define(function(require, exports, module) {
       var node = new Node(Node.BINDREST);
       node.add(
         this.match('...'),
-        this.bindid()
+        this.bindid('no parameter name after ...')
       );
       return node;
     },
@@ -336,11 +353,16 @@ define(function(require, exports, module) {
       node.add(this.assignexpr());
       return node;
     },
-    block: function() {
+    blockstmt: function() {
+      var node = new Node(Node.BLOCKSTMT);
+      node.add(this.block());
+      return node;
+    },
+    block: function(msg) {
       var node = new Node(Node.BLOCK);
-      node.add(this.match('{'));
+      node.add(this.match('{', msg));
       while(this.look && this.look.content() != '}') {
-        node.add(this.stmt());
+        node.add(this.stmtlitem());
       }
       node.add(this.match('}', 'missing } in compound statement'));
       return node;
@@ -519,10 +541,10 @@ define(function(require, exports, module) {
     withstmt: function() {
       var node = new Node(Node.WITHSTMT);
       node.add(
-        this.match('with'),
+        this.match('with', 'missing ( before with-statement object'),
         this.match('('),
         this.expr(),
-        this.match(')'),
+        this.match(')', 'missing ) after with-statement object'),
         this.stmt()
       );
       return node;
@@ -583,8 +605,13 @@ define(function(require, exports, module) {
     },
     labstmt: function() {
       var node = new Node(Node.LABSTMT);
+      if(this.look.content() == 'yield') {
+        node.add(this.match());
+      }
+      else {
+        node.add(this.match(Token.ID));
+      }
       node.add(
-        this.match(Token.ID),
         this.match(':'),
         this.stmt()
       );
@@ -603,7 +630,7 @@ define(function(require, exports, module) {
       var node = new Node(Node.TRYSTMT);
       node.add(
         this.match('try'),
-        this.block()
+        this.block('missing { before try block')
       );
       if(this.look && this.look.content() == 'catch') {
         node.add(this.cach());
@@ -624,19 +651,29 @@ define(function(require, exports, module) {
     cach: function() {
       var node = new Node(Node.CACH);
       node.add(
-        this.match('catch'),
-        this.match('('),
-        this.match(Token.ID, 'missing identifier in catch'),
-        this.match(')'),
-        this.block()
+        this.match('catch', 'missing catch or finally after try'),
+        this.match('(', 'missing ( before catch'),
+        this.cachparam(),
+        this.match(')', 'missing ) after catch'),
+        this.block('missing { before catch block')
       );
+      return node;
+    },
+    cachparam: function() {
+      var node = new Node(Node.CACHPARAM);
+      if(['[', '{'].indexOf(this.look.content()) > -1) {
+        node.add(this.bindpat());
+      }
+      else {
+        node.add(this.bindid('missing identifier in catch'));
+      }
       return node;
     },
     finl: function() {
       var node = new Node(Node.FINL);
       node.add(
         this.match('finally'),
-        this.block()
+        this.block('missing { before finally block')
       );
       return node;
     },
@@ -680,7 +717,7 @@ define(function(require, exports, module) {
       var node = new Node(Node.FNDECL);
       node.add(
         this.match('function'),
-        this.bindid(),
+        this.bindid('function statement requires a name'),
         this.match('(', 'missing ( before formal parameters'),
         this.fmparams(),
         this.match(')', 'missing ) after formal parameters'),
@@ -835,8 +872,8 @@ define(function(require, exports, module) {
       return node;
     },
     assignexpr: function(noIn) {
-      var node = new Node(Node.ASSIGNEXPR),
-        cndt = this.cndtexpr(noIn);
+      var node = new Node(Node.ASSIGNEXPR);
+      var cndt = this.cndtexpr(noIn);
       if(this.look && {
         '*=': true,
         '/=': true,
@@ -850,7 +887,7 @@ define(function(require, exports, module) {
         '^=': true,
         '|=': true,
         '=': true
-      }.hasOwnProperty(this.look.content())) {
+      }.hasOwnProperty(this.look.content()) && !NOASSIGN.hasOwnProperty(cndt.name())) {
         node.add(cndt, this.match(), this.assignexpr(noIn));
       }
       else {
@@ -1137,7 +1174,7 @@ define(function(require, exports, module) {
           if(this.look.content() == '.') {
             mmb.add(
               this.match(),
-              this.match(Token.ID)
+              this.match(Token.ID, 'missing name after . operator')
             );
           }
           else if(this.look.content() == '[') {
@@ -1172,7 +1209,7 @@ define(function(require, exports, module) {
             if(this.look.content() == '.') {
               node.add(
                 this.match(),
-                this.match(Token.ID)
+                this.match(Token.ID, 'missing name after . operator')
               );
             }
             else if(this.look.content() == '[') {
@@ -1211,7 +1248,7 @@ define(function(require, exports, module) {
           if(this.look.content() == '.') {
             node.add(
               this.match(),
-              this.match(Token.ID)
+              this.match(Token.ID, 'missing name after . operator')
             );
           }
           else if(this.look.content() == '[') {

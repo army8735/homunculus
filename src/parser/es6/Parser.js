@@ -6,6 +6,21 @@ var Token = require('../../lexer/Token');
 var Node = require('./Node');
 var S = {};
 S[Token.BLANK] = S[Token.TAB] = S[Token.COMMENT] = S[Token.LINE] = S[Token.ENTER] = true;
+var NOASSIGN = {};
+NOASSIGN[Node.CNDTEXPR]
+  = NOASSIGN[Node.LOGOREXPR]
+  = NOASSIGN[Node.LOGANDEXPR]
+  = NOASSIGN[Node.BITOREXPR]
+  = NOASSIGN[Node.BITXOREXPR]
+  = NOASSIGN[Node.BITANDEXPR]
+  = NOASSIGN[Node.EQEXPR]
+  = NOASSIGN[Node.RELTEXPR]
+  = NOASSIGN[Node.SHIFTEXPR]
+  = NOASSIGN[Node.ADDEXPR]
+  = NOASSIGN[Node.MTPLEXPR]
+  = NOASSIGN[Node.UNARYEXPR]
+  = NOASSIGN[Node.POSTFIXEXPR]
+  = true;
 var Parser = Class(function(lexer) {
   this.init(lexer);
 }).methods({
@@ -858,21 +873,6 @@ var Parser = Class(function(lexer) {
   assignexpr: function(noIn) {
     var node = new Node(Node.ASSIGNEXPR);
     var cndt = this.cndtexpr(noIn);
-    var noCndt = {};
-    noCndt[Node.CNDTEXPR]
-      = noCndt[Node.LOGOREXPR]
-      = noCndt[Node.LOGANDEXPR]
-      = noCndt[Node.BITOREXPR]
-      = noCndt[Node.BITXOREXPR]
-      = noCndt[Node.BITANDEXPR]
-      = noCndt[Node.EQEXPR]
-      = noCndt[Node.RELTEXPR]
-      = noCndt[Node.SHIFTEXPR]
-      = noCndt[Node.ADDEXPR]
-      = noCndt[Node.MTPLEXPR]
-      = noCndt[Node.UNARYEXPR]
-      = noCndt[Node.POSTFIXEXPR]
-      = true;
     if(this.look && {
       '*=': true,
       '/=': true,
@@ -886,7 +886,7 @@ var Parser = Class(function(lexer) {
       '^=': true,
       '|=': true,
       '=': true
-    }.hasOwnProperty(this.look.content()) && !noCndt.hasOwnProperty(cndt.name())) {
+    }.hasOwnProperty(this.look.content()) && !NOASSIGN.hasOwnProperty(cndt.name())) {
       node.add(cndt, this.match(), this.assignexpr(noIn));
     }
     else {

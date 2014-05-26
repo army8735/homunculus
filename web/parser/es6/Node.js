@@ -69,6 +69,7 @@ define(function(require, exports, module) {
     VARSTMT: 'varstmt',
     VARDECL: 'vardecl',
     FNBODY: 'fnbody',
+    BLOCKSTMT: 'blockstmt',
     BLOCK: 'block',
     ITERSTMT: 'iterstmt',
     TOKEN: 'token',
@@ -103,6 +104,7 @@ define(function(require, exports, module) {
     DEBSTMT: 'debstmt',
     EXPRSTMT: 'exprstmt',
     CACH: 'cach',
+    CACHPARAM: 'cachparam',
     FINL: 'finl',
     FNDECL: 'fndecl',
     FNEXPR: 'fnexpr',
@@ -134,7 +136,7 @@ define(function(require, exports, module) {
     SPREAD: 'spread',
     ARRCMPH: 'arrcmph',
     CMPHFOR: 'cmphfor',
-
+  
     INITLZ: 'initlz',
     BINDID: 'bindid',
     ARRBINDPAT: 'arrbindpat',
