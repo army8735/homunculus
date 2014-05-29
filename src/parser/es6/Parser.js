@@ -846,56 +846,88 @@ var Parser = Class(function(lexer) {
   },
   heratige: function() {
     var node = new Node(Node.HERITAGE);
-    node.add(this.match('extends'), this.match(Token.ID));
+    node.add(
+      this.match('extends'),
+      this.leftexpr()
+    );
     return node;
   },
   classbody: function() {
-    var node = new Node(Node.CLASSBODY),
-      methods = {},
-      hasStatic = false;
+    var node = new Node(Node.CLASSBODY);
     while(this.look && this.look.content() != '}') {
-      if(this.look.content() == ';') {
-        node.add(this.match());
-        continue;
-      }
-      hasStatic = false;
-      if(this.look.content() == 'static') {
-        node.add(this.match());
-        hasStatic = true;
-      }
-      if(!this.look) {
-        this.error();
-      }
-      node.add(this.method(hasStatic, methods));
+      node.add(this.classelem());
     }
     return node;
   },
-  method: function(hasStatic, methods, statics) {
-    var node = new Node(Node.METHOD);
-    if(this.look.content() == 'get') {
-      node.add(this.match(), this.getfn());
+  classelem: function() {
+    var node = new Node(Node.CLASSELEM);
+    if(this.look.content() == ';') {
+      node.add(this.match());
     }
-    else if(this.look.content() == 'set') {
-      node.add(this.match(), this.setfn());
-    }
-    else {
-      node.add(this.match(Token.ID));
-      var id = node.leaves()[0].token().content();
-      if(methods.hasOwnProperty(id)) {
-        this.error('duplicate method decl in class');
-      }
-      methods[id] = true;
-      node.add(this.match('('));
-      if(this.look.content() != ')') {
-        node.add(this.fnparams());
-      }
+    else if(this.look.content() == 'static') {
       node.add(
-        this.match(')'),
-        this.match('{'),
-        this.fnbody(true),
-        this.match('}', 'missing } in compound statement')
+        this.match(),
+        this.method()
       );
     }
+    else {
+      node.add(this.method());
+    }
+    return node;
+  },
+  method: function() {
+    var node = new Node(Node.METHOD);
+    if(this.look.content() == 'get') {
+      node.add(
+        this.match(),
+        this.proptname(),
+        this.match('('),
+        this.match(')'),
+        this.match('{'),
+        this.fnbody(),
+        this.match('}')
+      );
+    }
+    else if(this.look.content() == 'set') {
+      node.add(
+        this.match(),
+        this.proptname(),
+        this.match('('),
+        this.fmparams(),
+        this.match(')'),
+        this.match('{'),
+        this.fnbody(),
+        this.match('}')
+      );
+    }
+    else if(this.look.content() == '*') {
+      node.add(this.genmethod());
+    }
+    else {
+      node.add(
+        this.proptname(),
+        this.match('('),
+        this.fmparams(),
+        this.match(')'),
+        this.match('{'),
+        this.fnbody(),
+        this.match('}')
+      );
+    }
+    return node;
+  },
+  genmethod: function() {
+    var node = new Node(Node.GENMETHOD);
+    node.add(
+      this.match('*'),
+      this.proptname(),
+      this.match('('),
+      this.fmparams(),
+      this.match(')'),
+      this.match('{'),
+      this.fnbody(),
+      this.match('}')
+    );
     return node;
   },
   expr: function(noIn) {

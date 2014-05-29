@@ -77,11 +77,6 @@ define(function(require, exports, module) {
     BINDELEMENT: 'bindelement',
     RESTPARAM: 'restparam',
     EXPR: 'expr',
-    METHOD: 'method',
-    SUPERSTMT: 'superstmt',
-    GETFN: 'getfn',
-    SETFN: 'setfn',
-    PROGRAM: 'program',
     STMT: 'stmt',
     ASSIGN: 'assign',
     EMPTSTMT: 'emptstmt',
@@ -132,7 +127,6 @@ define(function(require, exports, module) {
     SPREAD: 'spread',
     ARRCMPH: 'arrcmph',
     CMPHFOR: 'cmphfor',
-  
     INITLZ: 'initlz',
     BINDID: 'bindid',
     ARRBINDPAT: 'arrbindpat',
@@ -160,6 +154,9 @@ define(function(require, exports, module) {
     CLASSDECL: 'classdecl',
     HERITAGE: 'heritage',
     CLASSBODY: 'classbody',
+    CLASSELEM: 'classelem',
+    METHOD: 'method',
+    GENMETHOD: 'genmethod',
     getKey: function(s) {
       if(!s) {
         throw new Error('empty value');

@@ -76,11 +76,6 @@ var Node = Class(function(type, children) {
   BINDELEMENT: 'bindelement',
   RESTPARAM: 'restparam',
   EXPR: 'expr',
-  METHOD: 'method',
-  SUPERSTMT: 'superstmt',
-  GETFN: 'getfn',
-  SETFN: 'setfn',
-  PROGRAM: 'program',
   STMT: 'stmt',
   ASSIGN: 'assign',
   EMPTSTMT: 'emptstmt',
@@ -131,7 +126,6 @@ var Node = Class(function(type, children) {
   SPREAD: 'spread',
   ARRCMPH: 'arrcmph',
   CMPHFOR: 'cmphfor',
-
   INITLZ: 'initlz',
   BINDID: 'bindid',
   ARRBINDPAT: 'arrbindpat',
@@ -159,6 +153,9 @@ var Node = Class(function(type, children) {
   CLASSDECL: 'classdecl',
   HERITAGE: 'heritage',
   CLASSBODY: 'classbody',
+  CLASSELEM: 'classelem',
+  METHOD: 'method',
+  GENMETHOD: 'genmethod',
   getKey: function(s) {
     if(!s) {
       throw new Error('empty value');
