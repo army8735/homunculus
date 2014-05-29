@@ -327,7 +327,7 @@ var Parser = Class(function(lexer) {
     //还是SingleNameBinding[?Yield, ?GeneratorParameter]
     for(var i = this.index; i < this.length; i++) {
       var next = this.tokens[i];
-      if(!S[next.tag()]) {
+      if(!S[next.type()]) {
         if(next.content() == ':') {
           node.add(
             this.proptname(),
@@ -880,9 +880,29 @@ var Parser = Class(function(lexer) {
   expr: function(noIn) {
     var node = new Node(Node.EXPR),
       assignexpr = this.assignexpr(noIn);
+    //LL2区分,后的...是否为cpeapl
     if(this.look && this.look.content() == ',') {
+      for(var i = this.index; i < this.length; i++) {
+        var next = this.tokens[i];
+        if(!S[next.type()]) {
+          if(next.content() == '...') {
+            return assignexpr;
+          }
+          break;
+        }
+      }
       node.add(assignexpr);
+      outer:
       while(this.look && this.look.content() == ',') {
+        for(var i = this.index; i < this.length; i++) {
+          var next = this.tokens[i];
+          if(!S[next.type()]) {
+            if(next.content() == '...') {
+              break outer;
+            }
+            break;
+          }
+        }
         node.add(this.match(), this.assignexpr(noIn));
       }
     }
@@ -968,26 +988,21 @@ var Parser = Class(function(lexer) {
     if(!this.look) {
       this.error();
     }
-    if(this.look.content() == '...') {
+    if(['...', ')'].indexOf(this.look.content()) == -1) {
+      node.add(this.expr());
+    }
+    if(this.look.content() == ',') {
+      node.add(
+        this.match(),
+        this.match('...'),
+        this.bindid()
+      );
+    }
+    else if(this.look.content() == '...') {
       node.add(
         this.match(),
         this.bindid()
       );
-    }
-    else {
-      while(this.look && this.look.content() != ')') {
-        node.add(this.expr());
-        if(this.look && this.look.content() == ',') {
-          node.add(this.match());
-          if(this.look && this.look.content() == '...') {
-            node.add(
-              this.match(),
-              this.bindid()
-            );
-            break;
-          }
-        }
-      }
     }
     node.add(this.match(')'));
     return node;
@@ -1312,7 +1327,7 @@ var Parser = Class(function(lexer) {
       if(this.look.content() == 'super') {
         for(var i = this.index; i < this.length; i++) {
           var next = this.tokens[i];
-          if(!S[next.tag()]) {
+          if(!S[next.type()]) {
             if(next.content() == '(') {
               node.add(
                 this.match(),
@@ -1487,7 +1502,7 @@ var Parser = Class(function(lexer) {
           case 'function':
             for(var i = this.index; i < this.length; i++) {
               var next = this.tokens[i];
-              if(!S[next.tag()]) {
+              if(!S[next.type()]) {
                 if(next.content() == '*') {
                   node.add(this.genexpr());
                 }
@@ -1509,7 +1524,7 @@ var Parser = Class(function(lexer) {
           case '(':
             for(var i = this.index; i < this.length; i++) {
               var next = this.tokens[i];
-              if(!S[next.tag()]) {
+              if(!S[next.type()]) {
                 if(next.content() == 'for') {
                   node.add(this.gencmph());
                 }
@@ -1537,7 +1552,7 @@ var Parser = Class(function(lexer) {
     //[assignexpr or [for
     for(var i = this.index; i < this.length; i++) {
       var next = this.tokens[i];
-      if(!S[next.tag()]) {
+      if(!S[next.type()]) {
         if(next.content() == 'for') {
           return this.arrcmph();
         }
