@@ -923,19 +923,38 @@ define(function(require, exports, module) {
       }
       if(this.look && ['.', '['].indexOf(this.look.content()) > -1) {
         node.add(mmb);
+        if(this.look.content() == '.') {
+          node.add(
+            this.match(),
+            this.match(Token.ID, 'missing name after . operator')
+          )
+        }
+        else {
+          node.add(
+            this.match(),
+            this.expr(),
+            this.match(']')
+          );
+        }
         while(this.look) {
           if(this.look.content() == '.') {
-            node.add(
+            var temp = new Node(Node.MMBEXPR);
+            temp.add(
+              node,
               this.match(),
               this.match(Token.ID, 'missing name after . operator')
             );
+            node = temp;
           }
           else if(this.look.content() == '[') {
-            node.add(
+            var temp = new Node(Node.MMBEXPR);
+            temp.add(
+              node,
               this.match(),
               this.expr(),
               this.match(']')
             );
+            node = temp;
           }
           else {
             break;

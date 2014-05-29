@@ -116,12 +116,17 @@ describe('jsparser', function() {
     it('mmbexpr 1', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('a.b.c');
-      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.EXPRSTMT, [JsNode.MMBEXPR, [JsNode.PRMREXPR, ['a'], '.', 'b', '.', 'c']]]]);
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.EXPRSTMT,[JsNode.MMBEXPR,[JsNode.MMBEXPR,[JsNode.PRMREXPR,["a"],".","b"],".","c"]]]]);
     });
     it('mmbexpr 2', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('a.b[c]');
-      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.EXPRSTMT, [JsNode.MMBEXPR, [JsNode.PRMREXPR, ['a'], '.', 'b', '[', JsNode.PRMREXPR, ['c'], ']']]]]);
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.EXPRSTMT,[JsNode.MMBEXPR,[JsNode.MMBEXPR,[JsNode.PRMREXPR,["a"],".","b"],"[",JsNode.PRMREXPR,["c"],"]"]]]]);
+    });
+    it('mmbexpr 3', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('a.b');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.EXPRSTMT,[JsNode.MMBEXPR,[JsNode.PRMREXPR,["a"],".","b"]]]]);
     });
     it('returnstmt 1', function() {
       var parser = homunculus.getParser('js');

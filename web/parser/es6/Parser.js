@@ -1217,7 +1217,6 @@ define(function(require, exports, module) {
       //new super后不跟任何token
       else if(this.look.content() == 'super') {
         node.add(this.match());
-        return node;
       }
       else {
         node.add(this.mmbexpr());
@@ -1303,7 +1302,7 @@ define(function(require, exports, module) {
             node.add(this.args());
           }
           else if(this.look.type() == Token.TEMPLATE) {
-  
+            node.add(this.match());
           }
           else {
             break;
@@ -1318,6 +1317,24 @@ define(function(require, exports, module) {
     mmbexpr: function() {
       var node = new Node(Node.MMBEXPR);
       var mmb;
+      if(this.look.content() == 'super') {
+        node.add(this.match());
+        if(!this.look) {
+          this.error();
+        }
+        if(this.look.content() == '.') {
+          node.add(
+            this.match(),
+            this.match(Token.ID)
+          );
+        }
+        else if(this.look.content() == '[') {
+          node.add(
+            this.match(),
+            this.expr()
+          );
+        }
+      }
       if(this.look.content() == 'function') {
         mmb = this.fnexpr();
       }
