@@ -156,6 +156,10 @@ define(function(require, exports, module) {
     ARROWFN: 'arrowfn',
     ARROWPARAMS: 'arrowparams',
     CPEAPL: 'cpeapl',
+    CLASSEXPR: 'classexpr',
+    GENEXPR: 'genexpr',
+    GENCMPH: 'gencmph',
+    CMPH: 'cmph',
     getKey: function(s) {
       if(!s) {
         throw new Error('empty value');

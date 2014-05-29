@@ -748,6 +748,28 @@ define(function(require, exports, module) {
       );
       return node;
     },
+    genexpr: function() {
+      var node = new Node(Node.GENEXPR);
+      node.add(
+        this.match('function'),
+        this.match('*')
+      );
+      if(!this.look) {
+        this.error('missing formal parameter');
+      }
+      if(this.look.type() == Token.ID) {
+        node.add(this.bindid());
+      }
+      node.add(
+        this.match('(', 'missing ( before formal parameters'),
+        this.fmparams(),
+        this.match(')', 'missing ) after formal parameters'),
+        this.match('{'),
+        this.fnbody(),
+        this.match('}', 'missing } after function body')
+      );
+      return node;
+    },
     sfnparams: function() {
       return this.fmparams();
     },
@@ -796,6 +818,10 @@ define(function(require, exports, module) {
         this.classbody(),
         this.match('}')
       );
+      return node;
+    },
+    classexpr: function() {
+      var node = new Node(Node.CLASSEXPR);
       return node;
     },
     heratige: function() {
@@ -924,7 +950,7 @@ define(function(require, exports, module) {
         this.arrowparams(),
         this.match('=>'),
         this.cncsbody()
-      )
+      );
       return node;
     },
     arrowparams: function() {
@@ -938,7 +964,34 @@ define(function(require, exports, module) {
       return node;
     },
     cpeapl: function() {
-  
+      var node = new Node(Node.CPEAPL);
+      node.add(this.match('('));
+      if(!this.look) {
+        this.error();
+      }
+      if(this.look.content() == '...') {
+        node.add(
+          this.match(),
+          this.bindid()
+        );
+      }
+      else {
+        while(this.look && this.look.content() != ')') {
+          node.add(this.expr());
+          if(this.look && this.look.content() == ',') {
+            node.add(this.match());
+            if(this.look && this.look.content() == '...') {
+              node.add(
+                this.match(),
+                this.bindid()
+              );
+              break;
+            }
+          }
+        }
+      }
+      node.add(this.match(')'));
+      return node;
     },
     cncsbody: function() {
   
@@ -1434,14 +1487,42 @@ define(function(require, exports, module) {
         break;
         default:
           switch(this.look.content()) {
+            //LL2是否为*区分fnexpr和genexpr
+            case 'function':
+              for(var i = this.index; i < this.length; i++) {
+                var next = this.tokens[i];
+                if(!S[next.tag()]) {
+                  if(next.content() == '*') {
+                    node.add(this.genexpr());
+                  }
+                  else {
+                    node.add(this.fnexpr());
+                  }
+                  break;
+                }
+              }
+            case 'class':
+              node.add(this.classexpr());
             case 'this':
             case 'null':
             case 'true':
             case 'false':
               node.add(this.match());
             break;
+            //LL2区分for是否为gencmph
             case '(':
-              node.add(this.match(), this.expr(), this.match(')'));
+              for(var i = this.index; i < this.length; i++) {
+                var next = this.tokens[i];
+                if(!S[next.tag()]) {
+                  if(next.content() == 'for') {
+                    node.add(this.gencmph());
+                  }
+                  else {
+                    node.add(this.cpeapl());
+                  }
+                  break;
+                }
+              }
             break;
             case '[':
               node.add(this.arrinit());
@@ -1471,9 +1552,26 @@ define(function(require, exports, module) {
       }
       this.error();
     },
+    gencmph: function() {
+      var node = new Node(Node.GENCMPH);
+      node.add(
+        this.match('('),
+        this.cmph(),
+        this.match(')')
+      );
+      return node;
+    },
     arrcmph: function() {
       var node = new Node(Node.ARRCMPH);
-      node.add(this.match('['));
+      node.add(
+        this.match('['),
+        this.cmph(),
+        this.match(']', 'missing ] after element list')
+      );
+      return node;
+    },
+    cmph: function() {
+      var node = new Node(Node.CMPH);
       node.add(this.cmphfor());
       while(this.look && this.look.content() != ']') {
         if(this.look.content() == 'for') {
@@ -1487,7 +1585,6 @@ define(function(require, exports, module) {
           break;
         }
       }
-      node.add(this.match(']', 'missing ] after element list'));
       return node;
     },
     cmphfor: function() {
