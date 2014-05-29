@@ -925,20 +925,38 @@ var Parser = Class(function(lexer) {
       return this.yieldexpr();
     }
     var cndt = this.cndtexpr(noIn);
-    if(this.look && {
-      '*=': true,
-      '/=': true,
-      '%=': true,
-      '+=': true,
-      '-=': true,
-      '<<=': true,
-      '>>=': true,
-      '>>>=': true,
-      '&=': true,
-      '^=': true,
-      '|=': true,
-      '=': true
-    }.hasOwnProperty(this.look.content()) && !NOASSIGN.hasOwnProperty(cndt.name())) {
+    if(this.look
+      && this.look.content() == '=>'
+      && cndt.name() == Node.PRMREXPR
+      && cndt.size() == 1
+      && (cndt.leaf(0).name() == Node.CPEAPL
+        || (cndt.leaf(0).name() == Node.TOKEN
+          && cndt.leaf(0).token().type() == Token.ID))) {
+      node = new Node(Node.ARROWFN);
+      var arrowparams = new Node(Node.ARROWPARAMS);
+      arrowparams.add(cndt.leaf(0));
+      node.add(
+        arrowparams,
+        this.match(),
+        this.cncsbody()
+      );
+    }
+    else if(this.look
+      && {
+        '*=': true,
+        '/=': true,
+        '%=': true,
+        '+=': true,
+        '-=': true,
+        '<<=': true,
+        '>>=': true,
+        '>>>=': true,
+        '&=': true,
+        '^=': true,
+        '|=': true,
+        '=': true
+      }.hasOwnProperty(this.look.content())
+      && !NOASSIGN.hasOwnProperty(cndt.name())) {
       node.add(cndt, this.match(), this.assignexpr(noIn));
     }
     else {
@@ -960,25 +978,6 @@ var Parser = Class(function(lexer) {
         && this.look.type() != Token.KEYWORD) {
         node.add(this.assignexpr());
       }
-    }
-    return node;
-  },
-  arrowfn: function() {
-    var node = new Node(Node.ARROWFN);
-    node.add(
-      this.arrowparams(),
-      this.match('=>'),
-      this.cncsbody()
-    );
-    return node;
-  },
-  arrowparams: function() {
-    var node = new Node(Node.ARROWPARAMS);
-    if(this.look.type() == Token.ID) {
-      node.add(this.bindid());
-    }
-    else {
-      node.add(this.cpeapl());
     }
     return node;
   },
@@ -1008,7 +1007,9 @@ var Parser = Class(function(lexer) {
     return node;
   },
   cncsbody: function() {
-
+    var node = new Node(Node.CNCSBODY);
+    node.add(this.assignexpr());
+    return node;
   },
   cndtexpr: function(noIn) {
     var node = new Node(Node.CNDTEXPR),

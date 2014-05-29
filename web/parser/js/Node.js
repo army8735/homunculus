@@ -25,7 +25,7 @@ define(function(require, exports, module) {
     leaf: function(i) {
       return this.children[i];
     },
-    number: function() {
+    size: function() {
       return this.children.length;
     },
     add: function() {

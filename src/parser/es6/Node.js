@@ -24,7 +24,7 @@ var Node = Class(function(type, children) {
   leaf: function(i) {
     return this.children[i];
   },
-  number: function() {
+  size: function() {
     return this.children.length;
   },
   add: function() {
@@ -159,6 +159,7 @@ var Node = Class(function(type, children) {
   GENEXPR: 'genexpr',
   GENCMPH: 'gencmph',
   CMPH: 'cmph',
+  CNCSBODY: 'cncsbody',
   getKey: function(s) {
     if(!s) {
       throw new Error('empty value');

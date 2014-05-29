@@ -25,7 +25,7 @@ define(function(require, exports, module) {
     leaf: function(i) {
       return this.children[i];
     },
-    number: function() {
+    size: function() {
       return this.children.length;
     },
     add: function() {
@@ -160,6 +160,7 @@ define(function(require, exports, module) {
     GENEXPR: 'genexpr',
     GENCMPH: 'gencmph',
     CMPH: 'cmph',
+    CNCSBODY: 'cncsbody',
     getKey: function(s) {
       if(!s) {
         throw new Error('empty value');

@@ -24,7 +24,7 @@ var Node = Class(function(type, children) {
   leaf: function(i) {
     return this.children[i];
   },
-  number: function() {
+  size: function() {
     return this.children.length;
   },
   add: function() {
