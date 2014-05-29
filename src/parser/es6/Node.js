@@ -151,6 +151,7 @@ var Node = Class(function(type, children) {
   LEXBIND: 'lexbind',
   FMPARAMS: 'fmparams',
   CMPHIF: 'cmphif',
+  YIELDEXPR: 'yieldexpr',
   getKey: function(s) {
     if(!s) {
       throw new Error('empty value');

@@ -152,6 +152,7 @@ define(function(require, exports, module) {
     LEXBIND: 'lexbind',
     FMPARAMS: 'fmparams',
     CMPHIF: 'cmphif',
+    YIELDEXPR: 'yieldexpr',
     getKey: function(s) {
       if(!s) {
         throw new Error('empty value');

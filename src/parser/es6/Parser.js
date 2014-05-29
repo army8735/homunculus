@@ -872,6 +872,9 @@ var Parser = Class(function(lexer) {
   },
   assignexpr: function(noIn) {
     var node = new Node(Node.ASSIGNEXPR);
+    if(this.look.content() == 'yield') {
+      return this.yieldexpr();
+    }
     var cndt = this.cndtexpr(noIn);
     if(this.look && {
       '*=': true,
@@ -891,6 +894,23 @@ var Parser = Class(function(lexer) {
     }
     else {
       return cndt;
+    }
+    return node;
+  },
+  yieldexpr: function() {
+    var node = new Node(Node.YIELDEXPR);
+    node.add(this.match('yield'));
+    if(this.look) {
+      if(this.look.content() == '*') {
+        node.add(
+          this.match(),
+          this.assignexpr()
+        );
+      }
+      else if([';', '}', '...', ':', '?', ',', '=>'].indexOf(this.look.content()) == -1
+        && this.look.type() != Token.KEYWORD) {
+        node.add(this.assignexpr());
+      }
     }
     return node;
   },

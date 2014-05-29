@@ -873,6 +873,9 @@ define(function(require, exports, module) {
     },
     assignexpr: function(noIn) {
       var node = new Node(Node.ASSIGNEXPR);
+      if(this.look.content() == 'yield') {
+        return this.yieldexpr();
+      }
       var cndt = this.cndtexpr(noIn);
       if(this.look && {
         '*=': true,
@@ -892,6 +895,23 @@ define(function(require, exports, module) {
       }
       else {
         return cndt;
+      }
+      return node;
+    },
+    yieldexpr: function() {
+      var node = new Node(Node.YIELDEXPR);
+      node.add(this.match('yield'));
+      if(this.look) {
+        if(this.look.content() == '*') {
+          node.add(
+            this.match(),
+            this.assignexpr()
+          );
+        }
+        else if([';', '}', '...', ':', '?', ',', '=>'].indexOf(this.look.content()) == -1
+          && this.look.type() != Token.KEYWORD) {
+          node.add(this.assignexpr());
+        }
       }
       return node;
     },
@@ -1138,10 +1158,10 @@ define(function(require, exports, module) {
       var node = new Node(Node.POSTFIXEXPR);
       var leftexpr = this.leftexpr();
       if(this.look && ['++', '--'].indexOf(this.look.content()) > -1 && !this.hasMoveLine) {
-        node.add(leftexpr);
-        while(this.look && ['++', '--'].indexOf(this.look.content()) > -1) {
-          node.add(this.match(undefined, true));
-        }
+        node.add(
+          leftexpr,
+          this.match(undefined, true)
+        );
       }
       else {
         return leftexpr;
