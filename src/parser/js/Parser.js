@@ -948,8 +948,9 @@ var Parser = Class(function(lexer) {
         );
       }
       while(this.look) {
+        var temp;
         if(this.look.content() == '.') {
-          var temp = new Node(Node.MMBEXPR);
+          temp = new Node(Node.MMBEXPR);
           temp.add(
             node,
             this.match(),
@@ -958,7 +959,7 @@ var Parser = Class(function(lexer) {
           node = temp;
         }
         else if(this.look.content() == '[') {
-          var temp = new Node(Node.MMBEXPR);
+          temp = new Node(Node.MMBEXPR);
           temp.add(
             node,
             this.match(),
