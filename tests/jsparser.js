@@ -348,10 +348,27 @@ describe('jsparser', function() {
       var node = parser.parse('!!0');
       expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.EXPRSTMT, [JsNode.UNARYEXPR, ['!', JsNode.UNARYEXPR, ['!', JsNode.PRMREXPR, ['0']]]]]]);
     });
-    it('unaryexpr error', function() {
+    it('unaryexpr error 1', function() {
       var parser = homunculus.getParser('js');
       expect(function() {
         parser.parse('!');
+      }).to.throwError();
+    });
+    it('unaryexpr error 2', function() {
+      var parser = homunculus.getParser('js');
+      expect(function() {
+        parser.parse('++ +a');
+      }).to.throwError();
+    });
+    it('postfixexpr', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('a++');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.EXPRSTMT,[JsNode.POSTFIXEXPR,[JsNode.PRMREXPR,["a"],"++"]]]]);
+    });
+    it('postfixexpr error', function() {
+      var parser = homunculus.getParser('js');
+      expect(function() {
+        parser.parse('a++ ++');
       }).to.throwError();
     });
     it('mtplexpr 1', function() {

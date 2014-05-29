@@ -785,11 +785,16 @@ var Parser = Class(function(lexer) {
       this.error();
     }
     switch(this.look.content()) {
+      case '++':
+      case '--':
+        node.add(
+          this.match(),
+          this.leftexpr()
+        );
+      break;
       case 'delete':
       case 'void':
       case 'typeof':
-      case '++':
-      case '--':
       case '+':
       case '-':
       case '~':
@@ -808,10 +813,10 @@ var Parser = Class(function(lexer) {
     var node = new Node(Node.POSTFIXEXPR);
     var leftexpr = this.leftexpr();
     if(this.look && ['++', '--'].indexOf(this.look.content()) > -1 && !this.hasMoveLine) {
-      node.add(leftexpr);
-      while(this.look && ['++', '--'].indexOf(this.look.content()) > -1) {
-        node.add(this.match(undefined, true));
-      }
+      node.add(
+        leftexpr,
+        this.match(undefined, true)
+      );
     }
     else {
       return leftexpr;

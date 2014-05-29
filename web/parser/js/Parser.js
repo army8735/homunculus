@@ -786,11 +786,16 @@ define(function(require, exports, module) {
         this.error();
       }
       switch(this.look.content()) {
+        case '++':
+        case '--':
+          node.add(
+            this.match(),
+            this.leftexpr()
+          );
+        break;
         case 'delete':
         case 'void':
         case 'typeof':
-        case '++':
-        case '--':
         case '+':
         case '-':
         case '~':
