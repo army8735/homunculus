@@ -747,6 +747,9 @@ var Parser = Class(function(lexer) {
     );
     return node;
   },
+  sfnparams: function() {
+    return this.fmparams();
+  },
   fmparams: function() {
     var node = new Node(Node.FMPARAMS);
     if(!this.look) {
@@ -913,6 +916,31 @@ var Parser = Class(function(lexer) {
       }
     }
     return node;
+  },
+  arrowfn: function() {
+    var node = new Node(Node.ARROWFN);
+    node.add(
+      this.arrowparams(),
+      this.match('=>'),
+      this.cncsbody()
+    )
+    return node;
+  },
+  arrowparams: function() {
+    var node = new Node(Node.ARROWPARAMS);
+    if(this.look.type() == Token.ID) {
+      node.add(this.bindid());
+    }
+    else {
+      node.add(this.cpeapl());
+    }
+    return node;
+  },
+  cpeapl: function() {
+
+  },
+  cncsbody: function() {
+
   },
   cndtexpr: function(noIn) {
     var node = new Node(Node.CNDTEXPR),
@@ -1185,6 +1213,11 @@ var Parser = Class(function(lexer) {
     if(this.look.content() == 'new') {
       node.add(this.newexpr(depth + 1));
     }
+    //new super后不跟任何token
+    else if(this.look.content() == 'super') {
+      node.add(this.match());
+      return node;
+    }
     else {
       node.add(this.mmbexpr());
     }
@@ -1222,33 +1255,57 @@ var Parser = Class(function(lexer) {
   },
   callexpr: function(mmb) {
     var node = new Node(Node.CALLEXPR);
-    mmb = mmb || this.mmbexpr();
+    if(!mmb) {
+      //根据LL2分辨是super()还是mmbexpr
+      if(this.look.content() == 'super') {
+        for(var i = this.index; i < this.length; i++) {
+          var next = this.tokens[i];
+          if(!S[next.tag()]) {
+            if(next.content() == '(') {
+              node.add(
+                this.match(),
+                this.args()
+              );
+              return node;
+            }
+            else {
+              mmb = this.mmbexpr();
+              break;
+            }
+          }
+        }
+      }
+      else {
+        mmb = this.mmbexpr();
+      }
+    }
     if(this.look && this.look.content() == '(') {
       node.add(
         mmb,
         this.args()
       );
-      if(this.look && ['.', '[', '('].indexOf(this.look.content()) > -1) {
-        while(this.look) {
-          if(this.look.content() == '.') {
-            node.add(
-              this.match(),
-              this.match(Token.ID, 'missing name after . operator')
-            );
-          }
-          else if(this.look.content() == '[') {
-            node.add(
-              this.match(),
-              this.expr(),
-              this.match(']')
-            );
-          }
-          else if(this.look.content() == '(') {
-            node.add(this.args());
-          }
-          else {
-            break;
-          }
+      while(this.look) {
+        if(this.look.content() == '.') {
+          node.add(
+            this.match(),
+            this.match(Token.ID, 'missing name after . operator')
+          );
+        }
+        else if(this.look.content() == '[') {
+          node.add(
+            this.match(),
+            this.expr(),
+            this.match(']')
+          );
+        }
+        else if(this.look.content() == '(') {
+          node.add(this.args());
+        }
+        else if(this.look.type() == Token.TEMPLATE) {
+
+        }
+        else {
+          break;
         }
       }
     }

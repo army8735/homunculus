@@ -885,27 +885,25 @@ define(function(require, exports, module) {
           mmb,
           this.args()
         );
-        if(this.look && ['.', '[', '('].indexOf(this.look.content()) > -1) {
-          while(this.look) {
-            if(this.look.content() == '.') {
-              node.add(
-                this.match(),
-                this.match(Token.ID, 'missing name after . operator')
-              );
-            }
-            else if(this.look.content() == '[') {
-              node.add(
-                this.match(),
-                this.expr(),
-                this.match(']')
-              );
-            }
-            else if(this.look.content() == '(') {
-              node.add(this.args());
-            }
-            else {
-              break;
-            }
+        while(this.look) {
+          if(this.look.content() == '.') {
+            node.add(
+              this.match(),
+              this.match(Token.ID, 'missing name after . operator')
+            );
+          }
+          else if(this.look.content() == '[') {
+            node.add(
+              this.match(),
+              this.expr(),
+              this.match(']')
+            );
+          }
+          else if(this.look.content() == '(') {
+            node.add(this.args());
+          }
+          else {
+            break;
           }
         }
       }

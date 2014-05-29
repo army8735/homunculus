@@ -153,6 +153,9 @@ define(function(require, exports, module) {
     FMPARAMS: 'fmparams',
     CMPHIF: 'cmphif',
     YIELDEXPR: 'yieldexpr',
+    ARROWFN: 'arrowfn',
+    ARROWPARAMS: 'arrowparams',
+    CPEAPL: 'cpeapl',
     getKey: function(s) {
       if(!s) {
         throw new Error('empty value');

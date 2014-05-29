@@ -152,6 +152,9 @@ var Node = Class(function(type, children) {
   FMPARAMS: 'fmparams',
   CMPHIF: 'cmphif',
   YIELDEXPR: 'yieldexpr',
+  ARROWFN: 'arrowfn',
+  ARROWPARAMS: 'arrowparams',
+  CPEAPL: 'cpeapl',
   getKey: function(s) {
     if(!s) {
       throw new Error('empty value');
