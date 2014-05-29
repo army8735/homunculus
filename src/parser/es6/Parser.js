@@ -1409,9 +1409,6 @@ var Parser = Class(function(lexer) {
         this.error();
       }
     }
-//    if(this.look.content() == 'function') {
-//      mmb = this.fnexpr();
-//    }
     else {
       mmb = this.prmrexpr();
     }
