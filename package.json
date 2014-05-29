@@ -38,6 +38,9 @@
   "license": "MIT",
   "dependencies": {},
   "main": "./index",
+  "spm": {
+    "main": "./index"
+  },
   "engines": {
     "node": ">= 0.10.0"
   },
