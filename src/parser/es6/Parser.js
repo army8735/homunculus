@@ -805,7 +805,10 @@ var Parser = Class(function(lexer) {
   },
   classdecl: function() {
     var node = new Node(Node.CLASSDECL);
-    node.add(this.match('class'), this.match(Token.ID));
+    node.add(
+      this.match('class'),
+      this.bindid()
+    );
     if(!this.look) {
       this.error();
     }
@@ -821,6 +824,24 @@ var Parser = Class(function(lexer) {
   },
   classexpr: function() {
     var node = new Node(Node.CLASSEXPR);
+    node.add(this.match('class'));
+    if(!this.look) {
+      this.error();
+    }
+    if(this.look.type() == Token.ID) {
+      node.add(this.bindid());
+    }
+    if(!this.look) {
+      this.error();
+    }
+    if(this.look.content() == 'extends') {
+      node.add(this.heratige());
+    }
+    node.add(
+      this.match('{'),
+      this.classbody(),
+      this.match('}')
+    );
     return node;
   },
   heratige: function() {
@@ -1793,15 +1814,27 @@ var Parser = Class(function(lexer) {
   },
   arglist: function() {
     var node = new Node(Node.ARGLIST);
-    while(this.look && this.look.content() != ')' && this.look.content() != '...') {
-      node.add(this.assignexpr());
-      if(this.look && this.look.content() == ',') {
-        node.add(this.match());
+    if(this.look && this.look.content() == '...') {
+      node.add(
+        this.match(),
+        this.assignexpr()
+      );
+    }
+    else {
+      while(this.look && this.look.content() != ')') {
+        node.add(this.assignexpr());
+        if(this.look && this.look.content() == ',') {
+          node.add(this.match());
+          if(this.look && this.look.content() == '...') {
+            node.add(
+              this.match(),
+              this.assignexpr()
+            );
+            break;
+          }
+        }
       }
     }
-//    if(this.look && this.look.content() == '...') {
-//      node.add(this.bindid());
-//    }
     return node;
   },
   virtual: function(s) {
