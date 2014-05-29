@@ -886,21 +886,33 @@ define(function(require, exports, module) {
           this.args()
         );
         while(this.look) {
+          var temp;
           if(this.look.content() == '.') {
-            node.add(
+            temp = new Node(Node.CALLEXPR);
+            temp.add(
+              node,
               this.match(),
               this.match(Token.ID, 'missing name after . operator')
             );
+            node = temp;
           }
           else if(this.look.content() == '[') {
-            node.add(
+            temp = new Node(Node.CALLEXPR);
+            temp.add(
+              node,
               this.match(),
               this.expr(),
               this.match(']')
             );
+            node = temp;
           }
           else if(this.look.content() == '(') {
-            node.add(this.args());
+            temp = new Node(Node.CALLEXPR);
+            temp.add(
+              node,
+              this.args()
+            );
+            node = temp;
           }
           else {
             break;

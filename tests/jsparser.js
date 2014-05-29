@@ -337,6 +337,16 @@ describe('jsparser', function() {
       var node = parser.parse('new A().f()');
       expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.EXPRSTMT, [JsNode.CALLEXPR, [JsNode.MMBEXPR, [JsNode.NEWEXPR, ['new', JsNode.PRMREXPR, ['A'], JsNode.ARGS, ['(', ')']], '.', 'f'], JsNode.ARGS, ['(', ')']]]]])
     });
+    it('callexpr 4', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('f()()');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.EXPRSTMT,[JsNode.CALLEXPR,[JsNode.CALLEXPR,[JsNode.PRMREXPR,["f"],JsNode.ARGS,["(",")"]],JsNode.ARGS,["(",")"]]]]]);
+    });
+    it('callexpr 5', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('f().b[1]');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.EXPRSTMT,[JsNode.CALLEXPR,[JsNode.CALLEXPR,[JsNode.CALLEXPR,[JsNode.PRMREXPR,["f"],JsNode.ARGS,["(",")"]],".","b"],"[",JsNode.PRMREXPR,["1"],"]"]]]]);
+    });
     it('callexpr error', function() {
       var parser = homunculus.getParser('js');
       expect(function() {
