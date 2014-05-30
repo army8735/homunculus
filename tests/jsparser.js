@@ -978,12 +978,12 @@ describe('jsparser', function() {
       expect(a.next()).to.be(b);
       expect(b.prev()).to.be(a);
     });
-    it('node #leaf,#number,#leaves', function() {
+    it('node #leaf,#size,#leaves', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('var a');
       var varstmt = node.leaf(0);
       expect(varstmt.name()).to.be(JsNode.VARSTMT);
-      expect(varstmt.number()).to.be(3);
+      expect(varstmt.size()).to.be(3);
     });
     it('#ast should return as parse return', function() {
       var parser = homunculus.getParser('js');
