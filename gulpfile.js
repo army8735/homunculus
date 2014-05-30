@@ -1,7 +1,7 @@
 var gulp = require('gulp');
 var clean = require('gulp-clean');
 var util = require('gulp-util');
-var es = require('event-stream');
+var through2 = require('through2');
 
 var fs = require('fs');
 var path = require('path');
@@ -19,7 +19,7 @@ gulp.task('clean-dist', function() {
     .pipe(clean());
 });
 
-function cb(file, cb) {
+function cb(file, enc, cb) {
   var target = file.path.replace(path.sep + 'src' + path.sep,  path.sep + 'dist' + path.sep);
   mkdir(path.dirname(target));
   util.log(path.relative(file.cwd, file.path), '->', path.relative(file.cwd, target));
@@ -33,7 +33,7 @@ function cb(file, cb) {
 gulp.task('default', ['clean-dist'], function() {
   gulp.src('./src/**/*.js')
     .pipe(function() {
-      return es.map(cb);
+      return through2.obj(cb);
     }());
 });
 
@@ -43,7 +43,7 @@ gulp.task('watch', function() {
     args.forEach(function(arg) {
       gulp.src(arg.path)
         .pipe(function() {
-          return es.map(cb);
+          return through2.obj(cb);
         }());
     });
   });
