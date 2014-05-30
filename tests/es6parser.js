@@ -215,12 +215,12 @@ describe('es6parser', function() {
     it('fnexpr 1', function() {
       var parser = homunculus.getParser('es6');
       var node = parser.parse('~function() {}()');
-      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.UNARYEXPR,["~",JsNode.CALLEXPR,[JsNode.FNEXPR,["function","(",JsNode.FMPARAMS,[],")","{",JsNode.FNBODY,[],"}"],JsNode.ARGS,["(",")"]]]]]]]);
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.UNARYEXPR,["~",JsNode.CALLEXPR,[JsNode.PRMREXPR,[JsNode.FNEXPR,["function","(",JsNode.FMPARAMS,[],")","{",JsNode.FNBODY,[],"}"]],JsNode.ARGS,["(",")"]]]]]]]);
     });
     it('fnexpr 2', function() {
       var parser = homunculus.getParser('es6');
       var node = parser.parse('(function a() {})()');
-      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.CALLEXPR,[JsNode.PRMREXPR,["(",JsNode.FNEXPR,["function",JsNode.BINDID,["a"],"(",JsNode.FMPARAMS,[],")","{",JsNode.FNBODY,[],"}"],")"],JsNode.ARGS,["(",")"]]]]]]);
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.CALLEXPR,[JsNode.PRMREXPR,[JsNode.CPEAPL,["(",JsNode.PRMREXPR,[JsNode.FNEXPR,["function",JsNode.BINDID,["a"],"(",JsNode.FMPARAMS,[],")","{",JsNode.FNBODY,[],"}"]],")"]],JsNode.ARGS,["(",")"]]]]]]);
     });
     it('fnexpr error 1', function() {
       var parser = homunculus.getParser('es6');
@@ -271,22 +271,22 @@ describe('es6parser', function() {
     it('arrcmph no if', function() {
       var parser = homunculus.getParser('es6');
       var node = parser.parse('[for(a of b)a]');
-      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.PRMREXPR,[JsNode.ARRCMPH,["[",JsNode.CMPHFOR,["for","(",JsNode.BINDID,["a"],"of",JsNode.PRMREXPR,["b"],")"],JsNode.PRMREXPR,["a"],"]"]]]]]]);
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.PRMREXPR,[JsNode.ARRCMPH,["[",JsNode.CMPH,[JsNode.CMPHFOR,["for","(",JsNode.BINDID,["a"],"of",JsNode.PRMREXPR,["b"],")"],JsNode.PRMREXPR,["a"]],"]"]]]]]]);
     });
     it('arrcmph with if', function() {
       var parser = homunculus.getParser('es6');
       var node = parser.parse('[for(a of b)if(a>1)a]');
-      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.PRMREXPR,[JsNode.ARRCMPH,["[",JsNode.CMPHFOR,["for","(",JsNode.BINDID,["a"],"of",JsNode.PRMREXPR,["b"],")"],JsNode.CMPHIF,["if","(",JsNode.RELTEXPR,[JsNode.PRMREXPR,["a"],">",JsNode.PRMREXPR,["1"]],")"],JsNode.PRMREXPR,["a"],"]"]]]]]]);
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.PRMREXPR,[JsNode.ARRCMPH,["[",JsNode.CMPH,[JsNode.CMPHFOR,["for","(",JsNode.BINDID,["a"],"of",JsNode.PRMREXPR,["b"],")"],JsNode.CMPHIF,["if","(",JsNode.RELTEXPR,[JsNode.PRMREXPR,["a"],">",JsNode.PRMREXPR,["1"]],")"],JsNode.PRMREXPR,["a"]],"]"]]]]]]);
     });
     it('arrcmph recursion', function() {
       var parser = homunculus.getParser('es6');
       var node = parser.parse('[for(a of b)if(true)for(c of a)if(false)c]');
-      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.PRMREXPR,[JsNode.ARRCMPH,["[",JsNode.CMPHFOR,["for","(",JsNode.BINDID,["a"],"of",JsNode.PRMREXPR,["b"],")"],JsNode.CMPHIF,["if","(",JsNode.PRMREXPR,["true"],")"],JsNode.CMPHFOR,["for","(",JsNode.BINDID,["c"],"of",JsNode.PRMREXPR,["a"],")"],JsNode.CMPHIF,["if","(",JsNode.PRMREXPR,["false"],")"],JsNode.PRMREXPR,["c"],"]"]]]]]]);
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.PRMREXPR,[JsNode.ARRCMPH,["[",JsNode.CMPH,[JsNode.CMPHFOR,["for","(",JsNode.BINDID,["a"],"of",JsNode.PRMREXPR,["b"],")"],JsNode.CMPHIF,["if","(",JsNode.PRMREXPR,["true"],")"],JsNode.CMPHFOR,["for","(",JsNode.BINDID,["c"],"of",JsNode.PRMREXPR,["a"],")"],JsNode.CMPHIF,["if","(",JsNode.PRMREXPR,["false"],")"],JsNode.PRMREXPR,["c"]],"]"]]]]]]);
     });
     it('arrcmph forbindpat', function() {
       var parser = homunculus.getParser('es6');
       var node = parser.parse('[for([a,b] of c)a+b]');
-      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.PRMREXPR,[JsNode.ARRCMPH,["[",JsNode.CMPHFOR,["for","(",JsNode.ARRBINDPAT,["[",JsNode.SINGLENAME,[JsNode.BINDID,["a"]],",",JsNode.SINGLENAME,[JsNode.BINDID,["b"]],"]"],"of",JsNode.PRMREXPR,["c"],")"],JsNode.ADDEXPR,[JsNode.PRMREXPR,["a"],"+",JsNode.PRMREXPR,["b"]],"]"]]]]]]);
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.PRMREXPR,[JsNode.ARRCMPH,["[",JsNode.CMPH,[JsNode.CMPHFOR,["for","(",JsNode.ARRBINDPAT,["[",JsNode.SINGLENAME,[JsNode.BINDID,["a"]],",",JsNode.SINGLENAME,[JsNode.BINDID,["b"]],"]"],"of",JsNode.PRMREXPR,["c"],")"],JsNode.ADDEXPR,[JsNode.PRMREXPR,["a"],"+",JsNode.PRMREXPR,["b"]]],"]"]]]]]]);
     });
     it('arrcmph error 1', function() {
       var parser = homunculus.getParser('es6');

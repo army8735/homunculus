@@ -1566,8 +1566,10 @@ var Parser = Class(function(lexer) {
                 break;
               }
             }
+          break;
           case 'class':
             node.add(this.classexpr());
+          break;
           case 'this':
           case 'null':
           case 'true':
