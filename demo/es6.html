@@ -84,11 +84,11 @@
     }
     w = Math.max(w, x2);
   }
-  require(['../web/parser/es6/Parser',
-      '../web/lexer/Lexer',
-      '../web/lexer/rule/EcmascriptRule',
-      '../web/parser/es6/Node',
-      '../web/lexer/Token'],
+  require(['../dist/parser/es6/Parser',
+      '../dist/lexer/Lexer',
+      '../dist/lexer/rule/EcmascriptRule',
+      '../dist/parser/es6/Node',
+      '../dist/lexer/Token'],
     function(Parser, Lexer, EcmascriptRule, JsNode, Token) {
       var ta = document.getElementById('ta');
       var input = document.getElementById('btn');

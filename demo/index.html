@@ -84,11 +84,11 @@ function drawNode(layer, node, x, index, parent, sibling) {
 	}
 	w = Math.max(w, x2);
 }
-require(['../web/parser/js/Parser',
-  '../web/lexer/Lexer',
-  '../web/lexer/rule/EcmascriptRule',
-  '../web/parser/js/Node',
-  '../web/lexer/Token'],
+require(['../dist/parser/js/Parser',
+  '../dist/lexer/Lexer',
+  '../dist/lexer/rule/EcmascriptRule',
+  '../dist/parser/js/Node',
+  '../dist/lexer/Token'],
 function(Parser, Lexer, EcmascriptRule, JsNode, Token) {
 	var ta = document.getElementById('ta');
 	var input = document.getElementById('btn');

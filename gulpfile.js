@@ -14,27 +14,37 @@ function mkdir(dir) {
   }
 }
 
-gulp.task('clean-web', function() {
-  return gulp.src('./web/*')
-    .pipe(clean());
-});
-gulp.task('clean-src', function() {
-  return gulp.src('./src/*')
+gulp.task('clean-dist', function() {
+  return gulp.src('./dist/*')
     .pipe(clean());
 });
 
-gulp.task('default', ['clean-web'], function() {
+function cb(file, cb) {
+  var target = file.path.replace(path.sep + 'src' + path.sep,  path.sep + 'dist' + path.sep);
+  mkdir(path.dirname(target));
+  util.log(path.relative(file.cwd, file.path), '->', path.relative(file.cwd, target));
+  var content = file._contents;
+  content = content.toString('utf-8');
+  content = "(function(factory) {\n  if(typeof define === 'function' && (define.amd || define.cmd)) {\n    define(factory);\n  }\n  else {\n    factory(require, exports, module);\n  }\n})(function(require, exports, module) {\n" + content.replace(/\n/g, '\n  ') + '\n});';
+  fs.writeFileSync(target, content, { encoding: 'utf-8' });
+  cb(null, file);
+}
+
+gulp.task('default', ['clean-dist'], function() {
   gulp.src('./src/**/*.js')
     .pipe(function() {
-      return es.map(function (file, cb) {
-        var target = file.path.replace(path.sep + 'src' + path.sep,  path.sep + 'web' + path.sep);
-        mkdir(path.dirname(target));
-        util.log(path.relative(file.cwd, file.path), '->', path.relative(file.cwd, target));
-        var content = file._contents;
-        content = content.toString('utf-8');
-        content = 'define(function(require, exports, module) {\n  ' + content.replace(/\n/g, '\n  ') + '\n});';
-        fs.writeFileSync(target, content, { encoding: 'utf-8' });
-        cb(null, file);
-      });
+      return es.map(cb);
     }());
+});
+
+gulp.task('watch', function() {
+  gulp.watch('./src/**/*.js', function() {
+    var args = Array.prototype.slice.call(arguments);
+    args.forEach(function(arg) {
+      gulp.src(arg.path)
+        .pipe(function() {
+          return es.map(cb);
+        }());
+    });
+  });
 });
