@@ -706,4 +706,47 @@ describe('es6parser', function() {
       }).to.throwError();
     });
   });
+  describe('other test', function() {
+    it('node #parent,#prev,#next', function () {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('var a, b;');
+      var varstmt = node.leaf(0).leaf(0);
+      var children = varstmt.leaves();
+      var a = children[0];
+      var b = children[1];
+      expect(node.parent()).to.be(null);
+      expect(a.parent()).to.be(varstmt);
+      expect(b.parent()).to.be(varstmt);
+      expect(a.prev()).to.be(null);
+      expect(a.next()).to.be(b);
+      expect(b.prev()).to.be(a);
+    });
+    it('node #leaf,#size,#leaves', function () {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('var a');
+      var varstmt = node.leaf(0).leaf(0);
+      expect(varstmt.name()).to.be(JsNode.VARSTMT);
+      expect(varstmt.size()).to.be(3);
+    });
+    it('#ast should return as parse return', function () {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('var a, b;');
+      expect(node).to.equal(parser.ast());
+    });
+    it('init class Parser(lexer) with a lexer', function () {
+      var lexer = homunculus.getLexer('es6');
+      var parser = new Parser(lexer);
+      var node = parser.parse('var a, b;');
+      expect(node).to.equal(parser.ast());
+      expect(function () {
+        parser.init();
+      }).to.not.throwError();
+    });
+    it('JsNode#getKey', function () {
+      expect(JsNode.getKey('script')).to.eql('SCRIPT');
+      expect(function () {
+        JsNode.getKey('');
+      }).to.throwError();
+    });
+  });
 });
