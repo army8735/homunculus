@@ -411,5 +411,26 @@ describe('es6parser', function() {
         parser.parse('a.');
       }).to.throwError();
     });
+    it('postfixexpr 1', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('a++ + b');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.ADDEXPR,[JsNode.POSTFIXEXPR,[JsNode.PRMREXPR,["a"],"++"],"+",JsNode.PRMREXPR,["b"]]]]]]);
+    });
+    it('postfixexpr 2', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('a\nb++');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.PRMREXPR,["a"]],JsNode.EXPRSTMT,[JsNode.POSTFIXEXPR,[JsNode.PRMREXPR,["b"],"++"]]]]]);
+    });
+    it('postfixexpr 3', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('a/*\n*/b++');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.PRMREXPR,["a"]],JsNode.EXPRSTMT,[JsNode.POSTFIXEXPR,[JsNode.PRMREXPR,["b"],"++"]]]]]);
+    });
+    it('postfixexpr error', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('++');
+      }).to.throwError();
+    });
   });
 });
