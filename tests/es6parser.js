@@ -620,5 +620,30 @@ describe('es6parser', function() {
         parser.parse('a ==');
       }).to.throwError();
     });
+    it('bitandexpr', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('void a & --b');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.BITANDEXPR,[JsNode.UNARYEXPR,["void",JsNode.PRMREXPR,["a"]],"&",JsNode.UNARYEXPR,["--",JsNode.PRMREXPR,["b"]]]]]]]);
+    });
+    it('bitxorexpr', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('a>1 & b--');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.BITANDEXPR,[JsNode.RELTEXPR,[JsNode.PRMREXPR,["a"],">",JsNode.PRMREXPR,["1"]],"&",JsNode.POSTFIXEXPR,[JsNode.PRMREXPR,["b"],"--"]]]]]]);
+    });
+    it('bitorexpr', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('++b | -a');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.BITOREXPR,[JsNode.UNARYEXPR,["++",JsNode.PRMREXPR,["b"]],"|",JsNode.UNARYEXPR,["-",JsNode.PRMREXPR,["a"]]]]]]]);
+    });
+    it('logandexpr', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('a.b && c >> 1');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.LOGANDEXPR,[JsNode.MMBEXPR,[JsNode.PRMREXPR,["a"],".","b"],"&&",JsNode.SHIFTEXPR,[JsNode.PRMREXPR,["c"],">>",JsNode.PRMREXPR,["1"]]]]]]]);
+    });
+    it('logorexpr', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('a || b && c || d && f');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.LOGOREXPR,[JsNode.PRMREXPR,["a"],"||",JsNode.LOGANDEXPR,[JsNode.PRMREXPR,["b"],"&&",JsNode.PRMREXPR,["c"]],"||",JsNode.LOGANDEXPR,[JsNode.PRMREXPR,["d"],"&&",JsNode.PRMREXPR,["f"]]]]]]]);
+    });
   });
 });
