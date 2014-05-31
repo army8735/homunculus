@@ -128,6 +128,12 @@ describe('jsparser', function() {
       var node = parser.parse('a.b');
       expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.EXPRSTMT,[JsNode.MMBEXPR,[JsNode.PRMREXPR,["a"],".","b"]]]]);
     });
+    it('mmbexpr error', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('a.');
+      }).to.throwError();
+    });
     it('returnstmt 1', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('return a');

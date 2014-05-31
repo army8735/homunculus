@@ -390,5 +390,26 @@ describe('es6parser', function() {
         parser.parse('new');
       }).to.throwError();
     });
+    it('mmbexpr 1', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('a.b.c');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.MMBEXPR,[JsNode.MMBEXPR,[JsNode.PRMREXPR,["a"],".","b"],".","c"]]]]]);
+    });
+    it('mmbexpr 2', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('a.b[c]');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.MMBEXPR,[JsNode.MMBEXPR,[JsNode.PRMREXPR,["a"],".","b"],"[",JsNode.PRMREXPR,["c"],"]"]]]]]);
+    });
+    it('mmbexpr 3', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('a.b');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.MMBEXPR,[JsNode.PRMREXPR,["a"],".","b"]]]]]);
+    });
+    it('mmbexpr error', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('a.');
+      }).to.throwError();
+    });
   });
 });
