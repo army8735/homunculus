@@ -432,5 +432,46 @@ describe('es6parser', function() {
         parser.parse('++');
       }).to.throwError();
     });
+    it('prmrexpr 1', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('a');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.PRMREXPR,["a"]]]]]);
+    });
+    it('prmrexpr 2', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('true');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.PRMREXPR,["true"]]]]]);
+    });
+    it('prmrexpr 3', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('null');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.PRMREXPR,["null"]]]]]);
+    });
+    it('prmrexpr 4', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('this');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.PRMREXPR,["this"]]]]]);
+    });
+    it('prmrexpr 5', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('false');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.PRMREXPR,["false"]]]]]);
+    });
+    it('prmrexpr 6', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('[]');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.PRMREXPR,[JsNode.ARRLTR,["[","]"]]]]]]);
+    });
+    it('prmrexpr 7', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('!{}');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.UNARYEXPR,["!",JsNode.PRMREXPR,[JsNode.OBJLTR,["{","}"]]]]]]]);
+    });
+    it('prmrexpr error', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('.');
+      }).to.throwError();
+    });
   });
 });
