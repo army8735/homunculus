@@ -354,5 +354,41 @@ describe('es6parser', function() {
         parser.parse('[for(a of b)if(true)a');
       }).to.throwError();
     });
+    it('newexpr 1', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('new A');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.NEWEXPR,["new",JsNode.PRMREXPR,["A"]]]]]]);
+    });
+    it('newexpr 2', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('new A()');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.NEWEXPR,["new",JsNode.PRMREXPR,["A"],JsNode.ARGS,["(",")"]]]]]]);
+    });
+    it('newexpr 3', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('new A().f');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.MMBEXPR,[JsNode.NEWEXPR,["new",JsNode.PRMREXPR,["A"],JsNode.ARGS,["(",")"]],".","f"]]]]]);
+    });
+    it('newexpr 4', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('new A().f()');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.CALLEXPR,[JsNode.MMBEXPR,[JsNode.NEWEXPR,["new",JsNode.PRMREXPR,["A"],JsNode.ARGS,["(",")"]],".","f"],JsNode.ARGS,["(",")"]]]]]]);
+    });
+    it('newexpr 5', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('new new A().f()');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.NEWEXPR,["new",JsNode.MMBEXPR,[JsNode.NEWEXPR,["new",JsNode.PRMREXPR,["A"],JsNode.ARGS,["(",")"]],".","f"],JsNode.ARGS,["(",")"]]]]]]);
+    });
+    it('newexpr 6', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('new A()[1]');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.MMBEXPR,[JsNode.NEWEXPR,["new",JsNode.PRMREXPR,["A"],JsNode.ARGS,["(",")"]],"[",JsNode.PRMREXPR,["1"],"]"]]]]]);
+    });
+    it('newexpr error', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('new');
+      }).to.throwError();
+    });
   });
 });
