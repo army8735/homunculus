@@ -179,7 +179,18 @@ describe('jsparser', function() {
       var node = parser.parse('a/*\n*/b++');
       expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.EXPRSTMT, [JsNode.PRMREXPR, ['a']], JsNode.EXPRSTMT, [JsNode.POSTFIXEXPR, [JsNode.PRMREXPR, ['b'], '++']]]]);
     });
-    it('postfixexpr error', function() {
+    it('postfixexpr 4', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('a++');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.EXPRSTMT,[JsNode.POSTFIXEXPR,[JsNode.PRMREXPR,["a"],"++"]]]]);
+    });
+    it('postfixexpr error 1', function() {
+      var parser = homunculus.getParser('js');
+      expect(function() {
+        parser.parse('a++ ++');
+      }).to.throwError();
+    });
+    it('postfixexpr error 2', function() {
       var parser = homunculus.getParser('js');
       expect(function() {
         parser.parse('++');
@@ -354,17 +365,6 @@ describe('jsparser', function() {
       var parser = homunculus.getParser('js');
       expect(function() {
         parser.parse('++ +a');
-      }).to.throwError();
-    });
-    it('postfixexpr', function() {
-      var parser = homunculus.getParser('js');
-      var node = parser.parse('a++');
-      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.EXPRSTMT,[JsNode.POSTFIXEXPR,[JsNode.PRMREXPR,["a"],"++"]]]]);
-    });
-    it('postfixexpr error', function() {
-      var parser = homunculus.getParser('js');
-      expect(function() {
-        parser.parse('a++ ++');
       }).to.throwError();
     });
     it('mtplexpr 1', function() {
