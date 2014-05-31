@@ -1048,19 +1048,21 @@ var Class = require('../../util/Class');
       if(!this.look) {
         this.error();
       }
-      if(['...', ')'].indexOf(this.look.content()) == -1) {
+      if(this.look.content() == '...') {
+        node.add(
+          this.match(),
+          this.bindid(),
+          this.match(')')
+        );
+        return node;
+      }
+      if(this.look.content() != ')') {
         node.add(this.expr());
       }
       if(this.look.content() == ',') {
         node.add(
           this.match(),
           this.match('...'),
-          this.bindid()
-        );
-      }
-      else if(this.look.content() == '...') {
-        node.add(
-          this.match(),
           this.bindid()
         );
       }

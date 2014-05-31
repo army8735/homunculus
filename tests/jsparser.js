@@ -500,6 +500,18 @@ describe('jsparser', function() {
       var node = parser.parse('(a, !b, c+d)');
       expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.EXPRSTMT,[JsNode.PRMREXPR,["(",JsNode.EXPR,[JsNode.PRMREXPR,["a"],",",JsNode.UNARYEXPR,["!",JsNode.PRMREXPR,["b"]],",",JsNode.ADDEXPR,[JsNode.PRMREXPR,["c"],"+",JsNode.PRMREXPR,["d"]]],")"]]]]);
     });
+    it('expr error 1', function() {
+      var parser = homunculus.getParser('js');
+      expect(function() {
+        parser.parse('(a,');
+      }).to.throwError();
+    });
+    it('expr error 2', function() {
+      var parser = homunculus.getParser('js');
+      expect(function() {
+        parser.parse('(a, b');
+      }).to.throwError();
+    });
     it('block', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('{}{}');
