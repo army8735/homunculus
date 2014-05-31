@@ -417,6 +417,12 @@ describe('jsparser', function() {
       var node = parser.parse('a instanceof new A()');
       expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.EXPRSTMT, [JsNode.RELTEXPR, [JsNode.PRMREXPR, ["a"], "instanceof", JsNode.NEWEXPR, ["new", JsNode.PRMREXPR, ["A"], JsNode.ARGS, ["(", ")"]]]]]]);
     });
+    it('reltexpr error', function() {
+      var parser = homunculus.getParser('js');
+      expect(function() {
+        parser.parse('a <');
+      }).to.throwError();
+    });
     it('eqexpr 1', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('a == 3');
