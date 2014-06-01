@@ -130,13 +130,6 @@ var Parser = Class(function(lexer) {
         return this.debstmt();
       case 'yield':
         return this.labstmt();
-//      case 'super':
-//        if(!allowSuper) {
-//          this.error('super must in a class');
-//        }
-//        return this.superstmt();
-//      case 'import':
-//        return this.imptstmt();
       default:
         if(this.look.type() == Token.ID) {
           for(var i = this.index; i < this.length; i++) {

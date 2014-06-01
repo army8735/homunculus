@@ -730,10 +730,15 @@ describe('es6parser', function() {
       var node = parser.parse('{return}');
       expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.BLOCKSTMT,[JsNode.BLOCK,["{",JsNode.RETSTMT,["return"],"}"]]]]]);
     });
-    it('labelstmt', function() {
+    it('labelstmt 1', function() {
       var parser = homunculus.getParser('es6');
       var node = parser.parse('label:;');
       expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.LABSTMT,["label",":",JsNode.EMPTSTMT,[";"]]]]]);
+    });
+    it('labelstmt 2', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('yield:;');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.LABSTMT,["yield",":",JsNode.EMPTSTMT,[";"]]]]]);
     });
     it('block', function() {
       var parser = homunculus.getParser('es6');
@@ -1024,6 +1029,71 @@ describe('es6parser', function() {
       var parser = homunculus.getParser('es6');
       var node = parser.parse();
       expect(tree(node)).to.eql([JsNode.SCRIPT,[]]);
+    });
+    it('class 1', function() {
+      var parser= homunculus.getParser('es6');
+      var node = parser.parse('class A{}');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.CLASSDECL,["class",JsNode.BINDID,["A"],"{",JsNode.CLASSBODY,[],"}"]]]]);
+    });
+    it('class 2', function() {
+      var parser= homunculus.getParser('es6');
+      var node = parser.parse('class A{;;}');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.CLASSDECL,["class",JsNode.BINDID,["A"],"{",JsNode.CLASSBODY,[JsNode.CLASSELEM,[";"],JsNode.CLASSELEM,[";"]],"}"]]]]);
+    });
+    it('class with extends', function() {
+      var parser= homunculus.getParser('es6');
+      var node = parser.parse('class A extends B{}');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.CLASSDECL,["class",JsNode.BINDID,["A"],JsNode.HERITAGE,["extends",JsNode.PRMREXPR,["B"]],"{",JsNode.CLASSBODY,[],"}"]]]]);
+    });
+    it('class method', function() {
+      var parser= homunculus.getParser('es6');
+      var node = parser.parse('class A{method(b){}}');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.CLASSDECL,["class",JsNode.BINDID,["A"],"{",JsNode.CLASSBODY,[JsNode.CLASSELEM,[JsNode.METHOD,[JsNode.PROPTNAME,[JsNode.LTRPROPT,["method"]],"(",JsNode.FMPARAMS,[JsNode.SINGLENAME,[JsNode.BINDID,["b"]]],")","{",JsNode.FNBODY,[],"}"]]],"}"]]]]);
+    });
+    it('class static', function() {
+      var parser= homunculus.getParser('es6');
+      var node = parser.parse('class A{static method(){}}');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.CLASSDECL,["class",JsNode.BINDID,["A"],"{",JsNode.CLASSBODY,[JsNode.CLASSELEM,["static",JsNode.METHOD,[JsNode.PROPTNAME,[JsNode.LTRPROPT,["method"]],"(",JsNode.FMPARAMS,[],")","{",JsNode.FNBODY,[],"}"]]],"}"]]]]);
+    });
+    it('class get', function() {
+      var parser= homunculus.getParser('es6');
+      var node = parser.parse('class A{get a(){return}}');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.CLASSDECL,["class",JsNode.BINDID,["A"],"{",JsNode.CLASSBODY,[JsNode.CLASSELEM,[JsNode.METHOD,["get",JsNode.PROPTNAME,[JsNode.LTRPROPT,["a"]],"(",")","{",JsNode.FNBODY,[JsNode.RETSTMT,["return"]],"}"]]],"}"]]]]);
+    });
+    it('class set', function() {
+      var parser= homunculus.getParser('es6');
+      var node = parser.parse('class A{set a(b){}}');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.CLASSDECL,["class",JsNode.BINDID,["A"],"{",JsNode.CLASSBODY,[JsNode.CLASSELEM,[JsNode.METHOD,["set",JsNode.PROPTNAME,[JsNode.LTRPROPT,["a"]],"(",JsNode.FMPARAMS,[JsNode.SINGLENAME,[JsNode.BINDID,["b"]]],")","{",JsNode.FNBODY,[],"}"]]],"}"]]]]);
+    });
+    it('class error 1', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('class');
+      }).to.throwError();
+    });
+    it('class error 2', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('class A');
+      }).to.throwError();
+    });
+    it('class error 3', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('class A extends');
+      }).to.throwError();
+    });
+    it('class error 4', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('class A {');
+      }).to.throwError();
+    });
+    it('class error 4', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('class A {get method{');
+      }).to.throwError();
     });
   });
   describe('other test', function() {
