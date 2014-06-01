@@ -730,6 +730,53 @@ describe('es6parser', function() {
       var node = parser.parse('{return}');
       expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.BLOCKSTMT,[JsNode.BLOCK,["{",JsNode.RETSTMT,["return"],"}"]]]]]);
     });
+    it('labelstmt', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('label:;');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.LABSTMT,["label",":",JsNode.EMPTSTMT,[";"]]]]]);
+    });
+    it('block', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('{}{}');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.BLOCKSTMT,[JsNode.BLOCK,["{","}"]],JsNode.BLOCKSTMT,[JsNode.BLOCK,["{","}"]]]]]);
+    });
+    it('varstmt 1', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('var a, b;');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.VARSTMT,["var",JsNode.VARDECL,[JsNode.BINDID,["a"]],",",JsNode.VARDECL,[JsNode.BINDID,["b"]],";"]]]]);
+    });
+    it('varstmt 2', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('var a = 1');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.VARSTMT,["var",JsNode.VARDECL,[JsNode.BINDID,["a"],JsNode.INITLZ,["=",JsNode.PRMREXPR,["1"]]]]]]]);
+    });
+    it('varstmt 3', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('var a = b = 1');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.VARSTMT,["var",JsNode.VARDECL,[JsNode.BINDID,["a"],JsNode.INITLZ,["=",JsNode.ASSIGNEXPR,[JsNode.PRMREXPR,["b"],"=",JsNode.PRMREXPR,["1"]]]]]]]]);
+    });
+    it('varstmt 4', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('var a = [{}]');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.VARSTMT,["var",JsNode.VARDECL,[JsNode.BINDID,["a"],JsNode.INITLZ,["=",JsNode.PRMREXPR,[JsNode.ARRLTR,["[",JsNode.PRMREXPR,[JsNode.OBJLTR,["{","}"]],"]"]]]]]]]]);
+    });
+    it('varstmt error 1', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('var')
+      }).to.throwError();
+    });
+    it('varstmt error 2', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('var a=');
+      }).to.throwError();
+    });
+    it('emptstmt', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse(';{;}');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EMPTSTMT,[";"],JsNode.BLOCKSTMT,[JsNode.BLOCK,["{",JsNode.EMPTSTMT,[";"],"}"]]]]]);
+    });
   });
   describe('other test', function() {
     it('node #parent,#prev,#next', function () {
