@@ -705,6 +705,31 @@ describe('es6parser', function() {
         parser.parse('(...a, b)');
       }).to.throwError();
     });
+    it('returnstmt 1', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('return a');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.RETSTMT,["return",JsNode.PRMREXPR,["a"]]]]]);
+    });
+    it('returnstmt 2', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('return\na');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.RETSTMT,["return"],JsNode.EXPRSTMT,[JsNode.PRMREXPR,["a"]]]]]);
+    });
+    it('returnstmt 3', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('return/*\n*/a');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.RETSTMT,["return"],JsNode.EXPRSTMT,[JsNode.PRMREXPR,["a"]]]]]);
+    });
+    it('returnstmt 4', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('return a\nreturn');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.RETSTMT,["return",JsNode.PRMREXPR,["a"]],JsNode.RETSTMT,["return"]]]]);
+    });
+    it('returnstmt 5', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('{return}');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.BLOCKSTMT,[JsNode.BLOCK,["{",JsNode.RETSTMT,["return"],"}"]]]]]);
+    });
   });
   describe('other test', function() {
     it('node #parent,#prev,#next', function () {
