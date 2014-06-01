@@ -336,15 +336,6 @@ var Parser = Class(function(lexer) {
     }
     this.error('missing : after property id');
   },
-  assign: function() {
-    var node = new Node(Node.ASSIGN);
-    node.add(this.match('='));
-    if(!this.look) {
-      this.error();
-    }
-    node.add(this.assignexpr());
-    return node;
-  },
   blockstmt: function() {
     var node = new Node(Node.BLOCKSTMT);
     node.add(this.block());

@@ -934,6 +934,17 @@ describe('es6parser', function() {
       var node = parser.parse('switch(a){case 1:case 2:;break;default:;}');
       expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.SWCHSTMT,["switch","(",JsNode.PRMREXPR,["a"],")",JsNode.CASEBLOCK,["{",JsNode.CASECLAUSE,["case",JsNode.PRMREXPR,["1"],":"],JsNode.CASECLAUSE,["case",JsNode.PRMREXPR,["2"],":",JsNode.EMPTSTMT,[";"],JsNode.BRKSTMT,["break",";"]],JsNode.DFTCLAUSE,["default",":",JsNode.EMPTSTMT,[";"]],"}"]]]]]);
     });
+    it('withstmt', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('with(a){}');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.WITHSTMT,["with","(",JsNode.PRMREXPR,["a"],")",JsNode.BLOCKSTMT,[JsNode.BLOCK,["{","}"]]]]]]);
+    });
+    it('withstmt error', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('with(){}');
+      }).to.throwError();
+    });
     it('swchstmt error', function() {
       var parser = homunculus.getParser('es6');
       expect(function() {

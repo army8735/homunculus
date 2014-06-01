@@ -705,6 +705,12 @@ describe('jsparser', function() {
       var node = parser.parse('with(a){}');
       expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.WITHSTMT,["with","(",JsNode.PRMREXPR,["a"],")",JsNode.BLOCK,["{","}"]]]]);
     });
+    it('withstmt error', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('with(){}');
+      }).to.throwError();
+    });
     it('swchstmt', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('switch(a){case 1:case 2:;break;default:;}');
