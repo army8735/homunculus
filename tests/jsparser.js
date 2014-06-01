@@ -716,15 +716,16 @@ describe('jsparser', function() {
         parser.parse('switch(a){else:;}');
       }).to.throwError();
     });
-    it('labstmt', function() {
-      var parser = homunculus.getParser('js');
-      var node = parser.parse('label:;');
-      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.LABSTMT,["label",":",JsNode.EMPTSTMT,[";"]]]]);
-    });
     it('thrstmt', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('throw e;');
       expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.THRSTMT,["throw",JsNode.PRMREXPR,["e"],";"]]]);
+    });
+    it('thrstmt error', function() {
+      var parser = homunculus.getParser('js');
+      expect(function() {
+        parser.parse('throw');
+      }).to.throwError();
     });
     it('trystmt 1', function() {
       var parser = homunculus.getParser('js');
@@ -735,6 +736,60 @@ describe('jsparser', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('try{}finally{}');
       expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.TRYSTMT,["try",JsNode.BLOCK,["{","}"],JsNode.FINL,["finally",JsNode.BLOCK,["{","}"]]]]]);
+    });
+    it('trystmt error 1', function() {
+      var parser = homunculus.getParser('js');
+      expect(function() {
+        parser.parse('try');
+      }).to.throwError();
+    });
+    it('trystmt error 2', function() {
+      var parser = homunculus.getParser('js');
+      expect(function() {
+        parser.parse('try{');
+      }).to.throwError();
+    });
+    it('trystmt error 3', function() {
+      var parser = homunculus.getParser('js');
+      expect(function() {
+        parser.parse('try{}catch');
+      }).to.throwError();
+    });
+    it('trystmt error 4', function() {
+      var parser = homunculus.getParser('js');
+      expect(function() {
+        parser.parse('try{}catch{');
+      }).to.throwError();
+    });
+    it('trystmt error 5', function() {
+      var parser = homunculus.getParser('js');
+      expect(function() {
+        parser.parse('try{}catch(');
+      }).to.throwError();
+    });
+    it('trystmt error 6', function() {
+      var parser = homunculus.getParser('js');
+      expect(function() {
+        parser.parse('try{}catch()');
+      }).to.throwError();
+    });
+    it('trystmt error 7', function() {
+      var parser = homunculus.getParser('js');
+      expect(function() {
+        parser.parse('try{}catch(a,b)');
+      }).to.throwError();
+    });
+    it('trystmt error 8', function() {
+      var parser = homunculus.getParser('js');
+      expect(function() {
+        parser.parse('try{}catch(a){');
+      }).to.throwError();
+    });
+    it('trystmt error 9', function() {
+      var parser = homunculus.getParser('js');
+      expect(function() {
+        parser.parse('try{}finally');
+      }).to.throwError();
     });
     it('debstmt', function() {
       var parser = homunculus.getParser('js');

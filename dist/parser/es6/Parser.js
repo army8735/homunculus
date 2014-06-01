@@ -982,6 +982,9 @@ var Class = require('../../util/Class');
     },
     assignexpr: function(noIn) {
       var node = new Node(Node.ASSIGNEXPR);
+      if(!this.look) {
+        this.error();
+      }
       if(this.look.content() == 'yield') {
         return this.yieldexpr();
       }
