@@ -66,15 +66,15 @@ var Parser = Class(function(lexer) {
     }
     return node;
   },
-  element: function(allowSuper) {
+  element: function() {
     if(this.look.content() == 'function') {
       return this.fndecl();
     }
     else {
-      return this.stmt(allowSuper);
+      return this.stmt();
     }
   },
-  stmt: function(allowSuper) {
+  stmt: function() {
     if(!this.look) {
       this.error();
     }
@@ -525,10 +525,10 @@ var Parser = Class(function(lexer) {
     }
     return node;
   },
-  fnbody: function(allowSuper) {
+  fnbody: function() {
     var node = new Node(Node.FNBODY);
     while(this.look && this.look.content() != '}') {
-      node.add(this.element(allowSuper));
+      node.add(this.element());
     }
     return node;
   },
@@ -1041,6 +1041,53 @@ var Parser = Class(function(lexer) {
     var node = new Node(Node.PROPTASSIGN);
     switch(this.look.type()) {
       case Token.ID:
+        if(this.look.content() == 'get') {
+          node.add(this.match());
+          if(!this.look) {
+            this.error('missing : after property id');
+          }
+          if(this.look.type() == Token.ID) {
+            node.add(
+              this.match(),
+              this.match('(', 'missing ( before formal parameters'),
+              this.match(')', 'missing ) after formal parameters'),
+              this.match('{'),
+              this.fnbody(),
+              this.match('}', 'missing } after function body')
+            );
+          }
+          else {
+            node.add(
+              this.match(':', 'missing : after property id'),
+              this.assignexpr()
+            );
+          }
+          break;
+        }
+        else if(this.look.content() == 'set') {
+          node.add(this.match());
+          if(!this.look) {
+            this.error('missing : after property id');
+          }
+          if(this.look.type() == Token.ID) {
+            node.add(
+              this.match(),
+              this.match('(', 'missing ( before formal parameters'),
+              this.match(Token.ID, 'setter functions must have one argument'),
+              this.match(')', 'missing ) after formal parameters'),
+              this.match('{'),
+              this.fnbody(),
+              this.match('}', 'missing } after function body')
+            );
+          }
+          else {
+            node.add(
+              this.match(':', 'missing : after property id'),
+              this.assignexpr()
+            );
+          }
+          break;
+        }
       case Token.STRING:
       case Token.NUMBER:
         node.add(

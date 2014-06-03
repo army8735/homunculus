@@ -314,6 +314,64 @@ describe('jsparser', function() {
         parser.parse('var o = {+');
       }).to.throwError();
     });
+    it('getter', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('var o = {get a(){}}');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.VARSTMT,["var",JsNode.VARDECL,["o",JsNode.ASSIGN,["=",JsNode.PRMREXPR,[JsNode.OBJLTR,["{",JsNode.PROPTASSIGN,["get","a","(",")","{",JsNode.FNBODY,[],"}"],"}"]]]]]]]);
+    });
+    it('getter error 1', function() {
+      var parser = homunculus.getParser('js');
+      expect(function() {
+        parser.parse('var o = {get a}');
+      }).to.throwError();
+    });
+    it('getter error 2', function() {
+      var parser = homunculus.getParser('js');
+      expect(function() {
+        parser.parse('var o = {get a(}');
+      }).to.throwError();
+    });
+    it('getter error 3', function() {
+      var parser = homunculus.getParser('js');
+      expect(function() {
+        parser.parse('var o = {get a()}');
+      }).to.throwError();
+    });
+    it('getter error 4', function() {
+      var parser = homunculus.getParser('js');
+      expect(function() {
+        parser.parse('var o = {get 3}');
+      }).to.throwError();
+    });
+    it('setter', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('var o = {set a(b){}}');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.VARSTMT,["var",JsNode.VARDECL,["o",JsNode.ASSIGN,["=",JsNode.PRMREXPR,[JsNode.OBJLTR,["{",JsNode.PROPTASSIGN,["set","a","(","b",")","{",JsNode.FNBODY,[],"}"],"}"]]]]]]]);
+    });
+    it('setter error 1', function() {
+      var parser = homunculus.getParser('js');
+      expect(function() {
+        parser.parse('var o = {set a}');
+      }).to.throwError();
+    });
+    it('setter error 2', function() {
+      var parser = homunculus.getParser('js');
+      expect(function() {
+        parser.parse('var o = {set a(}');
+      }).to.throwError();
+    });
+    it('setter error 3', function() {
+      var parser = homunculus.getParser('js');
+      expect(function() {
+        parser.parse('var o = {set a()}');
+      }).to.throwError();
+    });
+    it('setter error 4', function() {
+      var parser = homunculus.getParser('js');
+      expect(function() {
+        parser.parse('var o = {set a(){}}');
+      }).to.throwError();
+    });
     it('callexpr 1', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('a()');

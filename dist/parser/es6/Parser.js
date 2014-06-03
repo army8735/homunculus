@@ -138,13 +138,6 @@ var Class = require('../../util/Class');
           return this.debstmt();
         case 'yield':
           return this.labstmt();
-  //      case 'super':
-  //        if(!allowSuper) {
-  //          this.error('super must in a class');
-  //        }
-  //        return this.superstmt();
-  //      case 'import':
-  //        return this.imptstmt();
         default:
           if(this.look.type() == Token.ID) {
             for(var i = this.index; i < this.length; i++) {
@@ -350,15 +343,6 @@ var Class = require('../../util/Class');
         }
       }
       this.error('missing : after property id');
-    },
-    assign: function() {
-      var node = new Node(Node.ASSIGN);
-      node.add(this.match('='));
-      if(!this.look) {
-        this.error();
-      }
-      node.add(this.assignexpr());
-      return node;
     },
     blockstmt: function() {
       var node = new Node(Node.BLOCKSTMT);
