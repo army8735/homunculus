@@ -1399,7 +1399,7 @@ var Parser = Class(function(lexer) {
       while(this.look) {
         var temp;
         if(this.look.content() == '.') {
-          temp = new Node(Node.CALLEXPR);
+          temp = new Node(Node.MMBEXPR);
           temp.add(
             node,
             this.match(),
@@ -1408,7 +1408,7 @@ var Parser = Class(function(lexer) {
           node = temp;
         }
         else if(this.look.content() == '[') {
-          temp = new Node(Node.CALLEXPR);
+          temp = new Node(Node.MMBEXPR);
           temp.add(
             node,
             this.match(),

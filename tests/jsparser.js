@@ -395,7 +395,12 @@ describe('jsparser', function() {
     it('callexpr 5', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('f().b[1]');
-      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.EXPRSTMT,[JsNode.CALLEXPR,[JsNode.CALLEXPR,[JsNode.CALLEXPR,[JsNode.PRMREXPR,["f"],JsNode.ARGS,["(",")"]],".","b"],"[",JsNode.PRMREXPR,["1"],"]"]]]]);
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.EXPRSTMT,[JsNode.MMBEXPR,[JsNode.MMBEXPR,[JsNode.CALLEXPR,[JsNode.PRMREXPR,["f"],JsNode.ARGS,["(",")"]],".","b"],"[",JsNode.PRMREXPR,["1"],"]"]]]]);
+    });
+    it('callexpr 6', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('a.b().c.d()');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.EXPRSTMT,[JsNode.CALLEXPR,[JsNode.MMBEXPR,[JsNode.MMBEXPR,[JsNode.CALLEXPR,[JsNode.MMBEXPR,[JsNode.PRMREXPR,["a"],".","b"],JsNode.ARGS,["(",")"]],".","c"],".","d"],JsNode.ARGS,["(",")"]]]]]);
     });
     it('callexpr error', function() {
       var parser = homunculus.getParser('js');

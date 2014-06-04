@@ -1407,7 +1407,7 @@ var Class = require('../../util/Class');
         while(this.look) {
           var temp;
           if(this.look.content() == '.') {
-            temp = new Node(Node.CALLEXPR);
+            temp = new Node(Node.MMBEXPR);
             temp.add(
               node,
               this.match(),
@@ -1416,7 +1416,7 @@ var Class = require('../../util/Class');
             node = temp;
           }
           else if(this.look.content() == '[') {
-            temp = new Node(Node.CALLEXPR);
+            temp = new Node(Node.MMBEXPR);
             temp.add(
               node,
               this.match(),
