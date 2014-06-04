@@ -422,23 +422,62 @@ var Class = require('../../util/Class');
           if(!this.look) {
             this.error();
           }
-          if(this.look.content() == 'var' || this.look.content() == 'let') {
-            var node2 = this.look.content() == 'var' ? this.varstmt(true) : this.letstmt(true);
-            if(!this.look) {
+          //当前是var的话，LL2确定是for(var forbind;或for(var vardecllist
+          if(this.look.content() == 'var') {
+            var end = false;
+            outer:
+            for(var i = this.index; i < this.length; i++) {
+              var token = this.tokens[i];
+              if(!S[token.type()]) {
+                //直接指向forbind
+                if(['{', ']'].indexOf(token.content()) > -1) {
+                  node.add(
+                    this.match(),
+                    this.forbind()
+                  );
+                }
+                //仅一个id之后跟着of或in就是forbind
+                else if(token.type() == Token.ID) {
+                  var end2 = false;
+                  for(var j = i + 1; j < this.length; j++) {
+                    var next = this.tokens[j];
+                    if(!S[token.type()]) {
+                      if(['in', 'of'].indexOf(next.content()) > -1) {
+                        node.add(
+                          this.match(),
+                          this.forbind()
+                        );
+                      }
+                      else {
+                        node.add(this.varstmt(true));
+                      }
+                      end = end2 = true;
+                      break outer;
+                    }
+                  }
+                }
+                else {
+                  this.error();
+                }
+                end = true;
+                break;
+              }
+            }
+            if(!end || !this.look) {
               this.error('missing ; after for-loop initializer');
             }
-            if(this.look.content() == 'in') {
-              if(node2.leaves().length > 2) {
+            //in/of前只能是一个vardecl，不能出现vardecllist
+            if(['in', 'of'].indexOf(this.look.content()) > -1) {
+              if(node.leaf(2).name() == Node.VARSTMT && node.leaf(2).size() > 2) {
                 this.error('invalid for/in left-hand side');
               }
-              node.add(node2);
+              var isOf = this.look.content() == 'of';
               node.add(
                 this.match(),
-                this.expr()
+                isOf ? this.assignexpr() : this.expr()
               );
             }
             else {
-              node.add(node2);
               node.add(this.match(';'));
               if(this.look.content() != ';') {
                 node.add(this.expr());
@@ -452,43 +491,69 @@ var Class = require('../../util/Class');
               }
             }
           }
-          else {
-            if(this.look.content() == 'in') {
+          else if(['let', 'const'].indexOf(this.look.content()) > -1) {
+            node.add(
+              this.match(),
+              this.forbind()
+            );
+            if(!this.look || ['in', 'of'].indexOf(this.look.content()) == -1) {
               this.error();
             }
-            var hasIn = false;
-            for(var i = this.index; i < this.length; i++) {
-              var t = this.tokens[i];
-              if(t.content() == 'in') {
-                hasIn = true;
-                break;
+            var isOf = this.look.content() == 'of';
+            node.add(
+              this.match(),
+              isOf ? this.assignexpr() : this.expr()
+            );
+          }
+          else {
+            if(['in', 'of'].indexOf(this.look.content()) > -1) {
+              this.error();
+            }
+            //for(EXPRnoin;) or for(leftexpr in
+            var expr;
+            if(this.look.content() != ';') {
+              expr = this.expr(true, true);
+              node.add(expr);
+            }
+            if(!this.look) {
+              this.error('missing ;');
+            }
+            if(this.look.content() == 'in') {
+              if(expr.name() == Node.MMBEXPR
+                || expr.name() == Node.PRMREXPR
+                || expr.name() == Node.NEWEXPR) {
+                node.add(
+                  this.match(),
+                  this.expr()
+                );
               }
-              else if(t.content() == ')') {
-                break;
+              else {
+                this.error('invalid for/in left-hand side');
               }
             }
-            if(hasIn) {
-              node.add(this.expr(true), this.match('in'), this.expr());
+            else if(this.look.content() == 'of') {
+              if(expr.name() == Node.MMBEXPR
+                || expr.name() == Node.PRMREXPR
+                || expr.name() == Node.NEWEXPR) {
+                node.add(
+                  this.match(),
+                  this.assignexpr()
+                );
+              }
+              else {
+                this.error('invalid for/in left-hand side');
+              }
             }
             else {
-              if(this.look.content() != ';') {
-                node.add(this.expr());
-              }
               //for的;不能省略，强制判断
-              if(!this.look || this.look.content() != ';') {
-                this.error('missing ;')
-              }
-              node.add(this.match(';'));
+              node.add(this.match(';', 'missing ;'));
               if(!this.look) {
                 this.error();
               }
               if(this.look.content() != ';') {
                 node.add(this.expr());
               }
-              if(!this.look || this.look.content() != ';') {
-                this.error('missing ;')
-              }
-              node.add(this.match(';'));
+              node.add(this.match(';', 'missing ;'));
               if(!this.look) {
                 this.error();
               }
@@ -729,7 +794,7 @@ var Class = require('../../util/Class');
       );
       return node;
     },
-    fnexpr: function() {
+    fnexpr: function(noIn, noOf) {
       var node = new Node(Node.FNEXPR);
       node.add(
         this.match('function')
@@ -738,6 +803,12 @@ var Class = require('../../util/Class');
         this.error('missing formal parameter');
       }
       if(this.look.type() == Token.ID) {
+        if(noIn && this.look.content() == 'in') {
+          this.error();
+        }
+        if(noOf && this.look.content() == 'in') {
+          this.error();
+        }
         node.add(this.bindid());
       }
       node.add(
@@ -847,13 +918,19 @@ var Class = require('../../util/Class');
       );
       return node;
     },
-    classexpr: function() {
+    classexpr: function(noIn, noOf) {
       var node = new Node(Node.CLASSEXPR);
       node.add(this.match('class'));
       if(!this.look) {
         this.error();
       }
       if(this.look.type() == Token.ID) {
+        if(noIn && this.look.content() == 'in') {
+          this.error();
+        }
+        if(noOf && this.look.content() == 'in') {
+          this.error();
+        }
         node.add(this.bindid());
       }
       if(!this.look) {
@@ -955,9 +1032,9 @@ var Class = require('../../util/Class');
       );
       return node;
     },
-    expr: function(noIn) {
+    expr: function(noIn, noOf) {
       var node = new Node(Node.EXPR),
-        assignexpr = this.assignexpr(noIn);
+        assignexpr = this.assignexpr(noIn, noOf);
       //LL2区分,后的...是否为cpeapl
       if(this.look && this.look.content() == ',') {
         for(var i = this.index; i < this.length; i++) {
@@ -981,7 +1058,7 @@ var Class = require('../../util/Class');
               break;
             }
           }
-          node.add(this.match(), this.assignexpr(noIn));
+          node.add(this.match(), this.assignexpr(noIn, noOf));
         }
       }
       else {
@@ -997,7 +1074,7 @@ var Class = require('../../util/Class');
       );
       return node;
     },
-    assignexpr: function(noIn) {
+    assignexpr: function(noIn, noOf) {
       var node = new Node(Node.ASSIGNEXPR);
       if(!this.look) {
         this.error();
@@ -1005,7 +1082,7 @@ var Class = require('../../util/Class');
       if(this.look.content() == 'yield') {
         return this.yieldexpr();
       }
-      var cndt = this.cndtexpr(noIn);
+      var cndt = this.cndtexpr(noIn, noOf);
       if(this.look
         && this.look.content() == '=>'
         && cndt.name() == Node.PRMREXPR
@@ -1038,7 +1115,7 @@ var Class = require('../../util/Class');
           '=': true
         }.hasOwnProperty(this.look.content())
         && !NOASSIGN.hasOwnProperty(cndt.name())) {
-        node.add(cndt, this.match(), this.assignexpr(noIn));
+        node.add(cndt, this.match(), this.assignexpr(noIn, noOf));
       }
       else {
         return cndt;
@@ -1106,16 +1183,16 @@ var Class = require('../../util/Class');
       }
       return node;
     },
-    cndtexpr: function(noIn) {
+    cndtexpr: function(noIn, noOf) {
       var node = new Node(Node.CNDTEXPR),
-        logorexpr = this.logorexpr(noIn);
+        logorexpr = this.logorexpr(noIn, noOf);
       if(this.look && this.look.content() == '?') {
         node.add(
           logorexpr,
           this.match(),
-          this.assignexpr(noIn),
+          this.assignexpr(noIn, noOf),
           this.match(':'),
-          this.assignexpr(noIn)
+          this.assignexpr(noIn, noOf)
         );
       }
       else {
@@ -1123,15 +1200,15 @@ var Class = require('../../util/Class');
       }
       return node;
     },
-    logorexpr: function(noIn) {
+    logorexpr: function(noIn, noOf) {
       var node = new Node(Node.LOGOREXPR),
-        logandexpr = this.logandexpr(noIn);
+        logandexpr = this.logandexpr(noIn), noOf;
       if(this.look && this.look.content() == '||') {
         node.add(logandexpr);
         while(this.look && this.look.content() == '||') {
           node.add(
             this.match(),
-            this.logandexpr(noIn)
+            this.logandexpr(noIn, noOf)
           );
         }
       }
@@ -1140,15 +1217,15 @@ var Class = require('../../util/Class');
       }
       return node;
     },
-    logandexpr: function(noIn) {
+    logandexpr: function(noIn, noOf) {
       var node = new Node(Node.LOGANDEXPR),
-        bitorexpr = this.bitorexpr(noIn);
+        bitorexpr = this.bitorexpr(noIn, noOf);
       if(this.look && this.look.content() == '&&') {
         node.add(bitorexpr);
         while(this.look && this.look.content() == '&&') {
           node.add(
             this.match(),
-            this.bitorexpr(noIn)
+            this.bitorexpr(noIn, noOf)
           );
         }
       }
@@ -1157,15 +1234,15 @@ var Class = require('../../util/Class');
       }
       return node;
     },
-    bitorexpr: function(noIn) {
+    bitorexpr: function(noIn, noOf) {
       var node = new Node(Node.BITOREXPR),
-        bitxorexpr = this.bitxorexpr(noIn);
+        bitxorexpr = this.bitxorexpr(noIn, noOf);
       if(this.look && this.look.content() == '|') {
         node.add(bitxorexpr);
         while(this.look && this.look.content() == '|') {
           node.add(
             this.match(),
-            this.bitxorexpr(noIn)
+            this.bitxorexpr(noIn, noOf)
           );
         }
       }
@@ -1174,15 +1251,15 @@ var Class = require('../../util/Class');
       }
       return node;
     },
-    bitxorexpr: function(noIn) {
+    bitxorexpr: function(noIn, noOf) {
       var node = new Node(Node.BITXOREXPR),
-        bitandexpr = this.bitandexpr(noIn);
+        bitandexpr = this.bitandexpr(noIn, noOf);
       if(this.look && this.look.content() == '^') {
         node.add(bitandexpr);
         while(this.look && this.look.content() == '^') {
           node.add(
             this.match(),
-            this.bitandexpr(noIn)
+            this.bitandexpr(noIn, noOf)
           );
         }
       }
@@ -1191,15 +1268,15 @@ var Class = require('../../util/Class');
       }
       return node;
     },
-    bitandexpr: function(noIn) {
+    bitandexpr: function(noIn, noOf) {
       var node = new Node(Node.BITANDEXPR),
-        eqexpr = this.eqexpr(noIn);
+        eqexpr = this.eqexpr(noIn, noOf);
       if(this.look && this.look.content() == '&') {
         node.add(eqexpr);
         while(this.look && this.look.content() == '&') {
           node.add(
             this.match(),
-            this.eqexpr(noIn)
+            this.eqexpr(noIn, noOf)
           );
         }
       }
@@ -1208,9 +1285,9 @@ var Class = require('../../util/Class');
       }
       return node;
     },
-    eqexpr: function(noIn) {
+    eqexpr: function(noIn, noOf) {
       var node = new Node(Node.EQEXPR),
-        reltexpr = this.reltexpr(noIn);
+        reltexpr = this.reltexpr(noIn, noOf);
       if(this.look && {
         '==': true,
         '===': true,
@@ -1226,7 +1303,7 @@ var Class = require('../../util/Class');
         }.hasOwnProperty(this.look.content())) {
           node.add(
             this.match(),
-            this.reltexpr(noIn)
+            this.reltexpr(noIn, noOf)
           );
         }
       }
@@ -1235,7 +1312,7 @@ var Class = require('../../util/Class');
       }
       return node;
     },
-    reltexpr: function(noIn) {
+    reltexpr: function(noIn, noOf) {
       var node = new Node(Node.RELTEXPR),
         shiftexpr = this.shiftexpr();
       if(this.look && ({
@@ -1244,7 +1321,8 @@ var Class = require('../../util/Class');
         '>=': true,
         '<=': true,
         'instanceof': true
-      }.hasOwnProperty(this.look.content()) || (!noIn && this.look.content() == 'in'))) {
+      }.hasOwnProperty(this.look.content())
+        || (!noIn && this.look.content() == 'in'))) {
         node.add(shiftexpr);
         while(this.look && ({
           '<': true,
@@ -1252,10 +1330,11 @@ var Class = require('../../util/Class');
           '>=': true,
           '<=': true,
           'instanceof': true
-        }.hasOwnProperty(this.look.content()) || (!noIn && this.look.content() == 'in'))) {
+        }.hasOwnProperty(this.look.content())
+          || (!noIn && this.look.content() == 'in'))) {
           node.add(
             this.match(),
-            this.shiftexpr()
+            this.shiftexpr(noIn, noOf)
           );
         }
       }
@@ -1264,15 +1343,15 @@ var Class = require('../../util/Class');
       }
       return node;
     },
-    shiftexpr: function() {
+    shiftexpr: function(noIn, noOf) {
       var node = new Node(Node.SHIFTEXPR),
-        addexpr = this.addexpr();
+        addexpr = this.addexpr(noIn, noOf);
       if(this.look && ['<<', '>>', '>>>'].indexOf(this.look.content()) != -1) {
         node.add(addexpr);
         while(this.look && ['<<', '>>', '>>>'].indexOf(this.look.content()) != -1) {
           node.add(
             this.match(),
-            this.addexpr()
+            this.addexpr(noIn, noOf)
           );
         }
       }
@@ -1281,15 +1360,15 @@ var Class = require('../../util/Class');
       }
       return node;
     },
-    addexpr: function() {
+    addexpr: function(noIn, noOf) {
       var node = new Node(Node.ADDEXPR),
-        mtplexpr = this.mtplexpr();
+        mtplexpr = this.mtplexpr(noIn, noOf);
       if(this.look && ['+', '-'].indexOf(this.look.content()) != -1) {
         node.add(mtplexpr);
         while(this.look && ['+', '-'].indexOf(this.look.content()) != -1) {
           node.add(
             this.match(),
-            this.mtplexpr()
+            this.mtplexpr(noIn, noOf)
           );
         }
       }
@@ -1298,15 +1377,15 @@ var Class = require('../../util/Class');
       }
       return node;
     },
-    mtplexpr: function() {
+    mtplexpr: function(noIn, noOf) {
       var node = new Node(Node.MTPLEXPR),
-        unaryexpr = this.unaryexpr();
+        unaryexpr = this.unaryexpr(noIn, noOf);
       if(this.look && ['*', '/', '%'].indexOf(this.look.content()) != -1) {
         node.add(unaryexpr);
         while(this.look && ['*', '/', '%'].indexOf(this.look.content()) != -1) {
           node.add(
             this.match(),
-            this.unaryexpr()
+            this.unaryexpr(noIn, noOf)
           );
         }
       }
@@ -1315,7 +1394,7 @@ var Class = require('../../util/Class');
       }
       return node;
     },
-    unaryexpr: function() {
+    unaryexpr: function(noIn, noOf) {
       var node = new Node(Node.UNARYEXPR);
       if(!this.look) {
         this.error();
@@ -1325,7 +1404,7 @@ var Class = require('../../util/Class');
         case '--':
           node.add(
             this.match(),
-            this.leftexpr()
+            this.leftexpr(noIn, noOf)
           );
           break;
         case 'delete':
@@ -1337,17 +1416,17 @@ var Class = require('../../util/Class');
         case '!':
           node.add(
             this.match(),
-            this.unaryexpr()
+            this.unaryexpr(noIn, noOf)
           );
         break;
         default:
-          return this.postfixexpr();
+          return this.postfixexpr(noIn, noOf);
       }
       return node;
     },
-    postfixexpr: function() {
+    postfixexpr: function(noIn, noOf) {
       var node = new Node(Node.POSTFIXEXPR);
-      var leftexpr = this.leftexpr();
+      var leftexpr = this.leftexpr(noIn, noOf);
       if(this.look && ['++', '--'].indexOf(this.look.content()) > -1 && !this.hasMoveLine) {
         node.add(
           leftexpr,
@@ -1359,15 +1438,15 @@ var Class = require('../../util/Class');
       }
       return node;
     },
-    leftexpr: function() {
+    leftexpr: function(noIn, noOf) {
       if(this.look.content() == 'new') {
-        return this.newexpr();
+        return this.newexpr(0, noIn, noOf);
       }
       else {
-        return this.callexpr();
+        return this.callexpr(noIn, noOf);
       }
     },
-    newexpr: function(depth) {
+    newexpr: function(depth, noIn, noOf) {
       depth = depth || 0;
       var node = new Node(Node.NEWEXPR);
       node.add(this.match('new'));
@@ -1375,7 +1454,7 @@ var Class = require('../../util/Class');
         this.error();
       }
       if(this.look.content() == 'new') {
-        node.add(this.newexpr(depth + 1));
+        node.add(this.newexpr(depth + 1, noIn, noOf));
       }
       //LL2分辨super后是否为.[至mmbexpr
       else if(this.look.content() == 'super') {
@@ -1384,7 +1463,7 @@ var Class = require('../../util/Class');
           var next = this.tokens[i];
           if(!S[next.type()]) {
             if(['.', '['].indexOf(next.content()) > -1) {
-              node.add(this.mmbexpr());
+              node.add(this.mmbexpr(noIn, noOf));
             }
             else {
               node.add(this.match());
@@ -1398,7 +1477,7 @@ var Class = require('../../util/Class');
         }
       }
       else {
-        node.add(this.mmbexpr());
+        node.add(this.mmbexpr(noIn, noOf));
       }
       if(this.look && this.look.content() == '(') {
         node.add(this.args());
@@ -1416,7 +1495,7 @@ var Class = require('../../util/Class');
           else if(this.look.content() == '[') {
             mmb.add(
               this.match(),
-              this.expr(),
+              this.expr(noIn, noOf),
               this.match(']')
             );
           }
@@ -1425,14 +1504,14 @@ var Class = require('../../util/Class');
           }
         }
         if(depth == 0 && this.look && this.look.content() == '(') {
-          var callexpr = this.callexpr(mmb);
+          var callexpr = this.callexpr(mmb, noIn, noOf);
           return callexpr;
         }
         return mmb;
       }
       return node;
     },
-    callexpr: function(mmb) {
+    callexpr: function(mmb, noIn, noOf) {
       var node = new Node(Node.CALLEXPR);
       if(!mmb) {
         //根据LL2分辨是super()还是mmbexpr
@@ -1449,14 +1528,14 @@ var Class = require('../../util/Class');
                 node = new Node(Node.CALLEXPR);
               }
               else {
-                mmb = this.mmbexpr();
+                mmb = this.mmbexpr(noIn, noOf);
               }
               break;
             }
           }
         }
         else {
-          mmb = this.mmbexpr();
+          mmb = this.mmbexpr(noIn, noOf);
         }
       }
       if(this.look && this.look.content() == '(') {
@@ -1480,7 +1559,7 @@ var Class = require('../../util/Class');
             temp.add(
               node,
               this.match(),
-              this.expr(),
+              this.expr(noIn, noOf),
               this.match(']')
             );
             node = temp;
@@ -1511,7 +1590,7 @@ var Class = require('../../util/Class');
       }
       return node;
     },
-    mmbexpr: function() {
+    mmbexpr: function(noIn, noOf) {
       var node = new Node(Node.MMBEXPR);
       var mmb;
       if(this.look.content() == 'super') {
@@ -1521,7 +1600,7 @@ var Class = require('../../util/Class');
         }
       }
       else {
-        mmb = this.prmrexpr();
+        mmb = this.prmrexpr(noIn, noOf);
       }
       if(this.look
         && (['.', '['].indexOf(this.look.content()) > -1
@@ -1536,7 +1615,7 @@ var Class = require('../../util/Class');
         else if(this.look.content() == '[') {
           node.add(
             this.match(),
-            this.expr(),
+            this.expr(noIn, noOf),
             this.match(']')
           );
         }
@@ -1559,7 +1638,7 @@ var Class = require('../../util/Class');
             temp.add(
               node,
               this.match(),
-              this.expr(),
+              this.expr(noIn, noOf),
               this.match(']')
             );
             node = temp;
@@ -1582,10 +1661,16 @@ var Class = require('../../util/Class');
       }
       return node;
     },
-    prmrexpr: function() {
+    prmrexpr: function(noIn, noOf) {
       var node = new Node(Node.PRMREXPR);
       switch(this.look.type()) {
         case Token.ID:
+          if(noIn && this.look.content() == 'in') {
+            this.error();
+          }
+          if(noOf && this.look.content() == 'of') {
+            this.error();
+          }
         case Token.NUMBER:
         case Token.STRING:
         case Token.REG:
@@ -1600,17 +1685,17 @@ var Class = require('../../util/Class');
                 var next = this.tokens[i];
                 if(!S[next.type()]) {
                   if(next.content() == '*') {
-                    node.add(this.genexpr());
+                    node.add(this.genexpr(noIn, noOf));
                   }
                   else {
-                    node.add(this.fnexpr());
+                    node.add(this.fnexpr(noIn, noOf));
                   }
                   break;
                 }
               }
             break;
             case 'class':
-              node.add(this.classexpr());
+              node.add(this.classexpr(noIn, noOf));
             break;
             case 'this':
             case 'null':

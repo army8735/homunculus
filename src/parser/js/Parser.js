@@ -228,13 +228,14 @@ var Parser = Class(function(lexer) {
         if(!this.look) {
           this.error();
         }
-        if(this.look.content() == 'var' || this.look.content() == 'let') {
-          var node2 = this.look.content() == 'var' ? this.varstmt(true) : this.letstmt(true);
+        //当前是var/let/const的话，LL3确定是for(var vardecllist;或for(var vardecl in
+        if(this.look.content() == 'var') {
+          var node2 = this.varstmt(true);
           if(!this.look) {
             this.error('missing ; after for-loop initializer');
           }
           if(this.look.content() == 'in') {
-            if(node2.leaves().length > 2) {
+            if(node2.size() > 2) {
               this.error('invalid for/in left-hand side');
             }
             node.add(node2);
@@ -262,39 +263,38 @@ var Parser = Class(function(lexer) {
           if(this.look.content() == 'in') {
             this.error();
           }
-          var hasIn = false;
-          for(var i = this.index; i < this.length; i++) {
-            var t = this.tokens[i];
-            if(t.content() == 'in') {
-              hasIn = true;
-              break;
-            }
-            else if(t.content() == ')') {
-              break;
-            }
+          //for(EXPRnoin;) or for(leftexpr in
+          var expr;
+          if(this.look.content() != ';') {
+            expr = this.expr(true);
+            node.add(expr);
           }
-          if(hasIn) {
-            node.add(this.expr(true), this.match('in'), this.expr());
+          if(!this.look) {
+            this.error('missing ;');
+          }
+          if(this.look.content() == 'in') {
+            if(expr.name() == Node.MMBEXPR
+              || expr.name() == Node.PRMREXPR
+              || expr.name() == Node.NEWEXPR) {
+              node.add(
+                this.match(),
+                this.expr()
+              );
+            }
+            else {
+              this.error('invalid for/in left-hand side');
+            }
           }
           else {
-            if(this.look.content() != ';') {
-              node.add(this.expr());
-            }
             //for的;不能省略，强制判断
-            if(!this.look || this.look.content() != ';') {
-              this.error('missing ;')
-            }
-            node.add(this.match(';'));
+            node.add(this.match(';', 'missing ;'));
             if(!this.look) {
               this.error();
             }
             if(this.look.content() != ';') {
               node.add(this.expr());
             }
-            if(!this.look || this.look.content() != ';') {
-              this.error('missing ;')
-            }
-            node.add(this.match(';'));
+            node.add(this.match(';', 'missing ;'));
             if(!this.look) {
               this.error();
             }
@@ -491,13 +491,16 @@ var Parser = Class(function(lexer) {
     );
     return node;
   },
-  fnexpr: function() {
+  fnexpr: function(noIn) {
     var node = new Node(Node.FNEXPR);
     node.add(this.match('function'));
     if(!this.look) {
       this.error('missing formal parameter');
     }
     if(this.look.type() == Token.ID) {
+      if(noIn && this.look.content() == 'in') {
+        this.error();
+      }
       node.add(this.match());
     }
     node.add(this.match('('));
@@ -701,7 +704,7 @@ var Parser = Class(function(lexer) {
   },
   reltexpr: function(noIn) {
     var node = new Node(Node.RELTEXPR),
-      shiftexpr = this.shiftexpr();
+      shiftexpr = this.shiftexpr(noIn);
     if(this.look && ({
       '<': true,
       '>': true,
@@ -719,7 +722,7 @@ var Parser = Class(function(lexer) {
       }.hasOwnProperty(this.look.content()) || (!noIn && this.look.content() == 'in'))) {
         node.add(
           this.match(),
-          this.shiftexpr()
+          this.shiftexpr(noIn)
         );
       }
     }
@@ -728,15 +731,15 @@ var Parser = Class(function(lexer) {
     }
     return node;
   },
-  shiftexpr: function() {
+  shiftexpr: function(noIn) {
     var node = new Node(Node.SHIFTEXPR),
-      addexpr = this.addexpr();
+      addexpr = this.addexpr(noIn);
     if(this.look && ['<<', '>>', '>>>'].indexOf(this.look.content()) != -1) {
       node.add(addexpr);
       while(this.look && ['<<', '>>', '>>>'].indexOf(this.look.content()) != -1) {
         node.add(
           this.match(),
-          this.addexpr()
+          this.addexpr(noIn)
         );
       }
     }
@@ -745,15 +748,15 @@ var Parser = Class(function(lexer) {
     }
     return node;
   },
-  addexpr: function() {
+  addexpr: function(noIn) {
     var node = new Node(Node.ADDEXPR),
-      mtplexpr = this.mtplexpr();
+      mtplexpr = this.mtplexpr(noIn);
     if(this.look && ['+', '-'].indexOf(this.look.content()) != -1) {
       node.add(mtplexpr);
       while(this.look && ['+', '-'].indexOf(this.look.content()) != -1) {
         node.add(
           this.match(),
-          this.mtplexpr()
+          this.mtplexpr(noIn)
         );
       }
     }
@@ -762,15 +765,15 @@ var Parser = Class(function(lexer) {
     }
     return node;
   },
-  mtplexpr: function() {
+  mtplexpr: function(noIn) {
     var node = new Node(Node.MTPLEXPR),
-      unaryexpr = this.unaryexpr();
+      unaryexpr = this.unaryexpr(noIn);
     if(this.look && ['*', '/', '%'].indexOf(this.look.content()) != -1) {
       node.add(unaryexpr);
       while(this.look && ['*', '/', '%'].indexOf(this.look.content()) != -1) {
         node.add(
           this.match(),
-          this.unaryexpr()
+          this.unaryexpr(noIn)
         );
       }
     }
@@ -779,7 +782,7 @@ var Parser = Class(function(lexer) {
     }
     return node;
   },
-  unaryexpr: function() {
+  unaryexpr: function(noIn) {
     var node = new Node(Node.UNARYEXPR);
     if(!this.look) {
       this.error();
@@ -789,7 +792,7 @@ var Parser = Class(function(lexer) {
       case '--':
         node.add(
           this.match(),
-          this.leftexpr()
+          this.leftexpr(noIn)
         );
       break;
       case 'delete':
@@ -801,17 +804,17 @@ var Parser = Class(function(lexer) {
       case '!':
         node.add(
           this.match(),
-          this.unaryexpr()
+          this.unaryexpr(noIn)
         );
       break;
       default:
-        return this.postfixexpr();
+        return this.postfixexpr(noIn);
     }
     return node;
   },
-  postfixexpr: function() {
+  postfixexpr: function(noIn) {
     var node = new Node(Node.POSTFIXEXPR);
-    var leftexpr = this.leftexpr();
+    var leftexpr = this.leftexpr(noIn);
     if(this.look && ['++', '--'].indexOf(this.look.content()) > -1 && !this.hasMoveLine) {
       node.add(
         leftexpr,
@@ -823,12 +826,12 @@ var Parser = Class(function(lexer) {
     }
     return node;
   },
-  leftexpr: function() {
+  leftexpr: function(noIn) {
     if(this.look.content() == 'new') {
-      return this.newexpr();
+      return this.newexpr(0, noIn);
     }
     else {
-      return this.callexpr();
+      return this.callexpr(noIn);
     }
   },
   newexpr: function(depth) {
@@ -839,10 +842,10 @@ var Parser = Class(function(lexer) {
       this.error();
     }
     if(this.look.content() == 'new') {
-      node.add(this.newexpr(depth + 1));
+      node.add(this.newexpr(depth + 1, noIn));
     }
     else {
-      node.add(this.mmbexpr());
+      node.add(this.mmbexpr(noIn));
     }
     if(this.look && this.look.content() == '(') {
       node.add(this.args());
@@ -860,7 +863,7 @@ var Parser = Class(function(lexer) {
         else if(this.look.content() == '[') {
           mmb.add(
             this.match(),
-            this.expr(),
+            this.expr(noIn),
             this.match(']')
           );
         }
@@ -869,16 +872,16 @@ var Parser = Class(function(lexer) {
         }
       }
       if(depth == 0 && this.look && this.look.content() == '(') {
-        var callexpr = this.callexpr(mmb);
+        var callexpr = this.callexpr(mmb, noIn);
         return callexpr;
       }
       return mmb;
     }
     return node;
   },
-  callexpr: function(mmb) {
+  callexpr: function(mmb, noIn) {
     var node = new Node(Node.CALLEXPR);
-    mmb = mmb || this.mmbexpr();
+    mmb = mmb || this.mmbexpr(noIn);
     if(this.look && this.look.content() == '(') {
       node.add(
         mmb,
@@ -900,7 +903,7 @@ var Parser = Class(function(lexer) {
           temp.add(
             node,
             this.match(),
-            this.expr(),
+            this.expr(noIn),
             this.match(']')
           );
           node = temp;
@@ -923,14 +926,14 @@ var Parser = Class(function(lexer) {
     }
     return node;
   },
-  mmbexpr: function() {
+  mmbexpr: function(noIn) {
     var node = new Node(Node.MMBEXPR);
     var mmb;
     if(this.look.content() == 'function') {
-      mmb = this.fnexpr();
+      mmb = this.fnexpr(noIn);
     }
     else {
-      mmb = this.prmrexpr();
+      mmb = this.prmrexpr(noIn);
     }
     if(this.look && ['.', '['].indexOf(this.look.content()) > -1) {
       node.add(mmb);
@@ -943,7 +946,7 @@ var Parser = Class(function(lexer) {
       else {
         node.add(
           this.match(),
-          this.expr(),
+          this.expr(noIn),
           this.match(']')
         );
       }
@@ -963,7 +966,7 @@ var Parser = Class(function(lexer) {
           temp.add(
             node,
             this.match(),
-            this.expr(),
+            this.expr(noIn),
             this.match(']')
           );
           node = temp;
@@ -978,10 +981,13 @@ var Parser = Class(function(lexer) {
     }
     return node;
   },
-  prmrexpr: function() {
+  prmrexpr: function(noIn) {
     var node = new Node(Node.PRMREXPR);
     switch(this.look.type()) {
       case Token.ID:
+        if(noIn && this.look.content() == 'in') {
+          this.error();
+        }
       case Token.NUMBER:
       case Token.STRING:
       case Token.REG:

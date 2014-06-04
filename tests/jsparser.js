@@ -673,10 +673,26 @@ describe('jsparser', function() {
       var node = parser.parse('for(var k in {}){}');
       expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.ITERSTMT,["for","(",JsNode.VARSTMT,["var",JsNode.VARDECL,["k"]],"in",JsNode.PRMREXPR,[JsNode.OBJLTR,["{","}"]],")",JsNode.BLOCK,["{","}"]]]]);
     });
+    it('forstmt 5', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('for(new A in [1,2]);');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.ITERSTMT,["for","(",JsNode.NEWEXPR,["new",JsNode.PRMREXPR,["A"]],"in",JsNode.PRMREXPR,[JsNode.ARRLTR,["[",JsNode.PRMREXPR,["1"],",",JsNode.PRMREXPR,["2"],"]"]],")",JsNode.EMPTSTMT,[";"]]]]);
+    });
+    it('forstmt 6', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('for(a.b in [1,2]);');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.ITERSTMT,["for","(",JsNode.MMBEXPR,[JsNode.PRMREXPR,["a"],".","b"],"in",JsNode.PRMREXPR,[JsNode.ARRLTR,["[",JsNode.PRMREXPR,["1"],",",JsNode.PRMREXPR,["2"],"]"]],")",JsNode.EMPTSTMT,[";"]]]]);
+    });
     it('forstmt missing expr', function() {
       var parser = homunculus.getParser('js');
       expect(function() {
         parser.parse('for(');
+      }).to.throwError();
+    });
+    it('forstmt leftexpr error', function() {
+      var parser = homunculus.getParser('js');
+      expect(function() {
+        parser.parse('for(a() in b);');
       }).to.throwError();
     });
     it('forstmt missing ; 1', function() {
