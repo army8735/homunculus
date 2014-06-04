@@ -43,6 +43,12 @@ var EcmascriptRule = Rule.extend(function() {
   self.addMatch(new RegMatch(Token.NUMBER, /^0x[\da-f]*/i, {
     "SyntaxError: missing hexadecimal digits after '0x'": /^0x$/i
   }, Lexer.NOT_REG));
+  self.addMatch(new RegMatch(Token.NUMBER, /^0b[01]*/i, {
+    "SyntaxError: missing binary digits after '0b'": /^0b$/i
+  }, Lexer.NOT_REG));
+  self.addMatch(new RegMatch(Token.NUMBER, /^0o[01234567]*/i, {
+    "SyntaxError: missing octal digits after '0b'": /^0o$/i
+  }, Lexer.NOT_REG));
   self.addMatch(new RegMatch(Token.NUMBER, /^\d+\.?\d*(?:E[+-]?\d*)?/i, {
     'SyntaxError: missing exponent': /E[+-]?$/i
   }, Lexer.NOT_REG));
