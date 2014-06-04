@@ -1324,9 +1324,25 @@ var Parser = Class(function(lexer) {
     if(this.look.content() == 'new') {
       node.add(this.newexpr(depth + 1));
     }
-    //new super后不跟任何token
+    //LL2分辨super后是否为.[至mmbexpr
     else if(this.look.content() == 'super') {
-      node.add(this.match());
+      var end = false;
+      for(var i = this.index; i < this.length; i++) {
+        var next = this.tokens[i];
+        if(!S[next.type()]) {
+          if(['.', '['].indexOf(next.content()) > -1) {
+            node.add(this.mmbexpr());
+          }
+          else {
+            node.add(this.match());
+          }
+          end = true;
+          break;
+        }
+      }
+      if(!end) {
+        node.add(this.match());
+      }
     }
     else {
       node.add(this.mmbexpr());
@@ -1378,12 +1394,11 @@ var Parser = Class(function(lexer) {
               );
               mmb = node;
               node = new Node(Node.CALLEXPR);
-              break;
             }
             else {
               mmb = this.mmbexpr();
-              break;
             }
+            break;
           }
         }
       }
@@ -1447,23 +1462,8 @@ var Parser = Class(function(lexer) {
     var node = new Node(Node.MMBEXPR);
     var mmb;
     if(this.look.content() == 'super') {
-      node.add(this.match());
-      if(!this.look) {
-        this.error();
-      }
-      if(this.look.content() == '.') {
-        node.add(
-          this.match(),
-          this.match(Token.ID)
-        );
-      }
-      else if(this.look.content() == '[') {
-        node.add(
-          this.match(),
-          this.expr()
-        );
-      }
-      else {
+      mmb = this.match();
+      if(!this.look || ['.', '['].indexOf(this.look.content()) == -1) {
         this.error();
       }
     }

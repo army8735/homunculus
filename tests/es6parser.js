@@ -390,6 +390,47 @@ describe('es6parser', function() {
         parser.parse('new');
       }).to.throwError();
     });
+    it('super 1', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('new super');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.NEWEXPR,["new","super"]]]]]);
+    });
+    it('super 2', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('new super()');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.NEWEXPR,["new","super",JsNode.ARGS,["(",")"]]]]]]);
+    });
+    it('super 3', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('new super.a');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.NEWEXPR,["new",JsNode.MMBEXPR,["super",".","a"]]]]]]);
+    });
+    it('super 4', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('new super.a()');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.NEWEXPR,["new",JsNode.MMBEXPR,["super",".","a"],JsNode.ARGS,["(",")"]]]]]]);
+    });
+    it('super 5', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('new super.a().b');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.MMBEXPR,[JsNode.NEWEXPR,["new",JsNode.MMBEXPR,["super",".","a"],JsNode.ARGS,["(",")"]],".","b"]]]]]);
+    });
+    it('super 6', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('super.a');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.MMBEXPR,["super",".","a"]]]]]);
+    });
+    it('super 7', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('super["a"]()');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.CALLEXPR,[JsNode.MMBEXPR,["super","[",JsNode.PRMREXPR,["\"a\""],"]"],JsNode.ARGS,["(",")"]]]]]]);
+    });
+    it('super error', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('new a.super');
+      }).to.throwError();
+    });
     it('mmbexpr 1', function() {
       var parser = homunculus.getParser('es6');
       var node = parser.parse('a.b.c');
