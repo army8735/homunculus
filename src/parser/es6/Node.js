@@ -27,6 +27,15 @@ var Node = Class(function(type, children) {
   size: function() {
     return this.children.length;
   },
+  first: function() {
+    return this.leaf(0);
+  },
+  last: function() {
+    return this.leaf(this.size() - 1);
+  },
+  isEmpty: function() {
+    return this.size() === 0;
+  },
   add: function() {
     var self = this;
     var args = Array.prototype.slice.call(arguments, 0);
