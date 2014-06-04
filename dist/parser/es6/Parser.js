@@ -977,12 +977,12 @@ var Class = require('../../util/Class');
         && this.look.content() == '=>'
         && cndt.name() == Node.PRMREXPR
         && cndt.size() == 1
-        && (cndt.leaf(0).name() == Node.CPEAPL
-          || (cndt.leaf(0).name() == Node.TOKEN
-            && cndt.leaf(0).token().type() == Token.ID))) {
+        && (cndt.first().name() == Node.CPEAPL
+          || (cndt.first().name() == Node.TOKEN
+            && cndt.first().token().type() == Token.ID))) {
         node = new Node(Node.ARROWFN);
         var arrowparams = new Node(Node.ARROWPARAMS);
-        arrowparams.add(cndt.leaf(0));
+        arrowparams.add(cndt.first());
         node.add(
           arrowparams,
           this.match(),
@@ -1058,7 +1058,19 @@ var Class = require('../../util/Class');
     },
     cncsbody: function() {
       var node = new Node(Node.CNCSBODY);
-      node.add(this.assignexpr());
+      if(!this.look) {
+        this.error();
+      }
+      if(this.look.content() == '{') {
+        node.add(
+          this.match(),
+          this.fnbody(),
+          this.match('}')
+        );
+      }
+      else {
+        node.add(this.assignexpr());
+      }
       return node;
     },
     cndtexpr: function(noIn) {
