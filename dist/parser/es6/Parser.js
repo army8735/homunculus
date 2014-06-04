@@ -1443,7 +1443,7 @@ var Class = require('../../util/Class');
         return this.newexpr(0, noIn, noOf);
       }
       else {
-        return this.callexpr(noIn, noOf);
+        return this.callexpr(null, noIn, noOf);
       }
     },
     newexpr: function(depth, noIn, noOf) {

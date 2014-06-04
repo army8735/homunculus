@@ -831,10 +831,10 @@ var Parser = Class(function(lexer) {
       return this.newexpr(0, noIn);
     }
     else {
-      return this.callexpr(noIn);
+      return this.callexpr(null, noIn);
     }
   },
-  newexpr: function(depth) {
+  newexpr: function(depth, noIn) {
     depth = depth || 0;
     var node = new Node(Node.NEWEXPR);
     node.add(this.match('new'));
