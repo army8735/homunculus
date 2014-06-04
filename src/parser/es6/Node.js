@@ -156,6 +156,7 @@ var Node = Class(function(type, children) {
   CPEAPL: 'cpeapl',
   CLASSEXPR: 'classexpr',
   GENEXPR: 'genexpr',
+  GENDECL: 'gendecl',
   GENCMPH: 'gencmph',
   CMPH: 'cmph',
   CNCSBODY: 'cncsbody',

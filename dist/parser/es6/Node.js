@@ -164,6 +164,7 @@ var Class = require('../../util/Class');
     CPEAPL: 'cpeapl',
     CLASSEXPR: 'classexpr',
     GENEXPR: 'genexpr',
+    GENDECL: 'gendecl',
     GENCMPH: 'gencmph',
     CMPH: 'cmph',
     CNCSBODY: 'cncsbody',

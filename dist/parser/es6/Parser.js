@@ -98,6 +98,17 @@ var Class = require('../../util/Class');
         case 'const':
           return this.lexdecl();
         case 'function':
+          for(var i = this.index; i < this.length; i++) {
+            var token = this.tokens[i];
+            if(!S[token.type()]) {
+              if(token.content() == '*') {
+                return this.gendecl();
+              }
+              else {
+                return this.fndecl();
+              }
+            }
+          }
           return this.fndecl();
         case 'class':
           return this.classdecl();
@@ -741,6 +752,28 @@ var Class = require('../../util/Class');
     },
     genexpr: function() {
       var node = new Node(Node.GENEXPR);
+      node.add(
+        this.match('function'),
+        this.match('*')
+      );
+      if(!this.look) {
+        this.error('missing formal parameter');
+      }
+      if(this.look.type() == Token.ID) {
+        node.add(this.bindid());
+      }
+      node.add(
+        this.match('(', 'missing ( before formal parameters'),
+        this.fmparams(),
+        this.match(')', 'missing ) after formal parameters'),
+        this.match('{'),
+        this.fnbody(),
+        this.match('}', 'missing } after function body')
+      );
+      return node;
+    },
+    gendecl: function() {
+      var node = new Node(Node.GENDECL);
       node.add(
         this.match('function'),
         this.match('*')

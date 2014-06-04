@@ -246,6 +246,76 @@ describe('es6parser', function() {
         parser.parse('(function(a,1');
       }).to.throwError();
     });
+    it('gendecl', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('function * a(){}');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.GENDECL,["function","*",JsNode.BINDID,["a"],"(",JsNode.FMPARAMS,[],")","{",JsNode.FNBODY,[],"}"]]]]);
+    });
+    it('gendecl error 1', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('function *');
+      }).to.throwError();
+    });
+    it('gendecl error 2', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('function * a');
+      }).to.throwError();
+    });
+    it('gendecl error 3', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('function * a(');
+      }).to.throwError();
+    });
+    it('gendecl error 4', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('function * a()');
+      }).to.throwError();
+    });
+    it('gendecl error 5', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('function * a(){');
+      }).to.throwError();
+    });
+    it('genexpr', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('!function * a(){}');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.UNARYEXPR,["!",JsNode.PRMREXPR,[JsNode.GENEXPR,["function","*",JsNode.BINDID,["a"],"(",JsNode.FMPARAMS,[],")","{",JsNode.FNBODY,[],"}"]]]]]]]);
+    });
+    it('genexpr error 1', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('!function *');
+      }).to.throwError();
+    });
+    it('genexpr error 2', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('!function * a');
+      }).to.throwError();
+    });
+    it('genexpr error 3', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('!function * a(');
+      }).to.throwError();
+    });
+    it('genexpr error 4', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('!function * a()');
+      }).to.throwError();
+    });
+    it('genexpr error 5', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('!function * a(){');
+      }).to.throwError();
+    });
     it('arrinit error', function() {
       var parser = homunculus.getParser('es6');
       expect(function() {
