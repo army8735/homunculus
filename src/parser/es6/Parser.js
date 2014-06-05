@@ -62,7 +62,193 @@ var Parser = Class(function(lexer) {
     }
     var node = new Node(Node.SCRIPT);
     if(this.look) {
+      for(var i = 0; i < this.length; i++) {
+        if({
+          'export': true,
+          'import': true,
+          'module': true
+        }.hasOwnProperty(this.look.content())) {
+          node.add(this.modulebody());
+          return node;
+        }
+      }
       node.add(this.scriptbody());
+    }
+    return node;
+  },
+  modulebody: function() {
+    var node = new Node(Node.MODULEBODY);
+    while(this.look) {
+      node.add(this.moduleitem());
+    }
+    return node;
+  },
+  moduleitem: function() {
+    if(this.look.content() == 'module') {
+      return this.moduleimport();
+    }
+    else if(this.look.content() == 'import') {
+      return this.importdecl();
+    }
+    else if(this.look.content() == 'export') {
+      return this.exportdecl();
+    }
+    else {
+      return this.stmtlitem();
+    }
+  },
+  importdecl: function() {
+    var node = new Node(Node.IMPORTDECL);
+    node.add(this.match('import'));
+    if(!this.look) {
+      this.error();
+    }
+    if(this.look.type() == Token.STRING) {
+      node.add(
+        this.match(),
+        this.match(';')
+      );
+    }
+    else {
+      node.add(
+        this.importcaulse(),
+        this.fromcaulse(),
+        this.match(';')
+      );
+    }
+    return node;
+  },
+  moduleimport: function() {
+    var node = new Node(Node.MODULEIMPORT);
+    node.add(
+      this.match('module', true),
+      this.bindid(),
+      this.fromcaulse()
+    );
+    return node;
+  },
+  fromcaulse: function() {
+    var node = new Node(Node.FROMCAULSE);
+    node.add(
+      this.match('from'),
+      this.match(Token.STRING)
+    );
+    return node;
+  },
+  importcaulse: function() {
+    var node = new Node(Node.IMPORTCAULSE);
+    while(this.look) {
+      if(this.look.type() == Token.ID) {
+        node.add(this.match());
+        if(this.look && this.look.content() == ',') {
+          node.add(this.match());
+        }
+        else {
+          break;
+        }
+      }
+      else if(this.look.content() == '{') {
+        node.add(this.nameimport());
+        break;
+      }
+      else {
+        break;
+      }
+    }
+    return node;
+  },
+  nameimport: function() {
+    var node = new Node(Node.NAMEIMPORT);
+    node.add(this.match('{'));
+    while(this.look && this.look.content() != '}') {
+      node.add(this.importspec());
+      if(this.look && this.look.content() == ',') {
+        node.add(this.match());
+      }
+    }
+    node.add(this.match('}'));
+    return node;
+  },
+  importspec: function() {
+    var node = new Node(Node.IMPORTSPEC);
+    if(!this.look || this.look.type() != Token.ID) {
+      this.error();
+    }
+    //LL2确定是否有as
+    for(var i = this.index; i < this.length; i++) {
+      var token = this.tokens[i];
+      if(!S[token.type()]) {
+        if(token.content() == 'as') {
+          node.add(
+            this.match(),
+            this.match(),
+            this.bindid()
+          );
+          return node;
+        }
+        else {
+          break;
+        }
+      }
+    }
+    node.add(this.idref());
+    return node;
+  },
+  exportdecl: function() {
+    var node = new Node(Node.EXPORTDECL);
+    node.add(this.match('export'));
+    if(!this.look) {
+      this.error();
+    }
+    if(this.look.content() == '*') {
+      node.add(
+        this.match(),
+        this.fromcaulse(),
+        this.match(';')
+      );
+    }
+    else if(this.look.content() == '{') {
+      node.add(this.exportcaulse());
+      if(this.look && this.look.content() == 'from') {
+        node.add(this.fromcaulse());
+      }
+      node.add(this.match(';'));
+    }
+    else if(this.look.content() == 'default') {
+      node.add(
+        this.match(),
+        this.assignexpr(),
+        this.match(';')
+      );
+    }
+    else if(this.look.content() == 'var') {
+      node.add(this.varstmt());
+    }
+    else {
+      node.add(this.decl());
+    }
+    return node;
+  },
+  exportcaulse: function() {
+    var node = new Node(Node.EXPORTCAULSE);
+    while(this.look && this.look.content() != '}') {
+      node.add(this.match('{'));
+      node.add(this.exportspec());
+      if(this.look && this.look.content() == ',') {
+        node.add(this.match());
+      }
+    }
+    node.add(this.match('}'));
+    return node;
+  },
+  exportspec: function() {
+    var node = new Node(Node.EXPORTSPEC);
+    node.add(this.idref());
+    if(this.look && this.look.content() == 'as') {
+      node.add(
+        this.match('as'),
+        this.match(Token.ID)
+      );
     }
     return node;
   },

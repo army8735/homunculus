@@ -1352,6 +1352,121 @@ describe('es6parser', function() {
         parser.parse('a => {');
       }).to.throwError();
     });
+    it('module from', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('module a from "a"');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.MODULEBODY,[JsNode.MODULEIMPORT,["module",JsNode.BINDID,["a"],JsNode.FROMCAULSE,["from","\"a\""]]]]]);
+    });
+    it('module import', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('import "a"');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.MODULEBODY,[JsNode.IMPORTDECL,["import","\"a\""]]]]);
+    });
+    it('module import from 1', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('import {} from "a"');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.MODULEBODY,[JsNode.IMPORTDECL,["import",JsNode.IMPORTCAULSE,[JsNode.NAMEIMPORT,["{","}"]],JsNode.FROMCAULSE,["from","\"a\""]]]]]);
+    });
+    it('module import from 2', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('import {x} from "a"');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.MODULEBODY,[JsNode.IMPORTDECL,["import",JsNode.IMPORTCAULSE,[JsNode.NAMEIMPORT,["{",JsNode.IMPORTSPEC,["x"],"}"]],JsNode.FROMCAULSE,["from","\"a\""]]]]]);
+    });
+    it('module import from 3', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('import x from "a"');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.MODULEBODY,[JsNode.IMPORTDECL,["import",JsNode.IMPORTCAULSE,["x"],JsNode.FROMCAULSE,["from","\"a\""]]]]]);
+    });
+    it('module import from as', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('import x,{y as z,} from "a"');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.MODULEBODY,[JsNode.IMPORTDECL,["import",JsNode.IMPORTCAULSE,["x",",",JsNode.NAMEIMPORT,["{",JsNode.IMPORTSPEC,["y","as",JsNode.BINDID,["z"]],",","}"]],JsNode.FROMCAULSE,["from","\"a\""]]]]]);
+    });
+    it('module export *', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('export * from "a"');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.MODULEBODY,[JsNode.EXPORTDECL,["export","*",JsNode.FROMCAULSE,["from","\"a\""]]]]]);
+    });
+    it('module export from', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('export {x} from "a"');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.MODULEBODY,[JsNode.EXPORTDECL,["export",JsNode.EXPORTCAULSE,["{",JsNode.EXPORTSPEC,["x"],"}"],JsNode.FROMCAULSE,["from","\"a\""]]]]]);
+    });
+    it('module var', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('export var a = 1');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.MODULEBODY,[JsNode.EXPORTDECL,["export",JsNode.VARSTMT,["var",JsNode.VARDECL,[JsNode.BINDID,["a"],JsNode.INITLZ,["=",JsNode.PRMREXPR,["1"]]]]]]]]);
+    });
+    it('module decl', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('export function *(){}');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.MODULEBODY,[JsNode.EXPORTDECL,["export",JsNode.GENDECL,["function","*","(",JsNode.FMPARAMS,[],")","{",JsNode.FNBODY,[],"}"]]]]]);
+    });
+    it('module default', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('export default a+b');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.MODULEBODY,[JsNode.EXPORTDECL,["export","default",JsNode.ADDEXPR,[JsNode.PRMREXPR,["a"],"+",JsNode.PRMREXPR,["b"]]]]]]);
+    });
+    it('module error 1', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('module');
+      }).to.throwError();
+    });
+    it('module error 2', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('module a');
+      }).to.throwError();
+    });
+    it('module error 3', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('module a from');
+      }).to.throwError();
+    });
+    it('module error 4', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('import');
+      }).to.throwError();
+    });
+    it('module error 5', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('import x');
+      }).to.throwError();
+    });
+    it('module error 6', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('import x from');
+      }).to.throwError();
+    });
+    it('module error 7', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('export');
+      }).to.throwError();
+    });
+    it('module error 7', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('export x');
+      }).to.throwError();
+    });
+    it('module error 7', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('export "a"');
+      }).to.throwError();
+    });
+    it('module error 7', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('export x from');
+      }).to.throwError();
+    });
   });
   describe('other test', function() {
     it('node #parent,#prev,#next', function () {

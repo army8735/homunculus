@@ -165,11 +165,18 @@ var Node = Class(function(type, children) {
   CLASSELEM: 'classelem',
   METHOD: 'method',
   GENMETHOD: 'genmethod',
-  MODULE: 'module',
   MODULEBODY: 'moduelbody',
-  MODULEITEM: 'moduleitem',
   IMPORT: 'import',
   EXPORT: 'export',
+  IMPORTDECL: 'importdecl',
+  MODULEIMPORT: 'moduleimport',
+  FROMCAULSE: 'formcaulse',
+  IMPORTCAULSE: 'importcaulse',
+  NAMEIMPORT: 'nameimport',
+  IMPORTSPEC: 'importspec',
+  EXPORTDECL: 'exportdecl',
+  EXPORTCAULSE: 'exportcaulse',
+  EXPORTSPEC: 'exportspec',
   getKey: function(s) {
     if(!s) {
       throw new Error('empty value');
