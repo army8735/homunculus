@@ -151,9 +151,10 @@
             'g': true,
             'i': true,
             'm': true,
+            'u': true,
             'y': true
           };
-          //正则的flag中有gimy4种，大小写敏感且不能重复
+          //正则的flag中有gimuy4种，大小写敏感且不能重复
           do {
             this.readch();
             if(character.isLetter(this.peek)) {
