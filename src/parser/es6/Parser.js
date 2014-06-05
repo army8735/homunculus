@@ -226,7 +226,7 @@ var Parser = Class(function(lexer) {
     this.declnode(node);
     return node;
   },
-  bindid: function(msg, noIn, noOf, yYield) {
+  bindid: function(msg, noIn, noOf) {
     var node = new Node(Node.BINDID);
     if(!this.look) {
       this.error(msg);
@@ -237,12 +237,7 @@ var Parser = Class(function(lexer) {
     if(noOf && this.look.content() == 'of') {
       this.error();
     }
-    if(yYield && this.look.content() == 'yield') {
-      node.add(this.match());
-    }
-    else {
-      node.add(this.match(Token.ID, msg));
-    }
+    node.add(this.match(Token.ID, msg));
     return node;
   },
   bindpat: function() {
@@ -1876,7 +1871,7 @@ var Parser = Class(function(lexer) {
     }
     return node;
   },
-  idref: function(noIn, noOf, yYield) {
+  idref: function(noIn, noOf) {
     if(!this.look) {
       this.error('invalid property id');
     }
