@@ -125,6 +125,7 @@ var Node = Class(function(type, children) {
   ARRLTR: 'arrltr',
   OBJLTR: 'objltr',
   PROPTDEF: 'proptdef',
+  IDREF: 'idref',
   ARGS: 'args',
   ARGLIST: 'arglist',
   IMPTSTMT: 'imptstmt',

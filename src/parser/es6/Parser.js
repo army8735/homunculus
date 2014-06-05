@@ -1666,6 +1666,8 @@ var Parser = Class(function(lexer) {
         if(noOf && this.look.content() == 'of') {
           this.error();
         }
+        node.add(this.idref(noIn, noOf));
+      break;
       case Token.NUMBER:
       case Token.STRING:
       case Token.REG:
@@ -1890,7 +1892,7 @@ var Parser = Class(function(lexer) {
                 end = true;
               }
               else if([',', '}'].indexOf(next.content()) > -1) {
-                node.add(this.match());
+                node.add(this.idref(null, noIn, noOf));
                 end = true;
               }
               break;
@@ -1911,6 +1913,20 @@ var Parser = Class(function(lexer) {
           this.error('invalid property id');
       }
     }
+    return node;
+  },
+  idref: function(noYield, noIn, noOf) {
+    var node = new Node(Node.IDREF);
+    if(!this.look) {
+      this.error('invalid property id');
+    }
+    if(noIn && this.look.content() == 'in') {
+      this.error();
+    }
+    if(noOf && this.look.content() == 'of') {
+      this.error();
+    }
+    node.add(this.match(Token.ID, 'invalid property id'));
     return node;
   },
   proptname: function(cmpt, noIn, noOf) {
