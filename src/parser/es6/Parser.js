@@ -228,8 +228,17 @@ var Parser = Class(function(lexer) {
     this.declnode(node);
     return node;
   },
-  bindid: function(msg) {
+  bindid: function(msg, noIn, noOf) {
     var node = new Node(Node.BINDID);
+    if(!this.look) {
+      this.error(msg);
+    }
+    if(noIn && this.look.content() == 'in') {
+      this.error();
+    }
+    if(noOf && this.look.content() == 'of') {
+      this.error();
+    }
     node.add(this.match(Token.ID, msg));
     return node;
   },
@@ -795,13 +804,7 @@ var Parser = Class(function(lexer) {
       this.error('missing formal parameter');
     }
     if(this.look.type() == Token.ID) {
-      if(noIn && this.look.content() == 'in') {
-        this.error();
-      }
-      if(noOf && this.look.content() == 'in') {
-        this.error();
-      }
-      node.add(this.bindid());
+      node.add(this.bindid(noIn, noOf));
     }
     node.add(
       this.match('(', 'missing ( before formal parameters'),
@@ -813,7 +816,7 @@ var Parser = Class(function(lexer) {
     );
     return node;
   },
-  genexpr: function() {
+  genexpr: function(noIn, noOf) {
     var node = new Node(Node.GENEXPR);
     node.add(
       this.match('function'),
@@ -823,7 +826,7 @@ var Parser = Class(function(lexer) {
       this.error('missing formal parameter');
     }
     if(this.look.type() == Token.ID) {
-      node.add(this.bindid());
+      node.add(this.bindid(noIn, noOf));
     }
     node.add(
       this.match('(', 'missing ( before formal parameters'),
@@ -835,7 +838,7 @@ var Parser = Class(function(lexer) {
     );
     return node;
   },
-  gendecl: function() {
+  gendecl: function(noIn, noOf) {
     var node = new Node(Node.GENDECL);
     node.add(
       this.match('function'),
@@ -845,7 +848,7 @@ var Parser = Class(function(lexer) {
       this.error('missing formal parameter');
     }
     if(this.look.type() == Token.ID) {
-      node.add(this.bindid());
+      node.add(this.bindid(noIn, noOf));
     }
     node.add(
       this.match('(', 'missing ( before formal parameters'),
@@ -901,7 +904,7 @@ var Parser = Class(function(lexer) {
       this.error();
     }
     if(this.look.content() == 'extends') {
-      node.add(this.heratige());
+      node.add(this.heratige(noIn, noOf));
     }
     node.add(
       this.match('{'),
@@ -920,7 +923,7 @@ var Parser = Class(function(lexer) {
       if(noIn && this.look.content() == 'in') {
         this.error();
       }
-      if(noOf && this.look.content() == 'in') {
+      if(noOf && this.look.content() == 'of') {
         this.error();
       }
       node.add(this.bindid());
@@ -929,31 +932,31 @@ var Parser = Class(function(lexer) {
       this.error();
     }
     if(this.look.content() == 'extends') {
-      node.add(this.heratige());
+      node.add(this.heratige(noIn, noOf));
     }
     node.add(
       this.match('{'),
-      this.classbody(),
+      this.classbody(noIn, noOf),
       this.match('}')
     );
     return node;
   },
-  heratige: function() {
+  heratige: function(noIn, noOf) {
     var node = new Node(Node.HERITAGE);
     node.add(
       this.match('extends'),
-      this.leftexpr()
+      this.leftexpr(noIn, noOf)
     );
     return node;
   },
-  classbody: function() {
+  classbody: function(noIn, noOf) {
     var node = new Node(Node.CLASSBODY);
     while(this.look && this.look.content() != '}') {
-      node.add(this.classelem());
+      node.add(this.classelem(noIn, noOf));
     }
     return node;
   },
-  classelem: function() {
+  classelem: function(noIn, noOf) {
     var node = new Node(Node.CLASSELEM);
     if(this.look.content() == ';') {
       node.add(this.match());
@@ -961,20 +964,20 @@ var Parser = Class(function(lexer) {
     else if(this.look.content() == 'static') {
       node.add(
         this.match(),
-        this.method()
+        this.method(noIn, noOf)
       );
     }
     else {
-      node.add(this.method());
+      node.add(this.method(noIn, noOf));
     }
     return node;
   },
-  method: function() {
+  method: function(noIn, noOf) {
     var node = new Node(Node.METHOD);
     if(this.look.content() == 'get') {
       node.add(
         this.match(),
-        this.proptname(),
+        this.proptname(noIn, noOf),
         this.match('('),
         this.match(')'),
         this.match('{'),
@@ -985,7 +988,7 @@ var Parser = Class(function(lexer) {
     else if(this.look.content() == 'set') {
       node.add(
         this.match(),
-        this.proptname(),
+        this.proptname(noIn, noOf),
         this.match('('),
         this.fmparams(),
         this.match(')'),
@@ -995,11 +998,11 @@ var Parser = Class(function(lexer) {
       );
     }
     else if(this.look.content() == '*') {
-      node.add(this.genmethod());
+      node.add(this.genmethod(noIn, noOf));
     }
     else {
       node.add(
-        this.proptname(),
+        this.proptname(noIn, noOf),
         this.match('('),
         this.fmparams(),
         this.match(')'),
@@ -1010,11 +1013,11 @@ var Parser = Class(function(lexer) {
     }
     return node;
   },
-  genmethod: function() {
+  genmethod: function(noIn, noOf) {
     var node = new Node(Node.GENMETHOD);
     node.add(
       this.match('*'),
-      this.proptname(),
+      this.proptname(noIn, noOf),
       this.match('('),
       this.fmparams(),
       this.match(')'),
@@ -1058,11 +1061,11 @@ var Parser = Class(function(lexer) {
     }
     return node;
   },
-  initlz: function(noIn) {
+  initlz: function(noIn, noOf) {
     var node = new Node(Node.INITLZ);
     node.add(
       this.match('='),
-      this.assignexpr(noIn)
+      this.assignexpr(noIn, noOf)
     );
     return node;
   },
@@ -1072,7 +1075,7 @@ var Parser = Class(function(lexer) {
       this.error();
     }
     if(this.look.content() == 'yield') {
-      return this.yieldexpr();
+      return this.yieldexpr(noIn, noOf);
     }
     var cndt = this.cndtexpr(noIn, noOf);
     if(this.look
@@ -1088,7 +1091,7 @@ var Parser = Class(function(lexer) {
       node.add(
         arrowparams,
         this.match(),
-        this.cncsbody()
+        this.cncsbody(noIn, noOf)
       );
     }
     else if(this.look
@@ -1114,19 +1117,19 @@ var Parser = Class(function(lexer) {
     }
     return node;
   },
-  yieldexpr: function() {
+  yieldexpr: function(noIn, noOf) {
     var node = new Node(Node.YIELDEXPR);
     node.add(this.match('yield'));
     if(this.look) {
       if(this.look.content() == '*') {
         node.add(
           this.match(),
-          this.assignexpr()
+          this.assignexpr(noIn, noOf)
         );
       }
       else if([';', '}', '...', ':', '?', ',', '=>'].indexOf(this.look.content()) == -1
         && this.look.type() != Token.KEYWORD) {
-        node.add(this.assignexpr());
+        node.add(this.assignexpr(noIn, noOf));
       }
     }
     return node;
@@ -1158,7 +1161,7 @@ var Parser = Class(function(lexer) {
     node.add(this.match(')'));
     return node;
   },
-  cncsbody: function() {
+  cncsbody: function(noIn, noOf) {
     var node = new Node(Node.CNCSBODY);
     if(!this.look) {
       this.error();
@@ -1171,7 +1174,7 @@ var Parser = Class(function(lexer) {
       );
     }
     else {
-      node.add(this.assignexpr());
+      node.add(this.assignexpr(noIn, noOf));
     }
     return node;
   },
@@ -1701,20 +1704,20 @@ var Parser = Class(function(lexer) {
               var next = this.tokens[i];
               if(!S[next.type()]) {
                 if(next.content() == 'for') {
-                  node.add(this.gencmph());
+                  node.add(this.gencmph(noIn, noOf));
                 }
                 else {
-                  node.add(this.cpeapl());
+                  node.add(this.cpeapl(noIn, noOf));
                 }
                 break;
               }
             }
           break;
           case '[':
-            node.add(this.arrinit());
+            node.add(this.arrinit(noIn, noOf));
           break;
           case '{':
-            node.add(this.objltr());
+            node.add(this.objltr(noIn, noOf));
           break;
           default:
             this.error();
@@ -1722,70 +1725,70 @@ var Parser = Class(function(lexer) {
     }
     return node;
   },
-  arrinit: function() {
+  arrinit: function(noIn, noOf) {
     //根据LL2分辨是arrltr还是arrcmph
     //[assignexpr or [for
     for(var i = this.index; i < this.length; i++) {
       var next = this.tokens[i];
       if(!S[next.type()]) {
         if(next.content() == 'for') {
-          return this.arrcmph();
+          return this.arrcmph(noIn, noOf);
         }
         else {
-          return this.arrltr();
+          return this.arrltr(noIn, noOf);
         }
       }
     }
     this.error();
   },
-  gencmph: function() {
+  gencmph: function(noIn, noOf) {
     var node = new Node(Node.GENCMPH);
     node.add(
       this.match('('),
-      this.cmph(),
+      this.cmph(noIn, noOf),
       this.match(')')
     );
     return node;
   },
-  arrcmph: function() {
+  arrcmph: function(noIn, noOf) {
     var node = new Node(Node.ARRCMPH);
     node.add(
       this.match('['),
-      this.cmph(),
+      this.cmph(noIn, noOf),
       this.match(']', 'missing ] after element list')
     );
     return node;
   },
-  cmph: function() {
+  cmph: function(noIn, noOf) {
     var node = new Node(Node.CMPH);
     node.add(this.cmphfor());
     while(this.look && this.look.content() != ']') {
       if(this.look.content() == 'for') {
-        node.add(this.cmphfor());
+        node.add(this.cmphfor(noIn, noOf));
       }
       else if(this.look.content() == 'if') {
-        node.add(this.cmphif());
+        node.add(this.cmphif(noIn, noOf));
       }
       else {
-        node.add(this.assignexpr());
+        node.add(this.assignexpr(noIn, noOf));
         break;
       }
     }
     return node;
   },
-  cmphfor: function() {
+  cmphfor: function(noIn, noOf) {
     var node = new Node(Node.CMPHFOR);
     node.add(
       this.match('for'),
       this.match('('),
-      this.forbind(),
+      this.forbind(noIn, noOf),
       this.match('of'),
-      this.assignexpr(),
+      this.assignexpr(noIn, noOf),
       this.match(')')
     );
     return node;
   },
-  forbind: function() {
+  forbind: function(noIn, noOf) {
     if(!this.look) {
       this.error();
     }
@@ -1793,20 +1796,20 @@ var Parser = Class(function(lexer) {
       return this.bindpat();
     }
     else {
-      return this.bindid();
+      return this.bindid(noIn, noOf);
     }
   },
-  cmphif: function() {
+  cmphif: function(noIn, noOf) {
     var node = new Node(Node.CMPHIF);
     node.add(
       this.match('if'),
       this.match('('),
-      this.assignexpr(),
+      this.assignexpr(noIn, noOf),
       this.match(')')
     );
     return node;
   },
-  arrltr: function() {
+  arrltr: function(noIn, noOf) {
     var node = new Node(Node.ARRLTR);
     node.add(this.match('['));
     while(this.look && this.look.content() != ']' && this.look.content() != '...') {
@@ -1814,28 +1817,28 @@ var Parser = Class(function(lexer) {
         node.add(this.match());
       }
       else {
-        node.add(this.assignexpr());
+        node.add(this.assignexpr(noIn, noOf));
         if(this.look && this.look.content() == ',') {
           node.add(this.match());
         }
       }
     }
     if(this.look.content() == '...') {
-      node.add(this.spread());
+      node.add(this.spread(noIn, noOf));
     }
     node.add(this.match(']', 'missing ] after element list'));
     return node;
   },
-  spread: function() {
+  spread: function(noIn, noOf) {
     var node = new Node(Node.SPREAD);
-    node.add(this.match('...'), this.assignexpr());
+    node.add(this.match('...'), this.assignexpr(noIn, noOf));
     return node;
   },
-  objltr: function() {
+  objltr: function(noIn, noOf) {
     var node = new Node(Node.OBJLTR);
     node.add(this.match('{'));
     while(this.look && this.look.content() != '}') {
-      node.add(this.proptassign());
+      node.add(this.proptdef(noIn, noOf));
       if(this.look && this.look.content() == ',') {
         node.add(this.match());
       }
@@ -1843,44 +1846,65 @@ var Parser = Class(function(lexer) {
     node.add(this.match('}', 'missing } after property list'));
     return node;
   },
-  proptassign: function() {
-    var node = new Node(Node.PROPTASSIGN);
+  proptdef: function(noIn, noOf) {
+    var node = new Node(Node.PROPTDEF);
     if(!this.look) {
       this.error();
     }
-    if(this.look.content() == 'get') {
-      node.add(this.match());
-      if(!this.look) {
-        this.error();
-      }
-      if(this.look.content() == ':') {
-        node.add(this.match(), this.assignexpr());
-      }
-      else {
-        node.add(this.getfn());
-      }
+    if(['get', 'set'].indexOf(this.look.content()) > -1) {
+      node.add(this.method(noIn, noOf));
     }
-    else if(this.look.content() == 'set') {
-      node.add(this.match());
+    else if(this.look.content() == '[') {
+      var cmpt = this.cmptpropt(noIn, noOf);
       if(!this.look) {
         this.error();
       }
       if(this.look.content() == ':') {
-        node.add(this.match(), this.assignexpr());
+        node.add(
+          this.proptname(cmpt, noIn, noOf),
+          this.match(),
+          this.assignexpr(noIn, noOf)
+        );
       }
       else {
-        node.add(this.setfn());
+        node.add(cmpt);
       }
     }
     else {
       switch(this.look.type()) {
         case Token.ID:
+          //LL2区分 (为method :为propt: assginment
+          var end = false;
+          for(var i = this.index; i < this.length; i++) {
+            var next = this.tokens[i];
+            if(!S[next.type()]) {
+              if(next.content() == '(') {
+                node.add(this.method(noIn, noOf));
+                end = true;
+              }
+              else if(next.content() == '=') {
+                node.add(
+                  this.match(),
+                  this.initlz(noIn, noOf)
+                );
+                end = true;
+              }
+              else if([',', '}'].indexOf(next.content()) > -1) {
+                node.add(this.match());
+                end = true;
+              }
+              break;
+            }
+          }
+          if(end) {
+            break;
+          }
         case Token.STRING:
         case Token.NUMBER:
           node.add(
-            this.match(),
+            this.proptname(noIn, noOf),
             this.match(':', 'missing : after property id'),
-            this.assignexpr()
+            this.assignexpr(noIn, noOf)
           );
         break;
         default:
@@ -1889,48 +1913,32 @@ var Parser = Class(function(lexer) {
     }
     return node;
   },
-  getfn: function() {
-    var node = new Node(Node.GETFN);
-    node.add(
-      this.proptname(),
-      this.match('('),
-      this.match(')'),
-      this.match('{'),
-      this.fnbody(),
-      this.match('}')
-    );
-    return node;
-  },
-  setfn: function() {
-    var node = new Node(Node.SETFN);
-    node.add(
-      this.proptname(),
-      this.match('('),
-      this.propsets(),
-      this.match(')'),
-      this.match('{'),
-      this.fnbody(),
-      this.match('}')
-    );
-    return node;
-  },
-  proptname: function() {
+  proptname: function(cmpt, noIn, noOf) {
     var node = new Node(Node.PROPTNAME);
     if(!this.look) {
       this.error('invalid property id');
     }
-    if(this.look.content() == '[') {
-      node.add(this.cmptpropt());
+    if(cmpt) {
+      node.add(cmpt);
+    }
+    else if(this.look.content() == '[') {
+      node.add(this.cmptpropt(noIn, noOf));
     }
     else {
-      node.add(this.ltrpropt());
+      node.add(this.ltrpropt(noIn, noOf));
     }
     return node;
   },
-  ltrpropt: function() {
+  ltrpropt: function(noIn, noOf) {
     var node = new Node(Node.LTRPROPT);
     switch(this.look.type()) {
       case Token.ID:
+        if(noIn && this.look.content() == 'in') {
+          this.error();
+        }
+        if(noOf && this.look.content() == 'of') {
+          this.error();
+        }
       case Token.NUMBER:
       case Token.STRING:
         node.add(this.match());
@@ -1939,18 +1947,13 @@ var Parser = Class(function(lexer) {
         this.error('invalid property id');
     }
   },
-  cmptpropt: function() {
+  cmptpropt: function(noIn, noOf) {
     var node = new Node(Node.CMPTPROPT);
     node.add(
       this.match('['),
-      this.assignexpr(),
+      this.assignexpr(noIn, noOf),
       this.match(']')
     );
-    return node;
-  },
-  propsets: function() {
-    var node = new Node(Node.PROPTSETS);
-    node.add(this.match(Token.ID, 'setter functions must have one argument'));
     return node;
   },
   args: function() {
