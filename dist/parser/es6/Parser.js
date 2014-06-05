@@ -1091,17 +1091,15 @@
     yieldexpr: function(noIn, noOf, yYield) {
       var node = new Node(Node.YIELDEXPR);
       node.add(this.match('yield'));
-      if(this.look) {
-        if(this.look.content() == '*') {
-          node.add(
-            this.match(),
-            this.assignexpr(noIn, noOf, yYield)
-          );
-        }
-        else if([';', '}', '...', ':', '?', ',', '=>'].indexOf(this.look.content()) == -1
-          && this.look.type() != Token.KEYWORD) {
-          node.add(this.assignexpr(noIn, noOf, yYield));
-        }
+      if(this.look && this.look.content() == '*') {
+        node.add(this.match());
+      }
+      if(!this.look) {
+        this.error();
+      }
+      if([';', '}'].indexOf(this.look.content()) == -1
+        && this.look.type() != Token.KEYWORD) {
+        node.add(this.assignexpr(noIn, noOf, yYield));
       }
       return node;
     },
