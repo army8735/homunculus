@@ -226,7 +226,7 @@ var Parser = Class(function(lexer) {
     this.declnode(node);
     return node;
   },
-  bindid: function(msg, noIn, noOf) {
+  bindid: function(msg, noIn, noOf, noYield, pYield) {
     var node = new Node(Node.BINDID);
     if(!this.look) {
       this.error(msg);
@@ -237,7 +237,15 @@ var Parser = Class(function(lexer) {
     if(noOf && this.look.content() == 'of') {
       this.error();
     }
-    node.add(this.match(Token.ID, msg));
+    if(pYield && this.look.content() == 'yield') {
+      node.add(this.match());
+    }
+    else if(noYield && this.look.content() == 'yield') {
+      this.error();
+    }
+    else {
+      node.add(this.match(Token.ID, msg));
+    }
     return node;
   },
   bindpat: function() {
@@ -271,32 +279,32 @@ var Parser = Class(function(lexer) {
     node.add(this.match(']', 'missing ] after element list'));
     return node;
   },
-  bindelem: function() {
+  bindelem: function(pYield) {
     var node = new Node(Node.BINDELEM);
     if(['[', '{'].indexOf(this.look.content()) > -1) {
-      node.add(this.bindpat());
+      node.add(this.bindpat(pYield));
       if(this.look && this.look.content() == '=') {
-        node.add(this.initlz());
+        node.add(this.initlz(pYield));
       }
     }
     else {
-      return this.singlename();
+      return this.singlename(pYield);
     }
     return node;
   },
-  singlename: function() {
+  singlename: function(pYield) {
     var node = new Node(Node.SINGLENAME);
-    node.add(this.bindid());
+    node.add(this.bindid(null, null, null, null, pYield));
     if(this.look && this.look.content() == '=') {
-      node.add(this.initlz());
+      node.add(this.initlz(pYield));
     }
     return node;
   },
-  bindrest: function() {
+  bindrest: function(pYield) {
     var node = new Node(Node.BINDREST);
     node.add(
       this.match('...'),
-      this.bindid('no parameter name after ...')
+      this.bindid('no parameter name after ...', null, null, null, pYield)
     );
     return node;
   },
@@ -802,7 +810,7 @@ var Parser = Class(function(lexer) {
       this.error('missing formal parameter');
     }
     if(this.look.type() == Token.ID) {
-      node.add(this.bindid(noIn, noOf));
+      node.add(this.bindid(null, noIn, noOf));
     }
     node.add(
       this.match('(', 'missing ( before formal parameters'),
@@ -824,7 +832,7 @@ var Parser = Class(function(lexer) {
       this.error('missing formal parameter');
     }
     if(this.look.type() == Token.ID) {
-      node.add(this.bindid(noIn, noOf));
+      node.add(this.bindid(null, noIn, noOf));
     }
     node.add(
       this.match('(', 'missing ( before formal parameters'),
@@ -846,7 +854,7 @@ var Parser = Class(function(lexer) {
       this.error('missing formal parameter');
     }
     if(this.look.type() == Token.ID) {
-      node.add(this.bindid(noIn, noOf));
+      node.add(this.bindid(null, noIn, noOf));
     }
     node.add(
       this.match('(', 'missing ( before formal parameters'),
@@ -871,7 +879,7 @@ var Parser = Class(function(lexer) {
         break;
       }
       else {
-        node.add(this.bindelem());
+        node.add(this.bindelem(true));
         if(this.look && this.look.content() == ',') {
           node.add(this.match());
         }
@@ -881,7 +889,7 @@ var Parser = Class(function(lexer) {
       this.error('missing ) after formal parameters');
     }
     if(this.look.content() == '...') {
-      node.add(this.bindrest());
+      node.add(this.bindrest(true));
     }
     return node;
   },
@@ -918,13 +926,7 @@ var Parser = Class(function(lexer) {
       this.error();
     }
     if(this.look.type() == Token.ID) {
-      if(noIn && this.look.content() == 'in') {
-        this.error();
-      }
-      if(noOf && this.look.content() == 'of') {
-        this.error();
-      }
-      node.add(this.bindid());
+      node.add(this.bindid(null, noIn, noOf));
     }
     if(!this.look) {
       this.error();
