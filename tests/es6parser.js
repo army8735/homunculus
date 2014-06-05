@@ -424,6 +424,26 @@ describe('es6parser', function() {
         parser.parse('[for(a of b)if(true)a');
       }).to.throwError();
     });
+    it('objlatr 1', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('({x,y}={"x":1,"y":2})');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.PRMREXPR,[JsNode.CPEAPL,["(",JsNode.ASSIGNEXPR,[JsNode.PRMREXPR,[JsNode.OBJLTR,["{",JsNode.PROPTDEF,["x"],",",JsNode.PROPTDEF,["y"],"}"]],"=",JsNode.PRMREXPR,[JsNode.OBJLTR,["{",JsNode.PROPTDEF,[JsNode.PROPTNAME,[JsNode.LTRPROPT,["\"x\""]],":",JsNode.PRMREXPR,["1"]],",",JsNode.PROPTDEF,[JsNode.PROPTNAME,[JsNode.LTRPROPT,["\"y\""]],":",JsNode.PRMREXPR,["2"]],"}"]]],")"]]]]]]);
+    });
+    it('objlatr 2', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('({x,y,[a]})');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.PRMREXPR,[JsNode.CPEAPL,["(",JsNode.PRMREXPR,[JsNode.OBJLTR,["{",JsNode.PROPTDEF,["x"],",",JsNode.PROPTDEF,["y"],",",JsNode.PROPTDEF,[JsNode.CMPTPROPT,["[",JsNode.PRMREXPR,["a"],"]"]],"}"]],")"]]]]]]);
+    });
+    it('objlatr 3', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('!{a(){}}');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.UNARYEXPR,["!",JsNode.PRMREXPR,[JsNode.OBJLTR,["{",JsNode.PROPTDEF,[JsNode.METHOD,[JsNode.PROPTNAME,[JsNode.LTRPROPT,["a"]],"(",JsNode.FMPARAMS,[],")","{",JsNode.FNBODY,[],"}"]],"}"]]]]]]]);
+    });
+    it('objlatr 4', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('~{x,y,}');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.UNARYEXPR,["~",JsNode.PRMREXPR,[JsNode.OBJLTR,["{",JsNode.PROPTDEF,["x"],",",JsNode.PROPTDEF,["y"],",","}"]]]]]]]);
+    });
     it('newexpr 1', function() {
       var parser = homunculus.getParser('es6');
       var node = parser.parse('new A');
