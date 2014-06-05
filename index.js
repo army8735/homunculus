@@ -35,6 +35,7 @@
           case 'js':
           case 'javascript':
           case 'es':
+          case 'es5':
           case 'ecmascript':
           case 'es6':
           case 'as':
@@ -51,6 +52,7 @@
           case 'js':
           case 'javascript':
           case 'es':
+          case 'es5':
           case 'ecmascript':
             return JsParser;
           case 'es6':
@@ -66,6 +68,7 @@
           case 'js':
           case 'javascript':
           case 'es':
+          case 'es5':
           case 'ecmascript':
             return JsNode;
           case 'es6':
@@ -81,6 +84,7 @@
           case 'js':
           case 'javascript':
           case 'es':
+          case 'es5':
           case 'ecmascript':
             return JsContext;
           default:
@@ -100,6 +104,7 @@
       case 'js':
       case 'javascript':
       case 'es':
+      case 'es5':
       case 'ecmascript':
       case 'es6':
       case 'as':
@@ -125,6 +130,7 @@
       case 'js':
       case 'javascript':
       case 'es':
+      case 'es5':
       case 'ecmascript':
         return new JsParser(exports.getLexer(lan));
       case 'es6':
@@ -142,6 +148,7 @@
       case 'js':
       case 'javascript':
       case 'es':
+      case 'es5':
       case 'ecmascript':
         return new JsContext();
       default:

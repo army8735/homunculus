@@ -13,13 +13,13 @@ npm install homunculus
 ## API
 * getClass(type:String, lan:String):class
  * type: lexer parser node context token
- * lan: js javascript es ecmascript as actionscript css
+ * lan: js javascript es es5 ecmascript es6 as actionscript css
 * getLexer(lan:String):object
- * lan: js javascript es ecmascript as actionscript css java c++ cpp cplusplus
+ * lan: js javascript es es5 ecmascript es6 as actionscript css java c++ cpp cplusplus
 * getParser(lan:String):object
- * lan: js javascript es ecmascript css
+ * lan: js javascript es es5 ecmascript es6 css
 * getContext(lan:String):object
- * lan: js javascript es ecmascript
+ * lan: js javascript es es5 ecmascript
 
 ## AST
 当调用语法分析器解析后，会返回生成ast，这是一个树状数据结构，每个节点都是对应语法解析器目录下的Node.js的实例。<br/>
