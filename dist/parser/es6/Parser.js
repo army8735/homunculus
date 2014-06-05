@@ -81,12 +81,12 @@
       }
       return node;
     },
-    stmtlitem: function() {
+    stmtlitem: function(yYield) {
       if(['function', 'class', 'let', 'const'].indexOf(this.look.content()) > -1) {
         return this.decl();
       }
       else {
-        return this.stmt();
+        return this.stmt(yYield);
       }
     },
     decl: function() {
@@ -114,7 +114,7 @@
           return this.classdecl();
       }
     },
-    stmt: function() {
+    stmt: function(yYield) {
       if(!this.look) {
         this.error();
       }
@@ -147,8 +147,6 @@
           return this.trystmt();
         case 'debugger':
           return this.debstmt();
-        case 'yield':
-          return this.labstmt();
         default:
           if(this.look.type() == Token.ID) {
             for(var i = this.index; i < this.length; i++) {
@@ -158,17 +156,17 @@
                   return this.labstmt();
                 }
                 else {
-                  return this.exprstmt();
+                  return this.exprstmt(yYield);
                 }
               }
             }
           }
-          return this.exprstmt();
+          return this.exprstmt(yYield);
       }
     },
-    exprstmt: function() {
+    exprstmt: function(yYield) {
       var node = new Node(Node.EXPRSTMT);
-      node.add(this.expr(), this.match(';'));
+      node.add(this.expr(null, null, yYield), this.match(';'));
       return node;
     },
     lexdecl: function() {
@@ -841,7 +839,7 @@
         this.fmparams(),
         this.match(')', 'missing ) after formal parameters'),
         this.match('{'),
-        this.fnbody(),
+        this.fnbody(true),
         this.match('}', 'missing } after function body')
       );
       return node;
@@ -863,7 +861,7 @@
         this.fmparams(),
         this.match(')', 'missing ) after formal parameters'),
         this.match('{'),
-        this.fnbody(),
+        this.fnbody(true),
         this.match('}', 'missing } after function body')
       );
       return node;
@@ -895,10 +893,10 @@
       }
       return node;
     },
-    fnbody: function() {
+    fnbody: function(yYield) {
       var node = new Node(Node.FNBODY);
       while(this.look && this.look.content() != '}') {
-        node.add(this.stmtlitem());
+        node.add(this.stmtlitem(yYield));
       }
       return node;
     },
@@ -1035,9 +1033,9 @@
       );
       return node;
     },
-    expr: function(noIn, noOf) {
+    expr: function(noIn, noOf, yYield) {
       var node = new Node(Node.EXPR),
-        assignexpr = this.assignexpr(noIn, noOf);
+        assignexpr = this.assignexpr(noIn, noOf, yYield);
       //LL2区分,后的...是否为cpeapl
       if(this.look && this.look.content() == ',') {
         for(var i = this.index; i < this.length; i++) {
@@ -1061,7 +1059,7 @@
               break;
             }
           }
-          node.add(this.match(), this.assignexpr(noIn, noOf));
+          node.add(this.match(), this.assignexpr(noIn, noOf, yYield));
         }
       }
       else {
@@ -1077,15 +1075,18 @@
       );
       return node;
     },
-    assignexpr: function(noIn, noOf) {
+    assignexpr: function(noIn, noOf, yYield) {
       var node = new Node(Node.ASSIGNEXPR);
       if(!this.look) {
         this.error();
       }
       if(this.look.content() == 'yield') {
-        return this.yieldexpr(noIn, noOf);
+        if(!yYield) {
+          this.error();
+        }
+        return this.yieldexpr(noIn, noOf, yYield);
       }
-      var cndt = this.cndtexpr(noIn, noOf);
+      var cndt = this.cndtexpr(noIn, noOf, yYield);
       if(this.look
         && this.look.content() == '=>'
         && cndt.name() == Node.PRMREXPR
@@ -1099,7 +1100,7 @@
         node.add(
           arrowparams,
           this.match(),
-          this.cncsbody(noIn, noOf)
+          this.cncsbody(noIn, noOf, yYield)
         );
       }
       else if(this.look
@@ -1118,26 +1119,26 @@
           '=': true
         }.hasOwnProperty(this.look.content())
         && !NOASSIGN.hasOwnProperty(cndt.name())) {
-        node.add(cndt, this.match(), this.assignexpr(noIn, noOf));
+        node.add(cndt, this.match(), this.assignexpr(noIn, noOf, yYield));
       }
       else {
         return cndt;
       }
       return node;
     },
-    yieldexpr: function(noIn, noOf) {
+    yieldexpr: function(noIn, noOf, yYield) {
       var node = new Node(Node.YIELDEXPR);
       node.add(this.match('yield'));
       if(this.look) {
         if(this.look.content() == '*') {
           node.add(
             this.match(),
-            this.assignexpr(noIn, noOf)
+            this.assignexpr(noIn, noOf, yYield)
           );
         }
         else if([';', '}', '...', ':', '?', ',', '=>'].indexOf(this.look.content()) == -1
           && this.look.type() != Token.KEYWORD) {
-          node.add(this.assignexpr(noIn, noOf));
+          node.add(this.assignexpr(noIn, noOf, yYield));
         }
       }
       return node;
@@ -1186,16 +1187,16 @@
       }
       return node;
     },
-    cndtexpr: function(noIn, noOf) {
+    cndtexpr: function(noIn, noOf, yYield) {
       var node = new Node(Node.CNDTEXPR),
-        logorexpr = this.logorexpr(noIn, noOf);
+        logorexpr = this.logorexpr(noIn, noOf, yYield);
       if(this.look && this.look.content() == '?') {
         node.add(
           logorexpr,
           this.match(),
-          this.assignexpr(noIn, noOf),
+          this.assignexpr(noIn, noOf, yYield),
           this.match(':'),
-          this.assignexpr(noIn, noOf)
+          this.assignexpr(noIn, noOf, yYield)
         );
       }
       else {
@@ -1203,15 +1204,15 @@
       }
       return node;
     },
-    logorexpr: function(noIn, noOf) {
+    logorexpr: function(noIn, noOf, yYield) {
       var node = new Node(Node.LOGOREXPR),
-        logandexpr = this.logandexpr(noIn), noOf;
+        logandexpr = this.logandexpr(noIn, noOf, yYield);
       if(this.look && this.look.content() == '||') {
         node.add(logandexpr);
         while(this.look && this.look.content() == '||') {
           node.add(
             this.match(),
-            this.logandexpr(noIn, noOf)
+            this.logandexpr(noIn, noOf, yYield)
           );
         }
       }
@@ -1220,7 +1221,7 @@
       }
       return node;
     },
-    logandexpr: function(noIn, noOf) {
+    logandexpr: function(noIn, noOf, yYield) {
       var node = new Node(Node.LOGANDEXPR),
         bitorexpr = this.bitorexpr(noIn, noOf);
       if(this.look && this.look.content() == '&&') {
@@ -1228,7 +1229,7 @@
         while(this.look && this.look.content() == '&&') {
           node.add(
             this.match(),
-            this.bitorexpr(noIn, noOf)
+            this.bitorexpr(noIn, noOf, yYield)
           );
         }
       }
@@ -1237,15 +1238,15 @@
       }
       return node;
     },
-    bitorexpr: function(noIn, noOf) {
+    bitorexpr: function(noIn, noOf, yYield) {
       var node = new Node(Node.BITOREXPR),
-        bitxorexpr = this.bitxorexpr(noIn, noOf);
+        bitxorexpr = this.bitxorexpr(noIn, noOf, yYield);
       if(this.look && this.look.content() == '|') {
         node.add(bitxorexpr);
         while(this.look && this.look.content() == '|') {
           node.add(
             this.match(),
-            this.bitxorexpr(noIn, noOf)
+            this.bitxorexpr(noIn, noOf, yYield)
           );
         }
       }
@@ -1254,15 +1255,15 @@
       }
       return node;
     },
-    bitxorexpr: function(noIn, noOf) {
+    bitxorexpr: function(noIn, noOf, yYield) {
       var node = new Node(Node.BITXOREXPR),
-        bitandexpr = this.bitandexpr(noIn, noOf);
+        bitandexpr = this.bitandexpr(noIn, noOf, yYield);
       if(this.look && this.look.content() == '^') {
         node.add(bitandexpr);
         while(this.look && this.look.content() == '^') {
           node.add(
             this.match(),
-            this.bitandexpr(noIn, noOf)
+            this.bitandexpr(noIn, noOf, yYield)
           );
         }
       }
@@ -1271,15 +1272,15 @@
       }
       return node;
     },
-    bitandexpr: function(noIn, noOf) {
+    bitandexpr: function(noIn, noOf, yYield) {
       var node = new Node(Node.BITANDEXPR),
-        eqexpr = this.eqexpr(noIn, noOf);
+        eqexpr = this.eqexpr(noIn, noOf, yYield);
       if(this.look && this.look.content() == '&') {
         node.add(eqexpr);
         while(this.look && this.look.content() == '&') {
           node.add(
             this.match(),
-            this.eqexpr(noIn, noOf)
+            this.eqexpr(noIn, noOf, yYield)
           );
         }
       }
@@ -1288,9 +1289,9 @@
       }
       return node;
     },
-    eqexpr: function(noIn, noOf) {
+    eqexpr: function(noIn, noOf, yYield) {
       var node = new Node(Node.EQEXPR),
-        reltexpr = this.reltexpr(noIn, noOf);
+        reltexpr = this.reltexpr(noIn, noOf, yYield);
       if(this.look && {
         '==': true,
         '===': true,
@@ -1306,7 +1307,7 @@
         }.hasOwnProperty(this.look.content())) {
           node.add(
             this.match(),
-            this.reltexpr(noIn, noOf)
+            this.reltexpr(noIn, noOf, yYield)
           );
         }
       }
@@ -1315,7 +1316,7 @@
       }
       return node;
     },
-    reltexpr: function(noIn, noOf) {
+    reltexpr: function(noIn, noOf, yYield) {
       var node = new Node(Node.RELTEXPR),
         shiftexpr = this.shiftexpr();
       if(this.look && ({
@@ -1337,7 +1338,7 @@
           || (!noIn && this.look.content() == 'in'))) {
           node.add(
             this.match(),
-            this.shiftexpr(noIn, noOf)
+            this.shiftexpr(noIn, noOf, yYield)
           );
         }
       }
@@ -1346,15 +1347,15 @@
       }
       return node;
     },
-    shiftexpr: function(noIn, noOf) {
+    shiftexpr: function(noIn, noOf, yYield) {
       var node = new Node(Node.SHIFTEXPR),
-        addexpr = this.addexpr(noIn, noOf);
+        addexpr = this.addexpr(noIn, noOf, yYield);
       if(this.look && ['<<', '>>', '>>>'].indexOf(this.look.content()) != -1) {
         node.add(addexpr);
         while(this.look && ['<<', '>>', '>>>'].indexOf(this.look.content()) != -1) {
           node.add(
             this.match(),
-            this.addexpr(noIn, noOf)
+            this.addexpr(noIn, noOf, yYield)
           );
         }
       }
@@ -1363,15 +1364,15 @@
       }
       return node;
     },
-    addexpr: function(noIn, noOf) {
+    addexpr: function(noIn, noOf, yYield) {
       var node = new Node(Node.ADDEXPR),
-        mtplexpr = this.mtplexpr(noIn, noOf);
+        mtplexpr = this.mtplexpr(noIn, noOf, yYield);
       if(this.look && ['+', '-'].indexOf(this.look.content()) != -1) {
         node.add(mtplexpr);
         while(this.look && ['+', '-'].indexOf(this.look.content()) != -1) {
           node.add(
             this.match(),
-            this.mtplexpr(noIn, noOf)
+            this.mtplexpr(noIn, noOf, yYield)
           );
         }
       }
@@ -1380,15 +1381,15 @@
       }
       return node;
     },
-    mtplexpr: function(noIn, noOf) {
+    mtplexpr: function(noIn, noOf, yYield) {
       var node = new Node(Node.MTPLEXPR),
-        unaryexpr = this.unaryexpr(noIn, noOf);
+        unaryexpr = this.unaryexpr(noIn, noOf, yYield);
       if(this.look && ['*', '/', '%'].indexOf(this.look.content()) != -1) {
         node.add(unaryexpr);
         while(this.look && ['*', '/', '%'].indexOf(this.look.content()) != -1) {
           node.add(
             this.match(),
-            this.unaryexpr(noIn, noOf)
+            this.unaryexpr(noIn, noOf, yYield)
           );
         }
       }
@@ -1397,7 +1398,7 @@
       }
       return node;
     },
-    unaryexpr: function(noIn, noOf) {
+    unaryexpr: function(noIn, noOf, yYield) {
       var node = new Node(Node.UNARYEXPR);
       if(!this.look) {
         this.error();
@@ -1407,7 +1408,7 @@
         case '--':
           node.add(
             this.match(),
-            this.leftexpr(noIn, noOf)
+            this.leftexpr(noIn, noOf, yYield)
           );
           break;
         case 'delete':
@@ -1419,17 +1420,17 @@
         case '!':
           node.add(
             this.match(),
-            this.unaryexpr(noIn, noOf)
+            this.unaryexpr(noIn, noOf, yYield)
           );
         break;
         default:
-          return this.postfixexpr(noIn, noOf);
+          return this.postfixexpr(noIn, noOf, yYield);
       }
       return node;
     },
-    postfixexpr: function(noIn, noOf) {
+    postfixexpr: function(noIn, noOf, yYield) {
       var node = new Node(Node.POSTFIXEXPR);
-      var leftexpr = this.leftexpr(noIn, noOf);
+      var leftexpr = this.leftexpr(noIn, noOf, yYield);
       if(this.look && ['++', '--'].indexOf(this.look.content()) > -1 && !this.hasMoveLine) {
         node.add(
           leftexpr,
@@ -1441,15 +1442,15 @@
       }
       return node;
     },
-    leftexpr: function(noIn, noOf) {
+    leftexpr: function(noIn, noOf, yYield) {
       if(this.look.content() == 'new') {
-        return this.newexpr(0, noIn, noOf);
+        return this.newexpr(0, noIn, noOf, yYield);
       }
       else {
-        return this.callexpr(null, noIn, noOf);
+        return this.callexpr(null, noIn, noOf, yYield);
       }
     },
-    newexpr: function(depth, noIn, noOf) {
+    newexpr: function(depth, noIn, noOf, yYield) {
       depth = depth || 0;
       var node = new Node(Node.NEWEXPR);
       node.add(this.match('new'));
@@ -1457,7 +1458,7 @@
         this.error();
       }
       if(this.look.content() == 'new') {
-        node.add(this.newexpr(depth + 1, noIn, noOf));
+        node.add(this.newexpr(depth + 1, noIn, noOf, yYield));
       }
       //LL2分辨super后是否为.[至mmbexpr
       else if(this.look.content() == 'super') {
@@ -1466,7 +1467,7 @@
           var next = this.tokens[i];
           if(!S[next.type()]) {
             if(['.', '['].indexOf(next.content()) > -1) {
-              node.add(this.mmbexpr(noIn, noOf));
+              node.add(this.mmbexpr(noIn, noOf, yYield));
             }
             else {
               node.add(this.match());
@@ -1480,7 +1481,7 @@
         }
       }
       else {
-        node.add(this.mmbexpr(noIn, noOf));
+        node.add(this.mmbexpr(noIn, noOf, yYield));
       }
       if(this.look && this.look.content() == '(') {
         node.add(this.args());
@@ -1498,7 +1499,7 @@
           else if(this.look.content() == '[') {
             mmb.add(
               this.match(),
-              this.expr(noIn, noOf),
+              this.expr(noIn, noOf, yYield),
               this.match(']')
             );
           }
@@ -1507,14 +1508,14 @@
           }
         }
         if(depth == 0 && this.look && this.look.content() == '(') {
-          var callexpr = this.callexpr(mmb, noIn, noOf);
+          var callexpr = this.callexpr(mmb, noIn, noOf, yYield);
           return callexpr;
         }
         return mmb;
       }
       return node;
     },
-    callexpr: function(mmb, noIn, noOf) {
+    callexpr: function(mmb, noIn, noOf, yYield) {
       var node = new Node(Node.CALLEXPR);
       if(!mmb) {
         //根据LL2分辨是super()还是mmbexpr
@@ -1531,14 +1532,14 @@
                 node = new Node(Node.CALLEXPR);
               }
               else {
-                mmb = this.mmbexpr(noIn, noOf);
+                mmb = this.mmbexpr(noIn, noOf, yYield);
               }
               break;
             }
           }
         }
         else {
-          mmb = this.mmbexpr(noIn, noOf);
+          mmb = this.mmbexpr(noIn, noOf, yYield);
         }
       }
       if(this.look && this.look.content() == '(') {
@@ -1562,7 +1563,7 @@
             temp.add(
               node,
               this.match(),
-              this.expr(noIn, noOf),
+              this.expr(noIn, noOf, yYield),
               this.match(']')
             );
             node = temp;
@@ -1593,7 +1594,7 @@
       }
       return node;
     },
-    mmbexpr: function(noIn, noOf) {
+    mmbexpr: function(noIn, noOf, yYield) {
       var node = new Node(Node.MMBEXPR);
       var mmb;
       if(this.look.content() == 'super') {
@@ -1603,7 +1604,7 @@
         }
       }
       else {
-        mmb = this.prmrexpr(noIn, noOf);
+        mmb = this.prmrexpr(noIn, noOf, yYield);
       }
       if(this.look
         && (['.', '['].indexOf(this.look.content()) > -1
@@ -1618,7 +1619,7 @@
         else if(this.look.content() == '[') {
           node.add(
             this.match(),
-            this.expr(noIn, noOf),
+            this.expr(noIn, noOf, yYield),
             this.match(']')
           );
         }
@@ -1641,7 +1642,7 @@
             temp.add(
               node,
               this.match(),
-              this.expr(noIn, noOf),
+              this.expr(noIn, noOf, yYield),
               this.match(']')
             );
             node = temp;
@@ -1664,7 +1665,7 @@
       }
       return node;
     },
-    prmrexpr: function(noIn, noOf) {
+    prmrexpr: function(noIn, noOf, yYield) {
       var node = new Node(Node.PRMREXPR);
       switch(this.look.type()) {
         case Token.ID:
@@ -1714,7 +1715,7 @@
                 var next = this.tokens[i];
                 if(!S[next.type()]) {
                   if(next.content() == 'for') {
-                    node.add(this.gencmph(noIn, noOf));
+                    node.add(this.gencmph(noIn, noOf, yYield));
                   }
                   else {
                     node.add(this.cpeapl(noIn, noOf));
@@ -1751,11 +1752,11 @@
       }
       this.error();
     },
-    gencmph: function(noIn, noOf) {
+    gencmph: function(noIn, noOf, yYield) {
       var node = new Node(Node.GENCMPH);
       node.add(
         this.match('('),
-        this.cmph(noIn, noOf),
+        this.cmph(noIn, noOf, yYield),
         this.match(')')
       );
       return node;
@@ -1769,7 +1770,7 @@
       );
       return node;
     },
-    cmph: function(noIn, noOf) {
+    cmph: function(noIn, noOf, yYield) {
       var node = new Node(Node.CMPH);
       node.add(this.cmphfor());
       while(this.look && this.look.content() != ']') {
@@ -1780,7 +1781,7 @@
           node.add(this.cmphif(noIn, noOf));
         }
         else {
-          node.add(this.assignexpr(noIn, noOf));
+          node.add(this.assignexpr(noIn, noOf, yYield));
           break;
         }
       }
@@ -1900,7 +1901,7 @@
                   end = true;
                 }
                 else if([',', '}'].indexOf(next.content()) > -1) {
-                  node.add(this.idref(null, noIn, noOf));
+                  node.add(this.idref(noIn, noOf));
                   end = true;
                 }
                 break;
@@ -1923,7 +1924,7 @@
       }
       return node;
     },
-    idref: function(noYield, noIn, noOf) {
+    idref: function(noIn, noOf, yYield) {
       if(!this.look) {
         this.error('invalid property id');
       }

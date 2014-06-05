@@ -246,10 +246,10 @@ describe('es6parser', function() {
         parser.parse('(function(a,1');
       }).to.throwError();
     });
-    it('gendecl', function() {
+    it('gendecl with yield', function() {
       var parser = homunculus.getParser('es6');
-      var node = parser.parse('function * a(){}');
-      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.GENDECL,["function","*",JsNode.BINDID,["a"],"(",JsNode.FMPARAMS,[],")","{",JsNode.FNBODY,[],"}"]]]]);
+      var node = parser.parse('function * a(){yield}');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.GENDECL,["function","*",JsNode.BINDID,["a"],"(",JsNode.FMPARAMS,[],")","{",JsNode.FNBODY,[JsNode.EXPRSTMT,[JsNode.YIELDEXPR,["yield"]]],"}"]]]]);
     });
     it('gendecl error 1', function() {
       var parser = homunculus.getParser('es6');
@@ -281,10 +281,21 @@ describe('es6parser', function() {
         parser.parse('function * a(){');
       }).to.throwError();
     });
+    it('yield expr error', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('yield');
+      }).to.throwError();
+    });
     it('genexpr', function() {
       var parser = homunculus.getParser('es6');
       var node = parser.parse('!function * a(){}');
       expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.UNARYEXPR,["!",JsNode.PRMREXPR,[JsNode.GENEXPR,["function","*",JsNode.BINDID,["a"],"(",JsNode.FMPARAMS,[],")","{",JsNode.FNBODY,[],"}"]]]]]]]);
+    });
+    it('genexpr with yield', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('function *(){yield}');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.GENDECL,["function","*","(",JsNode.FMPARAMS,[],")","{",JsNode.FNBODY,[JsNode.EXPRSTMT,[JsNode.YIELDEXPR,["yield"]]],"}"]]]]);
     });
     it('genexpr error 1', function() {
       var parser = homunculus.getParser('es6');
@@ -866,15 +877,10 @@ describe('es6parser', function() {
       var node = parser.parse('{return}');
       expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.BLOCKSTMT,[JsNode.BLOCK,["{",JsNode.RETSTMT,["return"],"}"]]]]]);
     });
-    it('labelstmt 1', function() {
+    it('labelstmt', function() {
       var parser = homunculus.getParser('es6');
       var node = parser.parse('label:;');
       expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.LABSTMT,["label",":",JsNode.EMPTSTMT,[";"]]]]]);
-    });
-    it('labelstmt 2', function() {
-      var parser = homunculus.getParser('es6');
-      var node = parser.parse('yield:;');
-      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.LABSTMT,["yield",":",JsNode.EMPTSTMT,[";"]]]]]);
     });
     it('block', function() {
       var parser = homunculus.getParser('es6');
