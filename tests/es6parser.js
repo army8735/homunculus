@@ -251,10 +251,11 @@ describe('es6parser', function() {
       var node = parser.parse('function * a(){yield}');
       expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.GENDECL,["function","*",JsNode.BINDID,["a"],"(",JsNode.FMPARAMS,[],")","{",JsNode.FNBODY,[JsNode.EXPRSTMT,[JsNode.YIELDEXPR,["yield"]]],"}"]]]]);
     });
-    it('yield can be used within fmparams', function() {
+    it('yield can not in gencmph', function() {
       var parser = homunculus.getParser('es6');
-      var node = parser.parse('function a(yield){}');
-      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.FNDECL,["function",JsNode.BINDID,["a"],"(",JsNode.FMPARAMS,[JsNode.SINGLENAME,[JsNode.BINDID,["yield"]]],")","{",JsNode.FNBODY,[],"}"]]]]);
+      expect(function() {
+        parser.parse('[for(yield of b)yield]');
+      }).to.throwError();
     });
     it('genmethod', function() {
       var parser = homunculus.getParser('es6');
