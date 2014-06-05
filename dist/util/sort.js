@@ -6,7 +6,7 @@
     factory(require, exports, module);
   }
 })(function(require, exports, module) {
-function quickSort(arr, begin, end, compare) {
+  function quickSort(arr, begin, end, compare) {
     if(begin >= end) {
       return;
     }

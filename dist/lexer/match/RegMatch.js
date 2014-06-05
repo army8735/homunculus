@@ -6,7 +6,7 @@
     factory(require, exports, module);
   }
 })(function(require, exports, module) {
-var Match = require('./Match');
+  var Match = require('./Match');
   var RegMatch = Match.extend(function(type, reg, valid, setPReg, special, parenthese) {
       if(typeof valid == 'number') {
         parenthese = special;

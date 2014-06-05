@@ -6,7 +6,7 @@
     factory(require, exports, module);
   }
 })(function(require, exports, module) {
-var Class = require('../../util/Class');
+  var Class = require('../../util/Class');
   var character = require('../../util/character');
   var Lexer = require('../../lexer/Lexer');
   var Rule = require('../../lexer/rule/EcmascriptRule');

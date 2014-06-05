@@ -6,7 +6,7 @@
     factory(require, exports, module);
   }
 })(function(require, exports, module) {
-function inheritPrototype(subType, superType) {
+  function inheritPrototype(subType, superType) {
     var prototype = Object.create(superType.prototype);
     prototype.constructor = subType;
     subType.prototype = prototype;

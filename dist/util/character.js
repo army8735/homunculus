@@ -6,7 +6,7 @@
     factory(require, exports, module);
   }
 })(function(require, exports, module) {
-exports.LINE = '\n';
+  exports.LINE = '\n';
   exports.ENTER = '\r';
   exports.BLANK = ' ';
   exports.TAB = '\t';

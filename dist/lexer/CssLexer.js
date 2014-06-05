@@ -6,7 +6,7 @@
     factory(require, exports, module);
   }
 })(function(require, exports, module) {
-var Lexer = require('./Lexer');
+  var Lexer = require('./Lexer');
   var Token = require('./Token');
   var character = require('../util/character');
   var CssLexer = Lexer.extend(function(rule) {

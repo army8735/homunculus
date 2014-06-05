@@ -6,7 +6,7 @@
     factory(require, exports, module);
   }
 })(function(require, exports, module) {
-var Rule = require('./Rule');
+  var Rule = require('./Rule');
   var LineSearch = require('../match/LineSearch');
   var RegMatch = require('../match/RegMatch');
   var LineParse = require('../match/LineParse');

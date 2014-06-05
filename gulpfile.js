@@ -25,7 +25,7 @@ function cb(file, enc, cb) {
   util.log(path.relative(file.cwd, file.path), '->', path.relative(file.cwd, target));
   var content = file._contents;
   content = content.toString('utf-8');
-  content = "(function(factory) {\n  if(typeof define === 'function' && (define.amd || define.cmd)) {\n    define(factory);\n  }\n  else {\n    factory(require, exports, module);\n  }\n})(function(require, exports, module) {\n" + content.replace(/\n/g, '\n  ') + '\n});';
+  content = "(function(factory) {\n  if(typeof define === 'function' && (define.amd || define.cmd)) {\n    define(factory);\n  }\n  else {\n    factory(require, exports, module);\n  }\n})(function(require, exports, module) {\n  " + content.replace(/\n/g, '\n  ') + '\n});';
   fs.writeFileSync(target, content, { encoding: 'utf-8' });
   cb(null, file);
 }

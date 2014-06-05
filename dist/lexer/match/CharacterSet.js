@@ -6,7 +6,7 @@
     factory(require, exports, module);
   }
 })(function(require, exports, module) {
-var Match = require('./Match');
+  var Match = require('./Match');
   var character = require('../../util/character');
   var CharacterSet = Match.extend(function(type, str, setPReg) {
     Match.call(this, type, setPReg);

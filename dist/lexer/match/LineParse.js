@@ -6,7 +6,7 @@
     factory(require, exports, module);
   }
 })(function(require, exports, module) {
-var Match = require('./Match');
+  var Match = require('./Match');
   var Token = require('../Token');
   var character = require('../../util/character');
   var LineParse = Match.extend(function(type, begin, end, mutiline, setPReg) {
