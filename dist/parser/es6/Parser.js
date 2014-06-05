@@ -912,7 +912,7 @@
         this.error();
       }
       if(this.look.content() == 'extends') {
-        node.add(this.heratige(noIn, noOf));
+        node.add(this.heratige());
       }
       node.add(
         this.match('{'),
@@ -1924,7 +1924,6 @@
       return node;
     },
     idref: function(noYield, noIn, noOf) {
-      var node = new Node(Node.IDREF);
       if(!this.look) {
         this.error('invalid property id');
       }
@@ -1934,8 +1933,7 @@
       if(noOf && this.look.content() == 'of') {
         this.error();
       }
-      node.add(this.match(Token.ID, 'invalid property id'));
-      return node;
+      return this.match(Token.ID, 'invalid property id');
     },
     proptname: function(cmpt, noIn, noOf) {
       var node = new Node(Node.PROPTNAME);
