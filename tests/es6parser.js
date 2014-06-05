@@ -256,6 +256,11 @@ describe('es6parser', function() {
       var node = parser.parse('function a(yield){}');
       expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.FNDECL,["function",JsNode.BINDID,["a"],"(",JsNode.FMPARAMS,[JsNode.SINGLENAME,[JsNode.BINDID,["yield"]]],")","{",JsNode.FNBODY,[],"}"]]]]);
     });
+    it('genmethod', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('class A{*method(){}}');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.CLASSDECL,["class",JsNode.BINDID,["A"],"{",JsNode.CLASSBODY,[JsNode.CLASSELEM,[JsNode.GENMETHOD,["*",JsNode.PROPTNAME,[JsNode.LTRPROPT,["method"]],"(",JsNode.FMPARAMS,[],")","{",JsNode.FNBODY,[],"}"]]],"}"]]]]);
+    });
     it('gendecl error 1', function() {
       var parser = homunculus.getParser('es6');
       expect(function() {
@@ -779,8 +784,8 @@ describe('es6parser', function() {
     });
     it('bitxorexpr', function() {
       var parser = homunculus.getParser('es6');
-      var node = parser.parse('a>1 & b--');
-      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.BITANDEXPR,[JsNode.RELTEXPR,[JsNode.PRMREXPR,["a"],">",JsNode.PRMREXPR,["1"]],"&",JsNode.POSTFIXEXPR,[JsNode.PRMREXPR,["b"],"--"]]]]]]);
+      var node = parser.parse('a>1 ^ b--');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.BITXOREXPR,[JsNode.RELTEXPR,[JsNode.PRMREXPR,["a"],">",JsNode.PRMREXPR,["1"]],"^",JsNode.POSTFIXEXPR,[JsNode.PRMREXPR,["b"],"--"]]]]]]);
     });
     it('bitorexpr', function() {
       var parser = homunculus.getParser('es6');
@@ -1294,6 +1299,29 @@ describe('es6parser', function() {
       var parser = homunculus.getParser('es6');
       expect(function() {
         parser.parse('class A {get method{');
+      }).to.throwError();
+    });
+    it('classexpr', function() {
+      var parser= homunculus.getParser('es6');
+      var node = parser.parse('!class A extends B{}');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.UNARYEXPR,["!",JsNode.PRMREXPR,[JsNode.CLASSEXPR,["class",JsNode.BINDID,["A"],JsNode.HERITAGE,["extends",JsNode.PRMREXPR,["B"]],"{",JsNode.CLASSBODY,[],"}"]]]]]]]);
+    });
+    it('classexpr error 1', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('!class A');
+      }).to.throwError();
+    });
+    it('classexpr error 2', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('!class A extends');
+      }).to.throwError();
+    });
+    it('classexpr error 3', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('!class A {');
       }).to.throwError();
     });
     it('arrowfn 1', function() {

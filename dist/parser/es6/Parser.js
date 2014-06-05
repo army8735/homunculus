@@ -759,38 +759,6 @@
       );
       return node;
     },
-    superstmt: function() {
-      var node = new Node(Node.SUPERSTMT);
-      node.add(this.match('super'));
-      if(!this.look) {
-        this.error();
-      }
-      if(this.look.content() == '.') {
-        while(this.look && this.look.content() == '.') {
-          node.add(this.match());
-          if(!this.look) {
-            this.error();
-          }
-          if(this.look.content() == 'super') {
-            node.add(this.match());
-          }
-          else {
-            break;
-          }
-        }
-        if(this.look.content() != '(') {
-          node.add(this.match(Token.ID));
-          while(this.look && this.look.content() == '.') {
-            node.add(this.match(), this.match(Token.ID));
-          }
-        }
-      }
-      node.add(
-        this.args(),
-        this.match(';')
-      );
-      return node;
-    },
     imptstmt: function() {
       var node = new Node(Node.IMPTSTMT);
       return node;
@@ -1006,7 +974,7 @@
         );
       }
       else if(this.look.content() == '*') {
-        node.add(this.genmethod(noIn, noOf));
+        return this.genmethod(noIn, noOf);
       }
       else {
         node.add(

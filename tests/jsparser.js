@@ -514,8 +514,8 @@ describe('jsparser', function() {
     });
     it('bitxorexpr', function() {
       var parser = homunculus.getParser('js');
-      var node = parser.parse('a>1 & b--');
-      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.EXPRSTMT, [JsNode.BITANDEXPR, [JsNode.RELTEXPR, [JsNode.PRMREXPR, ["a"], ">", JsNode.PRMREXPR, ["1"]], "&", JsNode.POSTFIXEXPR, [JsNode.PRMREXPR, ["b"], "--"]]]]]);
+      var node = parser.parse('a>1 ^ b--');
+      expect(tree(node)).to.eql([JsNode.PROGRAM, [JsNode.EXPRSTMT, [JsNode.BITXOREXPR, [JsNode.RELTEXPR, [JsNode.PRMREXPR, ["a"], ">", JsNode.PRMREXPR, ["1"]], "^", JsNode.POSTFIXEXPR, [JsNode.PRMREXPR, ["b"], "--"]]]]]);
     });
     it('bitorexpr', function() {
       var parser = homunculus.getParser('js');
