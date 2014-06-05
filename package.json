@@ -21,6 +21,8 @@
         "dist/lexer/rule/EcmascriptRule",
         "dist/parser/js",
         "dist/parser/es6",
+        "dist/parser/Parser",
+        "dist/parser/Node",
         "dist/util"
       ]
     }
