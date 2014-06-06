@@ -537,10 +537,15 @@ describe('es6parser', function() {
       var node = parser.parse('super["a"]()');
       expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.CALLEXPR,[JsNode.MMBEXPR,["super","[",JsNode.PRMREXPR,["\"a\""],"]"],JsNode.ARGS,["(",")"]]]]]]);
     });
+    it('super be an property', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('new a.super');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.NEWEXPR,["new",JsNode.MMBEXPR,[JsNode.PRMREXPR,["a"],".","super"]]]]]]);
+    });
     it('super error', function() {
       var parser = homunculus.getParser('es6');
       expect(function() {
-        parser.parse('new a.super');
+        parser.parse('super super');
       }).to.throwError();
     });
     it('mmbexpr 1', function() {

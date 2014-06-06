@@ -31,9 +31,6 @@ var Parser = IParser.extend(function(lexer) {
     this.tree = this.program();
     return this.tree;
   },
-  ast: function() {
-    return this.tree;
-  },
   init: function(lexer) {
     this.look = null;
     this.tokens = null;
@@ -1235,9 +1232,6 @@ var Parser = IParser.extend(function(lexer) {
   error: function(msg) {
     msg = 'SyntaxError: ' + (msg || ' syntax error');
     throw new Error(msg + ' line ' + this.lastLine + ' col ' + this.lastCol);
-  },
-  ignore: function() {
-    return this.ignores;
   }
 });
 module.exports = Parser;

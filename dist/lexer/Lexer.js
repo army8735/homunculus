@@ -68,6 +68,10 @@
               }
               temp.push(token);
               this.tokenList.push(token);
+              //回调可自定义处理匹配的token
+              if(match.callback) {
+                match.callback(token);
+              }
               this.index += matchLen - 1;
               var n = character.count(token.val(), character.LINE);
               count += n;

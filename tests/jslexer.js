@@ -142,6 +142,12 @@ describe('jslexer', function() {
       var tokens = lexer.parse('0.541 .32E+8 123E9 45.2E-10');
       expect(join(tokens)).to.eql(['0.541', ' ', '.32E+8', ' ', '123E9', ' ', '45.2E-10']);
     });
+    it('super', function() {
+      var lexer = homunculus.getLexer('js');
+      var tokens = lexer.parse('super.super');
+      expect(tokens[0].type()).to.eql(Token.KEYWORD);
+      expect(tokens[2].type()).to.eql(Token.ID);
+    });
     it('unknow token', function() {
       var lexer = homunculus.getLexer('js');
       expect(function() {
