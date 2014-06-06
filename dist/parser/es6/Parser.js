@@ -364,6 +364,7 @@
           this.lexbind()
         );
       }
+      node.add(this.match(';'));
       return node;
     },
     lexbind: function() {
