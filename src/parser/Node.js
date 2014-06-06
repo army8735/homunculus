@@ -1,5 +1,6 @@
 var Class = require('../util/Class');
 var character = require('../util/character');
+var nid = 0;
 var Node = Class(function(type, children) {
   this.type = type;
   if(type == Node.TOKEN) {
@@ -14,8 +15,12 @@ var Node = Class(function(type, children) {
   this.p = null;
   this.pr = null;
   this.ne = null;
+  this.id = nid++;
   return this;
 }).methods({
+  nid: function() {
+    return this.id;
+  },
   name: function(t) {
     if(!character.isUndefined(t)) {
       this.type = t;

@@ -11,7 +11,7 @@ npm install homunculus
 ```
 
 ## 使用说明
-* 解析语法并返回语法树和此法单元序列。、
+* 解析语法并返回语法树和此法单元序列。
 * CommonJS/AMD/CMD自适应。
 
 ## API

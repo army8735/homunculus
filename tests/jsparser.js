@@ -995,6 +995,12 @@ describe('jsparser', function() {
       var varstmt = node.leaf(0);
       expect(varstmt.name()).to.be(JsNode.VARSTMT);
       expect(varstmt.size()).to.be(3);
+      expect(varstmt.leaves().length).to.be(3);
+    });
+    it('node #nid', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('var a');
+      expect(node.nid()).to.be.a('number');
     });
     it('#ast should return as parse return', function() {
       var parser = homunculus.getParser('js');
