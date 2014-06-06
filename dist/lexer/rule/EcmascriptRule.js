@@ -32,19 +32,19 @@
     self.addMatch(new LineParse(Token.STRING, "'", "'", false, Lexer.IS_REG));
     self.addMatch(new LineParse(Token.TEMPLATE, '`', '`', true, Lexer.IS_REG));
   
-    var regMatch = new RegMatch(Token.ID, /^[$a-zA-Z_][$\w]*/, Lexer.SPECIAL, function() {
+    var id = new RegMatch(Token.ID, /^[$a-zA-Z_][$\w]*/, Lexer.SPECIAL, function() {
       return !!(self.keyWords().hasOwnProperty(this.content()));
     }, function() {
       return ['if', 'for', 'while'].indexOf(this.content()) != -1;
     });
-    regMatch.callback = function(token) {
+    id.callback = function(token) {
       var s = token.content();
       if(isProperty) {
         token.type(Token.ID);
       }
       isProperty = false;
     };
-    self.addMatch(regMatch);
+    self.addMatch(id);
   
     self.addMatch(new RegMatch(Token.NUMBER, /^\.\d+(?:E[+-]?\d*)?/i, {
       'SyntaxError: missing exponent': /E[+-]?$/i

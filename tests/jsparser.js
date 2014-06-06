@@ -313,6 +313,12 @@ describe('jsparser', function() {
       var node = parser.parse('var o = {var:1}');
       expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.VARSTMT,["var",JsNode.VARDECL,["o",JsNode.ASSIGN,["=",JsNode.PRMREXPR,[JsNode.OBJLTR,["{",JsNode.PROPTASSIGN,["var",":",JsNode.PRMREXPR,["1"]],"}"]]]]]]]);
     });
+    it('keyword can not be label', function() {
+      var parser = homunculus.getParser('js');
+      expect(function() {
+        parser.parse('var:');
+      }).to.throwError();
+    });
     it('keyword after get/set', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('~{get var(){}}');

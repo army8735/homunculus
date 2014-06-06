@@ -137,6 +137,18 @@ describe('es6parser', function() {
         parser.parse('var {a ');
       }).to.throwError();
     });
+    it('destructuring object error: kw can not in array 1', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('var [var] = [1]');
+      }).to.throwError();
+    });
+    it('destructuring object error: kw can not in array 2', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('var [x, {"a":[var=1,{z=2},...o]}] = []');
+      }).to.throwError();
+    });
     it('letdecl 1', function() {
       var parser = homunculus.getParser('es6');
       var node = parser.parse('let a');
@@ -475,6 +487,12 @@ describe('es6parser', function() {
       var parser = homunculus.getParser('es6');
       var node = parser.parse('var o = {var:1}');
       expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.VARSTMT,["var",JsNode.VARDECL,[JsNode.BINDID,["o"],JsNode.INITLZ,["=",JsNode.PRMREXPR,[JsNode.OBJLTR,["{",JsNode.PROPTDEF,[JsNode.PROPTNAME,[JsNode.LTRPROPT,["var"]],":",JsNode.PRMREXPR,["1"]],"}"]]]]]]]]);
+    });
+    it('keyword can not be label', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('var:');
+      }).to.throwError();
     });
     it('keyword after get/set', function() {
       var parser = homunculus.getParser('es6');
