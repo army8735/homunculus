@@ -148,6 +148,11 @@ describe('jslexer', function() {
       expect(tokens[0].type()).to.eql(Token.KEYWORD);
       expect(tokens[2].type()).to.eql(Token.ID);
     });
+    it('other keyword can be property name', function() {
+      var lexer = homunculus.getLexer('js');
+      var tokens = lexer.parse('a.var');
+      expect(tokens[2].type()).to.eql(Token.ID);
+    });
     it('unknow token', function() {
       var lexer = homunculus.getLexer('js');
       expect(function() {

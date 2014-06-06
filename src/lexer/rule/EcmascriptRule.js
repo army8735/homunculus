@@ -7,7 +7,7 @@ var CharacterSet = require('../match/CharacterSet');
 var Token = require('../Token');
 var Lexer = require('../Lexer');
 var character = require('../../util/character');
-var isSuper = true;
+var isProperty = false;
 var EcmascriptRule = Rule.extend(function() {
   var self = this;
   Rule.call(self, EcmascriptRule.KEYWORDS, true);
@@ -31,10 +31,10 @@ var EcmascriptRule = Rule.extend(function() {
   });
   regMatch.callback = function(token) {
     var s = token.content();
-    if(!isSuper && s == 'super') {
+    if(isProperty) {
       token.type(Token.ID);
     }
-    isSuper = true;
+    isProperty = false;
   };
   self.addMatch(regMatch);
 
@@ -50,7 +50,7 @@ var EcmascriptRule = Rule.extend(function() {
   var sign = new CharacterSet(Token.SIGN, ':;/?.,[]{}~!^|%=-+*()~><&\\', Lexer.IS_REG);
   sign.callback = function(token) {
     var s = token.content();
-    isSuper = s != '.';
+    isProperty = s == '.';
   };
   self.addMatch(sign);
 
