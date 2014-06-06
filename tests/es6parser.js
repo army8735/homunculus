@@ -97,6 +97,11 @@ describe('es6parser', function() {
       var node = parser.parse('var {x, y = 1, "f": [z]} = {}');
       expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.VARSTMT,["var",JsNode.VARDECL,[JsNode.OBJBINDPAT,["{",JsNode.BINDPROPT,[JsNode.SINGLENAME,[JsNode.BINDID,["x"]]],",",JsNode.BINDPROPT,[JsNode.SINGLENAME,[JsNode.BINDID,["y"],JsNode.INITLZ,["=",JsNode.PRMREXPR,["1"]]]],",",JsNode.BINDPROPT,[JsNode.PROPTNAME,[JsNode.LTRPROPT,["\"f\""]],":",JsNode.BINDELEM,[JsNode.ARRBINDPAT,["[",JsNode.SINGLENAME,[JsNode.BINDID,["z"]],"]"]]],"}"],JsNode.INITLZ,["=",JsNode.PRMREXPR,[JsNode.OBJLTR,["{","}"]]]]]]]]);
     });
+    it('destructuring object with keyword property', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('var {var, f,} = {}');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.VARSTMT,["var",JsNode.VARDECL,[JsNode.OBJBINDPAT,["{",JsNode.BINDPROPT,[JsNode.SINGLENAME,[JsNode.BINDID,["var"]]],",",JsNode.BINDPROPT,[JsNode.SINGLENAME,[JsNode.BINDID,["f"]]],",","}"],JsNode.INITLZ,["=",JsNode.PRMREXPR,[JsNode.OBJLTR,["{","}"]]]]]]]]);
+    });
     it('destructuring complex', function() {
       var parser = homunculus.getParser('es6');
       var node = parser.parse('var [x, {"a":[y=1,{z=2},...o]}] = []');
@@ -465,6 +470,16 @@ describe('es6parser', function() {
       var parser = homunculus.getParser('es6');
       var node = parser.parse('~{x,y,}');
       expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.UNARYEXPR,["~",JsNode.PRMREXPR,[JsNode.OBJLTR,["{",JsNode.PROPTDEF,["x"],",",JsNode.PROPTDEF,["y"],",","}"]]]]]]]);
+    });
+    it('keyword can be obj\'s property', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('var o = {var:1}');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.VARSTMT,["var",JsNode.VARDECL,[JsNode.BINDID,["o"],JsNode.INITLZ,["=",JsNode.PRMREXPR,[JsNode.OBJLTR,["{",JsNode.PROPTDEF,[JsNode.PROPTNAME,[JsNode.LTRPROPT,["var"]],":",JsNode.PRMREXPR,["1"]],"}"]]]]]]]]);
+    });
+    it('keyword after get/set', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('~{get var(){}}');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.UNARYEXPR,["~",JsNode.PRMREXPR,[JsNode.OBJLTR,["{",JsNode.PROPTDEF,[JsNode.METHOD,["get",JsNode.PROPTNAME,[JsNode.LTRPROPT,["var"]],"(",")","{",JsNode.FNBODY,[],"}"]],"}"]]]]]]]);
     });
     it('newexpr 1', function() {
       var parser = homunculus.getParser('es6');

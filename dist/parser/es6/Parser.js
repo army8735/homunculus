@@ -411,7 +411,7 @@
       this.declnode(node);
       return node;
     },
-    bindid: function(msg, noIn, noOf) {
+    bindid: function(msg, noIn, noOf, canKw) {
       var node = new Node(Node.BINDID);
       if(!this.look) {
         this.error(msg);
@@ -422,7 +422,12 @@
       if(noOf && this.look.content() == 'of') {
         this.error();
       }
-      node.add(this.match(Token.ID, msg));
+      if(canKw && this.look.type() == Token.KEYWORD) {
+        node.add(this.match(undefined, msg));
+      }
+      else {
+        node.add(this.match(Token.ID, msg));
+      }
       return node;
     },
     bindpat: function() {
@@ -469,9 +474,9 @@
       }
       return node;
     },
-    singlename: function() {
+    singlename: function(canKw) {
       var node = new Node(Node.SINGLENAME);
-      node.add(this.bindid());
+      node.add(this.bindid(null, null, null, canKw));
       if(this.look && this.look.content() == '=') {
         node.add(this.initlz());
       }
@@ -504,6 +509,7 @@
         case Token.ID:
         case Token.STRING:
         case Token.NUMBER:
+        case Token.KEYWORD:
         break;
         default:
           if(this.look.content() != '[') {
@@ -532,7 +538,7 @@
             );
           }
           else {
-            node.add(this.singlename());
+            node.add(this.singlename(true));
           }
           return node;
         }
@@ -2044,6 +2050,7 @@
             }
           case Token.STRING:
           case Token.NUMBER:
+          case Token.KEYWORD:
             node.add(
               this.proptname(noIn, noOf),
               this.match(':', 'missing : after property id'),
@@ -2096,6 +2103,7 @@
           }
         case Token.NUMBER:
         case Token.STRING:
+        case Token.KEYWORD:
           node.add(this.match());
           return node;
         default:

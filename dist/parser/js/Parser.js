@@ -1059,7 +1059,7 @@
             if(!this.look) {
               this.error('missing : after property id');
             }
-            if(this.look.type() == Token.ID) {
+            if(this.look.type() == Token.ID || this.look.type() == Token.KEYWORD) {
               node.add(
                 this.match(),
                 this.match('(', 'missing ( before formal parameters'),
@@ -1082,7 +1082,7 @@
             if(!this.look) {
               this.error('missing : after property id');
             }
-            if(this.look.type() == Token.ID) {
+            if(this.look.type() == Token.ID || this.look.type() == Token.KEYWORD) {
               node.add(
                 this.match(),
                 this.match('(', 'missing ( before formal parameters'),
@@ -1103,6 +1103,7 @@
           }
         case Token.STRING:
         case Token.NUMBER:
+        case Token.KEYWORD:
           node.add(
             this.match(),
             this.match(':', 'missing : after property id'),
