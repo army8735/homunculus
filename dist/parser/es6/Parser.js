@@ -69,17 +69,16 @@
       }
       var node = new Node(Node.SCRIPT);
       if(this.look) {
-        for(var i = 0; i < this.length; i++) {
-          if({
-            'export': true,
-            'import': true,
-            'module': true
-          }.hasOwnProperty(this.tokens[i].content())) {
-            node.add(this.modulebody());
+        node.add(this.modulebody());
+        //未出现export时，此script不是一个模块
+        var leaves = node.leaf(0).leaves();
+        for(i = 0; i < leaves.length; i++) {
+          if(leaves[i].name() == Node.EXPORTDECL) {
             return node;
           }
         }
-        node.add(this.scriptbody());
+        node.leaf(0).name(Node.SCRIPTBODY);
+        return node;
       }
       return node;
     },
@@ -256,13 +255,6 @@
           this.match('as'),
           this.match(Token.ID)
         );
-      }
-      return node;
-    },
-    scriptbody: function() {
-      var node = new Node(Node.SCRIPTBODY);
-      while(this.look) {
-        node.add(this.stmtlitem());
       }
       return node;
     },

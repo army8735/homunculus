@@ -98,7 +98,7 @@ npm install homunculus
 ### parser/Node
 #### 方法
 * constructor(type:String, children:Node/Array<Node> = null) 传入类型和子节点
-* name():String 返回节点类型
+* name(t:String):String 读取/设置节点类型
 * leaves():Array<Node> 返回子节点列表
 * leaf(i:int):Node 返回第i个子节点
 * size():int 返回有几个子节点

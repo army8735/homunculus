@@ -7,6 +7,7 @@
   }
 })(function(require, exports, module) {
   var Class = require('../util/Class');
+  var character = require('../util/character');
   var Node = Class(function(type, children) {
     this.type = type;
     if(type == Node.TOKEN) {
@@ -23,7 +24,10 @@
     this.ne = null;
     return this;
   }).methods({
-    name: function() {
+    name: function(t) {
+      if(!character.isUndefined(t)) {
+        this.type = t;
+      }
       return this.type;
     },
     leaves: function() {

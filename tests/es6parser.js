@@ -1360,32 +1360,32 @@ describe('es6parser', function() {
     it('module from', function() {
       var parser = homunculus.getParser('es6');
       var node = parser.parse('module a from "a"');
-      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.MODULEBODY,[JsNode.MODULEIMPORT,["module",JsNode.BINDID,["a"],JsNode.FROMCAULSE,["from","\"a\""]]]]]);
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.MODULEIMPORT,["module",JsNode.BINDID,["a"],JsNode.FROMCAULSE,["from","\"a\""]]]]]);
     });
     it('module import', function() {
       var parser = homunculus.getParser('es6');
       var node = parser.parse('import "a"');
-      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.MODULEBODY,[JsNode.IMPORTDECL,["import","\"a\""]]]]);
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.IMPORTDECL,["import","\"a\""]]]]);
     });
     it('module import from 1', function() {
       var parser = homunculus.getParser('es6');
       var node = parser.parse('import {} from "a"');
-      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.MODULEBODY,[JsNode.IMPORTDECL,["import",JsNode.IMPORTCAULSE,[JsNode.NAMEIMPORT,["{","}"]],JsNode.FROMCAULSE,["from","\"a\""]]]]]);
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.IMPORTDECL,["import",JsNode.IMPORTCAULSE,[JsNode.NAMEIMPORT,["{","}"]],JsNode.FROMCAULSE,["from","\"a\""]]]]]);
     });
     it('module import from 2', function() {
       var parser = homunculus.getParser('es6');
       var node = parser.parse('import {x} from "a"');
-      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.MODULEBODY,[JsNode.IMPORTDECL,["import",JsNode.IMPORTCAULSE,[JsNode.NAMEIMPORT,["{",JsNode.IMPORTSPEC,["x"],"}"]],JsNode.FROMCAULSE,["from","\"a\""]]]]]);
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.IMPORTDECL,["import",JsNode.IMPORTCAULSE,[JsNode.NAMEIMPORT,["{",JsNode.IMPORTSPEC,["x"],"}"]],JsNode.FROMCAULSE,["from","\"a\""]]]]]);
     });
     it('module import from 3', function() {
       var parser = homunculus.getParser('es6');
       var node = parser.parse('import x from "a"');
-      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.MODULEBODY,[JsNode.IMPORTDECL,["import",JsNode.IMPORTCAULSE,["x"],JsNode.FROMCAULSE,["from","\"a\""]]]]]);
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.IMPORTDECL,["import",JsNode.IMPORTCAULSE,["x"],JsNode.FROMCAULSE,["from","\"a\""]]]]]);
     });
     it('module import from as', function() {
       var parser = homunculus.getParser('es6');
       var node = parser.parse('import x,{y as z,} from "a"');
-      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.MODULEBODY,[JsNode.IMPORTDECL,["import",JsNode.IMPORTCAULSE,["x",",",JsNode.NAMEIMPORT,["{",JsNode.IMPORTSPEC,["y","as",JsNode.BINDID,["z"]],",","}"]],JsNode.FROMCAULSE,["from","\"a\""]]]]]);
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.IMPORTDECL,["import",JsNode.IMPORTCAULSE,["x",",",JsNode.NAMEIMPORT,["{",JsNode.IMPORTSPEC,["y","as",JsNode.BINDID,["z"]],",","}"]],JsNode.FROMCAULSE,["from","\"a\""]]]]]);
     });
     it('module export *', function() {
       var parser = homunculus.getParser('es6');
@@ -1412,43 +1412,42 @@ describe('es6parser', function() {
       var node = parser.parse('export default a+b');
       expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.MODULEBODY,[JsNode.EXPORTDECL,["export","default",JsNode.ADDEXPR,[JsNode.PRMREXPR,["a"],"+",JsNode.PRMREXPR,["b"]]]]]]);
     });
-    it('module error 1', function() {
+    it('module be an id', function() {
       var parser = homunculus.getParser('es6');
-      expect(function() {
-        parser.parse('module');
-      }).to.throwError();
+      var node = parser.parse('var module');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.VARSTMT,["var",JsNode.VARDECL,[JsNode.BINDID,["module"]]]]]]);
     });
-    it('module error 2', function() {
+    it('module error 1', function() {
       var parser = homunculus.getParser('es6');
       expect(function() {
         parser.parse('module a');
       }).to.throwError();
     });
-    it('module error 3', function() {
+    it('module error 2', function() {
       var parser = homunculus.getParser('es6');
       expect(function() {
         parser.parse('module a from');
       }).to.throwError();
     });
-    it('module error 4', function() {
+    it('module error 3', function() {
       var parser = homunculus.getParser('es6');
       expect(function() {
         parser.parse('import');
       }).to.throwError();
     });
-    it('module error 5', function() {
+    it('module error 4', function() {
       var parser = homunculus.getParser('es6');
       expect(function() {
         parser.parse('import x');
       }).to.throwError();
     });
-    it('module error 6', function() {
+    it('module error 5', function() {
       var parser = homunculus.getParser('es6');
       expect(function() {
         parser.parse('import x from');
       }).to.throwError();
     });
-    it('module error 7', function() {
+    it('module error 6', function() {
       var parser = homunculus.getParser('es6');
       expect(function() {
         parser.parse('export');
@@ -1460,17 +1459,22 @@ describe('es6parser', function() {
         parser.parse('export x');
       }).to.throwError();
     });
-    it('module error 7', function() {
+    it('module error 8', function() {
       var parser = homunculus.getParser('es6');
       expect(function() {
         parser.parse('export "a"');
       }).to.throwError();
     });
-    it('module error 7', function() {
+    it('module error 9', function() {
       var parser = homunculus.getParser('es6');
       expect(function() {
         parser.parse('export x from');
       }).to.throwError();
+    });
+    it('export module import be property name', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('a.export = 1');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.ASSIGNEXPR,[JsNode.MMBEXPR,[JsNode.PRMREXPR,["a"],".","export"],"=",JsNode.PRMREXPR,["1"]]]]]]);
     });
   });
   describe('other test', function() {
