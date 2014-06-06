@@ -66,7 +66,7 @@ var Parser = IParser.extend(function(lexer) {
           'export': true,
           'import': true,
           'module': true
-        }.hasOwnProperty(this.look.content())) {
+        }.hasOwnProperty(this.tokens[i].content())) {
           node.add(this.modulebody());
           return node;
         }
