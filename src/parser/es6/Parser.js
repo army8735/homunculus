@@ -356,6 +356,7 @@ var Parser = IParser.extend(function(lexer) {
         this.lexbind()
       );
     }
+    node.add(this.match(';'));
     return node;
   },
   lexbind: function() {
