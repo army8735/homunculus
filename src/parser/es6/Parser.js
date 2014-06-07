@@ -2118,9 +2118,7 @@ var Parser = IParser.extend(function(lexer) {
     if(!this.look) {
       this.error();
     }
-    if(this.look.content() != ')') {
-      node.add(this.arglist());
-    }
+    node.add(this.arglist());
     node.add(this.match(')'));
     return node;
   },
