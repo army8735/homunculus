@@ -102,17 +102,16 @@ var Parser = IParser.extend(function(lexer) {
     }
     if(this.look.type() == Token.STRING) {
       node.add(
-        this.match(),
-        this.match(';')
+        this.match()
       );
     }
     else {
       node.add(
         this.importcaulse(),
-        this.fromcaulse(),
-        this.match(';')
+        this.fromcaulse()
       );
     }
+    node.add(this.match(';'));
     return node;
   },
   moduleimport: function() {
@@ -120,7 +119,8 @@ var Parser = IParser.extend(function(lexer) {
     node.add(
       this.match('module', true),
       this.bindid(),
-      this.fromcaulse()
+      this.fromcaulse(),
+      this.match(';')
     );
     return node;
   },
