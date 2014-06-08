@@ -42,6 +42,7 @@ var Parser = IParser.extend(function(lexer) {
     this.length = 0;
     this.ignores = {};
     this.hasMoveLine = false;
+    this.module = false;
     this.tree = {};
     if(lexer) {
       this.lexer = lexer;
@@ -62,15 +63,10 @@ var Parser = IParser.extend(function(lexer) {
     var node = new Node(Node.SCRIPT);
     if(this.look) {
       node.add(this.modulebody());
-      //未出现export时，此script不是一个模块
-      var leaves = node.leaf(0).leaves();
-      for(i = 0; i < leaves.length; i++) {
-        if(leaves[i].name() == Node.EXPORTDECL) {
-          return node;
-        }
+      //未出现module,import,export时，此script不是一个模块
+      if(!this.module) {
+        node.leaf(0).name(Node.SCRIPTBODY);
       }
-      node.leaf(0).name(Node.SCRIPTBODY);
-      return node;
     }
     return node;
   },
@@ -83,12 +79,15 @@ var Parser = IParser.extend(function(lexer) {
   },
   moduleitem: function() {
     if(this.look.content() == 'module') {
+      this.module = true;
       return this.moduleimport();
     }
     else if(this.look.content() == 'import') {
+      this.module = true;
       return this.importdecl();
     }
     else if(this.look.content() == 'export') {
+      this.module = true;
       return this.exportdecl();
     }
     else {
@@ -1993,10 +1992,7 @@ var Parser = IParser.extend(function(lexer) {
     if(!this.look) {
       this.error();
     }
-    if(['get', 'set'].indexOf(this.look.content()) > -1) {
-      node.add(this.method(noIn, noOf));
-    }
-    else if(this.look.content() == '[') {
+    if(this.look.content() == '[') {
       var cmpt = this.cmptpropt(noIn, noOf);
       if(!this.look) {
         this.error();
@@ -2020,7 +2016,7 @@ var Parser = IParser.extend(function(lexer) {
           for(var i = this.index; i < this.length; i++) {
             var next = this.tokens[i];
             if(!S[next.type()]) {
-              if(next.content() == '(') {
+              if([Token.KEYWORD, Token.ID].indexOf(next.type()) > -1 || next.content() == '(') {
                 node.add(this.method(noIn, noOf));
                 end = true;
               }
