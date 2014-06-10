@@ -113,6 +113,24 @@ describe('es6parser', function() {
         parser.parse('var [a];');
       }).to.throwError();
     });
+    it('destructuring array error 1', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('var [');
+      }).to.throwError();
+    });
+    it('destructuring array error 1', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('var [a');
+      }).to.throwError();
+    });
+    it('destructuring array error 1', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('var [a,');
+      }).to.throwError();
+    });
     it('destructuring object error 1', function() {
       var parser = homunculus.getParser('es6');
       expect(function() {
@@ -137,13 +155,13 @@ describe('es6parser', function() {
         parser.parse('var {a ');
       }).to.throwError();
     });
-    it('destructuring object error: kw can not in array 1', function() {
+    it('destructuring error: kw can not in array 1', function() {
       var parser = homunculus.getParser('es6');
       expect(function() {
         parser.parse('var [var] = [1]');
       }).to.throwError();
     });
-    it('destructuring object error: kw can not in array 2', function() {
+    it('destructuring error: kw can not in array 2', function() {
       var parser = homunculus.getParser('es6');
       expect(function() {
         parser.parse('var [x, {"a":[var=1,{z=2},...o]}] = []');

@@ -448,7 +448,7 @@ define(function(require, exports, module) {
           node.add(this.bindelem());
         }
       }
-      if(this.look.content() == '...') {
+      if(this.look && this.look.content() == '...') {
         node.add(this.bindrest());
       }
       node.add(this.match(']', 'missing ] after element list'));
