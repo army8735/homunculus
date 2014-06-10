@@ -13,7 +13,6 @@ define(function(require, exports, module) {
     BLOCK: 'block',
     ITERSTMT: 'iterstmt',
     FNPARAMS: 'fnparams',
-    BINDELEMENT: 'bindelement',
     RESTPARAM: 'restparam',
     EXPR: 'expr',
     STMT: 'stmt',

@@ -12,7 +12,6 @@ var Node = INode.extend(function(type, children) {
   BLOCK: 'block',
   ITERSTMT: 'iterstmt',
   FNPARAMS: 'fnparams',
-  BINDELEMENT: 'bindelement',
   RESTPARAM: 'restparam',
   EXPR: 'expr',
   STMT: 'stmt',
