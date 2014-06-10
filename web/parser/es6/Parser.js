@@ -1965,7 +1965,7 @@ define(function(require, exports, module) {
           }
         }
       }
-      if(this.look.content() == '...') {
+      if(this.look && this.look.content() == '...') {
         node.add(this.spread(noIn, noOf));
       }
       node.add(this.match(']', 'missing ] after element list'));

@@ -131,6 +131,12 @@ describe('es6parser', function() {
         parser.parse('var [a,');
       }).to.throwError();
     });
+    it('destructuring array error 2', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('var [a,[b]=');
+      }).to.throwError();
+    });
     it('destructuring object error 1', function() {
       var parser = homunculus.getParser('es6');
       expect(function() {
