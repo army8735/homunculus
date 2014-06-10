@@ -12,10 +12,10 @@ textarea:hover{opacity:0.8;}
 </style>
 </head>
 <body>
-<textarea id="ta" autocomplete="off"></textarea>
+<textarea id="ta" autocomplete="on"></textarea>
 <input id="btn" type="button" value="ok"/>
 <div id="ui" class="kineticjs-content"></div>
-<script src="Ai.js"></script>
+<script src="sea.js"></script>
 <script src="kinetic-v4.4.0.min.js"></script>
 <script>
 var w = 0, h = 0;
@@ -84,17 +84,14 @@ function drawNode(layer, node, x, index, parent, sibling) {
 	}
 	w = Math.max(w, x2);
 }
-require(['../dist/parser/js/Parser',
-  '../dist/lexer/Lexer',
-  '../dist/lexer/rule/EcmascriptRule',
-  '../dist/parser/js/Node',
-  '../dist/lexer/Token'],
-function(Parser, Lexer, EcmascriptRule, JsNode, Token) {
+seajs.use('../index.js', function(Homunculus) {
 	var ta = document.getElementById('ta');
 	var input = document.getElementById('btn');
 	input.onclick = function() {
 		var s = ta.value;
-    var parser = new Parser(new Lexer(new EcmascriptRule()));
+    var parser = Homunculus.getParser('js');
+    var JsNode = Homunculus.getClass('node', 'es6');
+    var Token = Homunculus.getClass('token');
     var ast = parser.parse(s);
     draw(ast);
     var s = JSON.stringify(tree(ast));

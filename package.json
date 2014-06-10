@@ -1,6 +1,6 @@
 {
   "name": "homunculus",
-  "version": "0.2.6-1",
+  "version": "0.2.6-2",
   "description": "A lexer&parser by Javascript",
   "maintainers": [
     {
@@ -14,16 +14,15 @@
   "config": {
     "blanket": {
       "pattern": [
-        "dist/lexer/Lexer",
-        "dist/lexer/Token",
-        "dist/lexer/match",
-        "dist/lexer/rule/Rule",
-        "dist/lexer/rule/EcmascriptRule",
-        "dist/parser/js",
-        "dist/parser/es6",
-        "dist/parser/Parser",
-        "dist/parser/Node",
-        "dist/util"
+        "src/lexer/Lexer",
+        "src/lexer/Token",
+        "src/lexer/match",
+        "src/lexer/rule/Rule",
+        "src/lexer/rule/EcmascriptRule",
+        "src/parser/js",
+        "src/parser/es6",
+        "src/parser/Parser",
+        "src/parser/Node"
       ]
     }
   },

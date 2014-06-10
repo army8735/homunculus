@@ -12,10 +12,10 @@
   </style>
 </head>
 <body>
-<textarea id="ta" autocomplete="off"></textarea>
+<textarea id="ta" autocomplete="on"></textarea>
 <input id="btn" type="button" value="ok"/>
 <div id="ui" class="kineticjs-content"></div>
-<script src="Ai.js"></script>
+<script src="sea.js"></script>
 <script src="kinetic-v4.4.0.min.js"></script>
 <script>
   var w = 0, h = 0;
@@ -84,17 +84,14 @@
     }
     w = Math.max(w, x2);
   }
-  require(['../dist/parser/css/Parser',
-      '../dist/lexer/CssLexer',
-      '../dist/lexer/rule/CssRule',
-      '../dist/parser/css/Node',
-      '../dist/lexer/Token'],
-    function(Parser, Lexer, CssRule, CssNode, Token) {
+  seajs.use('../index.js', function(Homunculus) {
       var ta = document.getElementById('ta');
       var input = document.getElementById('btn');
       input.onclick = function() {
         var s = ta.value;
-        var parser = new Parser(new Lexer(new CssRule()));
+        var parser = Homunculus.getParser('css');
+        var CssNode = Homunculus.getClass('node', 'css');
+        var Token = Homunculus.getClass('token');
         var ast = parser.parse(s);
         draw(ast);
         var s = JSON.stringify(tree(ast));

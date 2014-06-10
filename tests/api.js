@@ -2,16 +2,16 @@ var homunculus = require('../');
 
 var expect = require('expect.js');
 
-var Lexer = require('../dist/lexer/Lexer');
-var CssLexer = require('../dist/lexer/CssLexer');
-var JsParser = require('../dist/parser/js/Parser');
-var Es6Parser = require('../dist/parser/es6/Parser');
-var CssParser = require('../dist/parser/css/Parser');
-var JsNode = require('../dist/parser/js/Node');
-var Es6Node = require('../dist/parser/es6/Node');
-var CssNode = require('../dist/parser/css/Node');
-var Token = require('../dist/lexer/Token');
-var JsContext = require('../dist/parser/js/Context');
+var Lexer = require('../src/lexer/Lexer');
+var CssLexer = require('../src/lexer/CssLexer');
+var JsParser = require('../src/parser/js/Parser');
+var Es6Parser = require('../src/parser/es6/Parser');
+var CssParser = require('../src/parser/css/Parser');
+var JsNode = require('../src/parser/js/Node');
+var Es6Node = require('../src/parser/es6/Node');
+var CssNode = require('../src/parser/css/Node');
+var Token = require('../src/lexer/Token');
+var JsContext = require('../src/parser/js/Context');
 
 describe('api of homunculus', function() {
   it('#getClass', function() {

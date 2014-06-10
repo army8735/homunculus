@@ -15,6 +15,7 @@ npm install homunculus
 * CommonJS/AMD/CMD自适应。
 
 ## API
+### Homunculus
 * getClass(type:String, lan:String):class
   * type:
     * lexer 
