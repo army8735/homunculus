@@ -252,20 +252,20 @@ define(function(require, exports, module) {
     },
     stmtlitem: function(yYield) {
       if(['function', 'class', 'let', 'const'].indexOf(this.look.content()) > -1) {
-        return this.decl();
+        return this.decl(yYield);
       }
       else {
         return this.stmt(yYield);
       }
     },
-    decl: function() {
+    decl: function(yYield) {
       if(!this.look) {
         this.error();
       }
       switch(this.look.content()) {
         case 'let':
         case 'const':
-          return this.lexdecl();
+          return this.lexdecl(yYield);
         case 'function':
           for(var i = this.index; i < this.length; i++) {
             var token = this.tokens[i];
@@ -289,17 +289,17 @@ define(function(require, exports, module) {
       }
       switch(this.look.content()) {
         case 'var':
-          return this.varstmt();
+          return this.varstmt(null, yYield);
         case '{':
-          return this.blockstmt();
+          return this.blockstmt(yYield);
         case ';':
           return this.emptstmt();
         case 'if':
-          return this.ifstmt();
+          return this.ifstmt(yYield);
         case 'do':
         case 'while':
         case 'for':
-          return this.iterstmt();
+          return this.iterstmt(yYield);
         case 'continue':
           return this.cntnstmt();
         case 'break':
@@ -307,13 +307,13 @@ define(function(require, exports, module) {
         case 'return':
           return this.retstmt();
         case 'with':
-          return this.withstmt();
+          return this.withstmt(yYield);
         case 'switch':
-          return this.swchstmt();
+          return this.swchstmt(yYield);
         case 'throw':
-          return this.thrstmt();
+          return this.thrstmt(yYield);
         case 'try':
-          return this.trystmt();
+          return this.trystmt(yYield);
         case 'debugger':
           return this.debstmt();
         default:
@@ -338,7 +338,7 @@ define(function(require, exports, module) {
       node.add(this.expr(null, null, yYield), this.match(';'));
       return node;
     },
-    lexdecl: function() {
+    lexdecl: function(yYield) {
       var node = new Node(Node.LEXDECL);
       if(this.look.content() == 'let') {
         node.add(this.match());
@@ -349,22 +349,22 @@ define(function(require, exports, module) {
       else {
         this.error();
       }
-      node.add(this.lexbind());
+      node.add(this.lexbind(yYield));
       while(this.look && this.look.content() == ',') {
         node.add(
           this.match(),
-          this.lexbind()
+          this.lexbind(yYield)
         );
       }
       node.add(this.match(';'));
       return node;
     },
-    lexbind: function() {
+    lexbind: function(yYield) {
       var node = new Node(Node.LEXBIND);
-      this.declnode(node);
+      this.declnode(node, yYield);
       return node;
     },
-    declnode: function(node) {
+    declnode: function(node, yYield) {
       if(!this.look) {
         this.error('missing variable name');
       }
@@ -373,25 +373,25 @@ define(function(require, exports, module) {
         if(!this.look || this.look.content() != '=') {
           this.error('missing = in destructuring declaration');
         }
-        node.add(this.initlz());
+        node.add(this.initlz(null, null, yYield));
       }
       else {
         node.add(this.bindid('missing variable name'));
         if(this.look && this.look.content() == '=') {
-          node.add(this.initlz());
+          node.add(this.initlz(null, null, yYield));
         }
       }
     },
-    varstmt: function(noSem) {
+    varstmt: function(noSem, yYield) {
       var node = new Node(Node.VARSTMT);
       node.add(
         this.match('var'),
-        this.vardecl()
+        this.vardecl(yYield)
       );
       while(this.look && this.look.content() == ',') {
         node.add(
           this.match(),
-          this.vardecl()
+          this.vardecl(yYield)
         );
       }
       if(!noSem) {
@@ -399,9 +399,9 @@ define(function(require, exports, module) {
       }
       return node;
     },
-    vardecl: function() {
+    vardecl: function(yYield) {
       var node = new Node(Node.VARDECL);
-      this.declnode(node);
+      this.declnode(node, yYield);
       return node;
     },
     bindid: function(msg, noIn, noOf, canKw) {
@@ -540,14 +540,14 @@ define(function(require, exports, module) {
     },
     blockstmt: function() {
       var node = new Node(Node.BLOCKSTMT);
-      node.add(this.block());
+      node.add(this.block(null, yYield));
       return node;
     },
-    block: function(msg) {
+    block: function(msg, yYield) {
       var node = new Node(Node.BLOCK);
       node.add(this.match('{', msg));
       while(this.look && this.look.content() != '}') {
-        node.add(this.stmtlitem());
+        node.add(this.stmtlitem(yYield));
       }
       node.add(this.match('}', 'missing } in compound statement'));
       return node;
@@ -557,7 +557,7 @@ define(function(require, exports, module) {
       node.add(this.match(';'));
       return node;
     },
-    ifstmt: function() {
+    ifstmt: function(yYield) {
       var node = new Node(Node.IFSTMT);
       node.add(
         this.match('if'),
@@ -569,12 +569,12 @@ define(function(require, exports, module) {
       if(this.look && this.look.content() == 'else') {
         node.add(
           this.match('else'),
-          this.stmt()
+          this.stmt(yYield)
         );
       }
       return node;
     },
-    iterstmt: function() {
+    iterstmt: function(yYield) {
       var node = new Node(Node.ITERSTMT);
       switch(this.look.content()) {
         case 'do':
@@ -594,7 +594,7 @@ define(function(require, exports, module) {
             this.match('('),
             this.expr(),
             this.match(')'),
-            this.stmt()
+            this.stmt(yYield)
           );
         break;
         case 'for':
@@ -746,7 +746,7 @@ define(function(require, exports, module) {
             }
           }
           node.add(this.match(')'));
-          node.add(this.stmt());
+          node.add(this.stmt(yYield));
       }
       return node;
     },
@@ -788,37 +788,37 @@ define(function(require, exports, module) {
       }
       return node;
     },
-    withstmt: function() {
+    withstmt: function(yYield) {
       var node = new Node(Node.WITHSTMT);
       node.add(
         this.match('with', 'missing ( before with-statement object'),
         this.match('('),
         this.expr(),
         this.match(')', 'missing ) after with-statement object'),
-        this.stmt()
+        this.stmt(yYield)
       );
       return node;
     },
-    swchstmt: function() {
+    swchstmt: function(yYield) {
       var node = new Node(Node.SWCHSTMT);
       node.add(
         this.match('switch'),
         this.match('('),
         this.expr(),
         this.match(')'),
-        this.caseblock()
+        this.caseblock(yYield)
       );
       return node;
     },
-    caseblock: function() {
+    caseblock: function(yYield) {
       var node = new Node(Node.CASEBLOCK);
       node.add(this.match('{'));
       while(this.look && this.look.content() != '}') {
         if(this.look.content() == 'case') {
-          node.add(this.caseclause());
+          node.add(this.caseclause(yYield));
         }
         else if(this.look.content() == 'default') {
-          node.add(this.dftclause());
+          node.add(this.dftclause(yYield));
         }
         else {
           this.error('invalid switch statement');
@@ -827,7 +827,7 @@ define(function(require, exports, module) {
       node.add(this.match('}'));
       return node;
     },
-    caseclause: function() {
+    caseclause: function(yYield) {
       var node = new Node(Node.CASECLAUSE);
       node.add(
         this.match('case'),
@@ -838,18 +838,18 @@ define(function(require, exports, module) {
         && this.look.content() != 'case'
         && this.look.content() != 'default'
         && this.look.content() != '}') {
-        node.add(this.stmt());
+        node.add(this.stmt(yYield));
       }
       return node;
     },
-    dftclause: function() {
+    dftclause: function(yYield) {
       var node = new Node(Node.DFTCLAUSE);
       node.add(
         this.match('default'),
         this.match(':')
       );
       while(this.look && this.look.content() != '}') {
-        node.add(this.stmt());
+        node.add(this.stmt(yYield));
       }
       return node;
     },
@@ -871,20 +871,20 @@ define(function(require, exports, module) {
       );
       return node;
     },
-    trystmt: function() {
+    trystmt: function(yYield) {
       var node = new Node(Node.TRYSTMT);
       node.add(
         this.match('try'),
-        this.block('missing { before try block')
+        this.block('missing { before try block', yYield)
       );
       if(this.look && this.look.content() == 'catch') {
-        node.add(this.cach());
+        node.add(this.cach(yYield));
         if(this.look && this.look.content() == 'finally') {
-          node.add(this.finl());
+          node.add(this.finl(yYield));
         }
       }
       else {
-        node.add(this.finl());
+        node.add(this.finl(yYield));
       }
       return node;
     },
@@ -893,14 +893,14 @@ define(function(require, exports, module) {
       node.add(this.match('debugger'), this.match(';'));
       return node;
     },
-    cach: function() {
+    cach: function(yYield) {
       var node = new Node(Node.CACH);
       node.add(
         this.match('catch', 'missing catch or finally after try'),
         this.match('(', 'missing ( before catch'),
         this.cachparam(),
         this.match(')', 'missing ) after catch'),
-        this.block('missing { before catch block')
+        this.block('missing { before catch block', yYield)
       );
       return node;
     },
@@ -914,11 +914,11 @@ define(function(require, exports, module) {
       }
       return node;
     },
-    finl: function() {
+    finl: function(yYield) {
       var node = new Node(Node.FINL);
       node.add(
         this.match('finally'),
-        this.block('missing { before finally block')
+        this.block('missing { before finally block', yYield)
       );
       return node;
     },
@@ -1200,11 +1200,11 @@ define(function(require, exports, module) {
       }
       return node;
     },
-    initlz: function(noIn, noOf) {
+    initlz: function(noIn, noOf, yYield) {
       var node = new Node(Node.INITLZ);
       node.add(
         this.match('='),
-        this.assignexpr(noIn, noOf)
+        this.assignexpr(noIn, noOf, yYield)
       );
       return node;
     },
@@ -1215,7 +1215,7 @@ define(function(require, exports, module) {
       }
       if(this.look.content() == 'yield') {
         if(!yYield) {
-          this.error();
+          this.error('yield not in generator function');
         }
         return this.yieldexpr(noIn, noOf, yYield);
       }

@@ -292,6 +292,11 @@ describe('es6parser', function() {
       var node = parser.parse('function * a(){yield}');
       expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.GENDECL,["function","*",JsNode.BINDID,["a"],"(",JsNode.FMPARAMS,[],")","{",JsNode.FNBODY,[JsNode.EXPRSTMT,[JsNode.YIELDEXPR,["yield"]]],"}"]]]]);
     });
+    it('gendecl with var stmt yield', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('function * a(){var a = yield 1}');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.GENDECL,["function","*",JsNode.BINDID,["a"],"(",JsNode.FMPARAMS,[],")","{",JsNode.FNBODY,[JsNode.VARSTMT,["var",JsNode.VARDECL,[JsNode.BINDID,["a"],JsNode.INITLZ,["=",JsNode.YIELDEXPR,["yield",JsNode.PRMREXPR,["1"]]]]]],"}"]]]]);
+    });
     it('yield can not in gencmph', function() {
       var parser = homunculus.getParser('es6');
       expect(function() {
