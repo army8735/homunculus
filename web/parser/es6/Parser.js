@@ -281,6 +281,8 @@ define(function(require, exports, module) {
           return this.fndecl();
         case 'class':
           return this.classdecl();
+        default:
+          this.error();
       }
     },
     stmt: function(yYield) {

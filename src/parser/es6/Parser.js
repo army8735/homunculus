@@ -280,6 +280,8 @@ var Parser = IParser.extend(function(lexer) {
         return this.fndecl();
       case 'class':
         return this.classdecl();
+      default:
+        this.error();
     }
   },
   stmt: function(yYield) {
