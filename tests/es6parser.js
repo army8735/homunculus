@@ -1459,6 +1459,12 @@ describe('es6parser', function() {
       var node = parser.parse('export {x} from "a"');
       expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.MODULEBODY,[JsNode.EXPORTDECL,["export",JsNode.EXPORTCAULSE,["{",JsNode.EXPORTSPEC,["x"],"}"],JsNode.FROMCAULSE,["from","\"a\""]]]]]);
     });
+    it('module export error', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('export a');
+      }).to.throwError();
+    });
     it('module var', function() {
       var parser = homunculus.getParser('es6');
       var node = parser.parse('export var a = 1');
