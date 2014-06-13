@@ -1224,6 +1224,7 @@ define(function(require, exports, module) {
       var cndt = this.cndtexpr(noIn, noOf, yYield);
       if(this.look
         && this.look.content() == '=>'
+        && this.hasMoveLine == false
         && cndt.name() == Node.PRMREXPR
         && cndt.size() == 1
         && (cndt.first().name() == Node.CPEAPL
