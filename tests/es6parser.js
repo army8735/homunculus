@@ -1419,6 +1419,12 @@ describe('es6parser', function() {
         parser.parse('a => {');
       }).to.throwError();
     });
+    it('arrowfn error disallowed a line break between ArrowParameters and the ⇒', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('(a, b)\n=> a + b');
+      }).to.throwError();
+    });
     it('module from', function() {
       var parser = homunculus.getParser('es6');
       var node = parser.parse('module a from "a"');
