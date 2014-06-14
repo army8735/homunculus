@@ -12,6 +12,7 @@ var CssLexer = Lexer.extend(function(rule) {
   this.isUrl = false;
   this.isKw = false;
   this.isSelector = false;
+  this.depth = 0;
 }).methods({
   //@override
   scan: function(temp) {
@@ -89,8 +90,13 @@ var CssLexer = Lexer.extend(function(rule) {
               }
               else {
                 if(this.rule.keyWords().hasOwnProperty(s)) {
-                  token.type(Token.KEYWORD);
-                  this.isKw = true;
+                  if(this.depth || this.media || this.import) {
+                    token.type(Token.KEYWORD);
+                    this.isKw = true;
+                  }
+                  else {
+                    token.type(Token.IGNORE);
+                  }
                 }
                 else {
                   token.type(Token.SELECTOR);
@@ -118,6 +124,7 @@ var CssLexer = Lexer.extend(function(rule) {
                   if(this.isKw) {
                     this.isValue = true;
                   }
+                  this.isUrl = false;
                   this.isKw = false;
                   this.isSelector = false;
                   break;
@@ -129,7 +136,7 @@ var CssLexer = Lexer.extend(function(rule) {
                   break;
                 case ')':
                   if(this.media || this.import) {
-                    this.value = true;
+                    this.isValue = true;
                   }
                   this.isUrl = false;
                   this.parenthese = false;
@@ -137,26 +144,41 @@ var CssLexer = Lexer.extend(function(rule) {
                   if(this.isSelector) {
                     this.bracket = true;
                   }
+                  this.isUrl = false;
                   break;
                 case ']':
                   this.bracket = false;
+                  this.isUrl = false;
                   break;
                 case ';':
                   this.isValue = false;
                   this.import = false;
+                  this.isUrl = false;
                   break;
                 case '{':
+                  this.depth++;
+                  this.isValue = false;
+                  this.media = false;
+                  this.import = false;
+                  this.isUrl = false;
+                  break;
                 case '}':
                   this.isValue = false;
                   this.media = false;
                   this.import = false;
+                  this.isUrl = false;
+                  this.depth--;
                   break;
                 case '-':
                 case '*':
                 case '_':
-                  if(!this.isValue) {
+                  if(this.depth && !this.isValue) {
                     token.type(Token.HACK);
                   }
+                  this.isUrl = false;
+                  break;
+                default:
+                  this.isUrl = false;
                   break;
               }
             case Token.NUMBER:
