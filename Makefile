@@ -18,8 +18,11 @@ test-jscontext:
 test-es6parser:
 	@mocha tests/es6parser.js -R spec
 
+test-csslexer:
+	@mocha tests/csslexer.js -R spec
+
 coveralls:
-	@mocha tests/api.js tests/jslexer.js tests/jsparser.js tests/jscontext.js tests/es6parser.js --require blanket --reporter mocha-lcov-reporter | ./node_modules/coveralls/bin/coveralls.js
+	@mocha tests/api.js tests/jslexer.js tests/jsparser.js tests/jscontext.js tests/es6parser.js tests/csslexer.js --require blanket --reporter mocha-lcov-reporter | ./node_modules/coveralls/bin/coveralls.js
 
 test-cov:
-	@mocha tests/api.js tests/jslexer.js tests/jsparser.js tests/jscontext.js tests/es6parser.js --require blanket -R html-cov > tests/covrage.html
+	@mocha tests/api.js tests/jslexer.js tests/jsparser.js tests/jscontext.js tests/es6parser.js tests/csslexer.js --require blanket -R html-cov > tests/covrage.html

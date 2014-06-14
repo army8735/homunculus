@@ -3,6 +3,8 @@ var Token = require('./Token');
 var character = require('../util/character');
 var CssLexer = Lexer.extend(function(rule) {
   Lexer.call(this, rule);
+  this.media = false;
+  this.import = false;
   this.isValue = false;
   this.parenthese = false;
   this.bracket = false;
@@ -24,7 +26,7 @@ var CssLexer = Lexer.extend(function(rule) {
       for(var i = 0, matches = this.rule.matches(), len = matches.length; i < len; i++) {
         var match = matches[i];
         if(match.match(this.peek, this.code, this.index)) {
-          var token = new Token(match.tokenType(), match.content(), match.val());
+          var token = new Token(match.tokenType(), match.content(), match.val(), this.index - 1);
           var error = match.error();
           if(error) {
             this.error(error, this.code.slice(this.index - matchLen, this.index));
@@ -32,15 +34,17 @@ var CssLexer = Lexer.extend(function(rule) {
           var matchLen = match.content().length;
 
           //(之后的字符串可省略"号
-          if(this.parenthese) {
+          if(this.parenthese && this.isUrl) {
             if(token.type() == Token.STRING) {
-              //
+              this.isUrl = false;
             }
             else if(token.content() == ')') {
+              this.isUrl = false;
               this.parenthese = false;
             }
             else {
               this.dealPt(temp);
+              this.isUrl = false;
               continue outer;
             }
           }
@@ -49,9 +53,17 @@ var CssLexer = Lexer.extend(function(rule) {
           switch(token.type()) {
             //@import和@media之后进入值状态
             case Token.HEAD:
-              this.isValue = ['@import', '@media'].indexOf(s) != -1
+              switch(s) {
+                case '@import':
+                  this.import = true;
+                  break;
+                case '@media':
+                  this.media = true;
+                  break;
+              }
               this.isSelector = false;
               this.isKw = false;
+              this.isValue = true;
               break;
             //单位要跟在数字之后，否则便不是单位
             case Token.UNITS:
@@ -110,10 +122,17 @@ var CssLexer = Lexer.extend(function(rule) {
                   this.isSelector = false;
                   break;
                 case '(':
-                  if(this.isUrl) {
-                    this.parenthese = true;
+                  if(this.media || this.import) {
+                    this.isValue = false;
                   }
+                  this.parenthese = true;
                   break;
+                case ')':
+                  if(this.media || this.import) {
+                    this.value = true;
+                  }
+                  this.isUrl = false;
+                  this.parenthese = false;
                 case '[':
                   if(this.isSelector) {
                     this.bracket = true;
@@ -124,10 +143,13 @@ var CssLexer = Lexer.extend(function(rule) {
                   break;
                 case ';':
                   this.isValue = false;
+                  this.import = false;
                   break;
                 case '{':
                 case '}':
                   this.isValue = false;
+                  this.media = false;
+                  this.import = false;
                   break;
                 case '-':
                 case '*':

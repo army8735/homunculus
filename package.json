@@ -15,10 +15,12 @@
     "blanket": {
       "pattern": [
         "src/lexer/Lexer",
+        "src/lexer/CssLexer",
         "src/lexer/Token",
         "src/lexer/match",
         "src/lexer/rule/Rule",
         "src/lexer/rule/EcmascriptRule",
+        "src/lexer/rule/CssRule",
         "src/parser/js",
         "src/parser/es6",
         "src/parser/Parser",
