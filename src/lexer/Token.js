@@ -75,6 +75,10 @@ var Token = Class(function(type, content, val, sIndex) {
   VARS: 16,
   HACK: 17,
   IMPORTANT: 18,
+  PSEUDO: 19,
+  UNITS: 20,
+  SELECTOR: 21,
+  ATTR: 22,
   type: function(tag) {
     if(character.isUndefined(types)) {
       types = [];
