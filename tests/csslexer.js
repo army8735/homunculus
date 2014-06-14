@@ -46,11 +46,17 @@ describe('csslexer', function() {
       it('with quote', function () {
         var lexer = homunculus.getLexer('css');
         var tokens = lexer.parse('@import url("xxx")');
+        expect(join(tokens)).to.eql([ '@import', ' ', 'url', '(', '"xxx"', ')' ]);
+        expect(type(tokens)).to.eql([ 12, 1, 15, 8, 7, 8 ]);
+      });
+      it('url with blank and no quote', function () {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('@import url(x x)');
         console.log(join(tokens));
         console.log(type(tokens, true));
         console.log(type(tokens));
-        expect(join(tokens)).to.eql([ '@import', ' ', 'url', '(', '"xxx"', ')' ]);
-        expect(type(tokens)).to.eql([ 12, 1, 15, 8, 7, 8 ]);
+        expect(join(tokens)).to.eql([ '@import', ' ', 'url', '(', 'x x', ')' ]);
+        expect(type(tokens)).to.eql([ 12, 1, 15, 8, -2, 8 ]);
       });
     });
   });

@@ -24,6 +24,22 @@ var CssLexer = Lexer.extend(function(rule) {
         break;
       }
       this.readch();
+      //(之后的字符串可省略"号
+      if(this.parenthese && this.isUrl) {
+        if(!{
+          "'": true,
+          '"': true,
+          ' ': true,
+          '\n': true,
+          '\r': true,
+          '\t': true,
+          ')': true
+        }.hasOwnProperty(this.peek)) {
+          this.dealPt(temp);
+          this.isUrl = false;
+          continue outer;
+        }
+      }
       for(var i = 0, matches = this.rule.matches(), len = matches.length; i < len; i++) {
         var match = matches[i];
         if(match.match(this.peek, this.code, this.index)) {
@@ -33,22 +49,6 @@ var CssLexer = Lexer.extend(function(rule) {
             this.error(error, this.code.slice(this.index - matchLen, this.index));
           }
           var matchLen = match.content().length;
-
-          //(之后的字符串可省略"号
-          if(this.parenthese && this.isUrl) {
-            if(token.type() == Token.STRING) {
-              this.isUrl = false;
-            }
-            else if(token.content() == ')') {
-              this.isUrl = false;
-              this.parenthese = false;
-            }
-            else {
-              this.dealPt(temp);
-              this.isUrl = false;
-              continue outer;
-            }
-          }
 
           var s = token.content();
           switch(token.type()) {
@@ -65,6 +65,7 @@ var CssLexer = Lexer.extend(function(rule) {
               this.isSelector = false;
               this.isKw = false;
               this.isValue = true;
+              this.isNumber = false;
               break;
             //单位要跟在数字之后，否则便不是单位
             case Token.UNITS:
@@ -86,7 +87,9 @@ var CssLexer = Lexer.extend(function(rule) {
                 if(this.rule.colors().hasOwnProperty(s)) {
                   token.type(Token.NUMBER);
                 }
-                this.isUrl = token.content() == 'url' || token.content() == 'format';
+                else {
+                  this.isUrl = s == 'url' || s == 'format';
+                }
               }
               else {
                 if(this.rule.keyWords().hasOwnProperty(s)) {
@@ -103,6 +106,7 @@ var CssLexer = Lexer.extend(function(rule) {
                   this.isSelector = true;
                 }
               }
+              this.isNumber = false;
               break;
             case Token.PSEUDO:
               if(!this.isSelector) {
@@ -110,15 +114,12 @@ var CssLexer = Lexer.extend(function(rule) {
               }
               break;
             case Token.SELECTOR:
-              if(this.bracket) {
-                token.type(Token.ATTR);
-              }
-              else {
-                this.isSelector = true;
-              }
+              this.isSelector = true;
               this.isKw = false;
+              this.isNumber = false;
               break;
             case Token.SIGN:
+              this.isNumber = false;
               switch(s) {
                 case ':':
                   if(this.isKw) {
@@ -185,10 +186,11 @@ var CssLexer = Lexer.extend(function(rule) {
               if(!this.isValue && token.content().charAt(0) == '#') {
                 token.type(Token.SELECTOR);
               }
+              else {
+                this.isNumber = true;
+              }
               break;
           }
-
-          this.isNumber = token.type() == Token.NUMBER;
 
           //回调可自定义处理匹配的token
           if(match.callback) {
@@ -256,12 +258,15 @@ var CssLexer = Lexer.extend(function(rule) {
       return;
     }
     var s = this.code.slice(this.index - 1, k);
-    var reg = /[^\s\r\n]+[\s\r\n]/.exec(s);
+    var reg = /[\s\r\n]/.exec(s.trim());
+    var token;
     //)之前的空白要判断
     if(reg) {
-      s = reg[0];
+      token = new Token(Token.IGNORE, s);
     }
-    var token = new Token(Token.STRING, s);
+    else {
+      token = new Token(Token.STRING, s);
+    }
     temp.push(token);
     this.tokenList.push(token);
     this.index += s.length - 1;
@@ -269,8 +274,8 @@ var CssLexer = Lexer.extend(function(rule) {
     this.url = false;
     var n = character.count(token.val(), character.LINE);
     if(n > 0) {
-      var i = token.content().indexOf(character.LINE),
-        j = token.content().lastIndexOf(character.LINE);
+      var i = token.content().indexOf(character.LINE);
+      var j = token.content().lastIndexOf(character.LINE);
       this.colMax = Math.max(this.colMax, this.colNum + i);
       this.colNum = token.content().length - j;
     }
@@ -278,6 +283,9 @@ var CssLexer = Lexer.extend(function(rule) {
       this.colNum += token.content().length;
     }
     this.colMax = Math.max(this.colMax, this.colNum);
+  },
+  find: function() {
+    //
   }
 });
 
