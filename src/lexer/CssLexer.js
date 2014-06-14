@@ -44,10 +44,6 @@ var CssLexer = Lexer.extend(function(rule) {
         var match = matches[i];
         if(match.match(this.peek, this.code, this.index)) {
           var token = new Token(match.tokenType(), match.content(), match.val(), this.index - 1);
-          var error = match.error();
-          if(error) {
-            this.error(error, this.code.slice(this.index - matchLen, this.index));
-          }
           var matchLen = match.content().length;
 
           var s = token.content();
@@ -118,6 +114,18 @@ var CssLexer = Lexer.extend(function(rule) {
               this.isKw = false;
               this.isNumber = false;
               break;
+            case Token.HACK:
+              if(!this.depth || !this.isValue) {
+                token.type(Token.IGNORE);
+              }
+              this.isUrl = false;
+              break;
+            case Token.IMPORTANT:
+              if(!this.depth || !this.isValue) {
+                token.type(Token.IGNORE);
+              }
+              this.isUrl = false;
+              break;
             case Token.SIGN:
               this.isNumber = false;
               switch(s) {
@@ -182,6 +190,7 @@ var CssLexer = Lexer.extend(function(rule) {
                   this.isUrl = false;
                   break;
               }
+              break;
             case Token.NUMBER:
               if(!this.isValue && token.content().charAt(0) == '#') {
                 token.type(Token.SELECTOR);
@@ -215,10 +224,6 @@ var CssLexer = Lexer.extend(function(rule) {
           this.colMax = Math.max(this.colMax, this.colNum);
           continue outer;
         }
-      }
-      if(this.parenthese) {
-        this.dealPt(temp);
-        continue outer;
       }
       //如果有未匹配的，css默认忽略，查找下一个;
       var j = this.code.indexOf(';', this.index);

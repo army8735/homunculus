@@ -211,14 +211,9 @@ define(function(require, exports, module) {
         throw new Error(s + ', line ' + this.line() + ' col ' + this.colNum + '\n' + str);
       }
       else if(Lexer.mode() === Lexer.LOOSE && typeof console !== void 0) {
-        console.error(s + ', line ' + this.line() + ' col ' + this.colNum + '\n' + str);
-      }
-      return this;
-    },
-    warn: function(msg) {
-      if(typeof console !== void 0) {
         console.warn(s + ', line ' + this.line() + ' col ' + this.colNum + '\n' + str);
       }
+      return this;
     }
   }).statics({
     IGNORE: 0,
