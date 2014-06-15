@@ -41,6 +41,7 @@ define(function(require, exports, module) {
     self.addMatch(new CompleteEqual(Token.HACK, '\\9\\0'));
     self.addMatch(new CompleteEqual(Token.HACK, '\\0'));
     self.addMatch(new CompleteEqual(Token.HACK, '\\9'));
+    self.addMatch(new CompleteEqual(Token.HACK, '\\,'));
     self.addMatch(new CompleteEqual(Token.HACK, '-moz-'), null, true);
     self.addMatch(new CompleteEqual(Token.HACK, '-webkit-'), null, true);
     self.addMatch(new CompleteEqual(Token.HACK, '-ms-'), null, true);
@@ -68,7 +69,8 @@ define(function(require, exports, module) {
         '@media': true,
         '@font-face': true,
         '@keyframes': true,
-        '@namespace': true
+        '@namespace': true,
+        '@-moz-document': true
       }.hasOwnProperty(s)) {
         token.type(Token.VARS);
       }

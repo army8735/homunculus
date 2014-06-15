@@ -2,6 +2,12 @@ define(function(require, exports, module) {
   var Lexer = require('./Lexer');
   var Token = require('./Token');
   var character = require('../util/character');
+  var S = {
+    '\n': true,
+    '\r': true,
+    ' ': true,
+    '\t': true
+  };
   var CssLexer = Lexer.extend(function(rule) {
     Lexer.call(this, rule);
     this.media = false;
@@ -27,15 +33,12 @@ define(function(require, exports, module) {
         this.readch();
         //(之后的字符串可省略"号
         if(this.parenthese && this.isUrl) {
-          if(!{
-            "'": true,
-            '"': true,
-            ' ': true,
-            '\n': true,
-            '\r': true,
-            '\t': true,
-            ')': true
-          }.hasOwnProperty(this.peek)) {
+          if(!S.hasOwnProperty(this.peek)
+            && !{
+              "'": true,
+              '"': true,
+              ')': true
+            }.hasOwnProperty(this.peek)) {
             this.dealPt(temp);
             this.isUrl = false;
             continue outer;
@@ -74,25 +77,33 @@ define(function(require, exports, module) {
                 break;
               //将id区分出属性名和属性值
               case Token.ID:
-                this.isKw = false;
                 this.isSelector = false;
-                if(this.bracket) {
+                if(this.isKw) {
+                  token.type(Token.IGNORE);
+                  this.isKw = false;
+                }
+                else if(this.bracket) {
                   token.type(Token.ATTR);
+                  this.isUrl = false;
                 }
                 else if(this.isValue) {
-                  token.type(Token.PROPERTY);
                   if(this.rule.colors().hasOwnProperty(s)) {
                     token.type(Token.NUMBER);
+                    this.isUrl = false;
                   }
-                  else {
+                  else if(this.rule.keyWords().hasOwnProperty(s)
+                    || this.rule.values().hasOwnProperty(s)) {
+                    token.type(Token.PROPERTY);
                     this.isUrl = s == 'url' || s == 'format';
                   }
+                  this.isKw = false;
                 }
                 else {
                   if(this.rule.keyWords().hasOwnProperty(s)) {
                     if(this.depth || this.media || this.import) {
                       token.type(Token.KEYWORD);
                       this.isKw = true;
+                      this.isUrl = false;
                     }
                     else {
                       token.type(Token.IGNORE);
@@ -101,6 +112,8 @@ define(function(require, exports, module) {
                   else {
                     token.type(Token.SELECTOR);
                     this.isSelector = true;
+                    this.isUrl = false;
+                    this.isKw = false;
                   }
                 }
                 this.isNumber = false;
@@ -114,12 +127,6 @@ define(function(require, exports, module) {
                 this.isSelector = true;
                 this.isKw = false;
                 this.isNumber = false;
-                break;
-              case Token.HACK:
-                if(!this.depth || !this.isValue) {
-                  token.type(Token.IGNORE);
-                }
-                this.isUrl = false;
                 break;
               case Token.IMPORTANT:
                 if(!this.depth || !this.isValue) {
@@ -179,8 +186,31 @@ define(function(require, exports, module) {
                     this.isUrl = false;
                     this.depth--;
                     break;
-                  case '-':
                   case '*':
+                    if(this.depth) {
+                      if(!this.isValue) {
+                        //LL2确定是selector还是hack
+                        for (var j = this.index; j < length; j++) {
+                          var c = this.code.charAt(j);
+                          if (!S.hasOwnProperty(c)) {
+                            if (c == ':' || c == '{') {
+                              token.type(Token.SELECTOR);
+                              this.isSelector = true;
+                            }
+                            else {
+                              token.type(Token.HACK);
+                            }
+                            break;
+                          }
+                        }
+                      }
+                    }
+                    else {
+                      token.type(Token.SELECTOR);
+                      this.isSelector = true;
+                    }
+                    break;
+                  case '-':
                   case '_':
                     if(this.depth && !this.isValue) {
                       token.type(Token.HACK);
@@ -229,9 +259,15 @@ define(function(require, exports, module) {
         //如果有未匹配的，css默认忽略，查找下一个;
         var j = this.code.indexOf(';', this.index);
         if(j == -1) {
-          j = this.code.indexOf('}', this.index);
-          if(j == -1) {
-            j = this.code.length;
+          j = this.code.length;
+          if(this.depth) {
+            j = this.code.indexOf('}', this.index);
+            if (j == -1) {
+              j = this.code.length;
+            }
+            else {
+              j--;
+            }
           }
         }
         var s = this.code.slice(this.index - 1, ++j);
