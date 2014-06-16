@@ -49,6 +49,11 @@ var CssLexer = Lexer.extend(function(rule) {
           var token = new Token(match.tokenType(), match.content(), match.val(), this.index - 1);
           var matchLen = match.content().length;
 
+          //回调可自定义处理匹配的token
+          if(match.callback) {
+            match.callback(token);
+          }
+
           var s = token.content();
           switch(token.type()) {
             //@import和@media之后进入值状态
@@ -77,11 +82,7 @@ var CssLexer = Lexer.extend(function(rule) {
             //将id区分出属性名和属性值
             case Token.ID:
               this.isSelector = false;
-              if(this.isKw) {
-                token.type(Token.IGNORE);
-                this.isKw = false;
-              }
-              else if(this.bracket) {
+              if(this.bracket) {
                 token.type(Token.ATTR);
                 this.isUrl = false;
               }
@@ -134,14 +135,12 @@ var CssLexer = Lexer.extend(function(rule) {
               this.isUrl = false;
               break;
             case Token.SIGN:
-              this.isNumber = false;
               switch(s) {
                 case ':':
                   if(this.isKw) {
                     this.isValue = true;
                   }
                   this.isUrl = false;
-                  this.isKw = false;
                   this.isSelector = false;
                   break;
                 case '(':
@@ -149,6 +148,7 @@ var CssLexer = Lexer.extend(function(rule) {
                     this.isValue = false;
                   }
                   this.parenthese = true;
+                  this.isSelector = false;
                   break;
                 case ')':
                   if(this.media || this.import) {
@@ -156,20 +156,24 @@ var CssLexer = Lexer.extend(function(rule) {
                   }
                   this.isUrl = false;
                   this.parenthese = false;
+                  this.isSelector = false;
                 case '[':
                   if(this.isSelector) {
                     this.bracket = true;
                   }
                   this.isUrl = false;
+                  this.isSelector = false;
                   break;
                 case ']':
                   this.bracket = false;
                   this.isUrl = false;
+                  this.isSelector = false;
                   break;
                 case ';':
                   this.isValue = false;
                   this.import = false;
                   this.isUrl = false;
+                  this.isSelector = false;
                   break;
                 case '{':
                   this.depth++;
@@ -177,12 +181,14 @@ var CssLexer = Lexer.extend(function(rule) {
                   this.media = false;
                   this.import = false;
                   this.isUrl = false;
+                  this.isSelector = false;
                   break;
                 case '}':
                   this.isValue = false;
                   this.media = false;
                   this.import = false;
                   this.isUrl = false;
+                  this.isSelector = false;
                   this.depth--;
                   break;
                 case '*':
@@ -198,6 +204,7 @@ var CssLexer = Lexer.extend(function(rule) {
                           }
                           else {
                             token.type(Token.HACK);
+                            this.isSelector = false;
                           }
                           break;
                         }
@@ -215,11 +222,15 @@ var CssLexer = Lexer.extend(function(rule) {
                     token.type(Token.HACK);
                   }
                   this.isUrl = false;
+                  this.isSelector = false;
                   break;
                 default:
                   this.isUrl = false;
+                  this.isSelector = false;
                   break;
               }
+              this.isNumber = false;
+              this.isKw = false;
               break;
             case Token.NUMBER:
               if(!this.isValue && token.content().charAt(0) == '#') {
@@ -229,11 +240,6 @@ var CssLexer = Lexer.extend(function(rule) {
                 this.isNumber = true;
               }
               break;
-          }
-
-          //回调可自定义处理匹配的token
-          if(match.callback) {
-            match.callback(token);
           }
 
           temp.push(token);

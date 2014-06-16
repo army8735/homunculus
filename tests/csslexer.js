@@ -1,7 +1,6 @@
 var homunculus = require('../');
 
 var expect = require('expect.js');
-var fs = require('fs');
 var path = require('path');
 
 var Token = homunculus.getClass('token');
@@ -113,6 +112,12 @@ describe('csslexer', function() {
         expect(join(tokens)).to.eql(['#id', '{', '#id2', '{', '}', '}']);
         expect(type(tokens)).to.eql([21, 8, 21, 8, 8, 8]);
       });
+      it('#fff is not number', function () {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('#fff{}');
+        expect(join(tokens)).to.eql(['#fff', '{', '}']);
+        expect(type(tokens)).to.eql([21, 8, 8]);
+      });
       it('.class', function() {
         var lexer = homunculus.getLexer('css');
         var tokens = lexer.parse('.class{}');
@@ -193,11 +198,11 @@ describe('csslexer', function() {
         expect(join(tokens)).to.eql(['margin', ':', '0', '!important']);
         expect(type(tokens)).to.eql([-2, 8, 4, -2]);
       });
-      it('repeat kw is ignore', function() {
+      it('repeat kw', function() {
         var lexer = homunculus.getLexer('css');
         var tokens = lexer.parse('p{margin margin:0;}');
         expect(join(tokens)).to.eql(['p', '{', 'margin', ' ', 'margin', ':', '0', ';', '}']);
-        expect(type(tokens)).to.eql([21, 8, 10, 1, -2, 8, 4, 8, 8]);
+        expect(type(tokens)).to.eql([21, 8, 10, 1, 10, 8, 4, 8, 8]);
       });
     });
     describe('hack', function() {
@@ -230,6 +235,30 @@ describe('csslexer', function() {
         var tokens = lexer.parse('@media \\0screen{}');
         expect(join(tokens)).to.eql(['@media', ' ', '\\0', 'screen', '{', '}']);
         expect(type(tokens)).to.eql([12, 1, 17, 15, 8, 8]);
+      });
+      it('-moz-', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('p{-moz-width:1}');
+        expect(join(tokens)).to.eql(['p', '{', '-moz-', 'width', ':', '1', '}']);
+        expect(type(tokens)).to.eql([21, 8, 17, 10, 8, 4, 8]);
+      });
+      it('-webkit-', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('p{-webkit-width:1}');
+        expect(join(tokens)).to.eql(['p', '{', '-webkit-', 'width', ':', '1', '}']);
+        expect(type(tokens)).to.eql([21, 8, 17, 10, 8, 4, 8]);
+      });
+      it('-ms-', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('p{-ms-width:1}');
+        expect(join(tokens)).to.eql(['p', '{', '-ms-', 'width', ':', '1', '}']);
+        expect(type(tokens)).to.eql([21, 8, 17, 10, 8, 4, 8]);
+      });
+      it('-o-', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('p{-o-width:1}');
+        expect(join(tokens)).to.eql(['p', '{', '-o-', 'width', ':', '1', '}']);
+        expect(type(tokens)).to.eql([21, 8, 17, 10, 8, 4, 8]);
       });
     });
     describe('unknow', function() {
@@ -279,6 +308,12 @@ describe('csslexer', function() {
 //        console.log(type(tokens, true));
         expect(join(tokens)).to.eql(['p', '{', 'p', '{', '*', 'margin', ':', '0', ';', '*', '{', '}', '}', '}']);
         expect(type(tokens)).to.eql([21, 8, 21, 8, 17, 10, 8, 4, 8, 21, 8, 8, 8, 8]);
+      });
+      it('#fff is not number', function () {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('#fff{#fff{}}');
+        expect(join(tokens)).to.eql(['#fff', '{', '#fff', '{', '}', '}']);
+        expect(type(tokens)).to.eql([21, 8, 21, 8, 8, 8]);
       });
     });
   });
