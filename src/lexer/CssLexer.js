@@ -17,7 +17,7 @@ var CssLexer = Lexer.extend(function(rule) {
   this.isNumber = false;
   this.isUrl = false;
   this.isKw = false;
-  this.isSelector = false;
+  this.isSelector = true;
   this.depth = 0;
 }).methods({
   //@override
@@ -119,7 +119,7 @@ var CssLexer = Lexer.extend(function(rule) {
               this.isNumber = false;
               break;
             case Token.PSEUDO:
-              if(!this.isSelector) {
+              if(this.isKw || this.isValue) {
                 continue;
               }
               break;
@@ -239,6 +239,13 @@ var CssLexer = Lexer.extend(function(rule) {
               else {
                 this.isNumber = true;
               }
+              this.isUrl = false;
+              break;
+            case Token.VARS:
+              this.isKw = true;
+              this.isSelector = false;
+              this.isUrl = false;
+              this.isNumber = false;
               break;
           }
 

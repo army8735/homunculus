@@ -154,11 +154,17 @@ describe('csslexer', function() {
         expect(join(tokens)).to.eql(['a', ':hover', '{', '}', 'p', ':not(:first)', '{', '}']);
         expect(type(tokens)).to.eql([21, 19, 8, 8, 21, 19, 8, 8]);
       });
-      it('pseudo not after selector is useless', function() {
+      it('pseudo at start', function() {
         var lexer = homunculus.getLexer('css');
         var tokens = lexer.parse(':hover{}');
-        expect(join(tokens)).to.eql([':', 'hover', '{', '}']);
-        expect(type(tokens)).to.eql([8, 21, 8, 8]);
+        expect(join(tokens)).to.eql([':hover', '{', '}']);
+        expect(type(tokens)).to.eql([19, 8, 8]);
+      });
+      it('pseudo after ,', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('p,:root{}');
+        expect(join(tokens)).to.eql(['p', ',', ':root', '{', '}']);
+        expect(type(tokens)).to.eql([21, 8, 19, 8, 8]);
       });
       it('* and pseudo', function() {
         var lexer = homunculus.getLexer('css');
@@ -172,11 +178,17 @@ describe('csslexer', function() {
         expect(join(tokens)).to.eql(['body', ':not(:-moz-handler-blocked)']);
         expect(type(tokens)).to.eql([21, 19]);
       });
-      it('attr', function() {
+      it('attr 1', function() {
         var lexer = homunculus.getLexer('css');
         var tokens = lexer.parse('a[class*="c"]{}');
         expect(join(tokens)).to.eql(['a', '[', 'class', '*=', '"c"', ']', '{', '}']);
         expect(type(tokens)).to.eql([21, 8, 22, 8, 7, 8, 8, 8]);
+      });
+      it('attr 1', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('html[lang]');
+        expect(join(tokens)).to.eql(['html', '[', 'lang', ']']);
+        expect(type(tokens)).to.eql([21, 8, 22, 8]);
       });
     });
     describe('style', function() {
@@ -321,9 +333,6 @@ describe('csslexer', function() {
       it('selector', function() {
         var lexer = homunculus.getLexer('css');
         var tokens = lexer.parse('p{p{*margin:0;*{}}}');
-//        console.log(join(tokens));
-//        console.log(type(tokens));
-//        console.log(type(tokens, true));
         expect(join(tokens)).to.eql(['p', '{', 'p', '{', '*', 'margin', ':', '0', ';', '*', '{', '}', '}', '}']);
         expect(type(tokens)).to.eql([21, 8, 21, 8, 17, 10, 8, 4, 8, 21, 8, 8, 8, 8]);
       });
@@ -332,6 +341,26 @@ describe('csslexer', function() {
         var tokens = lexer.parse('#fff{#fff{}}');
         expect(join(tokens)).to.eql(['#fff', '{', '#fff', '{', '}', '}']);
         expect(type(tokens)).to.eql([21, 8, 21, 8, 8, 8]);
+      });
+    });
+    describe('var', function() {
+      it('normal', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('$a:1');
+        expect(join(tokens)).to.eql([ '$a', ':', '1' ]);
+        expect(type(tokens)).to.eql([ 16, 8, 4 ]);
+      });
+      it('@', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('@a:1');
+        expect(join(tokens)).to.eql([ '@a', ':', '1' ]);
+        expect(type(tokens)).to.eql([ 16, 8, 4 ]);
+      });
+      it('css3', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('var-a:1');
+        expect(join(tokens)).to.eql([ 'var-a', ':', '1' ]);
+        expect(type(tokens)).to.eql([ 16, 8, 4 ]);
       });
     });
   });
