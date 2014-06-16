@@ -154,6 +154,24 @@ describe('csslexer', function() {
         expect(join(tokens)).to.eql(['a', ':hover', '{', '}', 'p', ':not(:first)', '{', '}']);
         expect(type(tokens)).to.eql([21, 19, 8, 8, 21, 19, 8, 8]);
       });
+      it('pseudo not after selector is useless', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse(':hover{}');
+        expect(join(tokens)).to.eql([':', 'hover', '{', '}']);
+        expect(type(tokens)).to.eql([8, 21, 8, 8]);
+      });
+      it('* and pseudo', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('*:first-child+html');
+        expect(join(tokens)).to.eql(['*', ':first-child', '+', 'html']);
+        expect(type(tokens)).to.eql([21, 19, 8, 21]);
+      });
+      it('pseudo with ()', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('body:not(:-moz-handler-blocked)');
+        expect(join(tokens)).to.eql(['body', ':not(:-moz-handler-blocked)']);
+        expect(type(tokens)).to.eql([21, 19]);
+      });
       it('attr', function() {
         var lexer = homunculus.getLexer('css');
         var tokens = lexer.parse('a[class*="c"]{}');
