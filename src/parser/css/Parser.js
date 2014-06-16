@@ -1,15 +1,26 @@
-var Class = require('../../util/Class');
+var IParser = require('../Parser');
 var character = require('../../util/character');
 var Lexer = require('../../lexer/Lexer');
+var Rule = require('../../lexer/rule/CssRule');
 var Token = require('../../lexer/Token');
 var Node = require('./Node');
 var S = {};
 S[Token.BLANK] = S[Token.TAB] = S[Token.COMMENT] = S[Token.LINE] = S[Token.ENTER] = true;
-var Parser = Class(function(lexer) {
+var Parser = IParser.extend(function(lexer) {
+  IParser.call(this, lexer);
   this.init(lexer);
+  return this;
 }).methods({
   init: function(lexer) {
-    this.lexer = lexer;
+    if(lexer) {
+      this.lexer = lexer;
+    }
+    else if(this.lexer) {
+      this.lexer.init();
+    }
+    else {
+      this.lexer = new Lexer(new Rule());
+    }
     this.look = null;
     this.tokens = null;
     this.lastLine = 1;

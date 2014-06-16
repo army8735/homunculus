@@ -1,44 +1,8 @@
-var Class = require('../../util/Class');
-var Node = Class(function(type, children) {
-  this.type = type;
-  if(type == Node.TOKEN) {
-    this.children = children;
-  }
-  else if(Array.isArray(children)) {
-    this.children = children;
-  }
-  else {
-    this.children = children ? [children] : [];
-  }
+var INode = require('../Node');
+var Node = INode.extend(function(type, children) {
+  INode.call(this, type, children);
   return this;
-}).methods({
-  name: function(t) {
-    if(t) {
-      this.type = t;
-    }
-    return this.type;
-  },
-  leaves: function() {
-    return this.children;
-  },
-  add: function() {
-    var self = this,
-      args = Array.prototype.slice.call(arguments, 0);
-    args.forEach(function(node) {
-      if(Array.isArray(node)) {
-        self.children = self.children.concat(node);
-      }
-      else {
-        self.children.push(node);
-      }
-    });
-    return self;
-  },
-  token: function() {
-    return this.children;
-  }
 }).statics({
-  TOKEN: 'token',
   PROGRAME: 'program',
   ELEMENT: 'element',
   IMPORT: 'import',
