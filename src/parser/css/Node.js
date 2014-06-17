@@ -3,7 +3,7 @@ var Node = INode.extend(function(type, children) {
   INode.call(this, type, children);
   return this;
 }).statics({
-  PROGRAME: 'program',
+  SHEET: 'sheet',
   ELEMENT: 'element',
   IMPORT: 'import',
   MEDIA: 'media',

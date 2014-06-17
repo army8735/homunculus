@@ -1,7 +1,7 @@
 src2web:
 	@gulp
 
-test: src2web test-api test-jslexer test-jsparser test-jscontext test-es6parser test-csslexer
+test: src2web test-api test-jslexer test-jsparser test-jscontext test-es6parser test-csslexer test-cssparser
 
 test-api:
 	@mocha tests/api.js -R spec
@@ -20,6 +20,9 @@ test-es6parser:
 
 test-csslexer:
 	@mocha tests/csslexer.js -R spec
+
+test-cssparser:
+	@mocha tests/cssparser.js -R spec
 
 coveralls:
 	@mocha tests/api.js tests/jslexer.js tests/jsparser.js tests/jscontext.js tests/es6parser.js tests/csslexer.js --require blanket --reporter mocha-lcov-reporter | ./node_modules/coveralls/bin/coveralls.js

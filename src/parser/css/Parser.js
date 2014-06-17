@@ -5,7 +5,7 @@ var Rule = require('../../lexer/rule/CssRule');
 var Token = require('../../lexer/Token');
 var Node = require('./Node');
 var S = {};
-S[Token.BLANK] = S[Token.TAB] = S[Token.COMMENT] = S[Token.LINE] = S[Token.ENTER] = true;
+S[Token.BLANK] = S[Token.TAB] = S[Token.COMMENT] = S[Token.LINE] = true;
 var Parser = IParser.extend(function(lexer) {
   IParser.call(this, lexer);
   this.init(lexer);
@@ -35,19 +35,19 @@ var Parser = IParser.extend(function(lexer) {
   },
   parse: function(code) {
     this.lexer.parse(code);
-    this.tree = this.program();
+    this.tree = this.sheet();
     return this.tree;
   },
   ast: function() {
     return this.tree;
   },
-  program: function() {
+  sheet: function() {
     this.tokens = this.lexer.tokens();
     this.length = this.tokens.length;
     if(this.tokens.length) {
       this.move();
     }
-    var node = new Node(Node.PROGRAME);
+    var node = new Node(Node.SHEET);
     while(this.look) {
       var element = this.element();
       if(element) {
@@ -82,21 +82,7 @@ var Parser = IParser.extend(function(lexer) {
     }
   },
   head: function() {
-    var s = this.look.content();
-    var i = -1;
-    if((i = s.indexOf('-webkit-')) > -1) {
-      s = s.slice(0, i) + s.slice(i + 8);
-    }
-    else if((i = s.indexOf('-moz-')) > -1) {
-      s = s.slice(0, i) + s.slice(i + 5);
-    }
-    else if((i = s.indexOf('-ms-')) > -1) {
-      s = s.slice(0, i) + s.slice(i + 4);
-    }
-    else if((i = s.indexOf('-o-')) > -1) {
-      s = s.slice(0, i) + s.slice(i + 3);
-    }
-    switch(s) {
+    switch(this.look.content().toLowerCase()) {
       case '@import':
         return this.impt();
       case '@media':
@@ -111,6 +97,10 @@ var Parser = IParser.extend(function(lexer) {
         return this.page();
       case '@function':
         return this.fn();
+      case '@namespace':
+        return this.namespace();
+      case '@-moz-document':
+        return this.mozdoc();
       default:
         //兼容less
         this.look.type(Token.VARS);
@@ -121,7 +111,7 @@ var Parser = IParser.extend(function(lexer) {
     var node = new Node(Node.IMPORT);
     node.add(this.match());
     node.add(this.url(true));
-    var m = {
+    if(this.look && {
       'only': true,
       'not': true,
       'all': true,
@@ -134,8 +124,7 @@ var Parser = IParser.extend(function(lexer) {
       'tty': true,
       'embossed': true,
       'tv': true
-    };
-    if(m[this.look.content()]) {
+    }.hasOwnProperty(this.look.content())) {
       node.add(this.mediaQList());
     }
     node.add(this.match(';'));
@@ -581,7 +570,7 @@ var Parser = IParser.extend(function(lexer) {
     }
     var node = new Node(Node.URL);
     if(ellipsis && this.look.type() == Token.STRING) {
-      if(['"', '"'].indexOf(this.look.content().charAt(0)) > -1) {
+      if(this.look.content().charAt(0) == '"') {
         node.add(this.match());
       }
       else {
@@ -592,7 +581,7 @@ var Parser = IParser.extend(function(lexer) {
       node.add(
         this.match('url'),
         this.match('('),
-        this.match([Token.VARS, Token.STRING, Token.HEAD]),
+        this.match([Token.VARS, Token.STRING]),
         this.match(')')
       );
     }
