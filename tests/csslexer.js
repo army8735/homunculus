@@ -368,7 +368,7 @@ describe('csslexer', function() {
         expect(join(tokens)).to.eql(['var-a', ':', '1']);
         expect(type(tokens)).to.eql([16, 8, 4]);
       });
-      it.only('use in css3', function() {
+      it('use in css3', function() {
         var lexer = homunculus.getLexer('css');
         var tokens = lexer.parse('p{width:var(a)}');
         expect(join(tokens)).to.eql(['p', '{', 'width', ':', 'var', '(', 'a', ')', '}']);

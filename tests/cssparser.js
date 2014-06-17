@@ -138,5 +138,22 @@ describe('cssparser', function() {
         parser.parse('@media (notkeyword:1)');
       }).to.throwError();
     });
+    it('@charset string', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@charset "arail";');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.CHARSET,["@charset","\"arail\"",";"]]]);
+    });
+    it('@charset error 1', function() {
+      var parser = homunculus.getParser('css');
+      expect(function() {
+        parser.parse('@charset');
+      }).to.throwError();
+    });
+    it('@charset error 2', function() {
+      var parser = homunculus.getParser('css');
+      expect(function() {
+        parser.parse('@charset "arial"');
+      }).to.throwError();
+    });
   });
 });
