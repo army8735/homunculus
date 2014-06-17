@@ -9,6 +9,8 @@ var Node = INode.extend(function(type, children) {
   MEDIA: 'media',
   CHARSET: 'charset',
   MEDIAQLIST: 'mediaqlist',
+  MEDIAQUERY: 'mediaquer',
+  MEDIATYPE: 'mediatype',
   EXPR: 'expression',
   BLOCK: 'block',
   STYLESET: 'styleset',

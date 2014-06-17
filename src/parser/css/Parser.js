@@ -6,6 +6,21 @@ var Token = require('../../lexer/Token');
 var Node = require('./Node');
 var S = {};
 S[Token.BLANK] = S[Token.TAB] = S[Token.COMMENT] = S[Token.LINE] = true;
+var MQL = {
+  'only': true,
+  'not': true,
+  'all': true,
+  'aural': true,
+  'braille': true,
+  'handheld': true,
+  'print': true,
+  'projection': true,
+  'screen': true,
+  'tty': true,
+  'embossed': true,
+  'tv': true,
+  '(': true
+};
 var Parser = IParser.extend(function(lexer) {
   IParser.call(this, lexer);
   this.init(lexer);
@@ -111,20 +126,7 @@ var Parser = IParser.extend(function(lexer) {
     var node = new Node(Node.IMPORT);
     node.add(this.match());
     node.add(this.url(true));
-    if(this.look && {
-      'only': true,
-      'not': true,
-      'all': true,
-      'aural': true,
-      'braille': true,
-      'handheld': true,
-      'print': true,
-      'projection': true,
-      'screen': true,
-      'tty': true,
-      'embossed': true,
-      'tv': true
-    }.hasOwnProperty(this.look.content())) {
+    if(this.look && MQL.hasOwnProperty(this.look.content().toLowerCase())) {
       node.add(this.mediaQList());
     }
     node.add(this.match(';'));
@@ -133,29 +135,10 @@ var Parser = IParser.extend(function(lexer) {
   media: function() {
     var node = new Node(Node.MEDIA);
     node.add(this.match());
-    var m = {
-      'only': true,
-      'not': true,
-      'all': true,
-      'aural': true,
-      'braille': true,
-      'handheld': true,
-      'print': true,
-      'projection': true,
-      'screen': true,
-      'tty': true,
-      'embossed': true,
-      'tv': true,
-      '(': true
-    };
     if(!this.look) {
-      return node;
+      this.error();
     }
-    if(m[this.look.content()]) {
-      node.add(this.mediaQList());
-    }
-    while(this.look && this.look.content() == ',') {
-      node.add(this.match());
+    if(MQL.hasOwnProperty(this.look.content().toLowerCase())) {
       node.add(this.mediaQList());
     }
     if(this.look && this.look.content() == '{') {
@@ -165,42 +148,50 @@ var Parser = IParser.extend(function(lexer) {
   },
   mediaQList: function() {
     var node = new Node(Node.MEDIAQLIST);
-    if(['only', 'not'].indexOf(this.look.content()) != -1) {
+    node.add(this.mediaQuery());
+    while(this.look && this.look.content() == ',') {
+      node.add(
+        this.match(),
+        this.mediaQuery()
+      );
+    }
+    return node;
+  },
+  mediaQuery: function() {
+    var node = new Node(Node.MEDIAQUERY);
+    if(this.look && ['only', 'not'].indexOf(this.look.content().toLowerCase()) > -1) {
       node.add(this.match());
     }
     if(!this.look) {
-      return node;
+      this.error();
     }
-    if(this.look.type() == Token.PROPERTY) {
-      node.add(this.match(Token.PROPERTY));
-    }
-    else if(this.look.content() == '(') {
+    if(this.look.content() == '(') {
       node.add(this.expr());
     }
     else {
-      return node;
+      node.add(this.mediaType());
     }
-    while(this.look && this.look.content() == 'and') {
-      node.add(this.match());
-      node.add(this.expr());
+    if(this.look && this.look.content().toLowerCase() == 'and') {
+      node.add(
+        this.match(),
+        this.expr()
+      );
     }
+    return node;
+  },
+  mediaType: function() {
+    var node = new Node(Node.MEDIATYPE);
+    node.add(this.match());
     return node;
   },
   expr: function() {
     var node = new Node(Node.EXPR);
     node.add(this.match('('));
-    var key = new Node(Node.KEY);
-    key.add(this.match(Token.KEYWORD));
-    node.add(key);
-    node.add(this.match(':'));
-    var value = new Node(Node.VALUE);
-    if([Token.PROPERTY, Token.NUMBER, Token.SIGN].indexOf(this.look.type())== -1) {
-      this.error('missing value');
+    node.add(this.key());
+    if(this.look && this.look.content() == ':') {
+      node.add(this.match(':'));
+      node.add(this.value(true));
     }
-    while(this.look && this.look.content() != ')' && [Token.PROPERTY, Token.NUMBER, Token.SIGN].indexOf(this.look.type()) > -1) {
-      value.add(this.match());
-    }
-    node.add(value);
     node.add(this.match(')'));
     return node;
   },
@@ -524,32 +515,30 @@ var Parser = IParser.extend(function(lexer) {
     node.add(this.match(';'));
     return node;
   },
-  key: function(unknow) {
+  key: function() {
     var node = new Node(Node.KEY);
-    if(unknow) {
-      node.add(this.match(Token.ID));
+    while(this.look && this.look.type() == Token.HACK) {
+      node.add(this.match());
     }
-    else {
-      node.add(this.match(Token.KEYWORD));
-    }
+    node.add(this.match(Token.KEYWORD));
     return node;
   },
-  value: function() {
+  value: function(noP) {
     var node = new Node(Node.VALUE);
     if(!this.look) {
       this.error();
     }
-    if([Token.VARS, Token.ID, Token.PROPERTY, Token.NUMBER, Token.STRING, Token.HEAD].indexOf(this.look.type()) > -1) {
+    if([Token.VARS, Token.ID, Token.PROPERTY, Token.NUMBER, Token.STRING, Token.HEAD, Token.SIGN].indexOf(this.look.type()) > -1) {
       node.add(this.match());
     }
-    else if(['(', ')', '/', '~', '-'].indexOf(this.look.content()) != -1) {
-      node.add(this.match());
+    else {
+      this.error();
     }
     while(this.look) {
-      if([Token.VARS, Token.ID, Token.PROPERTY, Token.NUMBER, Token.STRING, Token.HEAD, Token.KEYWORD].indexOf(this.look.type()) > -1) {
-        node.add(this.match());
-      }
-      else if([',', '(', ')', '/', '=', ':', '-'].indexOf(this.look.content()) != -1) {
+      if([Token.VARS, Token.ID, Token.PROPERTY, Token.NUMBER, Token.STRING, Token.HEAD, Token.KEYWORD, Token.SIGN, Token.UNITS].indexOf(this.look.type()) > -1) {
+        if(noP && this.look.content() == ')') {
+          break;
+        }
         node.add(this.match());
       }
       else {
