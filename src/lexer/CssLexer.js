@@ -14,10 +14,12 @@ var CssLexer = Lexer.extend(function(rule) {
   this.isValue = false;
   this.parenthese = false;
   this.bracket = false;
+  this.afterHackBracket = false;
   this.isNumber = false;
   this.isUrl = false;
   this.isKw = false;
   this.isSelector = true;
+  this.isVar = false;
   this.depth = 0;
 }).methods({
   //@override
@@ -54,7 +56,7 @@ var CssLexer = Lexer.extend(function(rule) {
             match.callback(token);
           }
 
-          var s = token.content();
+          var s = token.content().toLowerCase();
           switch(token.type()) {
             //@import和@media之后进入值状态
             case Token.HEAD:
@@ -70,6 +72,8 @@ var CssLexer = Lexer.extend(function(rule) {
               this.isKw = false;
               this.isValue = true;
               this.isNumber = false;
+              this.afterHackBracket = false;
+              this.isVar = false;
               break;
             //单位要跟在数字之后，否则便不是单位
             case Token.UNITS:
@@ -78,25 +82,35 @@ var CssLexer = Lexer.extend(function(rule) {
               }
               this.isSelector = false;
               this.isKw = false;
+              this.afterHackBracket = false;
+              this.isVar = false;
               break;
             //将id区分出属性名和属性值
             case Token.ID:
-              this.isSelector = false;
-              if(this.bracket) {
+              if(this.bracket && this.isSelector) {
                 token.type(Token.ATTR);
                 this.isUrl = false;
+                this.isVar = false;
+              }
+              else if(this.isVar) {
+                token.type(Token.VARS);
+                this.isUrl = false;
+                this.isVar = false;
               }
               else if(this.isValue) {
                 if(this.rule.colors().hasOwnProperty(s)) {
                   token.type(Token.NUMBER);
                   this.isUrl = false;
+                  this.isVar = false;
                 }
                 else if(this.rule.keyWords().hasOwnProperty(s)
                   || this.rule.values().hasOwnProperty(s)) {
                   token.type(Token.PROPERTY);
                   this.isUrl = s == 'url' || s == 'format';
+                  this.isVar = s == 'var';
                 }
                 this.isKw = false;
+                this.isSelector = false;
               }
               else {
                 if(this.rule.keyWords().hasOwnProperty(s)) {
@@ -104,6 +118,8 @@ var CssLexer = Lexer.extend(function(rule) {
                     token.type(Token.KEYWORD);
                     this.isKw = true;
                     this.isUrl = false;
+                    this.isVar = false;
+                    this.isSelector = false;
                   }
                   else {
                     token.type(Token.IGNORE);
@@ -114,25 +130,33 @@ var CssLexer = Lexer.extend(function(rule) {
                   this.isSelector = true;
                   this.isUrl = false;
                   this.isKw = false;
+                  this.isVar = false;
                 }
               }
               this.isNumber = false;
+              this.afterHackBracket = false;
               break;
             case Token.PSEUDO:
               if(this.isKw || this.isValue) {
                 continue;
               }
+              this.afterHackBracket = false;
+              this.isVar = false;
               break;
             case Token.SELECTOR:
               this.isSelector = true;
               this.isKw = false;
               this.isNumber = false;
+              this.afterHackBracket = false;
+              this.isVar = false;
               break;
             case Token.IMPORTANT:
               if(!this.depth || !this.isValue) {
                 token.type(Token.IGNORE);
               }
               this.isUrl = false;
+              this.afterHackBracket = false;
+              this.isVar = false;
               break;
             case Token.SIGN:
               switch(s) {
@@ -142,6 +166,8 @@ var CssLexer = Lexer.extend(function(rule) {
                   }
                   this.isUrl = false;
                   this.isSelector = false;
+                  this.afterHackBracket = false;
+                  this.isVar = false;
                   break;
                 case '(':
                   if(this.media || this.import) {
@@ -149,6 +175,7 @@ var CssLexer = Lexer.extend(function(rule) {
                   }
                   this.parenthese = true;
                   this.isSelector = false;
+                  this.afterHackBracket = false;
                   break;
                 case ')':
                   if(this.media || this.import) {
@@ -157,23 +184,38 @@ var CssLexer = Lexer.extend(function(rule) {
                   this.isUrl = false;
                   this.parenthese = false;
                   this.isSelector = false;
+                  this.afterHackBracket = false;
+                  this.isVar = false;
+                  break;
                 case '[':
-                  if(this.isSelector) {
-                    this.bracket = true;
+                  if(!this.isValue && !this.isSelector && this.depth) {
+                    token.type(Token.HACK);
                   }
+                  this.bracket = true;
                   this.isUrl = false;
-                  this.isSelector = false;
+                  this.afterHackBracket = false;
+                  this.isVar = false;
                   break;
                 case ']':
+                  if(!this.isValue && !this.isSelector && this.depth) {
+                    token.type(Token.HACK);
+                    this.afterHackBracket = true;
+                  }
                   this.bracket = false;
                   this.isUrl = false;
-                  this.isSelector = false;
+                  this.isVar = false;
                   break;
                 case ';':
+                  if(this.bracket && !this.isValue && !this.isSelector && this.depth
+                    || this.afterHackBracket) {
+                    token.type(Token.HACK);
+                  }
                   this.isValue = false;
                   this.import = false;
                   this.isUrl = false;
                   this.isSelector = false;
+                  this.afterHackBracket = false;
+                  this.isVar = false;
                   break;
                 case '{':
                   this.depth++;
@@ -182,6 +224,8 @@ var CssLexer = Lexer.extend(function(rule) {
                   this.import = false;
                   this.isUrl = false;
                   this.isSelector = false;
+                  this.afterHackBracket = false;
+                  this.isVar = false;
                   break;
                 case '}':
                   this.isValue = false;
@@ -190,6 +234,8 @@ var CssLexer = Lexer.extend(function(rule) {
                   this.isUrl = false;
                   this.isSelector = false;
                   this.depth--;
+                  this.afterHackBracket = false;
+                  this.isVar = false;
                   break;
                 case '*':
                   if(this.depth) {
@@ -215,6 +261,8 @@ var CssLexer = Lexer.extend(function(rule) {
                     token.type(Token.SELECTOR);
                     this.isSelector = true;
                   }
+                  this.afterHackBracket = false;
+                  this.isVar = false;
                   break;
                 case '-':
                 case '_':
@@ -223,10 +271,13 @@ var CssLexer = Lexer.extend(function(rule) {
                   }
                   this.isUrl = false;
                   this.isSelector = false;
+                  this.afterHackBracket = false;
+                  this.isVar = false;
                   break;
                 default:
                   this.isUrl = false;
-                  this.isSelector = false;
+                  this.afterHackBracket = false;
+                  this.isVar = false;
                   break;
               }
               this.isNumber = false;
@@ -240,12 +291,16 @@ var CssLexer = Lexer.extend(function(rule) {
                 this.isNumber = true;
               }
               this.isUrl = false;
+              this.afterHackBracket = false;
+              this.isVar = false;
               break;
             case Token.VARS:
               this.isKw = true;
               this.isSelector = false;
               this.isUrl = false;
               this.isNumber = false;
+              this.afterHackBracket = false;
+              this.isVar = false;
               break;
           }
 
