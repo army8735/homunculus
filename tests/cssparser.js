@@ -273,5 +273,27 @@ describe('cssparser', function() {
         parser.parse('@keyframes a');
       }).to.throwError();
     });
+    it('@namespace normal', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@namespace a "url";');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.NAMESPACE,["@namespace","a","\"url\"",";"]]]);
+    });
+    it('@namespace without id', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@namespace "url";');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.NAMESPACE,["@namespace","\"url\"",";"]]]);
+    });
+    it('@namespace error 1', function() {
+      var parser = homunculus.getParser('css');
+      expect(function() {
+        parser.parse('@namespace');
+      }).to.throwError();
+    });
+    it('@namespace error 2', function() {
+      var parser = homunculus.getParser('css');
+      expect(function() {
+        parser.parse('@keyframes {}');
+      }).to.throwError();
+    });
   });
 });

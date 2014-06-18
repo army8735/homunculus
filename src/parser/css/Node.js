@@ -11,6 +11,7 @@ var Node = INode.extend(function(type, children) {
   MEDIAQLIST: 'mediaqlist',
   MEDIAQUERY: 'mediaquer',
   MEDIATYPE: 'mediatype',
+  NAMESPACE: 'namespace',
   EXPR: 'expression',
   BLOCK: 'block',
   STYLESET: 'styleset',

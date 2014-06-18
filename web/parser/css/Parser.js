@@ -268,6 +268,16 @@ define(function(require, exports, module) {
       node.add(this.block());
       return node;
     },
+    namespace: function() {
+      var node = new Node(Node.NAMESPACE);
+      node.add(this.match());
+      if(this.look && this.look.type() == Token.ID) {
+        node.add(this.match());
+      }
+      node.add(this.match(Token.STRING));
+      node.add(this.match(';'));
+      return node;
+    },
     vars: function() {
       var node = new Node(Node.VARS);
       node.add(this.match());

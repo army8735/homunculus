@@ -22,6 +22,7 @@ var CssLexer = Lexer.extend(function(rule) {
   this.isVar = false;
   this.isPage = false;
   this.isKf = false;
+  this.isNs = false;
   this.depth = 0;
 }).methods({
   //@override
@@ -94,24 +95,16 @@ var CssLexer = Lexer.extend(function(rule) {
               this.isVar = false;
               this.isPage = false;
               this.isKf = false;
+              this.isNs = false;
               break;
             //将id区分出属性名和属性值
             case Token.ID:
-              if(this.isPage) {
+              if(this.isPage || this.isKf || this.isNs) {
                 this.isSelector = true;
                 this.isUrl = false;
                 this.isKw = false;
                 this.isVar = false;
                 this.isValue = false;
-              }
-              else if(this.isKf) {
-                this.isSelector = false;
-                this.isUrl = false;
-                this.isKw = false;
-                this.isVar = false;
-                this.isValue = false;
-                this.isKf = false;
-                this.isPage = false;
               }
               else if(this.bracket && this.isSelector) {
                 token.type(Token.ATTR);
@@ -137,7 +130,6 @@ var CssLexer = Lexer.extend(function(rule) {
                 }
                 this.isKw = false;
                 this.isSelector = false;
-                this.isPage = false;
               }
               else {
                 if(this.rule.keyWords().hasOwnProperty(s)) {
@@ -158,6 +150,8 @@ var CssLexer = Lexer.extend(function(rule) {
               this.isNumber = false;
               this.afterHackBracket = false;
               this.isPage = false;
+              this.isKf = false;
+              this.isNs = false;
               break;
             case Token.PSEUDO:
               if((this.isKw || this.isValue)
@@ -167,6 +161,8 @@ var CssLexer = Lexer.extend(function(rule) {
               this.afterHackBracket = false;
               this.isVar = false;
               this.isPage = false;
+              this.isKf = false;
+              this.isNs = false;
               break;
             case Token.SELECTOR:
               this.isSelector = true;
@@ -175,12 +171,16 @@ var CssLexer = Lexer.extend(function(rule) {
               this.afterHackBracket = false;
               this.isVar = false;
               this.isPage = false;
+              this.isKf = false;
+              this.isNs = false;
               break;
             case Token.IMPORTANT:
               this.isUrl = false;
               this.afterHackBracket = false;
               this.isVar = false;
               this.isPage = false;
+              this.isKf = false;
+              this.isNs = false;
               break;
             case Token.SIGN:
               switch(s) {
@@ -307,6 +307,8 @@ var CssLexer = Lexer.extend(function(rule) {
               this.isNumber = false;
               this.isKw = false;
               this.isPage = false;
+              this.isKf = false;
+              this.isNs = false;
               break;
             case Token.NUMBER:
               if(!this.isValue && token.content().charAt(0) == '#') {
@@ -319,6 +321,8 @@ var CssLexer = Lexer.extend(function(rule) {
               this.afterHackBracket = false;
               this.isVar = false;
               this.isPage = false;
+              this.isKf = false;
+              this.isNs = false;
               break;
             case Token.VARS:
               this.isKw = true;
@@ -328,6 +332,8 @@ var CssLexer = Lexer.extend(function(rule) {
               this.afterHackBracket = false;
               this.isVar = false;
               this.isPage = false;
+              this.isKf = false;
+              this.isNs = false;
               break;
           }
 

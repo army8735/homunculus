@@ -12,6 +12,7 @@ define(function(require, exports, module) {
     MEDIAQLIST: 'mediaqlist',
     MEDIAQUERY: 'mediaquer',
     MEDIATYPE: 'mediatype',
+    NAMESPACE: 'namespace',
     EXPR: 'expression',
     BLOCK: 'block',
     STYLESET: 'styleset',
