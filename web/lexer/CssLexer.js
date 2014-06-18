@@ -21,6 +21,7 @@ define(function(require, exports, module) {
     this.isKw = false;
     this.isSelector = true;
     this.isVar = false;
+    this.isPage = false;
     this.depth = 0;
   }).methods({
     //@override
@@ -64,9 +65,14 @@ define(function(require, exports, module) {
                 switch(s) {
                   case '@import':
                     this.import = true;
+                    this.isPage = false;
                     break;
                   case '@media':
                     this.media = true;
+                    this.isPage = false;
+                    break;
+                  case '@page':
+                    this.isPage = true;
                     break;
                 }
                 this.isSelector = false;
@@ -85,10 +91,18 @@ define(function(require, exports, module) {
                 this.isKw = false;
                 this.afterHackBracket = false;
                 this.isVar = false;
+                this.isPage = false;
                 break;
               //将id区分出属性名和属性值
               case Token.ID:
-                if(this.bracket && this.isSelector) {
+                if(this.isPage) {
+                  this.isSelector = true;
+                  this.isUrl = false;
+                  this.isKw = false;
+                  this.isVar = false;
+                  this.isValue = false;
+                }
+                else if(this.bracket && this.isSelector) {
                   token.type(Token.ATTR);
                   this.isUrl = false;
                   this.isVar = false;
@@ -112,6 +126,7 @@ define(function(require, exports, module) {
                   }
                   this.isKw = false;
                   this.isSelector = false;
+                  this.isPage = false;
                 }
                 else {
                   if(this.rule.keyWords().hasOwnProperty(s)) {
@@ -131,13 +146,16 @@ define(function(require, exports, module) {
                 }
                 this.isNumber = false;
                 this.afterHackBracket = false;
+                this.isPage = false;
                 break;
               case Token.PSEUDO:
-                if(this.isKw || this.isValue) {
+                if((this.isKw || this.isValue)
+                  && !this.isPage) {
                   continue;
                 }
                 this.afterHackBracket = false;
                 this.isVar = false;
+                this.isPage = false;
                 break;
               case Token.SELECTOR:
                 this.isSelector = true;
@@ -145,11 +163,13 @@ define(function(require, exports, module) {
                 this.isNumber = false;
                 this.afterHackBracket = false;
                 this.isVar = false;
+                this.isPage = false;
                 break;
               case Token.IMPORTANT:
                 this.isUrl = false;
                 this.afterHackBracket = false;
                 this.isVar = false;
+                this.isPage = false;
                 break;
               case Token.SIGN:
                 switch(s) {
@@ -275,6 +295,7 @@ define(function(require, exports, module) {
                 }
                 this.isNumber = false;
                 this.isKw = false;
+                this.isPage = false;
                 break;
               case Token.NUMBER:
                 if(!this.isValue && token.content().charAt(0) == '#') {
@@ -286,6 +307,7 @@ define(function(require, exports, module) {
                 this.isUrl = false;
                 this.afterHackBracket = false;
                 this.isVar = false;
+                this.isPage = false;
                 break;
               case Token.VARS:
                 this.isKw = true;
@@ -294,6 +316,7 @@ define(function(require, exports, module) {
                 this.isNumber = false;
                 this.afterHackBracket = false;
                 this.isVar = false;
+                this.isPage = false;
                 break;
             }
   

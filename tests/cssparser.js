@@ -203,5 +203,27 @@ describe('cssparser', function() {
         parser.parse('@font-face{src:url(a)}');
       }).to.throwError();
     });
+    it('@page normal', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@page thin:first{size:3in 8in}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.PAGE,["@page","thin",":first",CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["size"],":",CssNode.VALUE,["3","in","8","in"]],"}"]]]]);
+    });
+    it('@page without id', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@page :first{size:3in 8in}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.PAGE,["@page",":first",CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["size"],":",CssNode.VALUE,["3","in","8","in"]],"}"]]]]);
+    });
+    it('@page error 1', function() {
+      var parser = homunculus.getParser('css');
+      expect(function() {
+        parser.parse('@page thin:first');
+      }).to.throwError();
+    });
+    it('@page error 2', function() {
+      var parser = homunculus.getParser('css');
+      expect(function() {
+        parser.parse('@page {}');
+      }).to.throwError();
+    });
   });
 });

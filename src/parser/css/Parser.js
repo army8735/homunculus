@@ -266,7 +266,11 @@ var Parser = IParser.extend(function(lexer) {
   page: function() {
     var node = new Node(Node.PAGE);
     node.add(this.match());
-    node.add(this.styleset());
+    if(this.look && this.look.type() == Token.ID) {
+      node.add(this.match());
+    }
+    node.add(this.match(Token.PSEUDO));
+    node.add(this.block());
     return node;
   },
   vars: function() {
@@ -354,9 +358,9 @@ var Parser = IParser.extend(function(lexer) {
     }
     return node;
   },
-  styleset: function(numCanBeKey) {
+  styleset: function() {
     var node = new Node(Node.STYLESET);
-    node.add(this.selectors(numCanBeKey));
+    node.add(this.selectors());
     node.add(this.block());
     return node;
   },
@@ -419,56 +423,13 @@ var Parser = IParser.extend(function(lexer) {
   block: function(single) {
     var node = new Node(Node.BLOCK);
     node.add(this.match('{'));
-    while(this.look) {
-      if(this.look.type() == Token.ID) {
-        outer:
-        for(var i = this.index; i < this.length; i++) {
-          var token = this.tokens[i];
-          if(!S[token.type()]) {
-            if(token.content() == ':') {
-              node.add(this.style(true));
-              break;
-            }
-            else if(token.content() == '(') {
-              node.add(this.fnc());
-              break;
-            }
-            for(var j = i; j < this.length; j++) {
-              token = this.tokens[j];
-              if(!S[token.type()]) {
-                if(token.type() == Token.ID || token.content() == ',') {
-                  continue;
-                }
-                else if(token.content() == ';' || token.content() == '}') {
-                  node.add(this.extend(true));
-                  break outer;
-                }
-                else {
-                  node.add(this.styleset());
-                  break outer;
-                }
-              }
-            }
-          }
-        }
-      }
-      else if(['*', '>', '~', ':', '&'].indexOf(this.look.content()) != -1) {
+    while(this.look
+      && this.look.content() != '}') {
+      if(this.look.type() == Token.SELECTOR) {
         node.add(this.styleset());
       }
-      else if(this.look.type() == Token.KEYWORD) {
-        node.add(this.style());
-      }
-      else if(this.look.content() == ';') {
-        node.add(this.match());
-      }
-      else if(this.look.content() == '@extend') {
-        node.add(this.extend());
-      }
-      else if(this.look.type() == Token.VARS) {
-        node.add(this.match());
-      }
       else {
-        break;
+        node.add(this.style());
       }
     }
     node.add(this.match('}'));
