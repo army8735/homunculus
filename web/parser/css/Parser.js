@@ -93,7 +93,7 @@ define(function(require, exports, module) {
         case Token.SELECTOR:
           return this.styleset();
         default:
-          if(this.look.content() == '[') {
+          if(this.look.content() == '[' && this.look.type() != Token.HACK) {
             return this.styleset();
           }
           return this.match();
@@ -121,10 +121,6 @@ define(function(require, exports, module) {
           return this.namespace();
         case '@document':
           return this.doc();
-        default:
-          //兼容less
-          this.look.type(Token.VARS);
-          return this.vardecl();
       }
     },
     impt: function() {
@@ -286,6 +282,9 @@ define(function(require, exports, module) {
     vardecl: function() {
       var node = new Node(Node.VARDECL);
       node.add(this.match());
+      if(!this.look) {
+        this.error();
+      }
       if([':', '='].indexOf(this.look.content()) > -1) {
         node.add(this.match());
       }
@@ -319,7 +318,7 @@ define(function(require, exports, module) {
       }
       else {
         var s = this.look.content().toLowerCase();
-        if(s == '[') {
+        if(s == '[' && this.look.type() != Token.HACK) {
           node.add(this.match());
           while(this.look && this.look.content() != ']') {
             node.add(this.match([Token.ATTR, Token.SIGN, Token.VARS, Token.NUMBER, Token.UNITS, Token.STRING]));
@@ -330,7 +329,7 @@ define(function(require, exports, module) {
           node.add(this.match(Token.SELECTOR));
         }
         while(this.look && [',', ';', '{', '}'].indexOf(this.look.content()) == -1) {
-          if(this.look.content() == '[') {
+          if(this.look.content() == '[' && this.look.type() != Token.HACK) {
             node.add(this.match());
             while(this.look && this.look.content() != ']') {
               node.add(this.match([Token.ATTR, Token.SIGN, Token.VARS, Token.NUMBER, Token.UNITS, Token.STRING]));
@@ -350,7 +349,8 @@ define(function(require, exports, module) {
       while(this.look
         && this.look.content() != '}') {
         if(this.look.type() == Token.SELECTOR
-          || this.look.content() == '[') {
+          || this.look.content() == '['
+            && this.look.type() != Token.HACK) {
           node.add(this.styleset());
         }
         else if(kf && this.look.type() == Token.NUMBER) {
@@ -371,6 +371,9 @@ define(function(require, exports, module) {
       node.add(this.key(name));
       node.add(this.match(':'));
       node.add(this.value());
+      while(this.look && this.look.type() == Token.HACK) {
+        node.add(this.match());
+      }
       node.add(this.match(';'));
       return node;
     },
@@ -392,9 +395,6 @@ define(function(require, exports, module) {
         && [';', '}'].indexOf(s) == -1) {
         if(s == 'url') {
           node.add(this.url());
-        }
-        else if(s == 'format') {
-          node.add(this.format());
         }
         else {
           node.add(this.match());

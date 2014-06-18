@@ -294,7 +294,7 @@ describe('csslexer', function() {
         var lexer = homunculus.getLexer('css');
         var tokens = lexer.parse('p{[;width:0;];}');
         expect(join(tokens)).to.eql(['p', '{', '[', ';', 'width', ':', '0', ';', ']', ';', '}']);
-        expect(type(tokens)).to.eql([21, 8, 17, 17, 10, 8, 4, 8, 17, 17, 8]);
+        expect(type(tokens)).to.eql([21, 8, 17, 17, 10, 8, 4, 17, 17, 8, 8]);
       });
       it('\\,', function() {
         var lexer = homunculus.getLexer('css');

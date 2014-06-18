@@ -92,7 +92,7 @@ var Parser = IParser.extend(function(lexer) {
       case Token.SELECTOR:
         return this.styleset();
       default:
-        if(this.look.content() == '[') {
+        if(this.look.content() == '[' && this.look.type() != Token.HACK) {
           return this.styleset();
         }
         return this.match();
@@ -120,10 +120,6 @@ var Parser = IParser.extend(function(lexer) {
         return this.namespace();
       case '@document':
         return this.doc();
-      default:
-        //兼容less
-        this.look.type(Token.VARS);
-        return this.vardecl();
     }
   },
   impt: function() {
@@ -285,6 +281,9 @@ var Parser = IParser.extend(function(lexer) {
   vardecl: function() {
     var node = new Node(Node.VARDECL);
     node.add(this.match());
+    if(!this.look) {
+      this.error();
+    }
     if([':', '='].indexOf(this.look.content()) > -1) {
       node.add(this.match());
     }
@@ -318,7 +317,7 @@ var Parser = IParser.extend(function(lexer) {
     }
     else {
       var s = this.look.content().toLowerCase();
-      if(s == '[') {
+      if(s == '[' && this.look.type() != Token.HACK) {
         node.add(this.match());
         while(this.look && this.look.content() != ']') {
           node.add(this.match([Token.ATTR, Token.SIGN, Token.VARS, Token.NUMBER, Token.UNITS, Token.STRING]));
@@ -329,7 +328,7 @@ var Parser = IParser.extend(function(lexer) {
         node.add(this.match(Token.SELECTOR));
       }
       while(this.look && [',', ';', '{', '}'].indexOf(this.look.content()) == -1) {
-        if(this.look.content() == '[') {
+        if(this.look.content() == '[' && this.look.type() != Token.HACK) {
           node.add(this.match());
           while(this.look && this.look.content() != ']') {
             node.add(this.match([Token.ATTR, Token.SIGN, Token.VARS, Token.NUMBER, Token.UNITS, Token.STRING]));
@@ -349,7 +348,8 @@ var Parser = IParser.extend(function(lexer) {
     while(this.look
       && this.look.content() != '}') {
       if(this.look.type() == Token.SELECTOR
-        || this.look.content() == '[') {
+        || this.look.content() == '['
+          && this.look.type() != Token.HACK) {
         node.add(this.styleset());
       }
       else if(kf && this.look.type() == Token.NUMBER) {
@@ -370,6 +370,9 @@ var Parser = IParser.extend(function(lexer) {
     node.add(this.key(name));
     node.add(this.match(':'));
     node.add(this.value());
+    while(this.look && this.look.type() == Token.HACK) {
+      node.add(this.match());
+    }
     node.add(this.match(';'));
     return node;
   },
@@ -391,9 +394,6 @@ var Parser = IParser.extend(function(lexer) {
       && [';', '}'].indexOf(s) == -1) {
       if(s == 'url') {
         node.add(this.url());
-      }
-      else if(s == 'format') {
-        node.add(this.format());
       }
       else {
         node.add(this.match());

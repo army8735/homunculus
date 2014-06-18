@@ -15,7 +15,6 @@ define(function(require, exports, module) {
     this.value = false;
     this.parenthese = false;
     this.bracket = false;
-    this.afterHackBracket = false;
     this.number = false;
     this.url = false;
     this.kw = false;
@@ -87,7 +86,6 @@ define(function(require, exports, module) {
                 this.kw = false;
                 this.value = true;
                 this.number = false;
-                this.afterHackBracket = false;
                 this.var = false;
                 break;
               //单位要跟在数字之后，否则便不是单位
@@ -97,7 +95,6 @@ define(function(require, exports, module) {
                 }
                 this.sel = false;
                 this.kw = false;
-                this.afterHackBracket = false;
                 this.var = false;
                 this.number = false;
                 this.page = false;
@@ -156,7 +153,6 @@ define(function(require, exports, module) {
                   }
                 }
                 this.number = false;
-                this.afterHackBracket = false;
                 this.page = false;
                 this.kf = false;
                 this.ns = false;
@@ -167,7 +163,6 @@ define(function(require, exports, module) {
                   && !this.page) {
                   continue;
                 }
-                this.afterHackBracket = false;
                 this.var = false;
                 this.page = false;
                 this.kf = false;
@@ -178,7 +173,6 @@ define(function(require, exports, module) {
                 this.sel = true;
                 this.kw = false;
                 this.number = false;
-                this.afterHackBracket = false;
                 this.var = false;
                 this.page = false;
                 this.kf = false;
@@ -187,7 +181,6 @@ define(function(require, exports, module) {
                 break;
               case Token.IMPORTANT:
                 this.url = false;
-                this.afterHackBracket = false;
                 this.var = false;
                 this.page = false;
                 this.kf = false;
@@ -202,7 +195,6 @@ define(function(require, exports, module) {
                     }
                     this.url = false;
                     this.sel = false;
-                    this.afterHackBracket = false;
                     this.var = false;
                     break;
                   case '(':
@@ -211,7 +203,6 @@ define(function(require, exports, module) {
                     }
                     this.parenthese = true;
                     this.sel = false;
-                    this.afterHackBracket = false;
                     break;
                   case ')':
                     if(this.media || this.import || this.doc) {
@@ -220,37 +211,42 @@ define(function(require, exports, module) {
                     this.url = false;
                     this.parenthese = false;
                     this.sel = false;
-                    this.afterHackBracket = false;
                     this.var = false;
                     break;
                   case '[':
-                    if(!this.value && !this.sel) {
-                      token.type(Token.HACK);
+                    if(!this.value) {
+                      //LL2确定是selector还是hack
+                      for(var j = this.index; j < length; j++) {
+                        var c = this.code.charAt(j);
+                        if(!S.hasOwnProperty(c)) {
+                          if(c == ';') {
+                            token.type(Token.HACK);
+                            this.sel = false;
+                          }
+                          break;
+                        }
+                      }
                     }
                     this.bracket = true;
                     this.url = false;
-                    this.afterHackBracket = false;
                     this.var = false;
                     break;
                   case ']':
                     if(!this.value && !this.sel) {
                       token.type(Token.HACK);
-                      this.afterHackBracket = true;
                     }
                     this.bracket = false;
                     this.url = false;
                     this.var = false;
                     break;
                   case ';':
-                    if(this.bracket && !this.value && !this.sel
-                      || this.afterHackBracket) {
+                    if(this.bracket && !this.sel) {
                       token.type(Token.HACK);
                     }
                     this.value = false;
                     this.import = false;
                     this.url = false;
                     this.sel = false;
-                    this.afterHackBracket = false;
                     this.var = false;
                     break;
                   case '{':
@@ -260,7 +256,6 @@ define(function(require, exports, module) {
                     this.import = false;
                     this.url = false;
                     this.sel = true;
-                    this.afterHackBracket = false;
                     this.var = false;
                     break;
                   case '}':
@@ -270,17 +265,16 @@ define(function(require, exports, module) {
                     this.url = false;
                     this.sel = true;
                     this.depth--;
-                    this.afterHackBracket = false;
                     this.var = false;
                     break;
                   case '*':
                     if(this.depth) {
                       if(!this.value) {
                         //LL2确定是selector还是hack
-                        for (var j = this.index; j < length; j++) {
+                        for(var j = this.index; j < length; j++) {
                           var c = this.code.charAt(j);
-                          if (!S.hasOwnProperty(c)) {
-                            if (c == ':' || c == '{') {
+                          if(!S.hasOwnProperty(c)) {
+                            if(c == ':' || c == '{') {
                               token.type(Token.SELECTOR);
                               this.sel = true;
                             }
@@ -297,7 +291,6 @@ define(function(require, exports, module) {
                       token.type(Token.SELECTOR);
                       this.sel = true;
                     }
-                    this.afterHackBracket = false;
                     this.var = false;
                     break;
                   case '-':
@@ -307,12 +300,10 @@ define(function(require, exports, module) {
                     }
                     this.url = false;
                     this.sel = false;
-                    this.afterHackBracket = false;
                     this.var = false;
                     break;
                   default:
                     this.url = false;
-                    this.afterHackBracket = false;
                     this.var = false;
                     break;
                 }
@@ -331,7 +322,6 @@ define(function(require, exports, module) {
                   this.number = true;
                 }
                 this.url = false;
-                this.afterHackBracket = false;
                 this.var = false;
                 this.page = false;
                 this.kf = false;
@@ -343,7 +333,6 @@ define(function(require, exports, module) {
                 this.sel = false;
                 this.url = false;
                 this.number = false;
-                this.afterHackBracket = false;
                 this.var = false;
                 this.page = false;
                 this.kf = false;

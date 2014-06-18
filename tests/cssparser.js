@@ -104,6 +104,11 @@ describe('cssparser', function() {
       var node = parser.parse('@import url(a);');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.IMPORT,["@import",CssNode.URL,["url","(","a",")"],";"]]]);
     });
+    it('@import with media', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@import "a" all;');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.IMPORT,["@import",CssNode.URL,["\"a\""],CssNode.MEDIAQLIST,[CssNode.MEDIAQUERY,[CssNode.MEDIATYPE,["all"]]],";"]]]);
+    });
     it('@import error', function() {
       var parser = homunculus.getParser('css');
       expect(function() {
@@ -349,6 +354,23 @@ describe('cssparser', function() {
       var node = parser.parse('h3{color:var(lighterblue);}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["h3"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["color"],":",CssNode.VALUE,["var","(","lighterblue",")"],";"],"}"]]]]);
     });
+    it('vardecl', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('$a:1;@b=2;');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.VARDECL,["$a",":",CssNode.VALUE,["1"],";"],CssNode.VARDECL,["@b","=",CssNode.VALUE,["2"],";"]]]);
+    });
+    it('vardecl error 1', function() {
+      var parser = homunculus.getParser('css');
+      expect(function() {
+        parser.parse('$a');
+      }).to.throwError();
+    });
+    it('vardecl error 2', function() {
+      var parser = homunculus.getParser('css');
+      expect(function() {
+        parser.parse('$a:');
+      }).to.throwError();
+    });
     it('nesting {}', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('h3{color:#000;h1{margin:0}}');
@@ -379,6 +401,11 @@ describe('cssparser', function() {
       var node = parser.parse('a[hidden]{}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["a","[","hidden","]"]],CssNode.BLOCK,["{","}"]]]]);
     });
+    it('hack', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('p{[;width:0;];}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["p"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["[",";","width"],":",CssNode.VALUE,["0"],";","]",";"],"}"]]]]);
+    })
   });
   describe('lib test', function() {
     it('bootstrap', function() {
@@ -420,6 +447,55 @@ describe('cssparser', function() {
       var ignore = parser.ignore();
       var str = jion(node, ignore);
       expect(str).to.eql(code);
+    });
+  });
+  describe('other test', function() {
+    it('node #parent,#prev,#next', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('a{}');
+      var styleset = node.first();
+      var children = styleset.leaves();
+      var a = children[0];
+      var b = children[1];
+      expect(node.parent()).to.be(null);
+      expect(a.parent()).to.be(styleset);
+      expect(b.parent()).to.be(styleset);
+      expect(a.prev()).to.be(null);
+      expect(a.next()).to.be(b);
+      expect(b.prev()).to.be(a);
+    });
+    it('node #leaf,#size,#leaves', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('a{}');
+      var styleset = node.first();
+      expect(styleset.name()).to.be(CssNode.STYLESET);
+      expect(styleset.size()).to.be(2);
+      expect(styleset.leaves().length).to.be(2);
+    });
+    it('node #nid', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('a{}');
+      expect(node.nid()).to.be.a('number');
+    });
+    it('#ast should return as parse return', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('a{}');
+      expect(node).to.equal(parser.ast());
+    });
+    it('init class Parser(lexer) with a lexer', function() {
+      var lexer = homunculus.getLexer('css');
+      var parser = new Parser(lexer);
+      var node = parser.parse('a{}');
+      expect(node).to.equal(parser.ast());
+      expect(function() {
+        parser.init();
+      }).to.not.throwError();
+    });
+    it('CssNode#getKey', function() {
+      expect(CssNode.getKey('sheet')).to.eql('SHEET');
+      expect(function() {
+        CssNode.getKey('');
+      }).to.throwError();
     });
   });
 });
