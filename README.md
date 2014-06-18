@@ -118,7 +118,8 @@ npm install homunculus
 
 ## AST
 当调用语法分析器解析后，会返回生成ast，这是一个树状数据结构，每个节点都是对应语法解析器目录下的Node.js的实例。<br/>
-demo目录下是一个用js的parser分析输入js代码并画出ast形状的页面。
+demo目录下是一个用js的parser分析输入js代码并画出ast形状的页面。<br/>
+你也可以在线尝试它：http://army8735.me/homunculus
 
 ## License
 [MIT License]
