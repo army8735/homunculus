@@ -22,6 +22,7 @@ define(function(require, exports, module) {
     this.isSelector = true;
     this.isVar = false;
     this.isPage = false;
+    this.isKf = false;
     this.depth = 0;
   }).methods({
     //@override
@@ -65,14 +66,15 @@ define(function(require, exports, module) {
                 switch(s) {
                   case '@import':
                     this.import = true;
-                    this.isPage = false;
                     break;
                   case '@media':
                     this.media = true;
-                    this.isPage = false;
                     break;
                   case '@page':
                     this.isPage = true;
+                    break;
+                  case '@keyframes':
+                    this.isKf = true;
                     break;
                 }
                 this.isSelector = false;
@@ -92,6 +94,7 @@ define(function(require, exports, module) {
                 this.afterHackBracket = false;
                 this.isVar = false;
                 this.isPage = false;
+                this.isKf = false;
                 break;
               //将id区分出属性名和属性值
               case Token.ID:
@@ -101,6 +104,15 @@ define(function(require, exports, module) {
                   this.isKw = false;
                   this.isVar = false;
                   this.isValue = false;
+                }
+                else if(this.isKf) {
+                  this.isSelector = false;
+                  this.isUrl = false;
+                  this.isKw = false;
+                  this.isVar = false;
+                  this.isValue = false;
+                  this.isKf = false;
+                  this.isPage = false;
                 }
                 else if(this.bracket && this.isSelector) {
                   token.type(Token.ATTR);

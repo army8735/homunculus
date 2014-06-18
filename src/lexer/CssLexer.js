@@ -21,6 +21,7 @@ var CssLexer = Lexer.extend(function(rule) {
   this.isSelector = true;
   this.isVar = false;
   this.isPage = false;
+  this.isKf = false;
   this.depth = 0;
 }).methods({
   //@override
@@ -64,14 +65,15 @@ var CssLexer = Lexer.extend(function(rule) {
               switch(s) {
                 case '@import':
                   this.import = true;
-                  this.isPage = false;
                   break;
                 case '@media':
                   this.media = true;
-                  this.isPage = false;
                   break;
                 case '@page':
                   this.isPage = true;
+                  break;
+                case '@keyframes':
+                  this.isKf = true;
                   break;
               }
               this.isSelector = false;
@@ -91,6 +93,7 @@ var CssLexer = Lexer.extend(function(rule) {
               this.afterHackBracket = false;
               this.isVar = false;
               this.isPage = false;
+              this.isKf = false;
               break;
             //将id区分出属性名和属性值
             case Token.ID:
@@ -100,6 +103,15 @@ var CssLexer = Lexer.extend(function(rule) {
                 this.isKw = false;
                 this.isVar = false;
                 this.isValue = false;
+              }
+              else if(this.isKf) {
+                this.isSelector = false;
+                this.isUrl = false;
+                this.isKw = false;
+                this.isVar = false;
+                this.isValue = false;
+                this.isKf = false;
+                this.isPage = false;
               }
               else if(this.bracket && this.isSelector) {
                 token.type(Token.ATTR);

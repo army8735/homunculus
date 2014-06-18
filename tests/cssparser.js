@@ -246,5 +246,32 @@ describe('cssparser', function() {
         parser.parse('@page {}');
       }).to.throwError();
     });
+    it('@keyframes normal', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@keyframes testanimations{}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.KEYFRAMES,["@keyframes","testanimations",CssNode.BLOCK,["{","}"]]]]);
+    });
+    it('@keyframes from to', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@keyframes testanimations{from{transform:translate(0,0)}to{transform:translate(100,20)}}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.KEYFRAMES,["@keyframes","testanimations",CssNode.BLOCK,["{",CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["from"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["transform"],":",CssNode.VALUE,["translate","(","0",",","0",")"]],"}"]],CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["to"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["transform"],":",CssNode.VALUE,["translate","(","100",",","20",")"]],"}"]],"}"]]]]);
+    });
+    it('@keyframes percent', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@keyframes testanimations{10%{width:0}}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.KEYFRAMES,["@keyframes","testanimations",CssNode.BLOCK,["{",CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["10","%"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["width"],":",CssNode.VALUE,["0"]],"}"]],"}"]]]]);
+    });
+    it('@keyframes error 1', function() {
+      var parser = homunculus.getParser('css');
+      expect(function() {
+        parser.parse('@keyframes {}');
+      }).to.throwError();
+    });
+    it('@keyframes error 2', function() {
+      var parser = homunculus.getParser('css');
+      expect(function() {
+        parser.parse('@keyframes a');
+      }).to.throwError();
+    });
   });
 });

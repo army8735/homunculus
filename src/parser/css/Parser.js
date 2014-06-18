@@ -254,13 +254,7 @@ var Parser = IParser.extend(function(lexer) {
     var node = new Node(Node.KEYFRAMES);
     node.add(this.match());
     node.add(this.match(Token.ID));
-    var node2 = new Node(Node.BLOCK);
-    node2.add(this.match('{'));
-    while(this.look && [Token.ID, Token.NUMBER].indexOf(this.look.type()) != -1) {
-      node2.add(this.styleset(true));
-    }
-    node2.add(this.match('}'));
-    node.add(node2);
+    node.add(this.block(true));
     return node;
   },
   page: function() {
@@ -358,75 +352,48 @@ var Parser = IParser.extend(function(lexer) {
     }
     return node;
   },
-  styleset: function() {
+  styleset: function(kf) {
     var node = new Node(Node.STYLESET);
-    node.add(this.selectors());
+    node.add(this.selectors(kf));
     node.add(this.block());
     return node;
   },
-  selectors: function(numCanBeKey) {
+  selectors: function(kf) {
     var node = new Node(Node.SELECTORS);
-    node.add(this.selector(numCanBeKey));
+    node.add(this.selector(kf));
     while(this.look && this.look.content() == ',') {
       node.add(this.match());
-      node.add(this.selector(numCanBeKey));
+      node.add(this.selector(kf));
     }
     return node;
   },
-  selector: function(numCanBeKey) {
+  selector: function(kf) {
     var node = new Node(Node.SELECTOR);
-    var sign = {
-      '*': true,
-      '>': true,
-      '~': true,
-      '::': true,
-      ':': true,
-      '[': true,
-      ']': true,
-      '$=': true,
-      '|=': true,
-      '*=': true,
-      '~=': true,
-      '^=': true,
-      '=': true,
-      '(': true,
-      ')': true
-    };
     if(!this.look) {
       this.error();
     }
-    if([Token.STRING, Token.ID].indexOf(this.look.type()) != -1) {
+    if(kf && this.look.type() == Token.NUMBER) {
       node.add(this.match());
-    }
-    else if(sign[this.look.content()]) {
-      node.add(this.match());
-    }
-    else if(numCanBeKey && this.look.type() == Token.NUMBER) {
-      node.add(this.match());
+      node.add(this.match('%'));
     }
     else {
-      this.error();
-    }
-    while(this.look) {
-      if([Token.STRING, Token.ID].indexOf(this.look.type()) != -1) {
+      node.add(this.match(Token.SELECTOR));
+      while(this.look && this.look.type() == Token.PSEUDO) {
         node.add(this.match());
-      }
-      else if(sign[this.look.content()]) {
-        node.add(this.match());
-      }
-      else {
-        break;
       }
     }
     return node;
   },
-  block: function(single) {
+  block: function(kf) {
     var node = new Node(Node.BLOCK);
     node.add(this.match('{'));
     while(this.look
       && this.look.content() != '}') {
       if(this.look.type() == Token.SELECTOR) {
         node.add(this.styleset());
+      }
+      else if(kf && this.look.type() == Token.NUMBER) {
+        node.add(this.styleset(kf));
       }
       else {
         node.add(this.style());

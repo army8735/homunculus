@@ -172,9 +172,8 @@ seajs.use(['../index.js', './jssc'], function(Homunculus, jssc) {
   function hashChange() {
     var s = location.hash.replace(/^#/, '');
     if(s) {
-      s = decodeURIComponent(s);
       if(s != ta.value) {
-        ta.value = decodeURIComponent(s);
+        ta.value = s;
         input.onclick();
       }
     }
