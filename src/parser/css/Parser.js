@@ -233,64 +233,15 @@ var Parser = IParser.extend(function(lexer) {
   fontface: function() {
     var node = new Node(Node.FONTFACE);
     node.add(this.match());
+
     var node2 = new Node(Node.BLOCK);
     node2.add(this.match('{'));
-    var style = new Node(Node.STYLE);
-    var key = new Node(Node.KEY);
-    var value = new Node(Node.VALUE);
-    key.add(this.match('font-family'));
-    style.add(key);
-    style.add(this.match(':'));
-    if(this.look.type() == Token.STRING) {
-      value.add(this.match());
-    }
-    else {
-      value.add(this.match(Token.ID));
-    }
-    style.add(value);
-    style.add(this.match(';'));
-    node2.add(style);
-    style = new Node(Node.STYLE);
-    key = new Node(Node.KEY);
-    value = new Node(Node.VALUE);
-    key.add(this.match('src'));
-    style.add(key);
-    style.add(this.match(':'));
-    value.add(this.url());
-    if(this.look && this.look.content() == 'format') {
-      value.add(this.format());
-    }
-    while(this.look && this.look.content() == ',') {
-      value.add(this.match());
-      value.add(this.url());
-      if(this.look && this.look.content() == 'format') {
-        value.add(this.format());
-      }
-    }
-    style.add(value);
-    style.add(this.match(';'));
-    node2.add(style);
+
+    node2.add(this.style('font-family'));
+    node2.add(this.style('src'));
+
     while(this.look && this.look.content() == 'src') {
-      style = new Node(Node.STYLE);
-      key = new Node(Node.KEY);
-      value = new Node(Node.VALUE);
-      key.add(this.match('src'));
-      style.add(key);
-      style.add(this.match(':'));
-      value.add(this.url());
-      if(this.look && this.look.content() == 'format') {
-        value.add(this.format());
-      }
-      while(this.look && this.look.content() == ',') {
-        value.add(this.match());
-        value.add(this.url());
-        if(this.look && this.look.content() == 'format') {
-          value.add(this.format());
-        }
-      }
-      style.add(value);
-      style.add(this.match(';'));
-      node2.add(style);
+      node2.add(this.style('src'));
     }
     while(this.look && this.look.content() != '}') {
       node2.add(this.style());
@@ -535,20 +486,20 @@ var Parser = IParser.extend(function(lexer) {
     node.add(this.match(';'));
     return node;
   },
-  style: function(unknow) {
+  style: function(name) {
     var node = new Node(Node.STYLE);
-    node.add(this.key(unknow));
+    node.add(this.key(name));
     node.add(this.match(':'));
     node.add(this.value());
     node.add(this.match(';'));
     return node;
   },
-  key: function() {
+  key: function(name) {
     var node = new Node(Node.KEY);
     while(this.look && this.look.type() == Token.HACK) {
       node.add(this.match());
     }
-    node.add(this.match(Token.KEYWORD));
+    node.add(this.match(name || Token.KEYWORD));
     return node;
   },
   value: function(noP) {
@@ -556,14 +507,16 @@ var Parser = IParser.extend(function(lexer) {
     if(!this.look) {
       this.error();
     }
-    if([Token.VARS, Token.ID, Token.PROPERTY, Token.NUMBER, Token.STRING, Token.HEAD, Token.SIGN].indexOf(this.look.type()) > -1) {
+    if([Token.VARS, Token.ID, Token.PROPERTY, Token.NUMBER, Token.STRING, Token.HEAD, Token.SIGN].indexOf(this.look.type()) > -1
+      && [';', '}'].indexOf(this.look.content()) == -1) {
       node.add(this.match());
     }
     else {
       this.error();
     }
     while(this.look) {
-      if([Token.VARS, Token.ID, Token.PROPERTY, Token.NUMBER, Token.STRING, Token.HEAD, Token.KEYWORD, Token.SIGN, Token.UNITS].indexOf(this.look.type()) > -1) {
+      if([Token.VARS, Token.ID, Token.PROPERTY, Token.NUMBER, Token.STRING, Token.HEAD, Token.KEYWORD, Token.SIGN, Token.UNITS].indexOf(this.look.type()) > -1
+        && [';', '}'].indexOf(this.look.content()) == -1) {
         if(noP && this.look.content() == ')') {
           break;
         }
@@ -645,7 +598,7 @@ var Parser = IParser.extend(function(lexer) {
     }
     //或者根据token的type或者content匹配
     else if(typeof type == 'string') {
-      if(this.look && this.look.content() == type) {
+      if(this.look && this.look.content().toLowerCase() == type) {
         var l = this.look;
         this.move();
         return new Node(Node.TOKEN, l);

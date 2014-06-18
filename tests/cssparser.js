@@ -67,6 +67,11 @@ describe('cssparser', function() {
       var node = parser.parse('@import "a";');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.IMPORT,["@import",CssNode.URL,["\"a\""],";"]]]);
     });
+    it('@import ignore case', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@IMPORT "a";');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.IMPORT,["@IMPORT",CssNode.URL,["\"a\""],";"]]]);
+    });
     it('@import url(string)', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('@import url("a");');
@@ -163,6 +168,39 @@ describe('cssparser', function() {
       var parser = homunculus.getParser('css');
       expect(function() {
         parser.parse('@charset "arial"');
+      }).to.throwError();
+    });
+    it('@font-face normal', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@font-face{font-family:YH;src:url(http://domain/fonts/MSYH.TTF)}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.FONTFACE,["@font-face",CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["font-family"],":",CssNode.VALUE,["YH"],";"],CssNode.STYLE,[CssNode.KEY,["src"],":",CssNode.VALUE,["url","(","http://domain/fonts/MSYH.TTF",")"]],"}"]]]]);
+    });
+    it('@font-face with format', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@font-face{font-family:YH;src:url(xx),format("embedded-opentype")}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.FONTFACE,["@font-face",CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["font-family"],":",CssNode.VALUE,["YH"],";"],CssNode.STYLE,[CssNode.KEY,["src"],":",CssNode.VALUE,["url","(","xx",")",",","format","(","\"embedded-opentype\"",")"]],"}"]]]]);
+    });
+    it('@font-face mulit', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@font-face{font-family:YH;src:url(a),url(b)}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.FONTFACE,["@font-face",CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["font-family"],":",CssNode.VALUE,["YH"],";"],CssNode.STYLE,[CssNode.KEY,["src"],":",CssNode.VALUE,["url","(","a",")",",","url","(","b",")"]],"}"]]]]);
+    });
+    it('@charset error 1', function() {
+      var parser = homunculus.getParser('css');
+      expect(function() {
+        parser.parse('@font-face');
+      }).to.throwError();
+    });
+    it('@charset error 2', function() {
+      var parser = homunculus.getParser('css');
+      expect(function() {
+        parser.parse('@font-face{}');
+      }).to.throwError();
+    });
+    it('@charset error 3', function() {
+      var parser = homunculus.getParser('css');
+      expect(function() {
+        parser.parse('@font-face{src:url(a)}');
       }).to.throwError();
     });
   });
