@@ -344,8 +344,8 @@ var CssLexer = Lexer.extend(function(rule) {
       this.index = this.code.length;
       var n = character.count(token.val(), character.LINE);
       if(n > 0) {
-        var i = token.content().indexOf(character.LINE),
-          j = token.content().lastIndexOf(character.LINE);
+        var i = token.content().indexOf(character.LINE);
+        var j = token.content().lastIndexOf(character.LINE);
         this.colMax = Math.max(this.colMax, this.colNum + i);
         this.colNum = token.content().length - j;
       }
@@ -381,9 +381,6 @@ var CssLexer = Lexer.extend(function(rule) {
       this.colNum += token.content().length;
     }
     this.colMax = Math.max(this.colMax, this.colNum);
-  },
-  find: function() {
-    //
   }
 });
 

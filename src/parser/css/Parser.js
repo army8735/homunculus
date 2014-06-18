@@ -21,6 +21,18 @@ var MQL = {
   'tv': true,
   '(': true
 };
+var MT = {
+  'all': true,
+  'aural': true,
+  'braille': true,
+  'handheld': true,
+  'print': true,
+  'projection': true,
+  'screen': true,
+  'tty': true,
+  'embossed': true,
+  'tv': true
+};
 var Parser = IParser.extend(function(lexer) {
   IParser.call(this, lexer);
   this.init(lexer);
@@ -138,7 +150,8 @@ var Parser = IParser.extend(function(lexer) {
     if(!this.look) {
       this.error();
     }
-    if(MQL.hasOwnProperty(this.look.content().toLowerCase())) {
+    if(MQL.hasOwnProperty(this.look.content().toLowerCase())
+      || this.look.type() == Token.HACK) {
       node.add(this.mediaQList());
     }
     if(this.look && this.look.content() == '{') {
@@ -181,7 +194,22 @@ var Parser = IParser.extend(function(lexer) {
   },
   mediaType: function() {
     var node = new Node(Node.MEDIATYPE);
+    if(this.look && this.look.type() == Token.HACK) {
+      node.add(this.match());
+    }
+    if(!this.look || !MT.hasOwnProperty(this.look.content().toLowerCase())) {
+      this.error();
+    }
     node.add(this.match());
+    if(this.look && this.look.type() == Token.HACK) {
+      node.add(this.match());
+      if(this.look && MT.hasOwnProperty(this.look.content().toLowerCase())) {
+        node.add(this.match());
+        if(this.look && this.look.type() == Token.HACK) {
+          node.add(this.match());
+        }
+      }
+    }
     return node;
   },
   expr: function() {
