@@ -198,11 +198,11 @@ describe('csslexer', function() {
         expect(join(tokens)).to.eql(['p', '{', 'background', ':', 'url', '(', 'xxx', ')', ' ', 'no-repeat', '}']);
         expect(type(tokens)).to.eql([21, 8, 10, 8, 15, 8, 7, 8, 1, 15, 8]);
       });
-      it('outof {} is useless', function() {
+      it('outof {}', function() {
         var lexer = homunculus.getLexer('css');
         var tokens = lexer.parse('color:#333');
         expect(join(tokens)).to.eql(['color', ':', '#333']);
-        expect(type(tokens)).to.eql([-2, 8, 21]);
+        expect(type(tokens)).to.eql([10, 8, 4]);
       });
       it('#number', function(){
         var lexer = homunculus.getLexer('css');
@@ -222,11 +222,11 @@ describe('csslexer', function() {
         expect(join(tokens)).to.eql(['p', '{', 'margin', ':', '0', '!important', '}']);
         expect(type(tokens)).to.eql([21, 8, 10, 8, 4, 18, 8]);
       });
-      it('!important out of {} is useless', function() {
+      it('!important out of {}', function() {
         var lexer = homunculus.getLexer('css');
         var tokens = lexer.parse('margin:0!important');
         expect(join(tokens)).to.eql(['margin', ':', '0', '!important']);
-        expect(type(tokens)).to.eql([-2, 8, 4, -2]);
+        expect(type(tokens)).to.eql([10, 8, 4, 18]);
       });
       it('repeat kw', function() {
         var lexer = homunculus.getLexer('css');
@@ -295,6 +295,18 @@ describe('csslexer', function() {
         var tokens = lexer.parse('p{[;width:0;];}');
         expect(join(tokens)).to.eql(['p', '{', '[', ';', 'width', ':', '0', ';', ']', ';', '}']);
         expect(type(tokens)).to.eql([21, 8, 17, 17, 10, 8, 4, 8, 17, 17, 8]);
+      });
+      it('\\,', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('@media \\0screen\\,');
+        expect(join(tokens)).to.eql(['@media', ' ', '\\0', 'screen', '\\,']);
+        expect(type(tokens)).to.eql([12, 1, 17, 15, 17]);
+      });
+      it('\\,', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('@media \\0screen\\,');
+        expect(join(tokens)).to.eql(['@media', ' ', '\\0', 'screen', '\\,']);
+        expect(type(tokens)).to.eql([12, 1, 17, 15, 17]);
       });
     });
     describe('unknow', function() {

@@ -38,9 +38,11 @@ var CssRule = Rule.extend(function() {
   });
 
   self.addMatch(new CompleteEqual(Token.HACK, '\\9\\0'));
+  self.addMatch(new CompleteEqual(Token.HACK, '\\0/'));
   self.addMatch(new CompleteEqual(Token.HACK, '\\0'));
   self.addMatch(new CompleteEqual(Token.HACK, '\\9'));
   self.addMatch(new CompleteEqual(Token.HACK, '\\,'));
+  self.addMatch(new CompleteEqual(Token.HACK, '!ie'));
   self.addMatch(new CompleteEqual(Token.HACK, '-moz-'), null, true);
   self.addMatch(new CompleteEqual(Token.HACK, '-webkit-'), null, true);
   self.addMatch(new CompleteEqual(Token.HACK, '-ms-'), null, true);

@@ -115,16 +115,11 @@ define(function(require, exports, module) {
                 }
                 else {
                   if(this.rule.keyWords().hasOwnProperty(s)) {
-                    if(this.depth || this.media || this.import) {
-                      token.type(Token.KEYWORD);
-                      this.isKw = true;
-                      this.isUrl = false;
-                      this.isVar = false;
-                      this.isSelector = false;
-                    }
-                    else {
-                      token.type(Token.IGNORE);
-                    }
+                    token.type(Token.KEYWORD);
+                    this.isKw = true;
+                    this.isUrl = false;
+                    this.isVar = false;
+                    this.isSelector = false;
                   }
                   else {
                     token.type(Token.SELECTOR);
@@ -152,9 +147,6 @@ define(function(require, exports, module) {
                 this.isVar = false;
                 break;
               case Token.IMPORTANT:
-                if(!this.depth || !this.isValue) {
-                  token.type(Token.IGNORE);
-                }
                 this.isUrl = false;
                 this.afterHackBracket = false;
                 this.isVar = false;
@@ -189,7 +181,7 @@ define(function(require, exports, module) {
                     this.isVar = false;
                     break;
                   case '[':
-                    if(!this.isValue && !this.isSelector && this.depth) {
+                    if(!this.isValue && !this.isSelector) {
                       token.type(Token.HACK);
                     }
                     this.bracket = true;
@@ -198,7 +190,7 @@ define(function(require, exports, module) {
                     this.isVar = false;
                     break;
                   case ']':
-                    if(!this.isValue && !this.isSelector && this.depth) {
+                    if(!this.isValue && !this.isSelector) {
                       token.type(Token.HACK);
                       this.afterHackBracket = true;
                     }
@@ -207,7 +199,7 @@ define(function(require, exports, module) {
                     this.isVar = false;
                     break;
                   case ';':
-                    if(this.bracket && !this.isValue && !this.isSelector && this.depth
+                    if(this.bracket && !this.isValue && !this.isSelector
                       || this.afterHackBracket) {
                       token.type(Token.HACK);
                     }
@@ -327,15 +319,12 @@ define(function(require, exports, module) {
         //如果有未匹配的，css默认忽略，查找下一个;
         var j = this.code.indexOf(';', this.index);
         if(j == -1) {
-          j = this.code.length;
-          if(this.depth) {
-            j = this.code.indexOf('}', this.index);
-            if (j == -1) {
-              j = this.code.length;
-            }
-            else {
-              j--;
-            }
+          j = this.code.indexOf('}', this.index);
+          if(j == -1) {
+            j = this.code.length;
+          }
+          else if(this.depth) {
+            j--;
           }
         }
         var s = this.code.slice(this.index - 1, ++j);
