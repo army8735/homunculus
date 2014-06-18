@@ -62,9 +62,10 @@ function tree(node, arr) {
 
 describe('cssparser', function() {
   describe('keyword test', function() {
-    var KEYWORDS = 'appearance ascent aspect-ratio azimuth backface-visibility background-attachment background-clip background-color background-image background-origin background-position background-repeat background-size background baseline bbox border-collapse border-color border-image border-radius border-spacing border-style border-top border-right border-bottom border-left border-top-color border-right-color border-bottom-color border-left-color border-top-style border-right-style border-bottom-style border-left-style border-top-width border-right-width border-bottom-width border-left-width border-width border-top-left-radius border-bottom-left-radius border-top-right-radius border-bottom-right-radius border bottom box-shadow box-sizing cap-height caption-side centerline clear clip color color-index content counter-increment counter-reset cue-after cue-before cue cursor definition-src descent device-aspect-ratio device-height device-width direction display elevation empty-cells filter float font-size-adjust font-smoothing font-family font-size font-stretch font-style font-variant font-weight font grid height interpolation-mode left letter-spacing line-height list-style-image list-style-position list-style-type list-style margin-top margin-right margin-bottom margin-left margin marker-offset marks mathline max-aspect-ratio max-device-pixel-ratio max-device-width max-height max-resolution max-width min-aspect-ratio min-device-pixel-ratio min-device-width min-height min-resolution min-width monochrome nav-down nav-left nav-right nav-up opacity orphans outline-color outline-style outline-width orientation outline overflow-x overflow-y overflow padding-top padding-right padding-bottom padding-left padding page page-break-after page-break-before page-break-inside pause pause-after pause-before pitch pitch-range play-during position quotes resize resolution right richness scan size slope src speak-header speak-numeral speak-punctuation speak speech-rate stemh stemv stress table-layout text-align top text-decoration text-indent text-justify text-overflow text-shadow text-transform transform transform-origin transition transition-property unicode-bidi unicode-range units-per-em vertical-align visibility voice-family volume white-space widows width widths word-break word-spacing word-wrap x-height z-index zoom'.split(' ');
-    var VALUES = 'above absolute all alpha always and antialiased aqua armenian attr aural auto avoid background baseline behind below bicubic bidi-override black blink block blue bold bolder border-box both bottom break-all break-word braille cal capitalize caption center center-left center-right circle close-quote code collapse color compact condensed contain content-box continuous counter counters cover crop cross crosshair cursive dashed decimal decimal-leading-zero default digits disc dotted double ease ease-in ease-out ease-in-out embed embossed e-resize expanded extra-condensed extra-expanded fantasy far-left far-right fast faster fixed flipouttoleft flipouttoright flipouttotop flipouttobottom format fuchsia gray grayscale green groove handheld hebrew help hidden hide high higher hsl hsla icon inline-table inline inset inside inter-ideograph invert italic justify landscape large larger left-side leftwards level lighter lime linear-gradient linear line-through list-item local loud lower-alpha lowercase lower-greek lower-latin lower-roman lower low ltr marker maroon medium message-box middle mix move narrower navy ne-resize not no-close-quote none no-open-quote no-repeat normal nowrap n-resize nw-resize oblique olive once only opacity open-quote outset outside overline padding-box pointer portrait pre print projection purple red relative repeat repeat-x repeat-y rgb rgba ridge right right-side rightwards rotate rotateX rotateY rtl run-in scale screen scroll semi-condensed semi-expanded separate se-resize show silent silver slower slow small small-caps small-caption smaller soft solid speech spell-out square s-resize static status-bar sub super sw-resize table-caption table-cell table-column table-column-group table-footer-group table-header-group table-row table-row-group teal text-bottom text-top text thick thin top transparent translate tty tv ultra-condensed ultra-expanded underline upper-alpha uppercase upper-latin upper-roman url visible wait white wider width w-resize var x-fast x-high x-large x-loud x-low x-slow x-small x-soft xx-large xx-small yellow'.split(' ');
-    var COLORS = 'black silver gray white maroon red purple fuchsia green lime olive yellow navy blue teal aqua activeborder appworkspace buttonface buttonshadow captiontext highlight inactiveborder inactivecaptiontext infotext menutext threeddarkshadow threedhighlight threedshadow windowframe aliceblue antiquewhite aqua aquamarine azure beige bisque black blanchedalmond blue blueviolet brown burlywood cadetblue chartreuse chocolate coral cornflowerblue cornsilk crimson cyan darkblue darkcyan darkgoldenrod darkgray darkgreen darkgrey darkkhaki darkmagenta darkolivegreen darkorange darkorchid darkred darksalmon darkseagreen darkslateblue darkslategray darkslategrey darkturquoise darkviolet deeppink deepskyblue dimgray dimgrey dodgerblue firebrick floralwhite forestgreen fuchsia gainsboro ghostwhite gold goldenrod gray green greenyellow grey honeydew hotpink indianred indigo ivory khaki lavender lavenderblush lawngreen lemonchiffon lightblue lightcoral lightcyan lightgoldenrodyellow lightgray lightgreen lightgrey lightpink lightsalmon lightseagreen lightskyblue lightslategray lightslategrey lightsteelblue lightyellow lime limegreen linen magenta maroon mediumaquamarine mediumblue mediumorchid mediumpurple mediumseagreen mediumslateblue mediumspringgreen mediumturquoise mediumvioletred midnightblue mintcream mistyrose moccasin navajowhite navy oldlace olive olivedrab orange orangered orchid palegoldenrod palegreen paleturquoise palevioletred papayawhip peachpuff peru pink plum powderblue purple red rosybrown royalblue saddlebrown salmon sandybrown seagreen seashell sienna silver skyblue slateblue slategray slategrey snow springgreen steelblue tan teal thistle tomato turquoise violet wheat white whitesmoke yellow yellowgreen'.split(' ');
+    var rule = require('../src/lexer/rule/CssRule')
+    var KEYWORDS = rule.KEYWORDS;
+    var VALUES = rule.VALUES;
+    var COLORS = rule.COLORS;
     var parser = homunculus.getParser('css');
     it('kw', function() {
       KEYWORDS.forEach(function(k) {
@@ -194,17 +195,17 @@ describe('cssparser', function() {
     it('@font-face normal', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('@font-face{font-family:YH;src:url(http://domain/fonts/MSYH.TTF)}');
-      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.FONTFACE,["@font-face",CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["font-family"],":",CssNode.VALUE,["YH"],";"],CssNode.STYLE,[CssNode.KEY,["src"],":",CssNode.VALUE,["url","(","http://domain/fonts/MSYH.TTF",")"]],"}"]]]]);
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.FONTFACE,["@font-face",CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["font-family"],":",CssNode.VALUE,["YH"],";"],CssNode.STYLE,[CssNode.KEY,["src"],":",CssNode.VALUE,[CssNode.URL,["url","(","http://domain/fonts/MSYH.TTF",")"]]],"}"]]]]);
     });
     it('@font-face with format', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('@font-face{font-family:YH;src:url(xx),format("embedded-opentype")}');
-      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.FONTFACE,["@font-face",CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["font-family"],":",CssNode.VALUE,["YH"],";"],CssNode.STYLE,[CssNode.KEY,["src"],":",CssNode.VALUE,["url","(","xx",")",",","format","(","\"embedded-opentype\"",")"]],"}"]]]]);
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.FONTFACE,["@font-face",CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["font-family"],":",CssNode.VALUE,["YH"],";"],CssNode.STYLE,[CssNode.KEY,["src"],":",CssNode.VALUE,[CssNode.URL,["url","(","xx",")"],",",CssNode.FORMAT,["format","(","\"embedded-opentype\"",")"]]],"}"]]]]);
     });
     it('@font-face mulit', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('@font-face{font-family:YH;src:url(a),url(b)}');
-      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.FONTFACE,["@font-face",CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["font-family"],":",CssNode.VALUE,["YH"],";"],CssNode.STYLE,[CssNode.KEY,["src"],":",CssNode.VALUE,["url","(","a",")",",","url","(","b",")"]],"}"]]]]);
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.FONTFACE,["@font-face",CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["font-family"],":",CssNode.VALUE,["YH"],";"],CssNode.STYLE,[CssNode.KEY,["src"],":",CssNode.VALUE,[CssNode.URL,["url","(","a",")"],",",CssNode.URL,["url","(","b",")"]]],"}"]]]]);
     });
     it('@charset error 1', function() {
       var parser = homunculus.getParser('css');
@@ -234,16 +235,15 @@ describe('cssparser', function() {
       var node = parser.parse('@page :first{size:3in 8in}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.PAGE,["@page",":first",CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["size"],":",CssNode.VALUE,["3","in","8","in"]],"}"]]]]);
     });
+    it('@page empty', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@page {}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.PAGE,["@page",CssNode.BLOCK,["{","}"]]]]);
+    });
     it('@page error 1', function() {
       var parser = homunculus.getParser('css');
       expect(function() {
         parser.parse('@page thin:first');
-      }).to.throwError();
-    });
-    it('@page error 2', function() {
-      var parser = homunculus.getParser('css');
-      expect(function() {
-        parser.parse('@page {}');
       }).to.throwError();
     });
     it('@keyframes normal', function() {
@@ -295,34 +295,131 @@ describe('cssparser', function() {
         parser.parse('@keyframes {}');
       }).to.throwError();
     });
-    it('@-moz-document normal', function() {
+    it('@document normal', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('@-moz-document url-prefix(){}');
-      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.MOZDOC,["@-moz-document","url-prefix","(",")",CssNode.BLOCK,["{","}"]]]]);
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.DOC,["@-moz-document","url-prefix","(",")",CssNode.BLOCK,["{","}"]]]]);
     });
-    it('@-moz-document error 1', function() {
+    it('@document error 1', function() {
       var parser = homunculus.getParser('css');
       expect(function() {
         parser.parse('@-moz-document');
       }).to.throwError();
     });
-    it('@-moz-document error 2', function() {
+    it('@document error 2', function() {
       var parser = homunculus.getParser('css');
       expect(function() {
         parser.parse('@-moz-document {}');
       }).to.throwError();
     });
-    it('@-moz-document error 3', function() {
+    it('@document error 3', function() {
       var parser = homunculus.getParser('css');
       expect(function() {
         parser.parse('@-moz-document a{}');
       }).to.throwError();
     });
-    it('@-moz-document error 4', function() {
+    it('@document error 4', function() {
       var parser = homunculus.getParser('css');
       expect(function() {
         parser.parse('@-moz-document a({}');
       }).to.throwError();
+    });
+    it('$ is variable', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('body{width:$a}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["width"],":",CssNode.VALUE,["$a"]],"}"]]]]);
+    });
+    it('unknow @ is variable', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('body{width:@a}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["width"],":",CssNode.VALUE,["@a"]],"}"]]]]);
+    });
+    it('normal style', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('body{width:0}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["width"],":",CssNode.VALUE,["0"]],"}"]]]]);
+    });
+    it('css3 variable', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse(':root{var-companyblue:#369;var-lighterblue:powderblue;}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[":root","{",CssNode.VARDECL,["var-companyblue",":",CssNode.VALUE,["#369"],";"],CssNode.VARDECL,["var-lighterblue",":",CssNode.VALUE,["powderblue"],";"],"}"]]);
+    });
+    it('css3 cal()', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('h3{color:var(lighterblue);}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["h3"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["color"],":",CssNode.VALUE,["var","(","lighterblue",")"],";"],"}"]]]]);
+    });
+    it('nesting {}', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('h3{color:#000;h1{margin:0}}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["h3"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["color"],":",CssNode.VALUE,["#000"],";"],CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["h1"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["margin"],":",CssNode.VALUE,["0"]],"}"]],"}"]]]]);
+    });
+    it('multi selectors', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('a,p{}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["a"],",",CssNode.SELECTOR,["p"]],CssNode.BLOCK,["{","}"]]]]);
+    });
+    it('multi values', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('a{margin:0px 2px 3% auto}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["a"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["margin"],":",CssNode.VALUE,["0","px","2","px","3","%","auto"]],"}"]]]]);
+    });
+    it('[pseudo]', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('[hidden]{}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["[","hidden","]"]],CssNode.BLOCK,["{","}"]]]]);
+    });
+    it('[pseudo] in block', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('a{[hidden]{}}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["a"]],CssNode.BLOCK,["{",CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["[","hidden","]"]],CssNode.BLOCK,["{","}"]],"}"]]]]);
+    });
+    it('selector[pseudo]', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('a[hidden]{}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["a","[","hidden","]"]],CssNode.BLOCK,["{","}"]]]]);
+    });
+  });
+  describe('lib test', function() {
+    it('bootstrap', function() {
+      var parser = homunculus.getParser('css');
+      var code = fs.readFileSync(path.join(__dirname, './lib/bootstrap.css'), { encoding: 'utf-8' });
+      var node = parser.parse(code);
+      var ignore = parser.ignore();
+      var str = jion(node, ignore);
+      expect(str).to.eql(code);
+    });
+    it('bootstrap-theme', function() {
+      var parser = homunculus.getParser('css');
+      var code = fs.readFileSync(path.join(__dirname, './lib/bootstrap-theme.css'), { encoding: 'utf-8' });
+      var node = parser.parse(code);
+      var ignore = parser.ignore();
+      var str = jion(node, ignore);
+      expect(str).to.eql(code);
+    });
+    it('normalize', function() {
+      var parser = homunculus.getParser('css');
+      var code = fs.readFileSync(path.join(__dirname, './lib/normalize.css'), { encoding: 'utf-8' });
+      var node = parser.parse(code);
+      var ignore = parser.ignore();
+      var str = jion(node, ignore);
+      expect(str).to.eql(code);
+    });
+    it('foundation', function() {
+      var parser = homunculus.getParser('css');
+      var code = fs.readFileSync(path.join(__dirname, './lib/foundation.css'), { encoding: 'utf-8' });
+      var node = parser.parse(code);
+      var ignore = parser.ignore();
+      var str = jion(node, ignore);
+      expect(str).to.eql(code);
+    });
+    it('animate', function() {
+      var parser = homunculus.getParser('css');
+      var code = fs.readFileSync(path.join(__dirname, './lib/animate.css'), { encoding: 'utf-8' });
+      var node = parser.parse(code);
+      var ignore = parser.ignore();
+      var str = jion(node, ignore);
+      expect(str).to.eql(code);
     });
   });
 });

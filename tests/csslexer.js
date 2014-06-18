@@ -368,10 +368,16 @@ describe('csslexer', function() {
         expect(join(tokens)).to.eql(['$a', ':', '1']);
         expect(type(tokens)).to.eql([16, 8, 4]);
       });
-      it('@', function() {
+      it('unknow @', function() {
         var lexer = homunculus.getLexer('css');
         var tokens = lexer.parse('@a:1');
         expect(join(tokens)).to.eql(['@a', ':', '1']);
+        expect(type(tokens)).to.eql([16, 8, 4]);
+      });
+      it('$', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('$a:1');
+        expect(join(tokens)).to.eql(['$a', ':', '1']);
         expect(type(tokens)).to.eql([16, 8, 4]);
       });
       it('css3', function() {

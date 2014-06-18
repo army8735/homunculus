@@ -85,32 +85,24 @@ define(function(require, exports, module) {
       return node;
     },
     element: function() {
-      if(this.look.type() == Token.HEAD) {
-        return this.head();
-      }
-      else if(this.look.type() == Token.VARS) {
-        return this.vars();
-      }
-      else if(['}', ';', ','].indexOf(this.look.content()) > -1) {
-        return this.match();
-      }
-      else {
-        for(var i = this.index; i < this.length; i++) {
-          var token = this.tokens[i];
-          if(!S[token.type()]) {
-            if(token.content() == '(' && this.look.type() == Token.ID) {
-              return this.fn();
-            }
-            else {
-              break;
-            }
+      switch(this.look.type()) {
+        case Token.HEAD:
+          return this.head();
+        case Token.VARS:
+          return this.vardecl();
+        case Token.SELECTOR:
+          return this.styleset();
+        default:
+          if(this.look.content() == '[') {
+            return this.styleset();
           }
-        }
-        return this.styleset();
+          return this.match();
       }
     },
     head: function() {
-      switch(this.look.content().toLowerCase()) {
+      var s = this.look.content().toLowerCase();
+      s = s.replace(/^@(-moz-|-o-|-ms-|-webkit-)/, '@');
+      switch(s) {
         case '@import':
           return this.impt();
         case '@media':
@@ -123,16 +115,16 @@ define(function(require, exports, module) {
           return this.kframes();
         case '@page':
           return this.page();
-        case '@function':
-          return this.fn();
+  //      case '@function':
+  //        return this.fn();
         case '@namespace':
           return this.namespace();
-        case '@-moz-document':
-          return this.mozdoc();
+        case '@document':
+          return this.doc();
         default:
           //兼容less
           this.look.type(Token.VARS);
-          return this.vars();
+          return this.vardecl();
       }
     },
     impt: function() {
@@ -156,7 +148,7 @@ define(function(require, exports, module) {
         node.add(this.mediaQList());
       }
       if(this.look && this.look.content() == '{') {
-        node.add(this.block(true));
+        node.add(this.block());
       }
       return node;
     },
@@ -264,7 +256,9 @@ define(function(require, exports, module) {
       if(this.look && this.look.type() == Token.ID) {
         node.add(this.match());
       }
-      node.add(this.match(Token.PSEUDO));
+      if(this.look && this.look.type() == Token.PSEUDO) {
+        node.add(this.match());
+      }
       node.add(this.block());
       return node;
     },
@@ -278,8 +272,8 @@ define(function(require, exports, module) {
       node.add(this.match(';'));
       return node;
     },
-    mozdoc: function() {
-      var node = new Node(Node.MOZDOC);
+    doc: function() {
+      var node = new Node(Node.DOC);
       node.add(
         this.match(),
         this.match(Token.ID),
@@ -289,89 +283,14 @@ define(function(require, exports, module) {
       );
       return node;
     },
-    vars: function() {
-      var node = new Node(Node.VARS);
+    vardecl: function() {
+      var node = new Node(Node.VARDECL);
       node.add(this.match());
       if([':', '='].indexOf(this.look.content()) > -1) {
         node.add(this.match());
       }
       node.add(this.value());
       node.add(this.match(';'));
-      return node;
-    },
-    fn: function() {
-      var node = new Node(Node.FN);
-      if(this.look.content() == '@function') {
-        node.add(this.match());
-      }
-      else {
-        node.add(new Node(Node.TOKEN, new Token(Token.VIRTUAL, '@function')));
-      }
-      node.add(this.match(Token.ID));
-      node.add(this.match('('));
-      node.add(this.params());
-      node.add(this.match(')'));
-      node.add(this.block());
-      return node;
-    },
-    params: function() {
-      var node = new Node(Node.PARAMS);
-      var hash = {};
-      while(this.look) {
-        if(this.look.type() == Token.VARS) {
-          var v = this.look.content().replace(/^$/, '');
-          if(hash.hasOwnProperty(v)) {
-            this.error('duplicate params');
-          }
-          hash[v] = true;
-          node.add(this.match());
-          if(this.look && this.look.content() == ',') {
-            node.add(this.match());
-          }
-        }
-        else if(this.look.type() == Token.ID) {
-          var v = this.look.content();
-          if(hash.hasOwnProperty(v)) {
-            this.error('duplicate params');
-          }
-          hash[v] = true;
-          node.add(this.match());
-          if(this.look && this.look.content() == ',') {
-            node.add(this.match());
-          }
-        }
-        else {
-          break;
-        }
-      }
-      return node;
-    },
-    fnc: function() {
-      var node = new Node(Node.FNC);
-      node.add(this.match(Token.ID));
-      node.add(this.match('('));
-      node.add(this.cparams());
-      node.add(this.match(')'));
-      node.add(this.match(';'));
-      return node;
-    },
-    cparams: function() {
-      var node = new Node(Node.CPARAMS);
-      if(this.look.content() != ')') {
-        node.add(this.cparam());
-      }
-      while(this.look && this.look.content() != ')') {
-        node.add(this.match(','));
-        node.add(this.cparam());
-      }
-      return node;
-    },
-    cparam: function() {
-      var node = new Node(Node.CPARAM);
-      node.add(this.match());
-      while(this.look && [',', ')'].indexOf(this.look.content()) == -1) {
-        node.add(this.match());
-      }
       return node;
     },
     styleset: function(kf) {
@@ -399,9 +318,28 @@ define(function(require, exports, module) {
         node.add(this.match('%'));
       }
       else {
-        node.add(this.match(Token.SELECTOR));
-        while(this.look && this.look.type() == Token.PSEUDO) {
+        var s = this.look.content().toLowerCase();
+        if(s == '[') {
           node.add(this.match());
+          while(this.look && this.look.content() != ']') {
+            node.add(this.match([Token.ATTR, Token.SIGN, Token.VARS, Token.NUMBER, Token.UNITS, Token.STRING]));
+          }
+          node.add(this.match(']'));
+        }
+        else {
+          node.add(this.match(Token.SELECTOR));
+        }
+        while(this.look && [',', ';', '{', '}'].indexOf(this.look.content()) == -1) {
+          if(this.look.content() == '[') {
+            node.add(this.match());
+            while(this.look && this.look.content() != ']') {
+              node.add(this.match([Token.ATTR, Token.SIGN, Token.VARS, Token.NUMBER, Token.UNITS, Token.STRING]));
+            }
+            node.add(this.match(']'));
+          }
+          else {
+            node.add(this.match([Token.SELECTOR, Token.PSEUDO, Token.SIGN]));
+          }
         }
       }
       return node;
@@ -411,29 +349,21 @@ define(function(require, exports, module) {
       node.add(this.match('{'));
       while(this.look
         && this.look.content() != '}') {
-        if(this.look.type() == Token.SELECTOR) {
+        if(this.look.type() == Token.SELECTOR
+          || this.look.content() == '[') {
           node.add(this.styleset());
         }
         else if(kf && this.look.type() == Token.NUMBER) {
           node.add(this.styleset(kf));
+        }
+        else if(this.look.type() == Token.HEAD) {
+          node.add(this.head());
         }
         else {
           node.add(this.style());
         }
       }
       node.add(this.match('}'));
-      return node;
-    },
-    extend: function(miss) {
-      var node = new Node(Node.EXTEND);
-      if(!miss) {
-        node.add(this.match());
-      }
-      else {
-        node.add(new Node(Node.TOKEN, new Token(Token.VIRTUAL, '@extend')));
-      }
-      node.add(this.selectors());
-      node.add(this.match(';'));
       return node;
     },
     style: function(name) {
@@ -457,27 +387,42 @@ define(function(require, exports, module) {
       if(!this.look) {
         this.error();
       }
-      if([Token.VARS, Token.ID, Token.PROPERTY, Token.NUMBER, Token.STRING, Token.HEAD, Token.SIGN].indexOf(this.look.type()) > -1
-        && [';', '}'].indexOf(this.look.content()) == -1) {
-        node.add(this.match());
+      var s = this.look.content().toLowerCase();
+      if([Token.HACK, Token.VARS, Token.ID, Token.PROPERTY, Token.NUMBER, Token.STRING, Token.HEAD, Token.SIGN, Token.UNITS, Token.KEYWORD].indexOf(this.look.type()) > -1
+        && [';', '}'].indexOf(s) == -1) {
+        if(s == 'url') {
+          node.add(this.url());
+        }
+        else if(s == 'format') {
+          node.add(this.format());
+        }
+        else {
+          node.add(this.match());
+        }
       }
       else {
         this.error();
       }
       while(this.look) {
-        if([Token.VARS, Token.ID, Token.PROPERTY, Token.NUMBER, Token.STRING, Token.HEAD, Token.KEYWORD, Token.SIGN, Token.UNITS].indexOf(this.look.type()) > -1
+        s = this.look.content().toLowerCase();
+        if([Token.HACK, Token.VARS, Token.ID, Token.PROPERTY, Token.NUMBER, Token.STRING, Token.HEAD, Token.KEYWORD, Token.SIGN, Token.UNITS, Token.KEYWORD].indexOf(this.look.type()) > -1
           && [';', '}'].indexOf(this.look.content()) == -1) {
           if(noP && this.look.content() == ')') {
             break;
           }
-          node.add(this.match());
+          if(s == 'url') {
+            node.add(this.url());
+          }
+          else if(s == 'format') {
+            node.add(this.format());
+          }
+          else {
+            node.add(this.match());
+          }
         }
         else {
           break;
         }
-      }
-      if(this.look && this.look.type() == Token.HACK) {
-        node.add(this.match());
       }
       if(this.look && this.look.type() == Token.IMPORTANT) {
         node.add(this.match());
@@ -511,7 +456,7 @@ define(function(require, exports, module) {
       var node = new Node(Node.FORMAT);
       node.add(this.match());
       node.add(this.match('('));
-      node.add(this.match(Token.STRING));
+      node.add(this.match([Token.VARS, Token.STRING]));
       node.add(this.match(')'));
       return node;
     },
@@ -574,7 +519,7 @@ define(function(require, exports, module) {
     },
     error: function(msg) {
       msg = 'SyntaxError: ' + (msg || ' syntax error');
-      throw new Error(msg + ' line ' + this.lastLine + ' col ' + this.lastCol);
+      throw new Error(msg + ' line ' + this.lastLine + ' col ' + this.lastCol + ' look ' + (this.look && this.look.content()));
     },
     move: function() {
       this.lastLine = this.line;

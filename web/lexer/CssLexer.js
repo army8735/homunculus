@@ -12,19 +12,19 @@ define(function(require, exports, module) {
     Lexer.call(this, rule);
     this.media = false;
     this.import = false;
-    this.isValue = false;
+    this.value = false;
     this.parenthese = false;
     this.bracket = false;
     this.afterHackBracket = false;
-    this.isNumber = false;
-    this.isUrl = false;
-    this.isKw = false;
-    this.isSelector = true;
-    this.isVar = false;
-    this.isPage = false;
-    this.isKf = false;
-    this.isNs = false;
-    this.isMD = false;
+    this.number = false;
+    this.url = false;
+    this.kw = false;
+    this.sel = true;
+    this.var = false;
+    this.page = false;
+    this.kf = false;
+    this.ns = false;
+    this.doc = false;
     this.depth = 0;
   }).methods({
     //@override
@@ -38,7 +38,7 @@ define(function(require, exports, module) {
         }
         this.readch();
         //(之后的字符串可省略"号
-        if(this.parenthese && this.isUrl) {
+        if(this.parenthese && this.url) {
           if(!S.hasOwnProperty(this.peek)
             && !{
               "'": true,
@@ -46,7 +46,7 @@ define(function(require, exports, module) {
               ')': true
             }.hasOwnProperty(this.peek)) {
             this.dealPt(temp);
-            this.isUrl = false;
+            this.url = false;
             continue outer;
           }
         }
@@ -65,6 +65,7 @@ define(function(require, exports, module) {
             switch(token.type()) {
               //@import和@media之后进入值状态
               case Token.HEAD:
+              s = s.replace(/^@(-moz-|-o-|-ms-|-webkit-)/, '@');
                 switch(s) {
                   case '@import':
                     this.import = true;
@@ -73,218 +74,219 @@ define(function(require, exports, module) {
                     this.media = true;
                     break;
                   case '@page':
-                    this.isPage = true;
+                    this.page = true;
                     break;
                   case '@keyframes':
-                    this.isKf = true;
+                    this.kf = true;
                     break;
-                  case '@-moz-document':
-                    this.isMD = true;
+                  case '@document':
+                    this.doc = true;
                     break;
                 }
-                this.isSelector = false;
-                this.isKw = false;
-                this.isValue = true;
-                this.isNumber = false;
+                this.sel = false;
+                this.kw = false;
+                this.value = true;
+                this.number = false;
                 this.afterHackBracket = false;
-                this.isVar = false;
+                this.var = false;
                 break;
               //单位要跟在数字之后，否则便不是单位
               case Token.UNITS:
-                if(!this.isNumber) {
+                if(!this.number) {
                   continue;
                 }
-                this.isSelector = false;
-                this.isKw = false;
+                this.sel = false;
+                this.kw = false;
                 this.afterHackBracket = false;
-                this.isVar = false;
-                this.isPage = false;
-                this.isKf = false;
-                this.isNs = false;
-                this.isMD = false;
+                this.var = false;
+                this.number = false;
+                this.page = false;
+                this.kf = false;
+                this.ns = false;
+                this.doc = false;
                 break;
               //将id区分出属性名和属性值
               case Token.ID:
-                if(this.isPage || this.isKf || this.isNs || this.isMD) {
-                  this.isSelector = true;
-                  this.isUrl = false;
-                  this.isKw = false;
-                  this.isVar = false;
-                  this.isValue = false;
+                if(this.page || this.kf || this.ns) {
+                  this.sel = true;
+                  this.url = false;
+                  this.kw = false;
+                  this.var = false;
+                  this.value = false;
                 }
-                else if(this.bracket && this.isSelector) {
+                else if(this.bracket && this.sel) {
                   token.type(Token.ATTR);
-                  this.isUrl = false;
-                  this.isVar = false;
+                  this.url = false;
+                  this.var = false;
                 }
-                else if(this.isVar) {
+                else if(this.var) {
                   token.type(Token.VARS);
-                  this.isUrl = false;
-                  this.isVar = false;
+                  this.url = false;
+                  this.var = false;
                 }
-                else if(this.isValue) {
+                else if(this.value) {
                   if(this.rule.colors().hasOwnProperty(s)) {
                     token.type(Token.NUMBER);
-                    this.isUrl = false;
-                    this.isVar = false;
+                    this.url = false;
+                    this.var = false;
                   }
                   else if(this.rule.keyWords().hasOwnProperty(s)
                     || this.rule.values().hasOwnProperty(s)) {
                     token.type(Token.PROPERTY);
-                    this.isUrl = s == 'url' || s == 'format';
-                    this.isVar = s == 'var';
+                    this.url = s == 'url' || s == 'format';
+                    this.var = s == 'var';
                   }
-                  this.isKw = false;
-                  this.isSelector = false;
+                  this.kw = false;
+                  this.sel = false;
                 }
                 else {
                   if(this.rule.keyWords().hasOwnProperty(s)) {
                     token.type(Token.KEYWORD);
-                    this.isKw = true;
-                    this.isUrl = false;
-                    this.isVar = false;
-                    this.isSelector = false;
+                    this.kw = true;
+                    this.url = false;
+                    this.var = false;
+                    this.sel = false;
                   }
                   else {
                     token.type(Token.SELECTOR);
-                    this.isSelector = true;
-                    this.isUrl = false;
-                    this.isKw = false;
-                    this.isVar = false;
+                    this.sel = true;
+                    this.url = false;
+                    this.kw = false;
+                    this.var = false;
                   }
                 }
-                this.isNumber = false;
+                this.number = false;
                 this.afterHackBracket = false;
-                this.isPage = false;
-                this.isKf = false;
-                this.isNs = false;
-                this.isMD = false;
+                this.page = false;
+                this.kf = false;
+                this.ns = false;
+                this.doc = false;
                 break;
               case Token.PSEUDO:
-                if((this.isKw || this.isValue)
-                  && !this.isPage) {
+                if((this.kw || this.value)
+                  && !this.page) {
                   continue;
                 }
                 this.afterHackBracket = false;
-                this.isVar = false;
-                this.isPage = false;
-                this.isKf = false;
-                this.isNs = false;
-                this.isMD = false;
+                this.var = false;
+                this.page = false;
+                this.kf = false;
+                this.ns = false;
+                this.doc = false;
                 break;
               case Token.SELECTOR:
-                this.isSelector = true;
-                this.isKw = false;
-                this.isNumber = false;
+                this.sel = true;
+                this.kw = false;
+                this.number = false;
                 this.afterHackBracket = false;
-                this.isVar = false;
-                this.isPage = false;
-                this.isKf = false;
-                this.isNs = false;
-                this.isMD = false;
+                this.var = false;
+                this.page = false;
+                this.kf = false;
+                this.ns = false;
+                this.doc = false;
                 break;
               case Token.IMPORTANT:
-                this.isUrl = false;
+                this.url = false;
                 this.afterHackBracket = false;
-                this.isVar = false;
-                this.isPage = false;
-                this.isKf = false;
-                this.isNs = false;
-                this.isMD = false;
+                this.var = false;
+                this.page = false;
+                this.kf = false;
+                this.ns = false;
+                this.doc = false;
                 break;
               case Token.SIGN:
                 switch(s) {
                   case ':':
-                    if(this.isKw) {
-                      this.isValue = true;
+                    if(this.kw) {
+                      this.value = true;
                     }
-                    this.isUrl = false;
-                    this.isSelector = false;
+                    this.url = false;
+                    this.sel = false;
                     this.afterHackBracket = false;
-                    this.isVar = false;
+                    this.var = false;
                     break;
                   case '(':
-                    if(this.media || this.import) {
-                      this.isValue = false;
+                    if(this.media || this.import || this.doc) {
+                      this.value = false;
                     }
                     this.parenthese = true;
-                    this.isSelector = false;
+                    this.sel = false;
                     this.afterHackBracket = false;
                     break;
                   case ')':
-                    if(this.media || this.import) {
-                      this.isValue = true;
+                    if(this.media || this.import || this.doc) {
+                      this.value = true;
                     }
-                    this.isUrl = false;
+                    this.url = false;
                     this.parenthese = false;
-                    this.isSelector = false;
+                    this.sel = false;
                     this.afterHackBracket = false;
-                    this.isVar = false;
+                    this.var = false;
                     break;
                   case '[':
-                    if(!this.isValue && !this.isSelector) {
+                    if(!this.value && !this.sel) {
                       token.type(Token.HACK);
                     }
                     this.bracket = true;
-                    this.isUrl = false;
+                    this.url = false;
                     this.afterHackBracket = false;
-                    this.isVar = false;
+                    this.var = false;
                     break;
                   case ']':
-                    if(!this.isValue && !this.isSelector) {
+                    if(!this.value && !this.sel) {
                       token.type(Token.HACK);
                       this.afterHackBracket = true;
                     }
                     this.bracket = false;
-                    this.isUrl = false;
-                    this.isVar = false;
+                    this.url = false;
+                    this.var = false;
                     break;
                   case ';':
-                    if(this.bracket && !this.isValue && !this.isSelector
+                    if(this.bracket && !this.value && !this.sel
                       || this.afterHackBracket) {
                       token.type(Token.HACK);
                     }
-                    this.isValue = false;
+                    this.value = false;
                     this.import = false;
-                    this.isUrl = false;
-                    this.isSelector = false;
+                    this.url = false;
+                    this.sel = false;
                     this.afterHackBracket = false;
-                    this.isVar = false;
+                    this.var = false;
                     break;
                   case '{':
                     this.depth++;
-                    this.isValue = false;
+                    this.value = false;
                     this.media = false;
                     this.import = false;
-                    this.isUrl = false;
-                    this.isSelector = false;
+                    this.url = false;
+                    this.sel = true;
                     this.afterHackBracket = false;
-                    this.isVar = false;
+                    this.var = false;
                     break;
                   case '}':
-                    this.isValue = false;
+                    this.value = false;
                     this.media = false;
                     this.import = false;
-                    this.isUrl = false;
-                    this.isSelector = false;
+                    this.url = false;
+                    this.sel = true;
                     this.depth--;
                     this.afterHackBracket = false;
-                    this.isVar = false;
+                    this.var = false;
                     break;
                   case '*':
                     if(this.depth) {
-                      if(!this.isValue) {
+                      if(!this.value) {
                         //LL2确定是selector还是hack
                         for (var j = this.index; j < length; j++) {
                           var c = this.code.charAt(j);
                           if (!S.hasOwnProperty(c)) {
                             if (c == ':' || c == '{') {
                               token.type(Token.SELECTOR);
-                              this.isSelector = true;
+                              this.sel = true;
                             }
                             else {
                               token.type(Token.HACK);
-                              this.isSelector = false;
+                              this.sel = false;
                             }
                             break;
                           }
@@ -293,60 +295,60 @@ define(function(require, exports, module) {
                     }
                     else {
                       token.type(Token.SELECTOR);
-                      this.isSelector = true;
+                      this.sel = true;
                     }
                     this.afterHackBracket = false;
-                    this.isVar = false;
+                    this.var = false;
                     break;
                   case '-':
                   case '_':
-                    if(this.depth && !this.isValue) {
+                    if(this.depth && !this.value) {
                       token.type(Token.HACK);
                     }
-                    this.isUrl = false;
-                    this.isSelector = false;
+                    this.url = false;
+                    this.sel = false;
                     this.afterHackBracket = false;
-                    this.isVar = false;
+                    this.var = false;
                     break;
                   default:
-                    this.isUrl = false;
+                    this.url = false;
                     this.afterHackBracket = false;
-                    this.isVar = false;
+                    this.var = false;
                     break;
                 }
-                this.isNumber = false;
-                this.isKw = false;
-                this.isPage = false;
-                this.isKf = false;
-                this.isNs = false;
-                this.isMD = false;
+                this.number = false;
+                this.kw = false;
+                this.page = false;
+                this.kf = false;
+                this.ns = false;
+                this.doc = false;
                 break;
               case Token.NUMBER:
-                if(!this.isValue && token.content().charAt(0) == '#') {
+                if(!this.value && token.content().charAt(0) == '#') {
                   token.type(Token.SELECTOR);
                 }
                 else {
-                  this.isNumber = true;
+                  this.number = true;
                 }
-                this.isUrl = false;
+                this.url = false;
                 this.afterHackBracket = false;
-                this.isVar = false;
-                this.isPage = false;
-                this.isKf = false;
-                this.isNs = false;
-                this.isMD = false;
+                this.var = false;
+                this.page = false;
+                this.kf = false;
+                this.ns = false;
+                this.doc = false;
                 break;
               case Token.VARS:
-                this.isKw = true;
-                this.isSelector = false;
-                this.isUrl = false;
-                this.isNumber = false;
+                this.kw = true;
+                this.sel = false;
+                this.url = false;
+                this.number = false;
                 this.afterHackBracket = false;
-                this.isVar = false;
-                this.isPage = false;
-                this.isKf = false;
-                this.isNs = false;
-                this.isMD = false;
+                this.var = false;
+                this.page = false;
+                this.kf = false;
+                this.ns = false;
+                this.doc = false;
                 break;
             }
   
