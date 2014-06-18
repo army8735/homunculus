@@ -186,8 +186,10 @@ define(function(require, exports, module) {
       if(this.look && this.look.type() == Token.HACK) {
         node.add(this.match());
       }
-      if(!this.look || !MT.hasOwnProperty(this.look.content().toLowerCase())) {
-        this.error();
+      while(this.look
+        && [Token.ID, Token.NUMBER].indexOf(this.look.type()) > -1
+        && !MT.hasOwnProperty(this.look.content().toLowerCase())) {
+        node.add(this.match());
       }
       node.add(this.match());
       if(this.look && this.look.type() == Token.HACK) {
