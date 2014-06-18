@@ -169,11 +169,15 @@ seajs.use(['../index.js', './jssc'], function(Homunculus, jssc) {
       return arr;
     }
   }
-  var s = location.hash.replace(/^#/, '');
-  if(s) {
-    ta.value = decodeURIComponent(s);
-    input.onclick();
+  function hashChange() {
+    var s = location.hash.replace(/^#/, '');
+    if(s) {
+      ta.value = decodeURIComponent(s);
+      input.onclick();
+    }
   }
+  hashChange();
+  window.onhashchange = hashChange;
 });
 </script>
 </body>
