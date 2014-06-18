@@ -24,6 +24,7 @@ define(function(require, exports, module) {
     this.isPage = false;
     this.isKf = false;
     this.isNs = false;
+    this.isMD = false;
     this.depth = 0;
   }).methods({
     //@override
@@ -77,6 +78,9 @@ define(function(require, exports, module) {
                   case '@keyframes':
                     this.isKf = true;
                     break;
+                  case '@-moz-document':
+                    this.isMD = true;
+                    break;
                 }
                 this.isSelector = false;
                 this.isKw = false;
@@ -97,10 +101,11 @@ define(function(require, exports, module) {
                 this.isPage = false;
                 this.isKf = false;
                 this.isNs = false;
+                this.isMD = false;
                 break;
               //将id区分出属性名和属性值
               case Token.ID:
-                if(this.isPage || this.isKf || this.isNs) {
+                if(this.isPage || this.isKf || this.isNs || this.isMD) {
                   this.isSelector = true;
                   this.isUrl = false;
                   this.isKw = false;
@@ -153,6 +158,7 @@ define(function(require, exports, module) {
                 this.isPage = false;
                 this.isKf = false;
                 this.isNs = false;
+                this.isMD = false;
                 break;
               case Token.PSEUDO:
                 if((this.isKw || this.isValue)
@@ -164,6 +170,7 @@ define(function(require, exports, module) {
                 this.isPage = false;
                 this.isKf = false;
                 this.isNs = false;
+                this.isMD = false;
                 break;
               case Token.SELECTOR:
                 this.isSelector = true;
@@ -174,6 +181,7 @@ define(function(require, exports, module) {
                 this.isPage = false;
                 this.isKf = false;
                 this.isNs = false;
+                this.isMD = false;
                 break;
               case Token.IMPORTANT:
                 this.isUrl = false;
@@ -182,6 +190,7 @@ define(function(require, exports, module) {
                 this.isPage = false;
                 this.isKf = false;
                 this.isNs = false;
+                this.isMD = false;
                 break;
               case Token.SIGN:
                 switch(s) {
@@ -310,6 +319,7 @@ define(function(require, exports, module) {
                 this.isPage = false;
                 this.isKf = false;
                 this.isNs = false;
+                this.isMD = false;
                 break;
               case Token.NUMBER:
                 if(!this.isValue && token.content().charAt(0) == '#') {
@@ -324,6 +334,7 @@ define(function(require, exports, module) {
                 this.isPage = false;
                 this.isKf = false;
                 this.isNs = false;
+                this.isMD = false;
                 break;
               case Token.VARS:
                 this.isKw = true;
@@ -335,6 +346,7 @@ define(function(require, exports, module) {
                 this.isPage = false;
                 this.isKf = false;
                 this.isNs = false;
+                this.isMD = false;
                 break;
             }
   

@@ -12,6 +12,7 @@ var Node = INode.extend(function(type, children) {
   MEDIAQUERY: 'mediaquer',
   MEDIATYPE: 'mediatype',
   NAMESPACE: 'namespace',
+  MOZDOC: 'mozdoc',
   EXPR: 'expression',
   BLOCK: 'block',
   STYLESET: 'styleset',

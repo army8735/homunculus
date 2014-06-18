@@ -295,5 +295,34 @@ describe('cssparser', function() {
         parser.parse('@keyframes {}');
       }).to.throwError();
     });
+    it('@-moz-document normal', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@-moz-document url-prefix(){}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.MOZDOC,["@-moz-document","url-prefix","(",")",CssNode.BLOCK,["{","}"]]]]);
+    });
+    it('@-moz-document error 1', function() {
+      var parser = homunculus.getParser('css');
+      expect(function() {
+        parser.parse('@-moz-document');
+      }).to.throwError();
+    });
+    it('@-moz-document error 2', function() {
+      var parser = homunculus.getParser('css');
+      expect(function() {
+        parser.parse('@-moz-document {}');
+      }).to.throwError();
+    });
+    it('@-moz-document error 3', function() {
+      var parser = homunculus.getParser('css');
+      expect(function() {
+        parser.parse('@-moz-document a{}');
+      }).to.throwError();
+    });
+    it('@-moz-document error 4', function() {
+      var parser = homunculus.getParser('css');
+      expect(function() {
+        parser.parse('@-moz-document a({}');
+      }).to.throwError();
+    });
   });
 });

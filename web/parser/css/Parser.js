@@ -278,6 +278,17 @@ define(function(require, exports, module) {
       node.add(this.match(';'));
       return node;
     },
+    mozdoc: function() {
+      var node = new Node(Node.MOZDOC);
+      node.add(
+        this.match(),
+        this.match(Token.ID),
+        this.match('('),
+        this.match(')'),
+        this.block()
+      );
+      return node;
+    },
     vars: function() {
       var node = new Node(Node.VARS);
       node.add(this.match());

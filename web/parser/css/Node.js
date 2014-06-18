@@ -13,6 +13,7 @@ define(function(require, exports, module) {
     MEDIAQUERY: 'mediaquer',
     MEDIATYPE: 'mediatype',
     NAMESPACE: 'namespace',
+    MOZDOC: 'mozdoc',
     EXPR: 'expression',
     BLOCK: 'block',
     STYLESET: 'styleset',
