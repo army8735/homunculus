@@ -372,7 +372,7 @@ define(function(require, exports, module) {
           }
         }
         var s = this.code.slice(this.index - 1, ++j);
-        var token = new Token(Token.IGNORE, s);
+        var token = new Token(Token.IGNORE, s, this.index - 1);
         temp.push(token);
         this.tokenList.push(token);
         this.index = j;
@@ -383,7 +383,7 @@ define(function(require, exports, module) {
       var k = this.code.indexOf(')', this.index);
       //()未结束直接跳出
       if(k == -1) {
-        var token = new Token(Token.IGNORE, this.code.slice(this.index - 1, this.code.length));
+        var token = new Token(Token.IGNORE, this.code.slice(this.index - 1, this.code.length), this.index - 1);
         temp.push(token);
         this.tokenList.push(token);
         this.index = this.code.length;
@@ -405,10 +405,10 @@ define(function(require, exports, module) {
       var token;
       //)之前的空白要判断
       if(reg) {
-        token = new Token(Token.IGNORE, s);
+        token = new Token(Token.IGNORE, s, this.index - 1);
       }
       else {
-        token = new Token(Token.STRING, s);
+        token = new Token(Token.STRING, s, this.index - 1);
       }
       temp.push(token);
       this.tokenList.push(token);
