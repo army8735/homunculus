@@ -101,6 +101,19 @@ var CssLexer = Lexer.extend(function(rule) {
               this.ns = false;
               this.doc = false;
               break;
+            case Token.KEYWORD:
+              if(!this.value) {
+                this.kw = true;
+                this.url = false;
+                this.var = false;
+                this.sel = false;
+                this.number = false;
+                this.page = false;
+                this.kf = false;
+                this.ns = false;
+                this.doc = false;
+              }
+              break;
             //将id区分出属性名和属性值
             case Token.ID:
               if(this.page || this.kf || this.ns) {

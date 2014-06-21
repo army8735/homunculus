@@ -234,6 +234,12 @@ describe('csslexer', function() {
         expect(join(tokens)).to.eql(['p', '{', 'margin', ' ', 'margin', ':', '0', ';', '}']);
         expect(type(tokens)).to.eql([21, 8, 10, 1, 10, 8, 4, 8, 8]);
       });
+      it('special kw', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('@media(min--moz-device-pixel-ratio:no-repeat)');
+        expect(join(tokens)).to.eql(['@media', '(', 'min--moz-device-pixel-ratio', ':', 'no-repeat', ')']);
+        expect(type(tokens)).to.eql([12, 8, 10, 8, 15, 8]);
+      });
     });
     describe('hack', function() {
       it('*-_', function() {
