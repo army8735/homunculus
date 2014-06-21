@@ -319,5 +319,13 @@ describe('jslexer', function() {
       }).to.not.throwError();
       Lexer.mode(Lexer.STRICT);
     });
+    it('#prev,#next', function() {
+      var lexer = homunculus.getLexer('js');
+      var tokens = lexer.parse('var a');
+      expect(tokens[0].prev()).to.eql(null);
+      expect(tokens[1].prev()).to.eql(tokens[0]);
+      expect(tokens[0].next()).to.eql(tokens[1]);
+      expect(tokens[2].next()).to.eql(null);
+    });
   });
 });

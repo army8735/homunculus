@@ -418,6 +418,14 @@ describe('csslexer', function() {
     it('tokens sIndex 4', function() {
       expect(tokens[3].sIndex()).to.eql(10);
     });
+    it('#prev,#next', function() {
+      var lexer = homunculus.getLexer('css');
+      var tokens = lexer.parse('p{}');
+      expect(tokens[0].prev()).to.eql(null);
+      expect(tokens[1].prev()).to.eql(tokens[0]);
+      expect(tokens[0].next()).to.eql(tokens[1]);
+      expect(tokens[2].next()).to.eql(null);
+    });
   });
   describe('cache line', function() {
     it('normal', function() {

@@ -18,6 +18,7 @@ define(function(require, exports, module) {
       this.totalLine = 1; //总行数
       this.colNum = 0; //列
       this.colMax = 0; //最大列数
+      this.last = null;
     },
     parse: function(code) {
       this.code = code || '';
@@ -72,6 +73,11 @@ define(function(require, exports, module) {
                 match.callback(token);
               }
   
+              if(this.last) {
+                token.prev(this.last);
+                this.last.next(token);
+              }
+              this.last = token;
               temp.push(token);
               this.tokenList.push(token);
               this.index += matchLen - 1;
@@ -182,6 +188,11 @@ define(function(require, exports, module) {
           this.code.slice(lastIndex, this.index - 1));
       }
       var token = new Token(Token.REG, this.code.slice(lastIndex, --this.index), lastIndex);
+      if(this.last) {
+        token.prev(this.last);
+        this.last.next(token);
+      }
+      this.last = token;
       temp.push(token);
       this.tokenList.push(token);
       this.colNum += this.index - lastIndex;

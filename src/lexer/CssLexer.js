@@ -353,6 +353,11 @@ var CssLexer = Lexer.extend(function(rule) {
               break;
           }
 
+          if(this.last) {
+            token.prev(this.last);
+            this.last.next(token);
+          }
+          this.last = token;
           temp.push(token);
           this.tokenList.push(token);
           this.index += matchLen - 1;
@@ -385,6 +390,11 @@ var CssLexer = Lexer.extend(function(rule) {
       }
       var s = this.code.slice(this.index - 1, ++j);
       var token = new Token(Token.IGNORE, s, this.index - 1);
+      if(this.last) {
+        token.prev(this.last);
+        this.last.next(token);
+      }
+      this.last = token;
       temp.push(token);
       this.tokenList.push(token);
       this.index = j;
@@ -422,6 +432,11 @@ var CssLexer = Lexer.extend(function(rule) {
     else {
       token = new Token(Token.STRING, s, this.index - 1);
     }
+    if(this.last) {
+      token.prev(this.last);
+      this.last.next(token);
+    }
+    this.last = token;
     temp.push(token);
     this.tokenList.push(token);
     this.index += s.length - 1;

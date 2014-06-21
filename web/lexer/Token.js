@@ -6,6 +6,8 @@ define(function(require, exports, module) {
   var Token = Class(function(type, content, val, sIndex) {
     this.t = type; //token类型
     this.c = content; //token的字面内容，string包括头尾的引号
+    this.pr = null;
+    this.ne = null;
     if(character.isNumber(val)) {
       sIndex = val;
       val = content;
@@ -19,40 +21,52 @@ define(function(require, exports, module) {
     this.si = sIndex; //token在源码字符串中的索引
   }).methods({
     type: function(t) {
-      if(!character.isUndefined(t)) {
+      if(t !== void 0) {
         this.t = t;
       }
       return this.t;
     },
     content: function(c) {
-      if(!character.isUndefined(c)) {
+      if(c !== void 0) {
         this.c = c;
       }
       return this.c;
     },
     val: function(v) {
-      if(!character.isUndefined(v)) {
+      if(v !== void 0) {
         this.v = v;
       }
       return this.v;
     },
     tag: function(t) {
-      if(!character.isUndefined(t)) {
+      if(t !== void 0) {
         this.t = t;
       }
       return Token.type(this.t);
     },
     tid: function(id) {
-      if(!character.isUndefined(id)) {
+      if(id !== void 0) {
         this.id = id;
       }
       return this.id;
     },
     sIndex: function(si) {
-      if(!character.isUndefined(si)) {
+      if(si !== void 0) {
         this.si = si;
       }
       return this.si;
+    },
+    prev: function(t) {
+      if(t !== void 0) {
+        this.pr = t;
+      }
+      return this.pr;
+    },
+    next: function(t) {
+      if(t !== void 0) {
+        this.ne = t;
+      }
+      return this.ne;
     }
   }).statics({
     IGNORE: -2,

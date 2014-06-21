@@ -354,6 +354,11 @@ define(function(require, exports, module) {
                 break;
             }
   
+            if(this.last) {
+              token.prev(this.last);
+              this.last.next(token);
+            }
+            this.last = token;
             temp.push(token);
             this.tokenList.push(token);
             this.index += matchLen - 1;
@@ -386,6 +391,11 @@ define(function(require, exports, module) {
         }
         var s = this.code.slice(this.index - 1, ++j);
         var token = new Token(Token.IGNORE, s, this.index - 1);
+        if(this.last) {
+          token.prev(this.last);
+          this.last.next(token);
+        }
+        this.last = token;
         temp.push(token);
         this.tokenList.push(token);
         this.index = j;
@@ -423,6 +433,11 @@ define(function(require, exports, module) {
       else {
         token = new Token(Token.STRING, s, this.index - 1);
       }
+      if(this.last) {
+        token.prev(this.last);
+        this.last.next(token);
+      }
+      this.last = token;
       temp.push(token);
       this.tokenList.push(token);
       this.index += s.length - 1;
