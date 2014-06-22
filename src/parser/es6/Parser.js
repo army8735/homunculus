@@ -565,7 +565,7 @@ var Parser = IParser.extend(function(lexer) {
       this.match('('),
       this.expr(),
       this.match(')'),
-      this.stmt()
+      this.stmt(yYield)
     );
     if(this.look && this.look.content() == 'else') {
       node.add(
@@ -581,7 +581,7 @@ var Parser = IParser.extend(function(lexer) {
       case 'do':
         node.add(
           this.match(),
-          this.stmt(),
+          this.stmt(yYield),
           this.match('while'),
           this.match('('),
           this.expr(),

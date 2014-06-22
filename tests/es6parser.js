@@ -303,6 +303,17 @@ describe('es6parser', function() {
         parser.parse('[for(yield of b)yield]');
       }).to.throwError();
     });
+    it('yield can not in ungenerator', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('function a(){yield}');
+      }).to.throwError();
+    });
+    it('yield can in generator', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('function *a(){if(false)yield;do yield;while(false);for(;;)yield;}');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.GENDECL,["function","*",JsNode.BINDID,["a"],"(",JsNode.FMPARAMS,[],")","{",JsNode.FNBODY,[JsNode.IFSTMT,["if","(",JsNode.PRMREXPR,["false"],")",JsNode.EXPRSTMT,[JsNode.YIELDEXPR,["yield"],";"]],JsNode.ITERSTMT,["do",JsNode.EXPRSTMT,[JsNode.YIELDEXPR,["yield"],";"],"while","(",JsNode.PRMREXPR,["false"],")",";"],JsNode.ITERSTMT,["for","(",";",";",")",JsNode.EXPRSTMT,[JsNode.YIELDEXPR,["yield"],";"]]],"}"]]]]);
+    });
     it('genmethod', function() {
       var parser = homunculus.getParser('es6');
       var node = parser.parse('class A{*method(){}}');

@@ -566,7 +566,7 @@ define(function(require, exports, module) {
         this.match('('),
         this.expr(),
         this.match(')'),
-        this.stmt()
+        this.stmt(yYield)
       );
       if(this.look && this.look.content() == 'else') {
         node.add(
@@ -582,7 +582,7 @@ define(function(require, exports, module) {
         case 'do':
           node.add(
             this.match(),
-            this.stmt(),
+            this.stmt(yYield),
             this.match('while'),
             this.match('('),
             this.expr(),
