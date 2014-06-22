@@ -349,6 +349,12 @@ describe('es6parser', function() {
         parser.parse('function * a(){');
       }).to.throwError();
     });
+    it('gendecl error 6', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('function *(){}');
+      }).to.throwError();
+    });
     it('yield expr error', function() {
       var parser = homunculus.getParser('es6');
       expect(function() {
@@ -362,8 +368,8 @@ describe('es6parser', function() {
     });
     it('genexpr with yield', function() {
       var parser = homunculus.getParser('es6');
-      var node = parser.parse('function *(){yield}');
-      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.GENDECL,["function","*","(",JsNode.FMPARAMS,[],")","{",JsNode.FNBODY,[JsNode.EXPRSTMT,[JsNode.YIELDEXPR,["yield"]]],"}"]]]]);
+      var node = parser.parse('!function *(){yield}');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.UNARYEXPR,["!",JsNode.PRMREXPR,[JsNode.GENEXPR,["function","*","(",JsNode.FMPARAMS,[],")","{",JsNode.FNBODY,[JsNode.EXPRSTMT,[JsNode.YIELDEXPR,["yield"]]],"}"]]]]]]]);
     });
     it('genexpr error 1', function() {
       var parser = homunculus.getParser('es6');
@@ -1489,8 +1495,8 @@ describe('es6parser', function() {
     });
     it('module decl', function() {
       var parser = homunculus.getParser('es6');
-      var node = parser.parse('export function *(){}');
-      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.MODULEBODY,[JsNode.EXPORTDECL,["export",JsNode.GENDECL,["function","*","(",JsNode.FMPARAMS,[],")","{",JsNode.FNBODY,[],"}"]]]]]);
+      var node = parser.parse('export function *a(){}');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.MODULEBODY,[JsNode.EXPORTDECL,["export",JsNode.GENDECL,["function","*",JsNode.BINDID,["a"],"(",JsNode.FMPARAMS,[],")","{",JsNode.FNBODY,[],"}"]]]]]);
     });
     it('module default', function() {
       var parser = homunculus.getParser('es6');

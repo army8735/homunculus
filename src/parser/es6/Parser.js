@@ -990,12 +990,7 @@ var Parser = IParser.extend(function(lexer) {
       this.match('function'),
       this.match('*')
     );
-    if(!this.look) {
-      this.error('missing formal parameter');
-    }
-    if(this.look.type() == Token.ID) {
-      node.add(this.bindid(null, noIn, noOf));
-    }
+    node.add(this.bindid('missing formal parameter', noIn, noOf));
     node.add(
       this.match('(', 'missing ( before formal parameters'),
       this.fmparams(),
