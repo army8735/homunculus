@@ -24,6 +24,7 @@ define(function(require, exports, module) {
     this.kf = false;
     this.ns = false;
     this.doc = false;
+    this.supports = false;
     this.depth = 0;
   }).methods({
     //@override
@@ -64,7 +65,7 @@ define(function(require, exports, module) {
             switch(token.type()) {
               //@import和@media之后进入值状态
               case Token.HEAD:
-              s = s.replace(/^@(-moz-|-o-|-ms-|-webkit-)/, '@');
+                s = s.replace(/^@(-moz-|-o-|-ms-|-webkit-|-vx-|-hp-|-khtml-|mso-|-prince-|-rim-|-ro-|-tc-|-wap-|-apple-|-atsc-|-ah-)/, '@');
                 switch(s) {
                   case '@import':
                     this.import = true;
@@ -80,6 +81,9 @@ define(function(require, exports, module) {
                     break;
                   case '@document':
                     this.doc = true;
+                    break;
+                  case '@supports':
+                    this.supports = true;
                     break;
                 }
                 this.sel = false;
@@ -103,7 +107,7 @@ define(function(require, exports, module) {
                 this.doc = false;
                 break;
               case Token.KEYWORD:
-                if(!this.value) {
+                if(!this.value || this.supports) {
                   this.kw = true;
                   this.url = false;
                   this.var = false;
@@ -117,7 +121,14 @@ define(function(require, exports, module) {
                 break;
               //将id区分出属性名和属性值
               case Token.ID:
-                if(this.page || this.kf || this.ns) {
+                if(this.number) {
+                  token.type(Token.UNITS);
+                  this.sel = true;
+                  this.url = false;
+                  this.kw = false;
+                  this.var = false;
+                }
+                else if(this.page || this.kf || this.ns) {
                   this.sel = true;
                   this.url = false;
                   this.kw = false;
@@ -133,6 +144,14 @@ define(function(require, exports, module) {
                   token.type(Token.VARS);
                   this.url = false;
                   this.var = false;
+                }
+                else if(this.supports) {
+                  if(this.rule.keyWords().hasOwnProperty(s)) {
+                    token.type(Token.KEYWORD);
+                  }
+                  else {
+                    token.type(Token.PROPERTY);
+                  }
                 }
                 else if(this.value) {
                   if(this.rule.colors().hasOwnProperty(s)) {
@@ -270,6 +289,7 @@ define(function(require, exports, module) {
                     this.url = false;
                     this.sel = true;
                     this.var = false;
+                    this.supports = false;
                     break;
                   case '}':
                     this.value = false;

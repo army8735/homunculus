@@ -121,7 +121,60 @@ define(function(require, exports, module) {
           return this.namespace();
         case '@document':
           return this.doc();
+        case '@counter-style':
+          return this.ctstyle();
+        case '@viewport':
+          return this.viewport();
+        case '@supports':
+          return this.supports();
       }
+    },
+    supports: function() {
+      var node = new Node(Node.SUPPORTS);
+      node.add(this.match());
+      while(this.look && this.look.content() != '{') {
+        node.add(this.cndt());
+      }
+      node.add(this.sheet());
+      return node;
+    },
+    cndt: function() {
+      var node = new Node(Node.CNDT);
+      if(!this.look) {
+        this.error();
+      }
+      switch(this.look.content().toLowerCase()) {
+        case 'and':
+        case 'not':
+        case 'or':
+          node.add(this.match());
+          node.add(this.cndt());
+          break;
+        case '(':
+          node.add(
+            this.match(),
+            this.cndt(),
+            this.match(')')
+          );
+          break;
+        default:
+          node.add(this.style(null, true, true));
+          break;
+      }
+      return node;
+    },
+    viewport: function() {
+      var node = new Node(Node.VIEWPORT);
+      node.add(this.match());
+      node.add(this.block());
+      return node;
+    },
+    ctstyle: function() {
+      var node = new Node(Node.CTSTYLE);
+      node.add(this.match());
+      node.add(this.match(Token.ID));
+      node.add(this.block());
+      return node;
     },
     impt: function() {
       var node = new Node(Node.IMPORT);
@@ -368,15 +421,17 @@ define(function(require, exports, module) {
       node.add(this.match('}'));
       return node;
     },
-    style: function(name) {
+    style: function(name, noP, noS) {
       var node = new Node(Node.STYLE);
       node.add(this.key(name));
       node.add(this.match(':'));
-      node.add(this.value());
+      node.add(this.value(noP));
       while(this.look && this.look.type() == Token.HACK) {
         node.add(this.match());
       }
-      node.add(this.match(';'));
+      if(!noS) {
+        node.add(this.match(';'));
+      }
       return node;
     },
     key: function(name) {

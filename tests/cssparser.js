@@ -155,7 +155,7 @@ describe('cssparser', function() {
     it('@media ignore unknow', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('@media screen,3D{}');
-      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.MEDIA,["@media",CssNode.MEDIAQLIST,[CssNode.MEDIAQUERY,[CssNode.MEDIATYPE,["screen"]],",",CssNode.MEDIAQUERY,[CssNode.MEDIATYPE,["3","D","{"]]]],"}"]]);
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.MEDIA,["@media",CssNode.MEDIAQLIST,[CssNode.MEDIAQUERY,[CssNode.MEDIATYPE,["screen"]],",",CssNode.MEDIAQUERY,[CssNode.MEDIATYPE,["3","D"]]],CssNode.BLOCK,["{","}"]]]]);
     });
     it('@media hack 1', function() {
       var parser = homunculus.getParser('css');
@@ -333,6 +333,21 @@ describe('cssparser', function() {
       expect(function() {
         parser.parse('@-moz-document a({}');
       }).to.throwError();
+    });
+    it('@viewport', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@viewport{width:0}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.VIEWPORT,["@viewport",CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["width"],":",CssNode.VALUE,["0"]],"}"]]]]);
+    });
+    it('@counter-style', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@counter-style a{width:0}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.CTSTYLE,["@counter-style","a",CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["width"],":",CssNode.VALUE,["0"]],"}"]]]]);
+    });
+    it('@supports', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@supports not(transform-origin:2px){}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.SUPPORTS,["@supports",CssNode.CNDT,["not",CssNode.CNDT,["(",CssNode.CNDT,[CssNode.STYLE,[CssNode.KEY,["transform-origin"],":",CssNode.VALUE,["2","px"]]],")"]],CssNode.SHEET,["}"]]]]);
     });
     it('$ is variable', function() {
       var parser = homunculus.getParser('css');

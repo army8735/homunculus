@@ -3,6 +3,10 @@ src2web:
 
 test: src2web test-api test-jslexer test-jsparser test-jscontext test-es6parser test-csslexer test-cssparser
 
+test-js: test-jslexer test-jsparser
+test-es6: test-jslexer test-es6parser
+test-css: test-csslexer test-cssparser
+
 test-api:
 	@mocha tests/api.js -R spec
 

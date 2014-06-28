@@ -135,6 +135,7 @@ seajs.use(['../index.js', './jssc'], function(Homunculus, jssc) {
 	var ta = document.getElementById('ta');
 	var input = document.getElementById('btn');
 	input.onclick = function() {
+    console.clear();
 		var s = ta.value;
     $('code').html(s);
     $('div.jssc').remove();
@@ -173,10 +174,8 @@ seajs.use(['../index.js', './jssc'], function(Homunculus, jssc) {
     var s = location.hash.replace(/^#/, '');
     if(s) {
       s = decodeURIComponent(s);
-      if(s != ta.value) {
-        ta.value = s;
-        input.onclick();
-      }
+      ta.value = s;
+      input.onclick();
     }
   }
   hashChange();

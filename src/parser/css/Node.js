@@ -36,6 +36,10 @@ var Node = INode.extend(function(type, children) {
   FNC: 'fncall',
   CPARAMS: 'cparams',
   CPARAM: 'cparam',
+  CTSTYLE: 'ctstyle',
+  VIEWPORT: 'viewport',
+  SUPPORTS: 'supports',
+  CNDT: 'cndt',
   getKey: function(s) {
     if(!s) {
       throw new Error('empty value');
