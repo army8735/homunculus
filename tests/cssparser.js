@@ -349,6 +349,12 @@ describe('cssparser', function() {
       var node = parser.parse('@supports not(transform-origin:2px){}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.SUPPORTS,["@supports",CssNode.CNDT,["not",CssNode.CNDT,["(",CssNode.CNDT,[CssNode.STYLE,[CssNode.KEY,["transform-origin"],":",CssNode.VALUE,["2","px"]]],")"]],CssNode.SHEET,["}"]]]]);
     });
+    it('@supports error', function() {
+      var parser = homunculus.getParser('css');
+      expect(function() {
+        parser.parse('@supports not(');
+      }).to.throwError();
+    });
     it('$ is variable', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('body{width:$a}');

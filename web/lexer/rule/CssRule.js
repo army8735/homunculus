@@ -91,7 +91,13 @@ define(function(require, exports, module) {
         '@viewport': true,
         '@supports': true,
         '@region': true,
-        '@navigation': true
+        '@navigation': true,
+        '@footnote': true,
+        '@layout': true,
+        '@top': true,
+        '@top-left': true,
+        '@top-center': true,
+        '@top-right': true
       }.hasOwnProperty(s)) {
         token.type(Token.VARS);
       }
