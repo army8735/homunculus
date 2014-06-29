@@ -447,7 +447,7 @@ var Parser = IParser.extend(function(lexer) {
       this.error();
     }
     var s = this.look.content().toLowerCase();
-    if([Token.HACK, Token.VARS, Token.ID, Token.PROPERTY, Token.NUMBER, Token.STRING, Token.HEAD, Token.SIGN, Token.UNITS, Token.KEYWORD].indexOf(this.look.type()) > -1
+    if([Token.COLOR, Token.HACK, Token.VARS, Token.ID, Token.PROPERTY, Token.NUMBER, Token.STRING, Token.HEAD, Token.SIGN, Token.UNITS, Token.KEYWORD].indexOf(this.look.type()) > -1
       && [';', '}'].indexOf(s) == -1) {
       switch(s) {
         case 'url':
@@ -474,6 +474,9 @@ var Parser = IParser.extend(function(lexer) {
         case 'min':
           node.add(this.minmax());
           break;
+        case 'linear-gradient':
+          node.add(this.lg());
+          break;
         default:
           node.add(this.match());
           break;
@@ -484,7 +487,7 @@ var Parser = IParser.extend(function(lexer) {
     }
     while(this.look) {
       s = this.look.content().toLowerCase();
-      if([Token.HACK, Token.VARS, Token.ID, Token.PROPERTY, Token.NUMBER, Token.STRING, Token.HEAD, Token.KEYWORD, Token.SIGN, Token.UNITS, Token.KEYWORD].indexOf(this.look.type()) > -1
+      if([Token.COLOR, Token.HACK, Token.VARS, Token.ID, Token.PROPERTY, Token.NUMBER, Token.STRING, Token.HEAD, Token.KEYWORD, Token.SIGN, Token.UNITS, Token.KEYWORD].indexOf(this.look.type()) > -1
         && [';', '}'].indexOf(this.look.content()) == -1) {
         if(noP && this.look.content() == ')') {
           break;
@@ -508,14 +511,17 @@ var Parser = IParser.extend(function(lexer) {
           case 'hsla':
             node.add(this.hsl(true));
             break;
-          default:
-            node.add(this.match());
-            break;
           case 'min':
             node.add(this.minmax());
             break;
           case 'max':
             node.add(this.minmax(true));
+            break;
+          case 'linear-gradient':
+            node.add(this.lg());
+            break;
+          default:
+            node.add(this.match());
             break;
         }
       }
@@ -525,6 +531,92 @@ var Parser = IParser.extend(function(lexer) {
     }
     if(this.look && this.look.type() == Token.IMPORTANT) {
       node.add(this.match());
+    }
+    return node;
+  },
+  lg: function() {
+    var node = new Node(Node.LINEARGRADIENT);
+    node.add(
+      this.match(),
+      this.match('(')
+    );
+    if(!this.look) {
+      this.error();
+    }
+    switch(this.look.type()) {
+      case Token.NUMBER:
+      case Token.PROPERTY:
+      case Token.ID:
+        node.add(this.point());
+        node.add(this.match(','));
+        break;
+    }
+    node.add(
+      this.colorstop(),
+      this.match(','),
+      this.colorstop()
+    );
+    while(this.look && this.look.content() == ',') {
+      node.add(
+        this.match(),
+        this.colorstop()
+      );
+    }
+    node.add(this.match(')'));
+    return node;
+  },
+  point: function() {
+    var node = new Node(Node.POINT);
+    if(this.look.type() == Token.NUMBER) {
+      node.add(
+        this.match(),
+        this.match('deg')
+      );
+    }
+    else {
+      if(this.look && this.look.content().toLowerCase() == 'to') {
+        node.add(this.match());
+      }
+      node.add(this.match(['left', 'right', 'top', 'bottom']));
+      if(this.look && this.look.content().toLowerCase() == 'to') {
+        node.add(this.match());
+      }
+      if(this.look && this.look.type() == Token.PROPERTY) {
+        node.add(this.match(['left', 'right', 'top', 'bottom']));
+      }
+    }
+    return node;
+  },
+  colorstop: function() {
+    var node = new Node(Node.COLORSTOP);
+    if(!this.look) {
+      this.error();
+    }
+    if(this.look.type() == Token.COLOR) {
+      node.add(this.match(Token.COLOR));
+    }
+    else {
+      switch(this.look.content()) {
+        case 'rgb':
+          node.add(this.rgb());
+          break;
+        case 'rgba':
+          node.add(this.rgb(true));
+          break;
+        case 'hsl':
+          node.add(this.hsl());
+          break;
+        case 'hsla':
+          node.add(this.hsl(true));
+          break;
+        default:
+          this.error();
+      }
+    }
+    if(this.look
+      && this.look.type() == Token.NUMBER) {
+      node.add(this.match());
+      node.add(this.match(Token.UNITS));
     }
     return node;
   },
@@ -546,7 +638,7 @@ var Parser = IParser.extend(function(lexer) {
   param: function() {
     var node = new Node(Node.PARAM);
     var s = this.look.content().toLowerCase();
-    if([Token.HACK, Token.VARS, Token.ID, Token.PROPERTY, Token.NUMBER, Token.STRING, Token.HEAD, Token.SIGN, Token.UNITS, Token.KEYWORD].indexOf(this.look.type()) > -1
+    if([Token.COLOR, Token.HACK, Token.VARS, Token.ID, Token.PROPERTY, Token.NUMBER, Token.STRING, Token.HEAD, Token.SIGN, Token.UNITS, Token.KEYWORD].indexOf(this.look.type()) > -1
       && [';', '}', ')', ','].indexOf(s) == -1) {
       node.add(this.match());
     }
@@ -555,7 +647,7 @@ var Parser = IParser.extend(function(lexer) {
     }
     while(this.look) {
       s = this.look.content().toLowerCase();
-      if([Token.HACK, Token.VARS, Token.ID, Token.PROPERTY, Token.NUMBER, Token.STRING, Token.HEAD, Token.KEYWORD, Token.SIGN, Token.UNITS, Token.KEYWORD].indexOf(this.look.type()) > -1
+      if([Token.COLOR, Token.HACK, Token.VARS, Token.ID, Token.PROPERTY, Token.NUMBER, Token.STRING, Token.HEAD, Token.KEYWORD, Token.SIGN, Token.UNITS, Token.KEYWORD].indexOf(this.look.type()) > -1
         && [';', '}', ')', ','].indexOf(this.look.content()) == -1) {
         node.add(this.match());
       }

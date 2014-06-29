@@ -462,6 +462,21 @@ describe('cssparser', function() {
       var node = parser.parse('p{color:min(1+2, 100)}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["p"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["color"],":",CssNode.VALUE,[CssNode.MIN,["min","(",CssNode.PARAM,["1","+","2"],",",CssNode.PARAM,["100"],")"]]],"}"]]]]);
     });
+    it('linear-gradient 1', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('p{background:linear-gradient(#fff,#333)}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["p"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["background"],":",CssNode.VALUE,[CssNode.LINEARGRADIENT,["linear-gradient","(",CssNode.COLORSTOP,["#fff"],",",CssNode.COLORSTOP,["#333"],")"]]],"}"]]]]);
+    });
+    it('linear-gradient 2', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('p{background:linear-gradient(to right,#fff 10%,#333,red)}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["p"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["background"],":",CssNode.VALUE,[CssNode.LINEARGRADIENT,["linear-gradient","(",CssNode.POINT,["to","right"],",",CssNode.COLORSTOP,["#fff","10","%"],",",CssNode.COLORSTOP,["#333"],",",CssNode.COLORSTOP,["red"],")"]]],"}"]]]]);
+    });
+    it('linear-gradient 3', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('p{background:linear-gradient(45deg,#fff 10%,transparent)}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["p"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["background"],":",CssNode.VALUE,[CssNode.LINEARGRADIENT,["linear-gradient","(",CssNode.POINT,["45","deg"],",",CssNode.COLORSTOP,["#fff","10","%"],",",CssNode.COLORSTOP,["transparent"],")"]]],"}"]]]]);
+    });
   });
   describe('lib test', function() {
     it('bootstrap', function() {

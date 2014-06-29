@@ -26,6 +26,8 @@ var Node = INode.extend(function(type, children) {
   PAGE: 'page',
   URL: 'url',
   LINEARGRADIENT: 'lineargradient',
+  POINT: 'point',
+  COLORSTOP: 'colorstop',
   LENGTH: 'length',
   RGB: 'rgb',
   RGBA: 'rgba',

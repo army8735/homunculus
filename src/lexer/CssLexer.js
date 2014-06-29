@@ -118,6 +118,11 @@ var CssLexer = Lexer.extend(function(rule) {
                 this.doc = false;
               }
               break;
+            case Token.COLOR:
+              if(!this.value) {
+                token.type(Token.SELECTOR);
+              }
+              break;
             //将id区分出属性名和属性值
             case Token.ID:
               if(this.number) {
@@ -154,7 +159,7 @@ var CssLexer = Lexer.extend(function(rule) {
               }
               else if(this.value) {
                 if(this.rule.colors().hasOwnProperty(s)) {
-                  token.type(Token.NUMBER);
+                  token.type(Token.COLOR);
                   this.url = false;
                   this.var = false;
                 }

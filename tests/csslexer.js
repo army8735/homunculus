@@ -202,19 +202,19 @@ describe('csslexer', function() {
         var lexer = homunculus.getLexer('css');
         var tokens = lexer.parse('color:#333');
         expect(join(tokens)).to.eql(['color', ':', '#333']);
-        expect(type(tokens)).to.eql([10, 8, 4]);
+        expect(type(tokens)).to.eql([10, 8, 23]);
       });
       it('#number', function(){
         var lexer = homunculus.getLexer('css');
         var tokens = lexer.parse('p{color:#333}');
         expect(join(tokens)).to.eql(['p', '{', 'color', ':', '#333', '}']);
-        expect(type(tokens)).to.eql([21, 8, 10, 8, 4, 8]);
+        expect(type(tokens)).to.eql([21, 8, 10, 8, 23, 8]);
       });
       it('color', function(){
         var lexer = homunculus.getLexer('css');
         var tokens = lexer.parse('p{color:red}');
         expect(join(tokens)).to.eql(['p', '{', 'color', ':', 'red', '}']);
-        expect(type(tokens)).to.eql([21, 8, 10, 8, 4, 8]);
+        expect(type(tokens)).to.eql([21, 8, 10, 8, 23, 8]);
       });
       it('!important', function() {
         var lexer = homunculus.getLexer('css');
