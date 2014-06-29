@@ -431,7 +431,27 @@ describe('cssparser', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('p{[;width:0;];}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["p"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["[",";","width"],":",CssNode.VALUE,["0"],";","]",";"],"}"]]]]);
-    })
+    });
+    it('rgb', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('p{color:rgb(0, 0, 255)}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["p"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["color"],":",CssNode.VALUE,[CssNode.RGB,["rgb","(","0",",","0",",","255",")"]]],"}"]]]]);
+    });
+    it('rgba', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('p{color:rgba(0, 0, 255, 0.5)}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["p"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["color"],":",CssNode.VALUE,[CssNode.RGBA,["rgba","(","0",",","0",",","255",",","0.5",")"]]],"}"]]]]);
+    });
+    it('hsl', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('p{color:hsl(0, 5%, 100%)}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["p"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["color"],":",CssNode.VALUE,[CssNode.HSL,["hsl","(","0",",","5","%",",","100","%",")"]]],"}"]]]]);
+    });
+    it('hsla', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('p{color:hsla(0, 5%, 100%, 0.2)}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["p"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["color"],":",CssNode.VALUE,[CssNode.HSLA,["hsla","(","0",",","5","%",",","100","%",",","0.2",")"]]],"}"]]]] );
+    });
   });
   describe('lib test', function() {
     it('bootstrap', function() {

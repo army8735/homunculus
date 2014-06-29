@@ -450,11 +450,28 @@ define(function(require, exports, module) {
       var s = this.look.content().toLowerCase();
       if([Token.HACK, Token.VARS, Token.ID, Token.PROPERTY, Token.NUMBER, Token.STRING, Token.HEAD, Token.SIGN, Token.UNITS, Token.KEYWORD].indexOf(this.look.type()) > -1
         && [';', '}'].indexOf(s) == -1) {
-        if(s == 'url') {
-          node.add(this.url());
-        }
-        else {
-          node.add(this.match());
+        switch(s) {
+          case 'url':
+            node.add(this.url());
+            break;
+          case 'format':
+            node.add(this.format());
+            break;
+          case 'rgb':
+            node.add(this.rgb());
+            break;
+          case 'rgba':
+            node.add(this.rgb(true));
+            break;
+          case 'hsl':
+            node.add(this.hsl());
+            break;
+          case 'hsla':
+            node.add(this.hsl(true));
+            break;
+          default:
+            node.add(this.match());
+            break;
         }
       }
       else {
@@ -467,14 +484,28 @@ define(function(require, exports, module) {
           if(noP && this.look.content() == ')') {
             break;
           }
-          if(s == 'url') {
-            node.add(this.url());
-          }
-          else if(s == 'format') {
-            node.add(this.format());
-          }
-          else {
-            node.add(this.match());
+          switch(s) {
+            case 'url':
+              node.add(this.url());
+              break;
+            case 'format':
+              node.add(this.format());
+              break;
+            case 'rgb':
+              node.add(this.rgb());
+              break;
+            case 'rgba':
+              node.add(this.rgb(true));
+              break;
+            case 'hsl':
+              node.add(this.hsl());
+              break;
+            case 'hsla':
+              node.add(this.hsl(true));
+              break;
+            default:
+              node.add(this.match());
+              break;
           }
         }
         else {
@@ -484,6 +515,48 @@ define(function(require, exports, module) {
       if(this.look && this.look.type() == Token.IMPORTANT) {
         node.add(this.match());
       }
+      return node;
+    },
+    rgb: function(alpha) {
+      var node = new Node(alpha ? Node.RGBA : Node.RGB);
+      node.add(
+        this.match(),
+        this.match('('),
+        this.match(Token.NUMBER),
+        this.match(','),
+        this.match(Token.NUMBER),
+        this.match(','),
+        this.match(Token.NUMBER)
+      );
+      if(alpha) {
+        node.add(
+          this.match(','),
+          this.match(Token.NUMBER)
+        );
+      }
+      node.add(this.match(')'));
+      return node;
+    },
+    hsl: function(alpha) {
+      var node = new Node(alpha ? Node.HSLA : Node.HSL);
+      node.add(
+        this.match(),
+        this.match('('),
+        this.match(Token.NUMBER),
+        this.match(','),
+        this.match(Token.NUMBER),
+        this.match('%'),
+        this.match(','),
+        this.match(Token.NUMBER),
+        this.match('%')
+      );
+      if(alpha) {
+        node.add(
+          this.match(','),
+          this.match(Token.NUMBER)
+        );
+      }
+      node.add(this.match(')'));
       return node;
     },
     url: function(ellipsis) {
