@@ -468,6 +468,12 @@ var Parser = IParser.extend(function(lexer) {
         case 'hsla':
           node.add(this.hsl(true));
           break;
+        case 'max':
+          node.add(this.minmax(true));
+          break;
+        case 'min':
+          node.add(this.minmax());
+          break;
         default:
           node.add(this.match());
           break;
@@ -505,6 +511,12 @@ var Parser = IParser.extend(function(lexer) {
           default:
             node.add(this.match());
             break;
+          case 'min':
+            node.add(this.minmax());
+            break;
+          case 'max':
+            node.add(this.minmax(true));
+            break;
         }
       }
       else {
@@ -513,6 +525,43 @@ var Parser = IParser.extend(function(lexer) {
     }
     if(this.look && this.look.type() == Token.IMPORTANT) {
       node.add(this.match());
+    }
+    return node;
+  },
+  minmax: function(max) {
+    var node = new Node(max ? Node.MAX : Node.MIN);
+    node.add(
+      this.match(),
+      this.match('(')
+    );
+    while(this.look && this.look.content() != ')') {
+      node.add(this.param());
+      if(this.look && this.look.content() == ',') {
+        node.add(this.match());
+      }
+    }
+    node.add(this.match(')'));
+    return node;
+  },
+  param: function() {
+    var node = new Node(Node.PARAM);
+    var s = this.look.content().toLowerCase();
+    if([Token.HACK, Token.VARS, Token.ID, Token.PROPERTY, Token.NUMBER, Token.STRING, Token.HEAD, Token.SIGN, Token.UNITS, Token.KEYWORD].indexOf(this.look.type()) > -1
+      && [';', '}', ')', ','].indexOf(s) == -1) {
+      node.add(this.match());
+    }
+    else {
+      this.error();
+    }
+    while(this.look) {
+      s = this.look.content().toLowerCase();
+      if([Token.HACK, Token.VARS, Token.ID, Token.PROPERTY, Token.NUMBER, Token.STRING, Token.HEAD, Token.KEYWORD, Token.SIGN, Token.UNITS, Token.KEYWORD].indexOf(this.look.type()) > -1
+        && [';', '}', ')', ','].indexOf(this.look.content()) == -1) {
+        node.add(this.match());
+      }
+      else {
+        break;
+      }
     }
     return node;
   },
