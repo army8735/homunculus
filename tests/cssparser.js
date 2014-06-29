@@ -447,6 +447,23 @@ describe('cssparser', function() {
       var node = parser.parse('p{color:hsl(0, 5%, 100%)}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["p"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["color"],":",CssNode.VALUE,[CssNode.HSL,["hsl","(","0",",","5","%",",","100","%",")"]]],"}"]]]]);
     });
+    it('hsl zero', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('p{color:hsl(0, 0, 100%)}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["p"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["color"],":",CssNode.VALUE,[CssNode.HSL,["hsl","(","0",",","0",",","100","%",")"]]],"}"]]]]);
+    });
+    it('hsl units error 1', function() {
+      var parser = homunculus.getParser('css');
+      expect(function() {
+        parser.parse('p{color:hsl(0, 3, 100%)}')
+      }).to.throwError();
+    });
+    it('hsl units error 2', function() {
+      var parser = homunculus.getParser('css');
+      expect(function() {
+        parser.parse('p{color:hsl(0, 3%, 100deg)}')
+      }).to.throwError();
+    });
     it('hsla', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('p{color:hsla(0, 5%, 100%, 0.2)}');
@@ -476,6 +493,16 @@ describe('cssparser', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('p{background:linear-gradient(45deg,#fff 10%,transparent)}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["p"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["background"],":",CssNode.VALUE,[CssNode.LINEARGRADIENT,["linear-gradient","(",CssNode.POINT,["45","deg"],",",CssNode.COLORSTOP,["#fff","10","%"],",",CssNode.COLORSTOP,["transparent"],")"]]],"}"]]]]);
+    });
+    it('radial-gradient 1', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('p{color:radial-gradient(circle,#f00,#ff0,#080)}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["p"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["color"],":",CssNode.VALUE,[CssNode.RADIOGRADIENT,["radial-gradient","(","circle",",",CssNode.COLORSTOP,["#f00"],",",CssNode.COLORSTOP,["#ff0"],",",CssNode.COLORSTOP,["#080"],")"]]],"}"]]]]);
+    });
+    it('radial-gradient 2', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('p{color:radial-gradient(50%, 10% 20%,#f00,#ff0,#080)}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["p"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["color"],":",CssNode.VALUE,[CssNode.RADIOGRADIENT,["radial-gradient","(",CssNode.POS,[CssNode.LEN,["50","%"]],",",CssNode.LEN,["10","%"],CssNode.LEN,["20","%"],",",CssNode.COLORSTOP,["#f00"],",",CssNode.COLORSTOP,["#ff0"],",",CssNode.COLORSTOP,["#080"],")"]]],"}"]]]]);
     });
   });
   describe('lib test', function() {

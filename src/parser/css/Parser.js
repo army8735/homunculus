@@ -475,7 +475,12 @@ var Parser = IParser.extend(function(lexer) {
           node.add(this.minmax());
           break;
         case 'linear-gradient':
+        case 'repeating-linear-gradient':
           node.add(this.lg());
+          break;
+        case 'radial-gradient':
+        case 'repeating-radial-gradient':
+          node.add(this.rg());
           break;
         default:
           node.add(this.match());
@@ -518,7 +523,12 @@ var Parser = IParser.extend(function(lexer) {
             node.add(this.minmax(true));
             break;
           case 'linear-gradient':
+          case 'repeating-linear-gradient':
             node.add(this.lg());
+            break;
+          case 'radial-gradient':
+          case 'repeating-radial-gradient':
+            node.add(this.rg());
             break;
           default:
             node.add(this.match());
@@ -531,6 +541,70 @@ var Parser = IParser.extend(function(lexer) {
     }
     if(this.look && this.look.type() == Token.IMPORTANT) {
       node.add(this.match());
+    }
+    return node;
+  },
+  rg: function() {
+    var node = new Node(Node.RADIOGRADIENT);
+    node.add(
+      this.match(),
+      this.match('(')
+    );
+    if(!this.look) {
+      this.error();
+    }
+    if(this.look.type() == Token.NUMBER
+      || ['left', 'center', 'right'].indexOf(this.look.content().toLowerCase()) > -1) {
+      node.add(this.pos());
+      node.add(this.match(','));
+    }
+    if(!this.look) {
+      this.error();
+    }
+    if(this.look.type() == Token.NUMBER) {
+      node.add(this.len());
+      node.add(this.len());
+    }
+    else {
+      node.add(this.match(['circle', 'ellipse', 'closest-side', 'closest-corner', 'farthest-side', 'farthest-corner', 'contain', 'cover']));
+    }
+    node.add(this.match(','), this.colorstop());
+    while(this.look && this.look.content() == ',') {
+      node.add(
+        this.match(),
+        this.colorstop()
+      );
+    }
+    node.add(this.match(')'));
+    return node;
+  },
+  pos: function() {
+    var node = new Node(Node.POS);
+    if(this.look.type() == Token.NUMBER) {
+      node.add(this.len());
+    }
+    else {
+      node.add(this.match(['left', 'center', 'right']));
+    }
+    if(this.look) {
+      if(this.look.type() == Token.NUMBER) {
+        node.add(this.len());
+      }
+      else if(['left', 'center', 'right'].indexOf(this.look.content().toLowerCase()) > -1){
+        node.add(this.match());
+      }
+    }
+    return node;
+  },
+  len: function() {
+    var node = new Node(Node.LEN);
+    var isZeror = this.look.content() == '0';
+    node.add(this.match(Token.NUMBER));
+    if(this.look && this.look.type() == Token.UNITS) {
+      node.add(this.match());
+    }
+    else if(!isZeror) {
+      this.error();
     }
     return node;
   },
@@ -615,8 +689,14 @@ var Parser = IParser.extend(function(lexer) {
     }
     if(this.look
       && this.look.type() == Token.NUMBER) {
+      var isZero = this.look.content() == '0';
       node.add(this.match());
-      node.add(this.match(Token.UNITS));
+      if(this.look && this.look.type() == Token.UNITS) {
+        node.add(this.match());
+      }
+      else if(!isZero) {
+        this.error();
+      }
     }
     return node;
   },
@@ -683,13 +763,25 @@ var Parser = IParser.extend(function(lexer) {
       this.match(),
       this.match('('),
       this.match(Token.NUMBER),
-      this.match(','),
-      this.match(Token.NUMBER),
-      this.match('%'),
-      this.match(','),
-      this.match(Token.NUMBER),
-      this.match('%')
+      this.match(',')
     );
+    var isZero = this.look && this.look.content() == '0';
+    node.add(this.match(Token.NUMBER));
+    if(this.look && this.look.content() == '%') {
+      node.add(this.match());
+    }
+    else if(!isZero) {
+      this.error();
+    }
+    node.add(this.match(','));
+    var isZero = this.look && this.look.content() == '0';
+    node.add(this.match(Token.NUMBER));
+    if(this.look && this.look.content() == '%') {
+      node.add(this.match());
+    }
+    else if(!isZero) {
+      this.error();
+    }
     if(alpha) {
       node.add(
         this.match(','),
