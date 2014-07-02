@@ -1101,6 +1101,16 @@ describe('es6parser', function() {
       var node = parser.parse('for(let a in {});');
       expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.ITERSTMT,["for","(","let",JsNode.BINDID,["a"],"in",JsNode.PRMREXPR,[JsNode.OBJLTR,["{","}"]],")",JsNode.EMPTSTMT,[";"]]]]]);
     });
+    it('forstmt 10', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('for(var [a] of o){}');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.ITERSTMT,["for","(","var",JsNode.ARRBINDPAT,["[",JsNode.SINGLENAME,[JsNode.BINDID,["a"]],"]"],"of",JsNode.PRMREXPR,["o"],")",JsNode.BLOCKSTMT,[JsNode.BLOCK,["{","}"]]]]]]);
+    });
+    it('forstmt 11', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('for({a,b} of o){}');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.ITERSTMT,["for","(",JsNode.PRMREXPR,[JsNode.OBJLTR,["{",JsNode.PROPTDEF,["a"],",",JsNode.PROPTDEF,["b"],"}"]],"of",JsNode.PRMREXPR,["o"],")",JsNode.BLOCKSTMT,[JsNode.BLOCK,["{","}"]]]]]]);
+    });
     it('forstmt missing expr', function() {
       var parser = homunculus.getParser('es6');
       expect(function() {

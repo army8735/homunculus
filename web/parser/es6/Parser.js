@@ -615,7 +615,7 @@ define(function(require, exports, module) {
               var token = this.tokens[i];
               if(!S[token.type()]) {
                 //直接指向forbind
-                if(['{', ']'].indexOf(token.content()) > -1) {
+                if(['{', '['].indexOf(token.content()) > -1) {
                   node.add(
                     this.match(),
                     this.forbind()
