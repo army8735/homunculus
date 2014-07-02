@@ -1,5 +1,5 @@
 # A lexer&parser by Javascript
-> `homunculus`取自`钢之炼金术师``人造人`，英语亦作`小矮人`，意指底层基石再造
+> `homunculus`取自`钢之炼金术师`人造人`，英语亦作`小矮人`，意指底层基石再造
 
 [![NPM version](https://badge.fury.io/js/homunculus.png)](https://npmjs.org/package/homunculus)
 [![Build Status](https://travis-ci.org/army8735/homunculus.svg?branch=master)](https://travis-ci.org/army8735/homunculus)
