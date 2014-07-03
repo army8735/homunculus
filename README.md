@@ -1,4 +1,4 @@
-## A lexer&parser by Javascript
+# A lexer&parser by Javascript
 
 `homunculus`取自`钢之炼金术师`中的`人造人`，英语亦作`小矮人`，意指底层基石再造
 
