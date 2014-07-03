@@ -1518,6 +1518,11 @@ describe('es6parser', function() {
       var node = parser.parse('var module');
       expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.VARSTMT,["var",JsNode.VARDECL,[JsNode.BINDID,["module"]]]]]]);
     });
+    it('module be an object', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('module.exports');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.MMBEXPR,[JsNode.PRMREXPR,["module"],".","exports"]]]]]);
+    });
     it('module error 1', function() {
       var parser = homunculus.getParser('es6');
       expect(function() {

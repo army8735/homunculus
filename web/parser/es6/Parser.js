@@ -80,8 +80,17 @@ define(function(require, exports, module) {
     },
     moduleitem: function() {
       if(this.look.content() == 'module') {
-        this.module = true;
-        return this.moduleimport();
+        //根据LL2分辨是es6 module语法还是module.exports等语法
+        for(var i = this.index; i < this.length; i++) {
+          var next = this.tokens[i];
+          if(!S[next.type()]) {
+            if(next.type() == Token.ID) {
+              this.module = true;
+              return this.moduleimport();
+            }
+            break;
+          }
+        }
       }
       else if(this.look.content() == 'import') {
         this.module = true;
@@ -91,9 +100,7 @@ define(function(require, exports, module) {
         this.module = true;
         return this.exportdecl();
       }
-      else {
-        return this.stmtlitem();
-      }
+      return this.stmtlitem();
     },
     importdecl: function() {
       var node = new Node(Node.IMPORTDECL);
