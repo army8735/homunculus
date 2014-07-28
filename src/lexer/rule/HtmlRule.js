@@ -7,7 +7,7 @@ var HtmlRule = Rule.extend(function() {
   var self = this;
   Rule.call(self, HtmlRule.KEYWORDS);
 
-  self.addMatch(new CompleteEqual(Token.HEAD, '<!DOCTYPE>', null, true));
+  self.addMatch(new CompleteEqual(Token.HEAD, '!DOCTYPE', null, true));
   self.addMatch(new LineSearch(Token.COMMENT, '<!--', '-->', true));
   self.addMatch(new LineSearch(Token.STRING, '"', '"', true));
   self.addMatch(new LineSearch(Token.STRING, "'", "'", true));
