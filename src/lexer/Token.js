@@ -94,6 +94,7 @@ var Token = Class(function(type, content, val, sIndex) {
   SELECTOR: 21,
   ATTR: 22,
   COLOR: 23,
+  DATA: 24,
   type: function(tag) {
     if(character.isUndefined(types)) {
       types = [];
