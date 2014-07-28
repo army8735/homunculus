@@ -95,6 +95,8 @@ define(function(require, exports, module) {
     SELECTOR: 21,
     ATTR: 22,
     COLOR: 23,
+    DATA: 24,
+    TEXT: 25,
     type: function(tag) {
       if(character.isUndefined(types)) {
         types = [];

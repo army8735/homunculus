@@ -14,6 +14,7 @@ var HtmlLexer = Class(function(rule) {
     this.totalLine = 1; //总行数
     this.colNum = 0; //列
     this.colMax = 0; //最大列数
+    this.state = false; //是否在<>状态中
     this.last = null;
   },
   parse: function(code) {
@@ -31,6 +32,27 @@ var HtmlLexer = Class(function(rule) {
     return this.tokenList;
   },
   scan: function(temp) {
+    var length = this.code.length;
+    var count = 0;
+    outer:
+    while(this.index < length) {
+      if(this.cacheLine > 0 && count >= this.cacheLine) {
+        break;
+      }
+      if(this.state) {
+        this.readch();
+      }
+      else {
+        var end = this.code.indexOf('<', this.index);
+        if(end == -1) {
+          end = length;
+          var s = this.code.slice(this.index, end);
+          var text = new Token(Token.TEXT, s, s, this.index);
+          temp.push(text);
+          this.tokenList.push(text);
+        }
+      }
+    }
     return this;
   },
   readch: function() {

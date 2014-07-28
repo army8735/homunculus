@@ -2,10 +2,17 @@ var Rule = require('./Rule');
 var LineSearch = require('../match/LineSearch');
 var CompleteEqual = require('../match/CompleteEqual');
 var RegMatch = require('../match/RegMatch');
+var character = require('../../util/character');
 var Token = require('../Token');
 var HtmlRule = Rule.extend(function() {
   var self = this;
   Rule.call(self, HtmlRule.KEYWORDS);
+
+  self.addMatch(new CompleteEqual(Token.BLANK, character.BLANK));
+  self.addMatch(new CompleteEqual(Token.TAB, character.TAB));
+  self.addMatch(new CompleteEqual(Token.LINE, character.ENTER + character.LINE));
+  self.addMatch(new CompleteEqual(Token.LINE, character.ENTER));
+  self.addMatch(new CompleteEqual(Token.LINE, character.LINE));
 
   self.addMatch(new CompleteEqual(Token.HEAD, '!DOCTYPE', null, true));
   self.addMatch(new LineSearch(Token.COMMENT, '<!--', '-->', true));
