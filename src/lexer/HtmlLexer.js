@@ -41,6 +41,52 @@ var HtmlLexer = Class(function(rule) {
       }
       if(this.state) {
         this.readch();
+        for(var i = 0, matches = this.rule.matches(), len = matches.length; i < len; i++) {
+          var match = matches[i];
+          if(match.match(this.peek, this.code, this.index)) {
+            var token = new Token(match.tokenType(), match.content(), match.val(), this.index - 1);
+            var error = match.error();
+            if(error) {
+              this.error(error, this.code.slice(this.index - matchLen, this.index));
+            }
+            var matchLen = match.content().length;
+            if(token.type() == Token.ID
+              && this.rule.keyWords().hasOwnProperty(token.content())) {
+              token.type(Token.KEYWORD);
+            }
+
+            //回调可自定义处理匹配的token
+            if(match.callback) {
+              match.callback(token);
+            }
+
+            if(this.last) {
+              token.prev(this.last);
+              this.last.next(token);
+            }
+            this.last = token;
+            temp.push(token);
+            this.tokenList.push(token);
+            this.index += matchLen - 1;
+            var n = character.count(token.val(), character.LINE);
+            count += n;
+            this.totalLine += n;
+            if(n) {
+              var j = match.content().indexOf(character.LINE);
+              var k = match.content().lastIndexOf(character.LINE);
+              this.colMax = Math.max(this.colMax, this.colNum + j);
+              this.colNum = match.content().length - k;
+            }
+            else {
+              this.colNum += matchLen;
+            }
+            this.colMax = Math.max(this.colMax, this.colNum);
+
+            continue outer;
+          }
+          //如果有未匹配的，说明规则不完整，抛出错误
+          this.error('unknow token');
+        }
       }
       else {
         var end = this.code.indexOf('<', this.index);
