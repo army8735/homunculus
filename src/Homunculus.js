@@ -1,10 +1,12 @@
 var Lexer = require('./lexer/Lexer');
 var CssLexer = require('./lexer/CssLexer');
+var HtmlLexer = require('./lexer/HtmlLexer');
 
 var EcmascriptRule = require('./lexer/rule/EcmascriptRule');
 var CssRule = require('./lexer/rule/CssRule');
 var JavaRule = require('./lexer/rule/JavaRule');
 var CRule = require('./lexer/rule/CRule');
+var HtmlRule = require('./lexer/rule/HtmlRule');
 
 var Token = require('./lexer/Token');
 
@@ -35,6 +37,9 @@ exports.getClass = function (type, lan) {
           return Lexer;
         case 'css':
           return CssLexer;
+        case 'html':
+        case 'htm':
+          return HtmlLexer;
         default:
           throw new Error('Unsupport Language Lexer: ' + lan);
       }
@@ -111,6 +116,9 @@ exports.getLexer = function (lan) {
     case "cpp":
     case "cplusplus":
       return new Lexer(new CRule());
+    case 'html':
+    case 'htm':
+      return new HtmlLexer(new HtmlRule());
     default:
       throw new Error('Unsupport Language Lexer: ' + lan);
   }

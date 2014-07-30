@@ -105,9 +105,24 @@ var HtmlLexer = Class(function(rule) {
           this.tokenList.push(text);
         }
         this.index = end;
+        var s = this.code.slice(this.index, this.index + 4).toLowerCase();
         var c1 = this.code.charAt(this.index);
         var c2 = this.code.charAt(this.index + 1);
-        if(c1 == '<' && (character.isLetter(c2) || c2 == '!')) {
+        if(s == '<!--') {
+          end = this.code.indexOf('-->', this.index + 4);
+          if(end == -1) {
+            end = length;
+          }
+          else {
+            end += 3;
+          }
+          s = this.code.slice(this.index, end);
+          var token = new Token(Token.COMMENT, s, s);
+          temp.push(token);
+          this.tokenList.push(token);
+          this.index = end;
+        }
+        else if(c1 == '<' && (character.isLetter(c2) || c2 == '!')) {
           this.state = true;
           var token = new Token(Token.SIGN, c1, c1);
           temp.push(token);

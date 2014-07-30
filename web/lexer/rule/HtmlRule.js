@@ -16,7 +16,6 @@ define(function(require, exports, module) {
     self.addMatch(new CompleteEqual(Token.LINE, character.LINE));
   
     self.addMatch(new CompleteEqual(Token.HEAD, '!DOCTYPE', null, true));
-    self.addMatch(new LineSearch(Token.COMMENT, '<!--', '-->', true));
     self.addMatch(new LineSearch(Token.STRING, '"', '"', true));
     self.addMatch(new LineSearch(Token.STRING, "'", "'", true));
     var id = new RegMatch(Token.PROPERTY, /^[a-z]+(-\w+)*/i);
