@@ -41,6 +41,11 @@ var HtmlLexer = Class(function(rule) {
       }
       if(this.state) {
         this.readch();
+        if(this.peek == '>') {
+          this.state = false;
+          var token = new Token(Token.SIGN, this.peek, this.peek);
+          continue;
+        }
         for(var i = 0, matches = this.rule.matches(), len = matches.length; i < len; i++) {
           var match = matches[i];
           if(match.match(this.peek, this.code, this.index)) {
@@ -92,10 +97,22 @@ var HtmlLexer = Class(function(rule) {
         var end = this.code.indexOf('<', this.index);
         if(end == -1) {
           end = length;
+        }
+        if(end > this.index) {
           var s = this.code.slice(this.index, end);
           var text = new Token(Token.TEXT, s, s, this.index);
           temp.push(text);
           this.tokenList.push(text);
+        }
+        this.index = end;
+        var c1 = this.code.charAt(this.index);
+        var c2 = this.code.charAt(this.index + 1);
+        if(c1 == '<' && (character.isLetter(c2) || c2 == '!')) {
+          this.state = true;
+          var token = new Token(Token.SIGN, c1, c1);
+          temp.push(token);
+          this.tokenList.push(token);
+          this.index++;
         }
       }
     }
