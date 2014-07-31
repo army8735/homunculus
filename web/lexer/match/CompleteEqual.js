@@ -5,12 +5,16 @@ define(function(require, exports, module) {
     Match.call(this, type, setPReg);
     this.result = result;
     this.ignoreCase = ignoreCase;
+    this.temp = null;
   }).methods({
     match: function(c, code, index) {
-      var s = code.substr(--index, this.result.length);
+      this.temp = code.substr(--index, this.result.length);
       return this.ignoreCase
-        ? s.toLowerCase() == this.result.toLowerCase()
-        : s == this.result;
+        ? this.temp.toLowerCase() == this.result.toLowerCase()
+        : this.temp == this.result;
+    },
+    content: function() {
+      return this.temp;
     }
   });
   module.exports = CompleteEqual;

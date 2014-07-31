@@ -18,11 +18,18 @@ define(function(require, exports, module) {
     self.addMatch(new CompleteEqual(Token.HEAD, '!DOCTYPE', null, true));
     self.addMatch(new LineSearch(Token.STRING, '"', '"', true));
     self.addMatch(new LineSearch(Token.STRING, "'", "'", true));
+    self.addMatch(new CompleteEqual(Token.SIGN, '=', null, true));
     var id = new RegMatch(Token.PROPERTY, /^[a-z]+(-\w+)*/i);
     id.callback = function(token) {
-      var s = token.content();
-      if(/^data-/i.test(s)) {
-        token.type(Token.DATA);
+      var prev = token.prev();
+      if(prev && prev.type() == Token.MARK) {
+        token.type(Token.KEYWORD);
+      }
+      else {
+        var s = token.content();
+        if(/^data-/i.test(s)) {
+          token.type(Token.DATA);
+        }
       }
     };
     self.addMatch(id);

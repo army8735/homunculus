@@ -9,6 +9,7 @@ var HtmlLexer = Class(function(rule) {
     this.code = ''; //要解析的代码
     this.peek = ''; //向前看字符
     this.index = 0; //向前看字符字符索引
+    this.index2 = 0; //临时索引
     this.tokenList = []; //结果的token列表
     this.cacheLine = 0; //行缓存值
     this.totalLine = 1; //总行数
@@ -41,11 +42,22 @@ var HtmlLexer = Class(function(rule) {
       }
       if(this.state) {
         this.readch();
-        if(this.peek == '>') {
+        if(this.peek == '/') {
+          if(this.code.charAt(this.index) == '>') {
+            this.state = false;
+            var token = new Token(Token.MARK, this.peek + '>', this.peek + '>');
+            temp.push(token);
+            this.tokenList.push(token);
+            this.index2 = this.index++;
+            continue;
+          }
+        }
+        else if(this.peek == '>') {
           this.state = false;
-          var token = new Token(Token.SIGN, this.peek, this.peek);
+          var token = new Token(Token.MARK, this.peek, this.peek);
           temp.push(token);
           this.tokenList.push(token);
+          this.index2 = this.index;
           continue;
         }
         for(var i = 0, matches = this.rule.matches(), len = matches.length; i < len; i++) {
@@ -62,19 +74,20 @@ var HtmlLexer = Class(function(rule) {
               token.type(Token.KEYWORD);
             }
 
-            //回调可自定义处理匹配的token
-            if(match.callback) {
-              match.callback(token);
-            }
-
             if(this.last) {
               token.prev(this.last);
               this.last.next(token);
             }
             this.last = token;
+
+            //回调可自定义处理匹配的token
+            if(match.callback) {
+              match.callback(token);
+            }
+
             temp.push(token);
             this.tokenList.push(token);
-            this.index += matchLen - 1;
+            this.index2 = this.index += matchLen - 1;
             var n = character.count(token.val(), character.LINE);
             count += n;
             this.totalLine += n;
@@ -96,44 +109,64 @@ var HtmlLexer = Class(function(rule) {
         this.error('unknow token');
       }
       else {
-        var end = this.code.indexOf('<', this.index);
-        if(end == -1) {
-          end = length;
+        var idx = this.code.indexOf('<', this.index);
+        if(idx == -1) {
+          idx = length;
+          if(idx > this.index2) {
+            this.addText(this.code.slice(this.index2, idx), temp);
+          }
+          return;
         }
-        if(end > this.index) {
-          var s = this.code.slice(this.index, end);
-          var text = new Token(Token.TEXT, s, s, this.index);
-          temp.push(text);
-          this.tokenList.push(text);
-        }
-        this.index = end;
-        var s = this.code.slice(this.index, this.index + 4).toLowerCase();
-        var c1 = this.code.charAt(this.index);
-        var c2 = this.code.charAt(this.index + 1);
+        var s = this.code.slice(idx, idx + 4).toLowerCase();
+        var c1 = this.code.charAt(idx);
+        var c2 = this.code.charAt(idx + 1);
         if(s == '<!--') {
-          end = this.code.indexOf('-->', this.index + 4);
+          var end = this.code.indexOf('-->', this.index + 4);
           if(end == -1) {
             end = length;
           }
           else {
             end += 3;
           }
-          s = this.code.slice(this.index, end);
+          if(idx > this.index2) {
+            s = this.code.slice(this.index2, idx);
+            this.addText(s, temp);
+          }
+          s = this.code.slice(idx, end);
           var token = new Token(Token.COMMENT, s, s);
+          this.last = token;
           temp.push(token);
           this.tokenList.push(token);
-          this.index = end;
+          this.index2 = this.index = end;
         }
-        else if(c1 == '<' && (character.isLetter(c2) || c2 == '!')) {
-          this.state = true;
-          var token = new Token(Token.SIGN, c1, c1);
-          temp.push(token);
-          this.tokenList.push(token);
-          this.index++;
+        else if(c1 == '<') {
+          if(c2 == '/') {
+            this.state = true;
+            s = c1 + c2;
+            var token = new Token(Token.MARK, s, s);
+            this.last = token;
+            temp.push(token);
+            this.tokenList.push(token);
+            this.index2 = this.index = idx + 2;
+          }
+          else if(character.isLetter(c2) || c2 == '!') {
+            this.state = true;
+            var token = new Token(Token.MARK, c1, c1);
+            this.last = token;
+            temp.push(token);
+            this.tokenList.push(token);
+            this.index2 = this.index = idx + 1;
+          }
         }
       }
     }
     return this;
+  },
+  addText: function(s, temp) {
+    var token = new Token(Token.TEXT, s, s);
+    this.last = token;
+    temp.push(token);
+    this.tokenList.push(token);
   },
   readch: function() {
     this.peek = this.code.charAt(this.index++);
