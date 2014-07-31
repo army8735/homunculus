@@ -2,6 +2,7 @@ var homunculus = require('../');
 
 var expect = require('expect.js');
 var path = require('path');
+var fs = require('fs');
 
 var Token = homunculus.getClass('token');
 var HtmlLexer = homunculus.getClass('lexer', 'html');
@@ -92,6 +93,20 @@ describe('htmllexer', function() {
         expect(join(tokens)).to.eql(['<', 'div', '>', 'text', '</', 'div', '>', ' ', '<', 'p', '/>']);
         expect(type(tokens)).to.eql([26, 10, 26, 25, 26, 10, 26, 25, 26, 10, 26]);
       });
+      it('error', function() {
+        var lexer = homunculus.getLexer('html');
+        expect(function() {
+          lexer.parse('<div |>');
+        }).to.throwError();
+      });
+    });
+  });
+  describe('page test', function() {
+    it('demo/html', function() {
+      var s = fs.readFileSync(path.join(__dirname, '..', 'demo', 'html.html'), { encoding: 'utf-8' });
+      var lexer = homunculus.getLexer('html');
+      var tokens = lexer.parse(s);
+      expect(tokens.length).to.eql(160);
     });
   });
 });
