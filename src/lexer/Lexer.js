@@ -58,10 +58,10 @@ var Lexer = Class(function(rule) {
           if(match.match(this.peek, this.code, this.index)) {
             var token = new Token(match.tokenType(), match.content(), match.val(), this.index - 1);
             var error = match.error();
+            var matchLen = match.content().length;
             if(error) {
               this.error(error, this.code.slice(this.index - matchLen, this.index));
             }
-            var matchLen = match.content().length;
             if(token.type() == Token.ID
               && this.rule.keyWords().hasOwnProperty(token.content())) {
               token.type(Token.KEYWORD);

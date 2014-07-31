@@ -45,6 +45,8 @@ define(function(require, exports, module) {
           if(this.peek == '>') {
             this.state = false;
             var token = new Token(Token.SIGN, this.peek, this.peek);
+            temp.push(token);
+            this.tokenList.push(token);
             continue;
           }
           for(var i = 0, matches = this.rule.matches(), len = matches.length; i < len; i++) {
@@ -52,10 +54,10 @@ define(function(require, exports, module) {
             if(match.match(this.peek, this.code, this.index)) {
               var token = new Token(match.tokenType(), match.content(), match.val(), this.index - 1);
               var error = match.error();
+              var matchLen = match.content().length;
               if(error) {
                 this.error(error, this.code.slice(this.index - matchLen, this.index));
               }
-              var matchLen = match.content().length;
               if(token.type() == Token.ID
                 && this.rule.keyWords().hasOwnProperty(token.content())) {
                 token.type(Token.KEYWORD);
@@ -90,9 +92,9 @@ define(function(require, exports, module) {
   
               continue outer;
             }
-            //如果有未匹配的，说明规则不完整，抛出错误
-            this.error('unknow token');
           }
+          //如果有未匹配的，说明规则不完整，抛出错误
+          this.error('unknow token');
         }
         else {
           var end = this.code.indexOf('<', this.index);
@@ -156,14 +158,24 @@ define(function(require, exports, module) {
       if(character.isUndefined(str)) {
         str = this.code.substr(this.index - 1, 20);
       }
-      if(Lexer.mode() === Lexer.STRICT) {
+      if(HtmlLexer.mode() === HtmlLexer.STRICT) {
         throw new Error(s + ', line ' + this.line() + ' col ' + this.colNum + '\n' + str);
       }
-      else if(Lexer.mode() === Lexer.LOOSE && typeof console !== void 0) {
+      else if(HtmlLexer.mode() === HtmlLexer.LOOSE && typeof console !== void 0) {
         console.warn(s + ', line ' + this.line() + ' col ' + this.colNum + '\n' + str);
       }
       return this;
     }
+  }).statics({
+    STRICT: 0,
+    LOOSE: 1,
+    mode: function(i) {
+      if(!character.isUndefined(i)) {
+        cmode = i;
+      }
+      return cmode;
+    }
   });
+  var cmode = HtmlLexer.STRICT;
   module.exports = HtmlLexer;
 });

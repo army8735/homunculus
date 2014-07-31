@@ -4,7 +4,7 @@ var expect = require('expect.js');
 var path = require('path');
 
 var Token = homunculus.getClass('token');
-var Lexer = homunculus.getClass('lexer', 'html');
+var HtmlLexer = homunculus.getClass('lexer', 'html');
 
 function join(tokens) {
   var arr = tokens.map(function(token) {
@@ -27,6 +27,14 @@ describe('htmllexer', function() {
         var tokens = lexer.parse('<!--comment-->');
         expect(join(tokens)).to.eql(['<!--comment-->']);
         expect(type(tokens)).to.eql([6]);
+      });
+    });
+    describe('doctype', function() {
+      it('normal', function () {
+        var lexer = homunculus.getLexer('html');
+        var tokens = lexer.parse('<!DOCTYPE>');
+        expect(join(tokens)).to.eql(['<', '!DOCTYPE', '>']);
+        expect(type(tokens)).to.eql([8, 12, 8]);
       });
     });
   });
