@@ -62,12 +62,24 @@ describe('htmllexer', function() {
         expect(join(tokens)).to.eql(['<', 'img', '>']);
         expect(type(tokens)).to.eql([26, 10, 26]);
       });
+      it('custom mark', function() {
+        var lexer = homunculus.getLexer('html');
+        var tokens = lexer.parse('<custom>');
+        expect(join(tokens)).to.eql(['<', 'custom', '>']);
+        expect(type(tokens)).to.eql([26, 10, 26]);
+      });
       it('attribute', function() {
         var lexer = homunculus.getLexer('html');
         var tokens = lexer.parse('<a href="#">');
         expect(join(tokens)).to.eql(['<', 'a', ' ', 'href', '=', '"#"', '>']);
         expect(type(tokens)).to.eql([26, 10, 1, 15, 8, 7, 26]);
-      })
+      });
+      it('custom attribute', function() {
+        var lexer = homunculus.getLexer('html');
+        var tokens = lexer.parse('<a custom=1>');
+        expect(join(tokens)).to.eql(['<', 'a', ' ', 'custom', '=', '1', '>']);
+        expect(type(tokens)).to.eql([26, 10, 1, 15, 8, 4, 26]);
+      });
     });
   });
 });

@@ -18,6 +18,8 @@ var HtmlRule = Rule.extend(function() {
   self.addMatch(new LineSearch(Token.STRING, '"', '"', true));
   self.addMatch(new LineSearch(Token.STRING, "'", "'", true));
   self.addMatch(new CompleteEqual(Token.SIGN, '=', null, true));
+  self.addMatch(new RegMatch(Token.NUMBER, /^\d+/));
+
   var id = new RegMatch(Token.PROPERTY, /^[a-z]+(-\w+)*/i);
   id.callback = function(token) {
     var prev = token.prev();
