@@ -116,7 +116,7 @@ define(function(require, exports, module) {
             if(idx > this.index2) {
               this.addText(this.code.slice(this.index2, idx), temp);
             }
-            return;
+            return this;
           }
           var s = this.code.slice(idx, idx + 4).toLowerCase();
           var c1 = this.code.charAt(idx);
@@ -130,8 +130,7 @@ define(function(require, exports, module) {
               end += 3;
             }
             if(idx > this.index2) {
-              s = this.code.slice(this.index2, idx);
-              this.addText(s, temp);
+              this.addText(this.code.slice(this.index2, idx), temp);
             }
             s = this.code.slice(idx, end);
             var token = new Token(Token.COMMENT, s, s);
@@ -142,6 +141,9 @@ define(function(require, exports, module) {
           }
           else if(c1 == '<') {
             if(c2 == '/') {
+              if(idx > this.index2) {
+                this.addText(this.code.slice(this.index2, idx), temp);
+              }
               this.state = true;
               s = c1 + c2;
               var token = new Token(Token.MARK, s, s);
@@ -151,6 +153,9 @@ define(function(require, exports, module) {
               this.index2 = this.index = idx + 2;
             }
             else if(character.isLetter(c2) || c2 == '!') {
+              if(idx > this.index2) {
+                this.addText(this.code.slice(this.index2, idx), temp);
+              }
               this.state = true;
               var token = new Token(Token.MARK, c1, c1);
               this.last = token;

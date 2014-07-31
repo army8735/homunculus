@@ -80,6 +80,18 @@ describe('htmllexer', function() {
         expect(join(tokens)).to.eql(['<', 'a', ' ', 'custom', '=', '1', '>']);
         expect(type(tokens)).to.eql([26, 10, 1, 15, 8, 4, 26]);
       });
+      it('data attribute', function() {
+        var lexer = homunculus.getLexer('html');
+        var tokens = lexer.parse('<a data-b=1>');
+        expect(join(tokens)).to.eql(['<', 'a', ' ', 'data-b', '=', '1', '>']);
+        expect(type(tokens)).to.eql([26, 10, 1, 24, 8, 4, 26]);
+      });
+      it('text', function() {
+        var lexer = homunculus.getLexer('html');
+        var tokens = lexer.parse('<div>text</div> <p/>');
+        expect(join(tokens)).to.eql(['<', 'div', '>', 'text', '</', 'div', '>', ' ', '<', 'p', '/>']);
+        expect(type(tokens)).to.eql([26, 10, 26, 25, 26, 10, 26, 25, 26, 10, 26]);
+      });
     });
   });
 });
