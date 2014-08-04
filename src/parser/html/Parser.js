@@ -14,7 +14,7 @@ var Parser = IParser.extend(function(lexer) {
 }).methods({
   parse: function(code) {
     this.lexer.parse(code);
-    this.tree = this.program();
+    this.tree = this.document();
     return this.tree;
   },
   init: function(lexer) {
@@ -39,15 +39,23 @@ var Parser = IParser.extend(function(lexer) {
       this.lexer = new Lexer(new Rule());
     }
   },
-  program: function() {
+  document: function() {
     this.tokens = this.lexer.tokens();
     this.length = this.tokens.length;
     if(this.tokens.length) {
       this.move();
     }
-    var node = new Node(Node.PROGRAM);
+    var node = new Node(Node.DOCUMENT);
     while(this.look) {
       node.add(this.element());
+    }
+    return node;
+  },
+  element: function() {
+    var node;
+    if(this.look.type() == Token.TEXT) {
+      node = new Node(Node.TEXT);
+      node.add(this.match());
     }
     return node;
   },

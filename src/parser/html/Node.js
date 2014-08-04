@@ -3,7 +3,8 @@ var Node = INode.extend(function(type, children) {
   INode.call(this, type, children);
   return this;
 }).statics({
-  PROGRAM: 'program',
+  DOCUMENT: 'document',
+  TEXT: 'text',
   getKey: function(s) {
     if(!s) {
       throw new Error('empty value');
