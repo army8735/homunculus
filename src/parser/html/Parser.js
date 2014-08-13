@@ -6,6 +6,13 @@ var Token = require('../../lexer/Token');
 var Node = require('./Node');
 var S = {};
 S[Token.BLANK] = S[Token.TAB] = S[Token.COMMENT] = S[Token.LINE] = S[Token.ENTER] = true;
+var SINGLE = {
+  'img': true,
+  'meta': true,
+  'link': true,
+  '!doctype': true,
+  'br': true
+};
 
 var Parser = IParser.extend(function(lexer) {
   IParser.call(this, lexer);
@@ -64,10 +71,50 @@ var Parser = IParser.extend(function(lexer) {
   },
   mark: function() {
     var node = new Node(Node.MARK);
-    node.add(this.match());
+    node.add(this.match('<'));
+    var tagName = this.look;
+    node.add(this.match(Token.KEYWORD));
+    tagName = tagName.content().toLowerCase();
+    while(this.look
+      && this.look.type() != Token.MARK
+      && this.look.type() != Token.KEYWORD) {
+      node.add(this.attr());
+    }
     if(!this.look) {
       this.error();
     }
+    if(SINGLE.hasOwnProperty(tagName)) {
+      if(this.look.content() == '/>') {
+        node.add(this.match('/>'));
+      }
+      else {
+        node.add(this.match('>'));
+      }
+    }
+    else {
+      node.add(this.match('>'));
+      if(!this.look) {
+        this.error();
+      }
+      if(this.look.type() == Token.TEXT) {
+        node.add(this.match());
+      }
+      if(this.look.content() == '<') {
+        node.add(this.element());
+      }
+      else if(this.look.content() == '</') {
+        node.add(this.match('</'));
+        node.add(this.match(tagName));
+        node.add(this.match('>'));
+      }
+      else {
+        this.error();
+      }
+    }
+    return node;
+  },
+  attr: function() {
+    var node = new Node(Node.ATTR);
     return node;
   },
   match: function(type, line, msg) {
