@@ -5,6 +5,7 @@ var Node = INode.extend(function(type, children) {
 }).statics({
   DOCUMENT: 'document',
   TEXT: 'text',
+  MARK: 'mark',
   getKey: function(s) {
     if(!s) {
       throw new Error('empty value');

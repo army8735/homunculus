@@ -57,6 +57,17 @@ var Parser = IParser.extend(function(lexer) {
       node = new Node(Node.TEXT);
       node.add(this.match());
     }
+    else if(this.look.type() == Token.MARK) {
+      return this.mark();
+    }
+    return node;
+  },
+  mark: function() {
+    var node = new Node(Node.MARK);
+    node.add(this.match());
+    if(!this.look) {
+      this.error();
+    }
     return node;
   },
   match: function(type, line, msg) {
