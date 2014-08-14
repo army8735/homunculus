@@ -100,22 +100,25 @@ define(function(require, exports, module) {
         if(this.look.type() == Token.TEXT) {
           node.add(this.match());
         }
-        if(this.look.content() == '<') {
+        if(this.look && this.look.content() == '<') {
           node.add(this.element());
+          if(this.look && this.look.type() == Token.TEXT) {
+            node.add(this.match());
+          }
         }
-        else if(this.look.content() == '</') {
-          node.add(this.match('</'));
-          node.add(this.match(tagName));
-          node.add(this.match('>'));
-        }
-        else {
-          this.error();
-        }
+        node.add(this.match('</'));
+        node.add(this.match(tagName));
+        node.add(this.match('>'));
       }
       return node;
     },
     attr: function() {
       var node = new Node(Node.ATTR);
+      node.add(
+        this.match([Token.PROPERTY, Token.DATA]),
+        this.match('='),
+        this.match([Token.STRING, Token.NUMBER, Token.PROPERTY])
+      );
       return node;
     },
     match: function(type, line, msg) {
