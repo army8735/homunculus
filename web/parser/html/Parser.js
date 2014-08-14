@@ -12,7 +12,8 @@ define(function(require, exports, module) {
     'meta': true,
     'link': true,
     '!doctype': true,
-    'br': true
+    'br': true,
+    '!doctype': true
   };
   
   var Parser = IParser.extend(function(lexer) {
@@ -54,27 +55,37 @@ define(function(require, exports, module) {
         this.move();
       }
       var node = new Node(Node.DOCUMENT);
+      var first = true;
       while(this.look) {
-        node.add(this.element());
+        node.add(this.element(first));
+        first = false;
       }
       return node;
     },
-    element: function() {
+    element: function(first) {
       var node;
       if(this.look.type() == Token.TEXT) {
         node = new Node(Node.TEXT);
         node.add(this.match());
       }
       else if(this.look.type() == Token.MARK) {
-        return this.mark();
+        return this.mark(first);
       }
       return node;
     },
-    mark: function() {
+    mark: function(first) {
       var node = new Node(Node.MARK);
       node.add(this.match('<'));
+      if(!this.look) {
+        this.error();
+      }
       var tagName = this.look;
-      node.add(this.match(Token.KEYWORD));
+      if(first && this.look.type() == Token.HEAD) {
+        node.add(this.match());
+      }
+      else {
+        node.add(this.match(Token.KEYWORD));
+      }
       tagName = tagName.content().toLowerCase();
       while(this.look
         && this.look.type() != Token.MARK
@@ -114,11 +125,27 @@ define(function(require, exports, module) {
     },
     attr: function() {
       var node = new Node(Node.ATTR);
-      node.add(
-        this.match([Token.PROPERTY, Token.DATA]),
-        this.match('='),
-        this.match([Token.STRING, Token.NUMBER, Token.PROPERTY])
-      );
+      if(this.look.type() == Token.PROPERTY) {
+        node.add(this.match());
+      }
+      else {
+        node.add(this.match(Token.DATA));
+      }
+      if(this.look && this.look.content() == '=') {
+        node.add(this.match('='));
+        if(!this.look) {
+          this.error();
+        }
+        switch(this.look.type()) {
+          case Token.STRING:
+          case Token.NUMBER:
+          case Token.PROPERTY:
+            node.add(this.match());
+            break;
+          default:
+            this.error();
+        }
+      }
       return node;
     },
     match: function(type, line, msg) {

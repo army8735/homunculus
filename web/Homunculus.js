@@ -14,10 +14,12 @@ define(function(require, exports, module) {
   var JsParser = require('./parser/js/Parser');
   var Es6Parser = require('./parser/es6/Parser');
   var CssParser = require('./parser/css/Parser');
+  var HtmlParser = require('./parser/html/Parser');
   
   var JsNode = require('./parser/js/Node');
   var Es6Node = require('./parser/es6/Node');
   var CssNode = require('./parser/css/Node');
+  var HtmlNode = require('./parser/html/Node');
   
   var JsContext = require('./parser/js/Context');
   
@@ -57,6 +59,9 @@ define(function(require, exports, module) {
             return Es6Parser;
           case 'css':
             return CssParser;
+          case 'html':
+          case 'htm':
+            return HtmlParser;
           default:
             throw new Error('Unsupport Language Parser: ' + lan);
         }
@@ -73,6 +78,9 @@ define(function(require, exports, module) {
             return Es6Node;
           case 'css':
             return CssNode;
+          case 'html':
+          case 'htm':
+            return HtmlNode;
           default:
             throw new Error('Unsupport Language Node: ' + lan);
         }
@@ -138,6 +146,9 @@ define(function(require, exports, module) {
         return new Es6Parser(exports.getLexer(lan));
       case 'css':
         return new CssParser(exports.getLexer(lan));
+      case 'html':
+      case 'htm':
+        return new HtmlParser(exports.getLexer(lan));
       default:
         throw new Error('Unsupport Language Parser: ' + lan);
     }

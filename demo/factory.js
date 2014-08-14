@@ -1,8 +1,12 @@
 define(function(require, exports) {
 	var Lexer = require('./lexer/Lexer'),
 		CssLexer = require('./lexer/CssLexer'),
+    HtmlLexer = require('./lexer/HtmlLexer'),
 		EcmascriptRule = require('./lexer/rule/EcmascriptRule'),
-		CssRule = require('./lexer/rule/CssRule');
+		CssRule = require('./lexer/rule/CssRule'),
+    HtmlRule = require('./lexer/rule/HtmlRule'),
+    JavaRule = require('./lexer/rule/JavaRule'),
+    CRule = require('./lexer/rule/CRule');
 	exports.lexer = function(syntax) {
 		switch(syntax.toLowerCase()) {
 			case "js":
@@ -25,16 +29,14 @@ define(function(require, exports) {
 			case "cpp":
 			case "cplusplus":
 				return new Lexer(new CRule());
+      case "htm":
+      case "html":
+        return new HtmlLexer(new HtmlRule());
 			/*case "py":
 			case "python":
 				return new PythonLexer(new PythonRule());
 			case "xml":
 				return new XmlLexer();
-			case "css":
-				return new CssLexer(new CssRule());
-			case "htm":
-			case "html":
-				return new HtmlLexer();
 			case "php":
 				return new PhpLexer();
 			default:

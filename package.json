@@ -16,6 +16,7 @@
       "pattern": [
         "src/lexer/Lexer",
         "src/lexer/CssLexer",
+        "src/lexer/HtmlLexer",
         "src/lexer/Token",
         "src/lexer/match",
         "src/lexer/rule/Rule",
@@ -33,7 +34,11 @@
   "keywords": [
     "lexer",
     "parser",
-    "javascript"
+    "javascript",
+    "html",
+    "css",
+    "es5",
+    "es6"
   ],
   "author": "army8735",
   "license": "MIT",

@@ -139,21 +139,21 @@ textarea:hover{opacity:0.8;}
     input.onclick = function() {
       console.clear();
       var s = ta.value;
-      $('code').html(s);
+      $('code').text(s);
       $('div.jssc').remove();
       location.hash = encodeURIComponent(s);
       jssc.cache(100).time(10).exec();
       var parser = Homunculus.getParser('html');
-      var CssNode = Homunculus.getClass('node', 'html');
+      var HtmlNode = Homunculus.getClass('node', 'html');
       var Token = Homunculus.getClass('token');
       var ast = parser.parse(s);
       draw(ast);
       var s = JSON.stringify(tree(ast));
-      s = s.replace(/(['"])(CssNode\.\w+)\1/g, '$2');
+      s = s.replace(/(['"])(HtmlNode\.\w+)\1/g, '$2');
       console.log(s);
       function tree(node, arr) {
         arr = arr || [];
-        var isToken = node.name() == CssNode.TOKEN;
+        var isToken = node.name() == HtmlNode.TOKEN;
         var isVirtual = isToken && node.token().type() == Token.VIRTUAL;
         if(isToken) {
           if(!isVirtual) {
@@ -162,7 +162,7 @@ textarea:hover{opacity:0.8;}
           }
         }
         else {
-          arr.push("CssNode." + CssNode.getKey(node.name()));
+          arr.push("HtmlNode." + HtmlNode.getKey(node.name()));
           var childs = [];
           arr.push(childs);
           node.leaves().forEach(function(leaf, i) {
