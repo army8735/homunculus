@@ -1,7 +1,7 @@
 web:
 	@gulp
 
-test: src2web test-api test-js test-jscontext test-es6parser test-css test-html
+test: web test-api test-js test-jscontext test-es6parser test-css test-html
 
 test-js: test-jslexer test-jsparser
 test-es6: test-jslexer test-es6parser
