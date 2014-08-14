@@ -87,6 +87,18 @@ describe('htmllexer', function() {
         expect(join(tokens)).to.eql(['<', 'a', ' ', 'data-b', '=', '1', '>']);
         expect(type(tokens)).to.eql([26, 10, 1, 24, 8, 4, 26]);
       });
+      it('attr without quote', function() {
+        var lexer = homunculus.getLexer('html');
+        var tokens = lexer.parse('<input checked=checked>');
+        expect(join(tokens)).to.eql(['<', 'input', ' ', 'checked', '=', 'checked', '>']);
+        expect(type(tokens)).to.eql([26, 10, 1, 15, 8, 15, 26]);
+      });
+      it('attr without value', function() {
+        var lexer = homunculus.getLexer('html');
+        var tokens = lexer.parse('<input checked>');
+        expect(join(tokens)).to.eql(['<', 'input', ' ', 'checked', '>']);
+        expect(type(tokens)).to.eql([26, 10, 1, 15, 26]);
+      });
       it('text', function() {
         var lexer = homunculus.getLexer('html');
         var tokens = lexer.parse('<div>text</div> <p/>');
