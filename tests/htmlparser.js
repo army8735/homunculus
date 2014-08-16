@@ -85,7 +85,7 @@ describe('htmlparser', function() {
     it('text node', function() {
       var parser = homunculus.getParser('html');
       var node = parser.parse('<div>\n<span>123<b>456</b></span> </div>');
-      expect(tree(node)).to.eql([HtmlNode.DOCUMENT,[HtmlNode.MARK,["<","div",">","\\n",HtmlNode.MARK,["<","span",">","123",HtmlNode.MARK,["<","b",">","456","</","b",">"],"</","span",">"]," ","</","div",">"]]]);
+      expect(tree(node)).to.eql([HtmlNode.DOCUMENT,[HtmlNode.MARK,["<","div",">","\n",HtmlNode.MARK,["<","span",">","123",HtmlNode.MARK,["<","b",">","456","</","b",">"],"</","span",">"]," ","</","div",">"]]]);
     });
     it('custom node', function() {
       it('!doctype', function() {
