@@ -104,22 +104,27 @@ define(function(require, exports, module) {
         }
       }
       else {
-        node.add(this.match('>'));
-        if(!this.look) {
-          this.error();
+        if(this.look.content() == '/>') {
+          node.add(this.match('/>'));
         }
-        if(this.look.type() == Token.TEXT) {
-          node.add(this.match());
-        }
-        if(this.look && this.look.content() == '<') {
-          node.add(this.element());
-          if(this.look && this.look.type() == Token.TEXT) {
+        else {
+          node.add(this.match('>'));
+          if(!this.look) {
+            this.error();
+          }
+          if(this.look.type() == Token.TEXT) {
             node.add(this.match());
           }
+          if(this.look && this.look.content() == '<') {
+            node.add(this.element());
+            if(this.look && this.look.type() == Token.TEXT) {
+              node.add(this.match());
+            }
+          }
+          node.add(this.match('</'));
+          node.add(this.match(tagName));
+          node.add(this.match('>'));
         }
-        node.add(this.match('</'));
-        node.add(this.match(tagName));
-        node.add(this.match('>'));
       }
       return node;
     },

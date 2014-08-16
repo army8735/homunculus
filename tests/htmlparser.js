@@ -67,5 +67,46 @@ describe('htmlparser', function() {
       var node = parser.parse('<!doctype html>');
       expect(tree(node)).to.eql([HtmlNode.DOCUMENT,[HtmlNode.MARK,["<","!doctype",HtmlNode.ATTR,["html"],">"]]]);
     });
+    it('single mark', function() {
+      var parser = homunculus.getParser('html');
+      var node = parser.parse('<img src="about:blank">');
+      expect(tree(node)).to.eql([HtmlNode.DOCUMENT,[HtmlNode.MARK,["<","img",HtmlNode.ATTR,["src","=","\"about:blank\""],">"]]]);
+    });
+    it('single mark closed', function() {
+      var parser = homunculus.getParser('html');
+      var node = parser.parse('<img src="about:blank"/>');
+      expect(tree(node)).to.eql([HtmlNode.DOCUMENT,[HtmlNode.MARK,["<","img",HtmlNode.ATTR,["src","=","\"about:blank\""],"/>"]]]);
+    });
+    it('couple mark', function() {
+      var parser = homunculus.getParser('html');
+      var node = parser.parse('<div><span></span></div>');
+      expect(tree(node)).to.eql([HtmlNode.DOCUMENT,[HtmlNode.MARK,["<","div",">",HtmlNode.MARK,["<","span",">","</","span",">"],"</","div",">"]]]);
+    });
+    it('text node', function() {
+      var parser = homunculus.getParser('html');
+      var node = parser.parse('<div>\n<span>123<b>456</b></span> </div>');
+      expect(tree(node)).to.eql([HtmlNode.DOCUMENT,[HtmlNode.MARK,["<","div",">","\\n",HtmlNode.MARK,["<","span",">","123",HtmlNode.MARK,["<","b",">","456","</","b",">"],"</","span",">"]," ","</","div",">"]]]);
+    });
+    it('custom node', function() {
+      it('!doctype', function() {
+        var parser = homunculus.getParser('html');
+        var node = parser.parse('<custom/>');
+        expect(tree(node)).to.eql([HtmlNode.DOCUMENT, [HtmlNode.MARK, ["<", "custom", "/>"]]]);
+      });
+    });
+    it('custom attr', function() {
+      it('!doctype', function() {
+        var parser = homunculus.getParser('html');
+        var node = parser.parse('<custom custom="123"></custom>');
+        expect(tree(node)).to.eql([HtmlNode.DOCUMENT,[HtmlNode.MARK,["<","custom",HtmlNode.ATTR,["custom","=","\"123\""],">","</","custom",">"]]]);
+      });
+    });
+    it('data attr', function() {
+      it('!doctype', function() {
+        var parser = homunculus.getParser('html');
+        var node = parser.parse('<img data-name="1">');
+        expect(tree(node)).to.eql([HtmlNode.DOCUMENT,[HtmlNode.MARK,["<","img",HtmlNode.ATTR,["data-name","=","\"1\""],">"]]]);
+      });
+    });
   });
 });
