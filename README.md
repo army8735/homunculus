@@ -35,6 +35,8 @@ npm install homunculus
     * as
     * actionscript
     * css
+    * html
+    * htm
 * getLexer(lan:String):lexer/Lexer
  * lan:
    * js
@@ -50,6 +52,8 @@ npm install homunculus
    * c++
    * cpp
    * cplusplus
+    * html
+    * htm
 * getParser(lan:String):parser/Parser
   * lan:
     * js
@@ -59,6 +63,8 @@ npm install homunculus
     * ecmascript
     * es6
     * css
+    * html
+    * htm
 * getContext(lan:String):parser/Context
   * lan:
     * js
