@@ -48,8 +48,11 @@ var HtmlLexer = Class(function(rule) {
             var token = new Token(Token.MARK, this.peek + '>', this.peek + '>');
             temp.push(token);
             this.tokenList.push(token);
-            this.index2 = this.index++;
+            this.index2 = ++this.index;
             continue;
+          }
+          else {
+            this.error();
           }
         }
         else if(this.peek == '>') {
