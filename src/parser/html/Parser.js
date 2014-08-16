@@ -12,7 +12,19 @@ var SINGLE = {
   'link': true,
   '!doctype': true,
   'br': true,
-  '!doctype': true
+  '!doctype': true,
+  'basefont': true,
+  'base': true,
+  'col': true,
+  'embed': true,
+  'frame': true,
+  'hr': true,
+  'input': true,
+  'keygen': true,
+  'area': true,
+  'param': true,
+  'source': true,
+  'track': true
 };
 
 var Parser = IParser.extend(function(lexer) {
