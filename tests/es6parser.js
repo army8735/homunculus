@@ -417,6 +417,11 @@ describe('es6parser', function() {
       var node = parser.parse('[...a]');
       expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.PRMREXPR,[JsNode.ARRLTR,["[",JsNode.SPREAD,["...",JsNode.PRMREXPR,["a"]],"]"]]]]]]);
     });
+    it('arrltr multi spread', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('[...a,...b]');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.PRMREXPR,[JsNode.ARRLTR,["[",JsNode.SPREAD,["...",JsNode.PRMREXPR,["a"]],",",JsNode.SPREAD,["...",JsNode.PRMREXPR,["b"]],"]"]]]]]]);
+    });
     it('arrltr error', function() {
       var parser = homunculus.getParser('es6');
       expect(function() {

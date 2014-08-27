@@ -1958,9 +1958,12 @@ var Parser = IParser.extend(function(lexer) {
   arrltr: function(noIn, noOf) {
     var node = new Node(Node.ARRLTR);
     node.add(this.match('['));
-    while(this.look && this.look.content() != ']' && this.look.content() != '...') {
+    while(this.look && this.look.content() != ']') {
       if(this.look.content() == ',') {
         node.add(this.match());
+      }
+      else if(this.look.content() == '...') {
+        node.add(this.spread(noIn, noOf));
       }
       else {
         node.add(this.assignexpr(noIn, noOf));
@@ -1968,9 +1971,6 @@ var Parser = IParser.extend(function(lexer) {
           node.add(this.match());
         }
       }
-    }
-    if(this.look && this.look.content() == '...') {
-      node.add(this.spread(noIn, noOf));
     }
     node.add(this.match(']', 'missing ] after element list'));
     return node;
