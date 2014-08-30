@@ -47,6 +47,8 @@ define(function(require, exports, module) {
       this.col = 1;
       this.index = 0;
       this.length = 0;
+      this.script = false;
+      this.style = false;
       this.ignores = {};
       this.hasMoveLine = false;
       this.tree = {};
@@ -87,6 +89,9 @@ define(function(require, exports, module) {
     },
     mark: function(first) {
       var node = new Node(Node.MARK);
+      if(this.script || this.style) {
+        this.error(tagName + ' could not contain any mark.');
+      }
       node.add(this.match('<'));
       if(!this.look) {
         this.error();
@@ -117,9 +122,18 @@ define(function(require, exports, module) {
       }
       else {
         if(this.look.content() == '/>') {
+          if(['script', 'style'].indexOf(tagName) > -1) {
+            this.error(tagName + ' could not be single.');
+          }
           node.add(this.match('/>'));
         }
         else {
+          if(tagName == 'script') {
+            this.script = true;
+          }
+          else if(tagName == 'style') {
+            this.style = true;
+          }
           node.add(this.match('>'));
           if(!this.look) {
             this.error();
@@ -136,6 +150,7 @@ define(function(require, exports, module) {
           node.add(this.match('</'));
           node.add(this.match(tagName));
           node.add(this.match('>'));
+          this.script = this.style = false;
         }
       }
       return node;

@@ -135,5 +135,17 @@ describe('htmlparser', function() {
         parser.parse('<div>123</p>');
       }).to.throwError();
     });
+    it('script autoclose', function() {
+      var parser = homunculus.getParser('html');
+      expect(function() {
+        parser.parse('<script/>');
+      }).to.throwError();
+    });
+    it('style contain others', function() {
+      var parser = homunculus.getParser('html');
+      expect(function() {
+        parser.parse('<style><div>123</div></style>');
+      }).to.throwError();
+    });
   });
 });
