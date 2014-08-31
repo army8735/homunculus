@@ -137,15 +137,19 @@ describe('htmlparser', function() {
     });
     it('script autoclose', function() {
       var parser = homunculus.getParser('html');
+      var node = parser.parse('<script/>');
+      expect(tree(node)).to.eql([HtmlNode.DOCUMENT,[HtmlNode.MARK,["<","script","/>"]]]);
+    });
+    it('script not close', function() {
+      var parser = homunculus.getParser('html');
       expect(function() {
-        parser.parse('<script/>');
+        parser.parse('<script>var a');
       }).to.throwError();
     });
     it('style contain others', function() {
       var parser = homunculus.getParser('html');
-      expect(function() {
-        parser.parse('<style><div>123</div></style>');
-      }).to.throwError();
+      var node = parser.parse('<style><div>123</div></style>');
+      expect(tree(node)).to.eql([HtmlNode.DOCUMENT,[HtmlNode.MARK,["<","style",">","<div>123</div>","</","style",">"]]]);
     });
   });
 });

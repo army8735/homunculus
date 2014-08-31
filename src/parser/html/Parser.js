@@ -46,8 +46,6 @@ var Parser = IParser.extend(function(lexer) {
     this.col = 1;
     this.index = 0;
     this.length = 0;
-    this.script = false;
-    this.style = false;
     this.ignores = {};
     this.hasMoveLine = false;
     this.tree = {};
@@ -88,9 +86,6 @@ var Parser = IParser.extend(function(lexer) {
   },
   mark: function(first) {
     var node = new Node(Node.MARK);
-    if(this.script || this.style) {
-      this.error(tagName + ' could not contain any mark.');
-    }
     node.add(this.match('<'));
     if(!this.look) {
       this.error();
@@ -121,18 +116,9 @@ var Parser = IParser.extend(function(lexer) {
     }
     else {
       if(this.look.content() == '/>') {
-        if(['script', 'style'].indexOf(tagName) > -1) {
-          this.error(tagName + ' could not be single.');
-        }
         node.add(this.match('/>'));
       }
       else {
-        if(tagName == 'script') {
-          this.script = true;
-        }
-        else if(tagName == 'style') {
-          this.style = true;
-        }
         node.add(this.match('>'));
         if(!this.look) {
           this.error();
@@ -149,7 +135,6 @@ var Parser = IParser.extend(function(lexer) {
         node.add(this.match('</'));
         node.add(this.match(tagName));
         node.add(this.match('>'));
-        this.script = this.style = false;
       }
     }
     return node;

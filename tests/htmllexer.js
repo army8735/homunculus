@@ -111,6 +111,24 @@ describe('htmllexer', function() {
           lexer.parse('<div |>');
         }).to.throwError();
       });
+      it('style with mark as text', function () {
+        var lexer = homunculus.getLexer('html');
+        var tokens = lexer.parse('<style><div></style>');
+        expect(join(tokens)).to.eql(['<', 'style', '>', '<div>', '</', 'style', '>']);
+        expect(type(tokens)).to.eql([26, 10, 26, 25, 26, 10, 26]);
+      });
+      it('script no end', function () {
+        var lexer = homunculus.getLexer('html');
+        var tokens = lexer.parse('<script>');
+        expect(join(tokens)).to.eql(['<', 'script', '>']);
+        expect(type(tokens)).to.eql([26, 10, 26]);
+      });
+      it('script with text no end', function () {
+        var lexer = homunculus.getLexer('html');
+        var tokens = lexer.parse('<script>var a');
+        expect(join(tokens)).to.eql(['<', 'script', '>', 'var a']);
+        expect(type(tokens)).to.eql([26, 10, 26, 25]);
+      });
     });
   });
   describe('page test', function() {
@@ -118,7 +136,7 @@ describe('htmllexer', function() {
       var s = fs.readFileSync(path.join(__dirname, '..', 'demo', 'html.html'), { encoding: 'utf-8' });
       var lexer = homunculus.getLexer('html');
       var tokens = lexer.parse(s);
-      expect(tokens.length).to.eql(160);
+      expect(tokens.length).to.eql(163);
     });
   });
 });

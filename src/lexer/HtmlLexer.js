@@ -16,6 +16,8 @@ var HtmlLexer = Class(function(rule) {
     this.colNum = 0; //列
     this.colMax = 0; //最大列数
     this.state = false; //是否在<>状态中
+    this.style = false;
+    this.script = false;
     this.last = null;
   },
   parse: function(code) {
@@ -111,6 +113,10 @@ var HtmlLexer = Class(function(rule) {
         //如果有未匹配的，说明规则不完整，抛出错误
         this.error('unknow token');
       }
+      else if(this.style || this.script) {
+        this.dealStSc(this.style ? 'style' : 'script', temp);
+        this.style = this.script = false;
+      }
       else {
         var idx = this.code.indexOf('<', this.index);
         if(idx == -1) {
@@ -158,6 +164,13 @@ var HtmlLexer = Class(function(rule) {
             if(idx > this.index2) {
               this.addText(this.code.slice(this.index2, idx), temp);
             }
+            s = this.code.slice(idx + 1, idx + 7).toLowerCase();
+            if(/^style\b/i.test(s)) {
+              this.style = true;
+            }
+            else if(/^script\b/i.test(s)) {
+              this.script = true;
+            }
             this.state = true;
             var token = new Token(Token.MARK, c1, c1);
             this.last = token;
@@ -169,6 +182,22 @@ var HtmlLexer = Class(function(rule) {
       }
     }
     return this;
+  },
+  dealStSc: function(s, temp) {
+    var reg = new RegExp('^/' + s + '\\b');
+    for(var i = this.index; i < this.code.length; i++) {
+      if(this.code.charAt(i) == '<') {
+        if(reg.test(this.code.slice(i + 1, i + 8))) {
+          var s = this.code.slice(this.index, i);
+          this.index = this.index2 = i;
+          this.addText(s, temp);
+          return;
+        }
+      }
+    }
+    var s = this.code.slice(this.index);
+    this.index = this.index2 = this.code.length;
+    this.addText(s, temp);
   },
   addText: function(s, temp) {
     var token = new Token(Token.TEXT, s, s);
