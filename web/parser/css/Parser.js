@@ -88,7 +88,15 @@ var Parser = IParser.extend(function(lexer) {
       case Token.HEAD:
         return this.head();
       case Token.VARS:
-        return this.vardecl();
+        var isFn = false;
+        for(var i = this.index; i < this.length; i++) {
+          var t = this.tokens[i];
+          if(!S.hasOwnProperty(t.type())) {
+            isFn = t.content() == '(';
+            break;
+          }
+        }
+        return isFn ? this.fn() : this.vardecl();
       case Token.SELECTOR:
         return this.styleset();
       default:
@@ -317,7 +325,6 @@ var Parser = IParser.extend(function(lexer) {
   fn: function() {
     var node = new Node(Node.FN);
     node.add(
-      this.match(),
       this.match(Token.VARS),
       this.params(),
       this.block()

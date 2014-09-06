@@ -518,8 +518,8 @@ describe('cssparser', function() {
     });
     it('fn decl', function() {
       var parser = homunculus.getParser('css');
-      var node = parser.parse('@function fn($a, $b){margin:$a;$b;$c()}');
-      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.FN,["@function","fn",CssNode.PARAMS,["(","$a",",","$b",")"],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["margin"],":",CssNode.VALUE,["$a"],";"],"$b",";",CssNode.FNC,["$c",CssNode.CPARAMS,["(",")"]],"}"]]]]);
+      var node = parser.parse('fn($a, $b){margin:$a;$b;$c()}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.FN,["fn",CssNode.PARAMS,["(","$a",",","$b",")"],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["margin"],":",CssNode.VALUE,["$a"],";"],"$b",";",CssNode.FNC,["$c",CssNode.CPARAMS,["(",")"]],"}"]]]]);
     });
     it('fn call', function() {
       var parser = homunculus.getParser('css');

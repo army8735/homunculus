@@ -413,9 +413,9 @@ describe('csslexer', function() {
       });
       it('fn decl', function() {
         var lexer = homunculus.getLexer('css');
-        var tokens = lexer.parse('@function fn($a, $b){}');
-        expect(join(tokens)).to.eql(['@function', ' ', 'fn', '(', '$a', ',', ' ', '$b', ')', '{', '}']);
-        expect(type(tokens)).to.eql([12, 1, 16, 8, 16, 8, 1, 16, 8, 8, 8]);
+        var tokens = lexer.parse('fn($a, $b){}');
+        expect(join(tokens)).to.eql(['fn', '(', '$a', ',', ' ', '$b', ')', '{', '}']);
+        expect(type(tokens)).to.eql([16, 8, 16, 8, 1, 16, 8, 8, 8]);
       });
       it('fn call', function() {
         var lexer = homunculus.getLexer('css');

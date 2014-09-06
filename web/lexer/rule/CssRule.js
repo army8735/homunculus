@@ -96,10 +96,7 @@ var CssRule = Rule.extend(function() {
       '@top': true,
       '@top-left': true,
       '@top-center': true,
-      '@top-right': true,
-      '@extend': true,
-      '@function': true,
-      '@mix': true
+      '@top-right': true
     }.hasOwnProperty(s)) {
       token.type(Token.VARS);
     }

@@ -25,7 +25,6 @@ var CssLexer = Lexer.extend(function(rule) {
   this.ns = false;
   this.doc = false;
   this.supports = false;
-  this.fn = false;
   this.depth = 0;
 }).methods({
   //@override
@@ -85,9 +84,6 @@ var CssLexer = Lexer.extend(function(rule) {
                   break;
                 case '@supports':
                   this.supports = true;
-                  break;
-                case '@function':
-                  this.fn = true;
                   break;
               }
               this.sel = false;
@@ -164,9 +160,6 @@ var CssLexer = Lexer.extend(function(rule) {
                   token.type(Token.PROPERTY);
                 }
               }
-              else if(this.fn) {
-                token.type(Token.VARS);
-              }
               else if(this.value) {
                 if(this.cvar && this.rule.keyWords().hasOwnProperty(s)) {
                   token.type(Token.KEYWORD);
@@ -220,7 +213,7 @@ var CssLexer = Lexer.extend(function(rule) {
               this.kf = false;
               this.ns = false;
               this.doc = false;
-              this.fn = false;
+
               break;
             case Token.PSEUDO:
               if((this.kw || this.value)
