@@ -19,6 +19,7 @@ var CssLexer = Lexer.extend(function(rule) {
   this.kw = false;
   this.sel = true;
   this.var = false;
+  this.cvar = false;
   this.page = false;
   this.kf = false;
   this.ns = false;
@@ -148,6 +149,7 @@ var CssLexer = Lexer.extend(function(rule) {
                 token.type(Token.VARS);
                 this.url = false;
                 this.var = false;
+                this.cvar = true;
               }
               else if(this.supports) {
                 if(this.rule.keyWords().hasOwnProperty(s)) {
@@ -158,7 +160,11 @@ var CssLexer = Lexer.extend(function(rule) {
                 }
               }
               else if(this.value) {
-                if(this.rule.colors().hasOwnProperty(s)) {
+                if(this.cvar && this.rule.keyWords().hasOwnProperty(s)) {
+                  token.type(Token.KEYWORD);
+                  this.cvar = false;
+                }
+                else if(this.rule.colors().hasOwnProperty(s)) {
                   token.type(Token.COLOR);
                   this.url = false;
                   this.var = false;
@@ -284,6 +290,7 @@ var CssLexer = Lexer.extend(function(rule) {
                   this.url = false;
                   this.sel = false;
                   this.var = false;
+                  this.cvar = false;
                   break;
                 case '{':
                   this.depth++;
@@ -294,6 +301,7 @@ var CssLexer = Lexer.extend(function(rule) {
                   this.sel = true;
                   this.var = false;
                   this.supports = false;
+                  this.cvar = false;
                   break;
                 case '}':
                   this.value = false;
@@ -303,6 +311,7 @@ var CssLexer = Lexer.extend(function(rule) {
                   this.sel = true;
                   this.depth--;
                   this.var = false;
+                  this.cvar = false;
                   break;
                 case '*':
                   if(this.depth) {
@@ -375,6 +384,7 @@ var CssLexer = Lexer.extend(function(rule) {
               this.kf = false;
               this.ns = false;
               this.doc = false;
+              this.cvar = true;
               break;
           }
 

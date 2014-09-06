@@ -510,6 +510,12 @@ describe('cssparser', function() {
       var node = parser.parse('p{xx:#fff}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["p"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["xx"],":",CssNode.VALUE,['#fff']],"}"]]]]);
     });
+    it('var can contain a styleset', function() {
+      var parser = homunculus.getParser('css');
+      parser.lexer.rule.addKeyWord('xx');
+      var node = parser.parse('@a = color:#fff;');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.VARDECL,["@a","=",CssNode.VALUE,["color",":","#fff"],";"]]]);
+    });
   });
   describe('lib test', function() {
     it('bootstrap', function() {

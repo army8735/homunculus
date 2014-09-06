@@ -405,6 +405,12 @@ describe('csslexer', function() {
         expect(join(tokens)).to.eql(['p', '{', 'width', ':', 'var', '(', 'a', ')', '}']);
         expect(type(tokens)).to.eql([21, 8, 10, 8, 15, 8, 16, 8, 8]);
       });
+      it('can contain a styleset', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('$c: background:url(xxx);');
+        expect(join(tokens)).to.eql(['$c', ':', ' ', 'background', ':', 'url', '(', 'xxx', ')', ';']);
+        expect(type(tokens)).to.eql([16, 8, 1, 10, 8, 15, 8, 7, 8, 8]);
+      });
     });
   });
   describe('index test', function() {
