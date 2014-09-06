@@ -114,8 +114,8 @@ var Parser = IParser.extend(function(lexer) {
         return this.kframes();
       case '@page':
         return this.page();
-//      case '@function':
-//        return this.fn();
+      case '@function':
+        return this.fn();
       case '@namespace':
         return this.namespace();
       case '@document':
@@ -126,6 +126,8 @@ var Parser = IParser.extend(function(lexer) {
         return this.viewport();
       case '@supports':
         return this.supports();
+      default:
+        this.error();
     }
   },
   supports: function() {
@@ -261,7 +263,7 @@ var Parser = IParser.extend(function(lexer) {
     node.add(this.key());
     if(this.look && this.look.content() == ':') {
       node.add(this.match(':'));
-      node.add(this.value(true));
+      node.add(this.value());
     }
     node.add(this.match(')'));
     return node;
@@ -312,6 +314,49 @@ var Parser = IParser.extend(function(lexer) {
     node.add(this.block());
     return node;
   },
+  fn: function() {
+    var node = new Node(Node.FN);
+    node.add(
+      this.match(),
+      this.match(Token.VARS),
+      this.params(),
+      this.block()
+    );
+    return node;
+  },
+  params: function() {
+    var node = new Node(Node.PARAMS);
+    node.add(this.match('('));
+    while(this.look && this.look.content() != ')') {
+      node.add(this.match(Token.VARS));
+      if(this.look && this.look.content() == ',') {
+        node.add(this.match());
+      }
+    }
+    node.add(this.match(')'));
+    return node;
+  },
+  fnc: function() {
+    var node = new Node(Node.FNC);
+    node.add(
+      this.match(),
+      this.cparams(),
+      this.match(';')
+    );
+    return node;
+  },
+  cparams: function() {
+    var node = new Node(Node.CPARAMS);
+    node.add(this.match('('));
+    while(this.look && this.look.content() != ')') {
+      node.add(this.value(true));
+      if(this.look && this.look.content() == ',') {
+        node.add(this.match());
+      }
+    }
+    node.add(this.match(')'));
+    return node;
+  },
   namespace: function() {
     var node = new Node(Node.NAMESPACE);
     node.add(this.match());
@@ -342,7 +387,18 @@ var Parser = IParser.extend(function(lexer) {
     if([':', '='].indexOf(this.look.content()) > -1) {
       node.add(this.match());
     }
-    node.add(this.value());
+    else {
+      this.error();
+    }
+    if(!this.look) {
+      this.error();
+    }
+    if(this.look.type() == Token.KEYWORD) {
+      node.add(this.style(null, null, true));
+    }
+    else {
+      node.add(this.value());
+    }
     node.add(this.match(';'));
     return node;
   },
@@ -413,6 +469,22 @@ var Parser = IParser.extend(function(lexer) {
       else if(this.look.type() == Token.HEAD) {
         node.add(this.head());
       }
+      else if(this.look.type() == Token.VARS) {
+        var isFnCall = false;
+        for(var i = this.index; i < this.length; i++) {
+          var t = this.tokens[i];
+          if(!S.hasOwnProperty(t.type())) {
+            isFnCall = t.content() == '(';
+            break;
+          }
+        }
+        if(isFnCall) {
+          node.add(this.fnc());
+        }
+        else {
+          node.add(this.match(), this.match(';'));
+        }
+      }
       else {
         node.add(this.style());
       }
@@ -424,7 +496,7 @@ var Parser = IParser.extend(function(lexer) {
     var node = new Node(Node.STYLE);
     node.add(this.key(name));
     node.add(this.match(':'));
-    node.add(this.value(noP));
+    node.add(this.value());
     while(this.look && this.look.type() == Token.HACK) {
       node.add(this.match());
     }
@@ -441,12 +513,13 @@ var Parser = IParser.extend(function(lexer) {
     node.add(this.match(name || Token.KEYWORD));
     return node;
   },
-  value: function(noP) {
+  value: function(noComma) {
     var node = new Node(Node.VALUE);
     if(!this.look) {
       this.error();
     }
     var s = this.look.content().toLowerCase();
+    var pCount = 0;
     if([Token.COLOR, Token.HACK, Token.VARS, Token.ID, Token.PROPERTY, Token.NUMBER, Token.STRING, Token.HEAD, Token.SIGN, Token.UNITS, Token.KEYWORD].indexOf(this.look.type()) > -1
       && [';', '}'].indexOf(s) == -1) {
       switch(s) {
@@ -483,6 +556,15 @@ var Parser = IParser.extend(function(lexer) {
           node.add(this.rg());
           break;
         default:
+          if(s == '(') {
+            pCount++;
+          }
+          else if(s == ')') {
+            this.error();
+          }
+          else if(noComma && s == ',') {
+            this.error();
+          }
           node.add(this.match());
           break;
       }
@@ -490,13 +572,11 @@ var Parser = IParser.extend(function(lexer) {
     else {
       this.error();
     }
+    outer:
     while(this.look) {
       s = this.look.content().toLowerCase();
       if([Token.COLOR, Token.HACK, Token.VARS, Token.ID, Token.PROPERTY, Token.NUMBER, Token.STRING, Token.HEAD, Token.KEYWORD, Token.SIGN, Token.UNITS, Token.KEYWORD].indexOf(this.look.type()) > -1
         && [';', '}'].indexOf(this.look.content()) == -1) {
-        if(noP && this.look.content() == ')') {
-          break;
-        }
         switch(s) {
           case 'url':
             node.add(this.url());
@@ -531,6 +611,18 @@ var Parser = IParser.extend(function(lexer) {
             node.add(this.rg());
             break;
           default:
+            if(s == '(') {
+              pCount++;
+            }
+            else if(s == ')') {
+              pCount--;
+              if(pCount < 0) {
+                break outer;
+              }
+            }
+            else if(noComma && s == ',') {
+              break outer;
+            }
             node.add(this.match());
             break;
         }

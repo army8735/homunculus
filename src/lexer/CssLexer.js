@@ -25,6 +25,7 @@ var CssLexer = Lexer.extend(function(rule) {
   this.ns = false;
   this.doc = false;
   this.supports = false;
+  this.fn = false;
   this.depth = 0;
 }).methods({
   //@override
@@ -85,6 +86,9 @@ var CssLexer = Lexer.extend(function(rule) {
                 case '@supports':
                   this.supports = true;
                   break;
+                case '@function':
+                  this.fn = true;
+                  break;
               }
               this.sel = false;
               this.kw = false;
@@ -117,6 +121,7 @@ var CssLexer = Lexer.extend(function(rule) {
                 this.kf = false;
                 this.ns = false;
                 this.doc = false;
+                this.parenthese = false;
               }
               break;
             case Token.COLOR:
@@ -159,6 +164,9 @@ var CssLexer = Lexer.extend(function(rule) {
                   token.type(Token.PROPERTY);
                 }
               }
+              else if(this.fn) {
+                token.type(Token.VARS);
+              }
               else if(this.value) {
                 if(this.cvar && this.rule.keyWords().hasOwnProperty(s)) {
                   token.type(Token.KEYWORD);
@@ -182,23 +190,37 @@ var CssLexer = Lexer.extend(function(rule) {
                 if(this.rule.keyWords().hasOwnProperty(s)) {
                   token.type(Token.KEYWORD);
                   this.kw = true;
-                  this.url = false;
-                  this.var = false;
                   this.sel = false;
+                  this.parenthese = false;
                 }
                 else {
-                  token.type(Token.SELECTOR);
-                  this.sel = true;
-                  this.url = false;
+                  var isFnCall = false;
+                  for(var i = this.index + s.length - 1; i < length; i++) {
+                    var c = this.code.charAt(i);
+                    if(!S.hasOwnProperty(c)) {
+                      isFnCall = c == '(';
+                      break;
+                    }
+                  }
+                  if(isFnCall) {
+                    token.type(Token.VARS);
+                    this.sel = false;
+                  }
+                  else {
+                    token.type(Token.SELECTOR);
+                    this.sel = true;
+                  }
                   this.kw = false;
-                  this.var = false;
                 }
+                this.url = false;
+                this.var = false;
               }
               this.number = false;
               this.page = false;
               this.kf = false;
               this.ns = false;
               this.doc = false;
+              this.fn = false;
               break;
             case Token.PSEUDO:
               if((this.kw || this.value)

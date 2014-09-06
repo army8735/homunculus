@@ -45,8 +45,6 @@ var Node = INode.extend(function(type, children) {
   PARAMS: 'params',
   FNC: 'fncall',
   CPARAMS: 'cparams',
-  CPARAM: 'cparam',
-  PARAM: 'param',
   CTSTYLE: 'ctstyle',
   VIEWPORT: 'viewport',
   SUPPORTS: 'supports',

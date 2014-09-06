@@ -411,6 +411,18 @@ describe('csslexer', function() {
         expect(join(tokens)).to.eql(['$c', ':', ' ', 'background', ':', 'url', '(', 'xxx', ')', ';']);
         expect(type(tokens)).to.eql([16, 8, 1, 10, 8, 15, 8, 7, 8, 8]);
       });
+      it('fn decl', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('@function fn($a, $b){}');
+        expect(join(tokens)).to.eql(['@function', ' ', 'fn', '(', '$a', ',', ' ', '$b', ')', '{', '}']);
+        expect(type(tokens)).to.eql([12, 1, 16, 8, 16, 8, 1, 16, 8, 8, 8]);
+      });
+      it('fn call', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('fn(background:url(xxx), #fff)');
+        expect(join(tokens)).to.eql(['fn', '(', 'background', ':', 'url', '(', 'xxx', ')', ',', ' ', '#fff', ')']);
+        expect(type(tokens)).to.eql([16, 8, 10, 8, 15, 8, 7, 8, 8, 1, 23, 8]);
+      });
     });
   });
   describe('index test', function() {

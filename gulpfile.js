@@ -25,7 +25,7 @@ function cb(file, enc, cb) {
   util.log(path.relative(file.cwd, file.path), '->', path.relative(file.cwd, target));
   var content = file._contents;
   content = content.toString('utf-8');
-  content = "define(function(require, exports, module) {\n  " + content.replace(/\n/g, '\n  ') + '\n});';
+  content = "define(function(require, exports, module) {" + content + '});';
   fs.writeFileSync(target, content, { encoding: 'utf-8' });
   cb(null, file);
 }

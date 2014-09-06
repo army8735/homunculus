@@ -514,7 +514,17 @@ describe('cssparser', function() {
       var parser = homunculus.getParser('css');
       parser.lexer.rule.addKeyWord('xx');
       var node = parser.parse('@a = color:#fff;');
-      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.VARDECL,["@a","=",CssNode.VALUE,["color",":","#fff"],";"]]]);
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.VARDECL,["@a","=",CssNode.STYLE,[CssNode.KEY,["color"],":",CssNode.VALUE,["#fff"]],";"]]]);
+    });
+    it('fn decl', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@function fn($a, $b){margin:$a;$b;$c()}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.FN,["@function","fn",CssNode.PARAMS,["(","$a",",","$b",")"],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["margin"],":",CssNode.VALUE,["$a"],";"],"$b",";",CssNode.FNC,["$c",CssNode.CPARAMS,["(",")"]],"}"]]]]);
+    });
+    it('fn call', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('body{fn(background:url(xxx), #fff)}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.FNC,["fn",CssNode.CPARAMS,["(",CssNode.VALUE,["background",":",CssNode.URL,["url","(","xxx",")"]],",",CssNode.VALUE,["#fff"],")"]],"}"]]]]);
     });
   });
   describe('lib test', function() {
