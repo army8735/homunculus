@@ -504,6 +504,12 @@ describe('cssparser', function() {
       var node = parser.parse('p{color:radial-gradient(50%, 10% 20%,#f00,#ff0,#080)}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["p"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["color"],":",CssNode.VALUE,[CssNode.RADIOGRADIENT,["radial-gradient","(",CssNode.POS,[CssNode.LEN,["50","%"]],",",CssNode.LEN,["10","%"],CssNode.LEN,["20","%"],",",CssNode.COLORSTOP,["#f00"],",",CssNode.COLORSTOP,["#ff0"],",",CssNode.COLORSTOP,["#080"],")"]]],"}"]]]]);
     });
+    it('new kw', function() {
+      var parser = homunculus.getParser('css');
+      parser.lexer.rule.addKeyWord('xx');
+      var node = parser.parse('p{xx:#fff}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["p"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["xx"],":",CssNode.VALUE,['#fff']],"}"]]]]);
+    });
   });
   describe('lib test', function() {
     it('bootstrap', function() {

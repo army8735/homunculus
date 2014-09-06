@@ -20,6 +20,10 @@ var Rule = Class(function(words, pReg) {
     },
     keyWords: function() {
       return this.kw;
+    },
+    addKeyWord: function(v) {
+      this.kw[v] = true;
+      return this.kw;
     }
   });
 module.exports = Rule;

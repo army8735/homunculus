@@ -124,6 +124,15 @@ npm install homunculus
 * prev():Node 返回兄弟前一个节点
 * next():Node 返回兄弟后一个节点
 
+### lexer/rule/Rule
+#### 方法
+* constructor(keyWords:Array<String>, supportPerlReg:Boolean = false) 关键字列表和是否支持perl风格的正则表达式
+* addKeyWord(kw:String):Object 添加未知关键字并返回关键字hash
+
+#### 特别的，对于css还可以设置添加属性和颜色别名
+* addValue(v:String):Object 添加未知属性并返回属性hash
+* addColor(c:String):Object 添加未知颜色并返回颜色hash
+
 ## AST
 当调用语法分析器解析后，会返回生成ast，这是一个树状数据结构，每个节点都是对应语法解析器目录下的Node.js的实例。<br/>
 demo目录下是一个用js的parser分析输入js代码并画出ast形状的页面。<br/>
