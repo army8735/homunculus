@@ -122,8 +122,6 @@ var Parser = IParser.extend(function(lexer) {
         return this.kframes();
       case '@page':
         return this.page();
-      case '@function':
-        return this.fn();
       case '@namespace':
         return this.namespace();
       case '@document':
@@ -134,9 +132,25 @@ var Parser = IParser.extend(function(lexer) {
         return this.viewport();
       case '@supports':
         return this.supports();
+      case '@extend':
+        return this.extend();
       default:
         this.error();
     }
+  },
+  extend: function() {
+    var node = new Node(Node.EXTEND);
+    node.add(this.match());
+    if(!this.look) {
+      this.error();
+    }
+    node.add(this.match(Token.SELECTOR));
+    while(this.look
+      && [Token.SELECTOR, Token.PSEUDO].indexOf(this.look.type()) > -1) {
+      node.add(this.match());
+    }
+    node.add(this.match(';'));
+    return node;
   },
   supports: function() {
     var node = new Node(Node.SUPPORTS);

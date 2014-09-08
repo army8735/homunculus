@@ -423,6 +423,24 @@ describe('csslexer', function() {
         expect(join(tokens)).to.eql(['fn', '(', 'background', ':', 'url', '(', 'xxx', ')', ',', ' ', '#fff', ')']);
         expect(type(tokens)).to.eql([16, 8, 10, 8, 15, 8, 7, 8, 8, 1, 23, 8]);
       });
+      it('@extend', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('body{@extend a;}');
+        expect(join(tokens)).to.eql(['body', '{', '@extend', ' ', 'a', ';', '}']);
+        expect(type(tokens)).to.eql([21, 8, 12, 1, 21, 8, 8]);
+      });
+      it('@extend 2', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('body{@extend .s;}');
+        expect(join(tokens)).to.eql(['body', '{', '@extend', ' ', '.s', ';', '}']);
+        expect(type(tokens)).to.eql([21, 8, 12, 1, 21, 8, 8]);
+      });
+      it('@extend 3', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('body{@extend custom;}');
+        expect(join(tokens)).to.eql(['body', '{', '@extend', ' ', 'custom', ';', '}']);
+        expect(type(tokens)).to.eql([21, 8, 12, 1, 21, 8, 8]);
+      });
     });
   });
   describe('index test', function() {

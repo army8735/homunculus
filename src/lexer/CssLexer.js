@@ -25,6 +25,7 @@ var CssLexer = Lexer.extend(function(rule) {
   this.ns = false;
   this.doc = false;
   this.supports = false;
+  this.extend = false;
   this.depth = 0;
 }).methods({
   //@override
@@ -66,6 +67,11 @@ var CssLexer = Lexer.extend(function(rule) {
             //@import和@media之后进入值状态
             case Token.HEAD:
               s = s.replace(/^@(-moz-|-o-|-ms-|-webkit-|-vx-|-hp-|-khtml-|mso-|-prince-|-rim-|-ro-|-tc-|-wap-|-apple-|-atsc-|-ah-)/, '@');
+              this.sel = false;
+              this.kw = false;
+              this.value = true;
+              this.number = false;
+              this.var = false;
               switch(s) {
                 case '@import':
                   this.import = true;
@@ -85,12 +91,10 @@ var CssLexer = Lexer.extend(function(rule) {
                 case '@supports':
                   this.supports = true;
                   break;
+                case '@extend':
+                  this.extend = true;
+                  break;
               }
-              this.sel = false;
-              this.kw = false;
-              this.value = true;
-              this.number = false;
-              this.var = false;
               break;
             //单位要跟在数字之后，否则便不是单位
             case Token.UNITS:
@@ -127,9 +131,11 @@ var CssLexer = Lexer.extend(function(rule) {
               break;
             //将id区分出属性名和属性值
             case Token.ID:
-              if(this.number) {
+              if(this.extend) {
+                token.type(Token.SELECTOR);
+              }
+              else if(this.number) {
                 token.type(Token.UNITS);
-                this.sel = true;
                 this.url = false;
                 this.kw = false;
                 this.var = false;
@@ -306,6 +312,7 @@ var CssLexer = Lexer.extend(function(rule) {
                   this.sel = false;
                   this.var = false;
                   this.cvar = false;
+                  this.extend = false;
                   break;
                 case '{':
                   this.depth++;
@@ -317,6 +324,7 @@ var CssLexer = Lexer.extend(function(rule) {
                   this.var = false;
                   this.supports = false;
                   this.cvar = false;
+                  this.extend = false;
                   break;
                 case '}':
                   this.value = false;
@@ -327,6 +335,7 @@ var CssLexer = Lexer.extend(function(rule) {
                   this.depth--;
                   this.var = false;
                   this.cvar = false;
+                  this.extend = false;
                   break;
                 case '*':
                   if(this.depth) {
