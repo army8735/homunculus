@@ -373,6 +373,12 @@ describe('csslexer', function() {
         expect(join(tokens)).to.eql(['p', '{', 'dd', ':', '#fff', '}']);
         expect(type(tokens)).to.eql([21, 8, 10, 8, 23, 8]);
       });
+      it('&', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('body{&:hover{}}');
+        expect(join(tokens)).to.eql(['body', '{', '&', ':hover', '{', '}', '}']);
+        expect(type(tokens)).to.eql([21, 8, 21, 19, 8, 8, 8]);
+      });
     });
     describe('var', function() {
       it('normal', function() {

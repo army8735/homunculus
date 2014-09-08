@@ -536,6 +536,11 @@ describe('cssparser', function() {
       var node = parser.parse('body[type=text]{@extend .a, input[type=text]}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body","[","type","=","text","]"]],CssNode.BLOCK,["{",CssNode.EXTEND,["@extend",CssNode.SELECTORS,[CssNode.SELECTOR,[".a"],",",CssNode.SELECTOR,["input","[","type","=","text","]"]]],"}"]]]]);
     });
+    it('&', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('body{&:hover{}}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["&",":hover"]],CssNode.BLOCK,["{","}"]],"}"]]]]);
+    });
   });
   describe('lib test', function() {
     it('bootstrap', function() {
