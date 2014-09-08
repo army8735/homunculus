@@ -144,11 +144,7 @@ var Parser = IParser.extend(function(lexer) {
     if(!this.look) {
       this.error();
     }
-    node.add(this.match(Token.SELECTOR));
-    while(this.look
-      && [Token.SELECTOR, Token.PSEUDO].indexOf(this.look.type()) > -1) {
-      node.add(this.match());
-    }
+    node.add(this.selectors());
     node.add(this.match(';'));
     return node;
   },

@@ -93,6 +93,8 @@ var CssLexer = Lexer.extend(function(rule) {
                   break;
                 case '@extend':
                   this.extend = true;
+                  this.value = false;
+                  this.sel = true;
                   break;
               }
               break;
@@ -131,7 +133,12 @@ var CssLexer = Lexer.extend(function(rule) {
               break;
             //将id区分出属性名和属性值
             case Token.ID:
-              if(this.extend) {
+              if(this.bracket && this.sel) {
+                token.type(Token.ATTR);
+                this.url = false;
+                this.var = false;
+              }
+              else if(this.extend) {
                 token.type(Token.SELECTOR);
               }
               else if(this.number) {
@@ -146,11 +153,6 @@ var CssLexer = Lexer.extend(function(rule) {
                 this.kw = false;
                 this.var = false;
                 this.value = false;
-              }
-              else if(this.bracket && this.sel) {
-                token.type(Token.ATTR);
-                this.url = false;
-                this.var = false;
               }
               else if(this.var) {
                 token.type(Token.VARS);

@@ -529,8 +529,12 @@ describe('cssparser', function() {
     it('@extend', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('body{@extend a}');
-      expect(tree(node)).to.eql(
-        [CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.EXTEND,["@extend","a"],"}"]]]]);
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.EXTEND,["@extend",CssNode.SELECTORS,[CssNode.SELECTOR,["a"]]],"}"]]]]);
+    });
+    it('@extend multi', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('body[type=text]{@extend .a, input[type=text]}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body","[","type","=","text","]"]],CssNode.BLOCK,["{",CssNode.EXTEND,["@extend",CssNode.SELECTORS,[CssNode.SELECTOR,[".a"],",",CssNode.SELECTOR,["input","[","type","=","text","]"]]],"}"]]]]);
     });
   });
   describe('lib test', function() {
