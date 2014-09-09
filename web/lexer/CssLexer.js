@@ -226,6 +226,7 @@ var CssLexer = Lexer.extend(function(rule) {
             case Token.PSEUDO:
               if((this.kw || this.value)
                 && !this.page) {
+                token.cancel();
                 continue;
               }
               this.var = false;

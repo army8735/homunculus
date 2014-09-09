@@ -66,6 +66,9 @@ var Token = Class(function(type, content, val, sIndex) {
       this.ne = t;
     }
     return this.ne;
+  },
+  cancel: function() {
+    tid--;
   }
 }).statics({
   IGNORE: -2,
