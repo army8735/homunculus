@@ -246,6 +246,18 @@ describe('jsparser', function() {
         parser.parse('(function(a,1');
       }).to.throwError();
     });
+    it('fnparams error', function() {
+      var parser = homunculus.getParser('js');
+      expect(function() {
+        parser.parse('function a(b,){}');
+      }).to.throwError();
+    });
+    it('args error', function() {
+      var parser = homunculus.getParser('js');
+      expect(function() {
+        parser.parse('a(b,)');
+      }).to.throwError();
+    });
     it('labelstmt', function() {
       var parser = homunculus.getParser('js');
       var node = parser.parse('label:;');

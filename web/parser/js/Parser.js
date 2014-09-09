@@ -519,10 +519,15 @@ var Parser = IParser.extend(function(lexer) {
   },
   fnparams: function() {
     var node = new Node(Node.FNPARAMS);
-    while(this.look && this.look.content() != ')') {
+    while(this.look) {
       node.add(this.match(Token.ID, 'missing formal parameter'));
-      if(this.look && this.look.content() == ',') {
-        node.add(this.match());
+      if(this.look) {
+        if(this.look.content() == ',') {
+          node.add(this.match());
+        }
+        else if(this.look.content() == ')') {
+          break;
+        }
       }
     }
     return node;
@@ -1121,10 +1126,15 @@ var Parser = IParser.extend(function(lexer) {
   },
   arglist: function() {
     var node = new Node(Node.ARGLIST);
-    while(this.look && this.look.content() != ')') {
+    while(this.look) {
       node.add(this.assignexpr());
-      if(this.look && this.look.content() == ',') {
-        node.add(this.match());
+      if(this.look) {
+        if(this.look.content() == ',') {
+          node.add(this.match());
+        }
+        else if(this.look.content() == ')') {
+          break;
+        }
       }
     }
     return node;

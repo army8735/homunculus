@@ -287,6 +287,18 @@ describe('es6parser', function() {
         parser.parse('(function(a,1');
       }).to.throwError();
     });
+    it('fnparams error', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('function a(b,){}');
+      }).to.throwError();
+    });
+    it('args error', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('a(b,)');
+      }).to.throwError();
+    });
     it('gendecl with yield', function() {
       var parser = homunculus.getParser('es6');
       var node = parser.parse('function * a(){yield}');

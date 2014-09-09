@@ -1008,22 +1008,24 @@ var Parser = IParser.extend(function(lexer) {
     );
     return node;
   },
-  sfnparams: function() {
-    return this.fmparams();
-  },
   fmparams: function() {
     var node = new Node(Node.FMPARAMS);
     if(!this.look) {
       this.error('missing formal parameter');
     }
-    while(this.look && this.look.content() != ')') {
-      if(this.look.content() == '...') {
-        break;
-      }
-      else {
-        node.add(this.bindelem(true));
-        if(this.look && this.look.content() == ',') {
-          node.add(this.match());
+    if(this.look.content() != ')') {
+      while(this.look) {
+        if(this.look.content() == '...') {
+          break;
+        }
+        else {
+          node.add(this.bindelem(true));
+          if(this.look && this.look.content() == ')') {
+            break;
+          }
+          if(this.look && this.look.content() == ',') {
+            node.add(this.match());
+          }
         }
       }
     }
@@ -2131,16 +2133,21 @@ var Parser = IParser.extend(function(lexer) {
         this.assignexpr()
       );
     }
-    else {
-      while(this.look && this.look.content() != ')') {
+    else if(this.look && this.look.content() != ')') {
+      while(this.look) {
         node.add(this.assignexpr());
-        if(this.look && this.look.content() == ',') {
-          node.add(this.match());
-          if(this.look && this.look.content() == '...') {
-            node.add(
-              this.match(),
-              this.assignexpr()
-            );
+        if(this.look) {
+          if(this.look.content() == ',') {
+            node.add(this.match());
+            if(this.look && this.look.content() == '...') {
+              node.add(
+                this.match(),
+                this.assignexpr()
+              );
+              break;
+            }
+          }
+          else if(this.look.content() == ')') {
             break;
           }
         }
