@@ -63,6 +63,7 @@ var CssRule = Rule.extend(function() {
   self.addMatch(new RegMatch(Token.SELECTOR, /^#\w[\w\-]*/i));
   self.addMatch(new CompleteEqual(Token.SELECTOR, '&'));
   self.addMatch(new RegMatch(Token.VARS, /^var-[\w\-]+/i));
+  self.addMatch(new RegMatch(Token.VARS, /^--[\w\-]+/i));
   self.addMatch(new CompleteEqual(Token.KEYWORD, 'min--moz-device-pixel-ratio'));
   self.addMatch(new CompleteEqual(Token.KEYWORD, 'max--moz-device-pixel-ratio'));
   self.addMatch(new RegMatch(Token.ID, /^[a-z]\w*(?:[.\-]\w+)*/i));

@@ -405,6 +405,12 @@ describe('csslexer', function() {
         expect(join(tokens)).to.eql(['var-a', ':', '1']);
         expect(type(tokens)).to.eql([16, 8, 4]);
       });
+      it('css3 --', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('--a:1');
+        expect(join(tokens)).to.eql(['--a', ':', '1']);
+        expect(type(tokens)).to.eql([16, 8, 4]);
+      });
       it('use in css3', function() {
         var lexer = homunculus.getLexer('css');
         var tokens = lexer.parse('p{width:var(a)}');
