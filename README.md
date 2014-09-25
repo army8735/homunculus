@@ -25,6 +25,7 @@ npm install homunculus
     * node
     * context
     * token
+    * rule
   * lan: 
     * js
     * javascript
@@ -127,11 +128,16 @@ npm install homunculus
 ### lexer/rule/Rule
 #### 方法
 * constructor(keyWords:Array<String>, supportPerlReg:Boolean = false) 关键字列表和是否支持perl风格的正则表达式
-* addKeyWord(kw:String):Object 添加未知关键字并返回关键字hash
+* addKeyWord(kw:String):Object 添加未知关键字并返回关键字hash，仅限此次对象分析
 
 #### 特别的，对于css还可以设置添加属性和颜色别名
-* addValue(v:String):Object 添加未知属性并返回属性hash
-* addColor(c:String):Object 添加未知颜色并返回颜色hash
+* addValue(v:String):Object 添加未知属性并返回属性hash，仅限此次对象分析
+* addColor(c:String):Object 添加未知颜色并返回颜色hash，仅限此次对象分析
+
+#### 亦可使用静态方法统一添加关键字等，一劳永逸
+* addKeyWord(kw:String):Array<String>
+* addValue(v:String):Array<String>
+* addColor(c:String):Array<String>
 
 ## AST
 当调用语法分析器解析后，会返回生成ast，这是一个树状数据结构，每个节点都是对应语法解析器目录下的Node.js的实例。<br/>

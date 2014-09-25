@@ -373,6 +373,44 @@ describe('csslexer', function() {
         expect(join(tokens)).to.eql(['p', '{', 'dd', ':', '#fff', '}']);
         expect(type(tokens)).to.eql([21, 8, 10, 8, 23, 8]);
       });
+      it('new kw by static', function() {
+        homunculus.getClass('rule', 'css').addKeyWord('hhh');
+        homunculus.getClass('rule', 'css').addKeyWord(['jjj']);
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('p{hhh:#fff;jjj:#000}');
+        expect(join(tokens)).to.eql(['p', '{', 'hhh', ':', '#fff', ';', 'jjj', ':', '#000', '}']);
+        expect(type(tokens)).to.eql([21, 8, 10, 8, 23, 8, 10, 8, 23, 8]);
+      });
+      it('new value', function() {
+        var lexer = homunculus.getLexer('css');
+        lexer.rule.addValue('qq');
+        var tokens = lexer.parse('p{margin:qq}');
+        expect(join(tokens)).to.eql(['p', '{', 'margin', ':', 'qq', '}']);
+        expect(type(tokens)).to.eql([21, 8, 10, 8, 15, 8]);
+      });
+      it('new value by static', function() {
+        homunculus.getClass('rule', 'css').addValue('ww');
+        homunculus.getClass('rule', 'css').addValue(['ee']);
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('p{margin:ww;padding:ee}');
+        expect(join(tokens)).to.eql(['p', '{', 'margin', ':', 'ww', ';', 'padding', ':', 'ee', '}']);
+        expect(type(tokens)).to.eql([21, 8, 10, 8, 15, 8, 10, 8, 15, 8]);
+      });
+      it('new color', function() {
+        var lexer = homunculus.getLexer('css');
+        lexer.rule.addColor('uu');
+        var tokens = lexer.parse('p{color:uu}');
+        expect(join(tokens)).to.eql(['p', '{', 'color', ':', 'uu', '}']);
+        expect(type(tokens)).to.eql([21, 8, 10, 8, 23, 8]);
+      });
+      it('new color by static', function() {
+        homunculus.getClass('rule', 'css').addColor('nn');
+        homunculus.getClass('rule', 'css').addColor(['mm']);
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('p{color:nn;color:mm}');
+        expect(join(tokens)).to.eql(['p', '{', 'color', ':', 'nn', ';', 'color', ':', 'mm', '}']);
+        expect(type(tokens)).to.eql([21, 8, 10, 8, 23, 8, 10, 8, 23, 8]);
+      });
       it('&', function() {
         var lexer = homunculus.getLexer('css');
         var tokens = lexer.parse('body{&:hover{}}');

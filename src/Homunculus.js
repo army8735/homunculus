@@ -98,6 +98,22 @@ exports.getClass = function (type, lan) {
       break;
     case 'token':
       return Token;
+    case 'rule':
+      switch (lan) {
+        case 'js':
+        case 'javascript':
+        case 'es':
+        case 'es5':
+        case 'ecmascript':
+          return EcmascriptRule;
+        case 'css':
+          return CssRule;
+        case 'htm':
+        case 'html':
+          return HtmlRule;
+        default:
+          throw new Error('Unsupport Language Context: ' + lan);
+      }
     default:
       throw new Error('Unsupport Class Type: ' + type);
   }
