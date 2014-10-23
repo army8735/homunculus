@@ -202,6 +202,12 @@ describe('csslexer', function() {
         expect(join(tokens)).to.eql(['html', '[', 'lang', ']']);
         expect(type(tokens)).to.eql([21, 8, 22, 8]);
       });
+      it('attr 3', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('[class*=block-grid-]');
+        expect(join(tokens)).to.eql(['[', 'class', '*=', 'block-grid-', ']']);
+        expect(type(tokens)).to.eql([8, 22, 8, 22, 8]);
+      });
     });
     describe('style', function() {
       it('background', function() {
@@ -325,6 +331,13 @@ describe('csslexer', function() {
         var tokens = lexer.parse('@media \\0screen\\,');
         expect(join(tokens)).to.eql(['@media', ' ', '\\0', 'screen', '\\,']);
         expect(type(tokens)).to.eql([12, 1, 17, 15, 17]);
+      });
+      it('filter', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('.a{filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);}');
+        expect(join(tokens)).to.eql(['.a', '{', 'filter', ':', ' ', 'progid', ':', 'DXImageTransform.Microsoft.gradient',
+          '(', 'enabled', ' ', '=', ' ', 'false', ')', ';', '}' ]);
+        expect(type(tokens)).to.eql([21, 8, 10, 8, 1, 5, 8, 5, 8, 15, 1, 8, 1, 15, 8, 8, 8]);
       });
     });
     describe('unknow', function() {
