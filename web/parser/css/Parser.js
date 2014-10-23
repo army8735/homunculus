@@ -300,11 +300,18 @@ var Parser = IParser.extend(function(lexer) {
     var node2 = new Node(Node.BLOCK);
     node2.add(this.match('{'));
 
-    node2.add(this.style('font-family'));
-    node2.add(this.style('src'));
-
-    while(this.look && this.look.content() == 'src') {
-      node2.add(this.style('src'));
+    outer:
+    while(this.look) {
+      switch(this.look.content().toLowerCase()) {
+        case 'font-family':
+        case 'src':
+        case 'font-weight':
+        case 'font-style':
+          node2.add(this.style(this.look.content()));
+          break;
+        default:
+          break outer;
+      }
     }
     while(this.look && this.look.content() != '}') {
       node2.add(this.style());

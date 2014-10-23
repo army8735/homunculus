@@ -217,22 +217,10 @@ describe('cssparser', function() {
       var node = parser.parse('@font-face{font-family:YH;src:url(a),url(b)}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.FONTFACE,["@font-face",CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["font-family"],":",CssNode.VALUE,["YH"],";"],CssNode.STYLE,[CssNode.KEY,["src"],":",CssNode.VALUE,[CssNode.URL,["url","(","a",")"],",",CssNode.URL,["url","(","b",")"]]],"}"]]]]);
     });
-    it('@charset error 1', function() {
+    it('@font-face error', function() {
       var parser = homunculus.getParser('css');
       expect(function() {
         parser.parse('@font-face');
-      }).to.throwError();
-    });
-    it('@charset error 2', function() {
-      var parser = homunculus.getParser('css');
-      expect(function() {
-        parser.parse('@font-face{}');
-      }).to.throwError();
-    });
-    it('@charset error 3', function() {
-      var parser = homunculus.getParser('css');
-      expect(function() {
-        parser.parse('@font-face{src:url(a)}');
       }).to.throwError();
     });
     it('@page normal', function() {
@@ -578,6 +566,14 @@ describe('cssparser', function() {
     it('animate', function() {
       var parser = homunculus.getParser('css');
       var code = fs.readFileSync(path.join(__dirname, './lib/animate.css'), { encoding: 'utf-8' });
+      var node = parser.parse(code);
+      var ignore = parser.ignore();
+      var str = jion(node, ignore);
+      expect(str).to.eql(code);
+    });
+    it('gumby', function() {
+      var parser = homunculus.getParser('css');
+      var code = fs.readFileSync(path.join(__dirname, './lib/gumby.css'), { encoding: 'utf-8' });
       var node = parser.parse(code);
       var ignore = parser.ignore();
       var str = jion(node, ignore);
