@@ -453,7 +453,7 @@ var Parser = IParser.extend(function(lexer) {
         node.add(this.match(']'));
       }
       else {
-        node.add(this.match(Token.SELECTOR));
+        node.add(this.match([Token.SELECTOR, Token.PSEUDO]));
       }
       while(this.look && [',', ';', '{', '}'].indexOf(this.look.content()) == -1) {
         if(this.look.content() == '[' && this.look.type() != Token.HACK) {

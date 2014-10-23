@@ -36,11 +36,6 @@ gulp.task('default', ['clean-web'], function() {
 
 gulp.task('watch', function() {
   gulp.watch('./src/**/*.js', function() {
-    var args = Array.prototype.slice.call(arguments);
-    args.forEach(function(arg) {
-      gulp.src(arg.path)
-        .pipe(through2.obj(cb))
-        .pipe(gulp.dest('./web/'));
-    });
+    gulp.run('default');
   });
 });

@@ -347,7 +347,7 @@ var CssLexer = Lexer.extend(function(rule) {
                       for(var j = this.index; j < length; j++) {
                         var c = this.code.charAt(j);
                         if(!S.hasOwnProperty(c)) {
-                          if(c == ':' || c == '{') {
+                          if(':{,+([#>.'.indexOf(c) > -1) {
                             token.type(Token.SELECTOR);
                             this.sel = true;
                           }
