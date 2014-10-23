@@ -136,6 +136,18 @@ describe('csslexer', function() {
         expect(join(tokens)).to.eql(['*', '{', '}']);
         expect(type(tokens)).to.eql([21, 8, 8]);
       });
+      it('*,', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('*,:after,:*{}');
+        expect(join(tokens)).to.eql(['*', ',', ':after', ',', ':', '*', '{', '}']);
+        expect(type(tokens)).to.eql([21, 8, 19, 8, 8, 21, 8, 8]);
+      });
+      it('* depth', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('*{*{}}');
+        expect(join(tokens)).to.eql(['*', '{', '*', '{', '}', '}']);
+        expect(type(tokens)).to.eql([21, 8, 21, 8, 8, 8]);
+      });
       it('tagname', function () {
         var lexer = homunculus.getLexer('css');
         var tokens = lexer.parse('body{}');
