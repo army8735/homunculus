@@ -516,6 +516,18 @@ describe('csslexer', function() {
         expect(join(tokens)).to.eql(['body', '{', '@extend', ' ', 'custom', ';', '}']);
         expect(type(tokens)).to.eql([21, 8, 12, 1, 21, 8, 8]);
       });
+      it('$chinese', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('$中文=1;');
+        expect(join(tokens)).to.eql(['$中文', '=', '1', ';']);
+        expect(type(tokens)).to.eql([16, 8, 4, 8]);
+      });
+      it('chinese()', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('$中文(){}');
+        expect(join(tokens)).to.eql(['$中文', '(', ')', '{', '}']);
+        expect(type(tokens)).to.eql([16, 8, 8, 8, 8]);
+      });
     });
   });
   describe('index test', function() {
