@@ -245,7 +245,7 @@ var Parser = IParser.extend(function(lexer) {
     else {
       node.add(this.mediaType());
     }
-    if(this.look && this.look.content().toLowerCase() == 'and') {
+    while(this.look && this.look.content().toLowerCase() == 'and') {
       node.add(
         this.match(),
         this.expr()

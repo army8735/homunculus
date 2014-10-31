@@ -106,9 +106,9 @@ var CssRule = Rule.extend(function() {
   };
   self.addMatch(head);
 
-  self.addMatch(new RegMatch(Token.VARS, /^@\{[\w-]+\}/));
-  self.addMatch(new RegMatch(Token.VARS, /^\$[\w-]+/));
-  self.addMatch(new RegMatch(Token.VARS, /^\$\{[\w-]+\}/));
+  self.addMatch(new RegMatch(Token.VARS, /^@\{[\w\-\u4e00-\u9fa5]+\}/));
+  self.addMatch(new RegMatch(Token.VARS, /^\$[\w\-\u4e00-\u9fa5]+/));
+  self.addMatch(new RegMatch(Token.VARS, /^\$\{[\w\-\u4e00-\u9fa5]+\}/));
 }).methods({
   values: function() {
     return this.vl;

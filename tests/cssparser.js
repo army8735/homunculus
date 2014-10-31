@@ -157,6 +157,11 @@ describe('cssparser', function() {
       var node = parser.parse('@media screen,3D{}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.MEDIA,["@media",CssNode.MEDIAQLIST,[CssNode.MEDIAQUERY,[CssNode.MEDIATYPE,["screen"]],",",CssNode.MEDIAQUERY,[CssNode.MEDIATYPE,["3","D"]]],CssNode.BLOCK,["{","}"]]]]);
     });
+    it('@media multi and', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@media only screen and (min-width:120.063em) and (max-width:99999999em){}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.MEDIA,["@media",CssNode.MEDIAQLIST,[CssNode.MEDIAQUERY,["only",CssNode.MEDIATYPE,["screen"],"and",CssNode.EXPR,["(",CssNode.KEY,["min-width"],":",CssNode.VALUE,["120.063","em"],")"],"and",CssNode.EXPR,["(",CssNode.KEY,["max-width"],":",CssNode.VALUE,["99999999","em"],")"]]],CssNode.BLOCK,["{","}"]]]]);
+    });
     it('@media hack 1', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('@media screen\\9');
