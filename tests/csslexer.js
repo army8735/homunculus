@@ -530,6 +530,20 @@ describe('csslexer', function() {
       });
     });
   });
+  describe('operate', function() {
+    it('add in url()', function() {
+      var lexer = homunculus.getLexer('css');
+      var tokens = lexer.parse('.a{background:url("a"+"b")}');
+      expect(join(tokens)).to.eql(['.a', '{', 'background', ':', 'url', '(', '"a"', '+', '"b"', ')', '}']);
+      expect(type(tokens)).to.eql([21, 8, 10, 8, 15, 8, 7, 8, 7, 8, 8]);
+    });
+    it('add in url() and first is $', function() {
+      var lexer = homunculus.getLexer('css');
+      var tokens = lexer.parse('.a{background:url($a+"b")}');
+      expect(join(tokens)).to.eql(['.a', '{', 'background', ':', 'url', '(', '$a', '+', '"b"', ')', '}']);
+      expect(type(tokens)).to.eql([21, 8, 10, 8, 15, 8, 16, 8, 7, 8, 8]);
+    });
+  });
   describe('index test', function() {
     var lexer = homunculus.getLexer('css');
     var tokens = lexer.parse('body{color:#FFF}');

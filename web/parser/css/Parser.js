@@ -924,7 +924,8 @@ var Parser = IParser.extend(function(lexer) {
       node.add(
         this.match('url'),
         this.match('('),
-        this.match([Token.VARS, Token.STRING]),
+        this.addexpr([Token.VARS, Token.STRING]),
+        //this.match([Token.VARS, Token.STRING]),
         this.match(')')
       );
     }
@@ -937,6 +938,26 @@ var Parser = IParser.extend(function(lexer) {
     node.add(this.match([Token.VARS, Token.STRING]));
     node.add(this.match(')'));
     return node;
+  },
+  addexpr: function(accepts) {
+    var node = new Node(Node.ADDEXPR);
+    var temp = this.tempexpr(accepts);
+    if(this.look && ['+', '-'].indexOf(this.look.content()) != -1) {
+      node.add(temp);
+      while(this.look && ['+', '-'].indexOf(this.look.content()) != -1) {
+        node.add(
+          this.match(),
+          this.tempexpr(accepts)
+        );
+      }
+    }
+    else {
+      return temp;
+    }
+    return node;
+  },
+  tempexpr: function(accepts) {
+    return this.match(accepts);
   },
   match: function(type, msg) {
     //未定义为所有

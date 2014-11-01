@@ -44,12 +44,15 @@ var CssLexer = Lexer.extend(function(rule) {
           && !{
             "'": true,
             '"': true,
-            ')': true
+            ')': true,
+            '$': true
           }.hasOwnProperty(this.peek)) {
           this.dealPt(temp);
           this.url = false;
           continue outer;
         }
+        //url只能省略一次，即url()中第一个出现的非空白token，多个的话不能省略
+        this.url = false;
       }
       for(var i = 0, matches = this.rule.matches(), len = matches.length; i < len; i++) {
         var match = matches[i];

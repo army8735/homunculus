@@ -535,6 +535,18 @@ describe('cssparser', function() {
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["&",":hover"]],CssNode.BLOCK,["{","}"]],"}"]]]]);
     });
   });
+  describe('operate', function() {
+    it('add in url()', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('.a{background:url("a"+"b")}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,[".a"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["background"],":",CssNode.VALUE,[CssNode.URL,["url","(",CssNode.ADDEXPR,["\"a\"","+","\"b\""],")"]]],"}"]]]]);
+    });
+    it('add in url() and first is $', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('.a{background:url($a+"b")}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,[".a"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["background"],":",CssNode.VALUE,[CssNode.URL,["url","(",CssNode.ADDEXPR,["$a","+","\"b\""],")"]]],"}"]]]]);
+    });
+  });
   describe('lib test', function() {
     it('bootstrap', function() {
       var parser = homunculus.getParser('css');
