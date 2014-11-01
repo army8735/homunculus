@@ -546,6 +546,11 @@ describe('cssparser', function() {
       var node = parser.parse('.a{background:url($a+"b")}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,[".a"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["background"],":",CssNode.VALUE,[CssNode.URL,["url","(",CssNode.ADDEXPR,["$a","+","\"b\""],")"]]],"}"]]]]);
     });
+    it('mtpl in url()', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('.a{background:url($a+$b*$c)}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,[".a"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["background"],":",CssNode.VALUE,[CssNode.URL,["url","(",CssNode.ADDEXPR,["$a","+",CssNode.MTPLEXPR,["$b","*","$c"]],")"]]],"}"]]]]);
+    });
   });
   describe('lib test', function() {
     it('bootstrap', function() {

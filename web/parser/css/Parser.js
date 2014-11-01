@@ -589,7 +589,7 @@ var Parser = IParser.extend(function(lexer) {
           else if(noComma && s == ',') {
             this.error();
           }
-          node.add(this.match());
+          node.add(this.addexpr());
           break;
       }
     }
@@ -647,7 +647,7 @@ var Parser = IParser.extend(function(lexer) {
             else if(noComma && s == ',') {
               break outer;
             }
-            node.add(this.match());
+            node.add(this.addexpr());
             break;
         }
       }
@@ -925,7 +925,6 @@ var Parser = IParser.extend(function(lexer) {
         this.match('url'),
         this.match('('),
         this.addexpr([Token.VARS, Token.STRING]),
-        //this.match([Token.VARS, Token.STRING]),
         this.match(')')
       );
     }
@@ -935,19 +934,36 @@ var Parser = IParser.extend(function(lexer) {
     var node = new Node(Node.FORMAT);
     node.add(this.match());
     node.add(this.match('('));
-    node.add(this.match([Token.VARS, Token.STRING]));
+    node.add(this.addexpr([Token.VARS, Token.STRING]));
     node.add(this.match(')'));
     return node;
   },
   addexpr: function(accepts) {
     var node = new Node(Node.ADDEXPR);
-    var temp = this.tempexpr(accepts);
+    var mtplexpr = this.mtplexpr(accepts);
     if(this.look && ['+', '-'].indexOf(this.look.content()) != -1) {
-      node.add(temp);
+      node.add(mtplexpr);
       while(this.look && ['+', '-'].indexOf(this.look.content()) != -1) {
         node.add(
           this.match(),
-          this.tempexpr(accepts)
+          this.mtplexpr(accepts)
+        );
+      }
+    }
+    else {
+      return mtplexpr;
+    }
+    return node;
+  },
+  mtplexpr: function(accepts) {
+    var node = new Node(Node.MTPLEXPR);
+    var temp = this.match(accepts);
+    if(this.look && ['*', '/'].indexOf(this.look.content()) != -1) {
+      node.add(temp);
+      while(this.look && ['*', '/'].indexOf(this.look.content()) != -1) {
+        node.add(
+          this.match(),
+          this.match(accepts)
         );
       }
     }
@@ -955,9 +971,6 @@ var Parser = IParser.extend(function(lexer) {
       return temp;
     }
     return node;
-  },
-  tempexpr: function(accepts) {
-    return this.match(accepts);
   },
   match: function(type, msg) {
     //未定义为所有
