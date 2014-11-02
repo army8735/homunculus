@@ -836,7 +836,7 @@ var Parser = IParser.extend(function(lexer) {
     var s = this.look.content().toLowerCase();
     if([Token.COLOR, Token.HACK, Token.VARS, Token.ID, Token.PROPERTY, Token.NUMBER, Token.STRING, Token.HEAD, Token.SIGN, Token.UNITS, Token.KEYWORD].indexOf(this.look.type()) > -1
       && [';', '}', ')', ','].indexOf(s) == -1) {
-      node.add(this.match());
+      node.add(this.addexpr());
     }
     else {
       this.error();
@@ -845,7 +845,7 @@ var Parser = IParser.extend(function(lexer) {
       s = this.look.content().toLowerCase();
       if([Token.COLOR, Token.HACK, Token.VARS, Token.ID, Token.PROPERTY, Token.NUMBER, Token.STRING, Token.HEAD, Token.KEYWORD, Token.SIGN, Token.UNITS, Token.KEYWORD].indexOf(this.look.type()) > -1
         && [';', '}', ')', ','].indexOf(this.look.content()) == -1) {
-        node.add(this.match());
+        node.add(this.addexpr());
       }
       else {
         break;
@@ -858,16 +858,16 @@ var Parser = IParser.extend(function(lexer) {
     node.add(
       this.match(),
       this.match('('),
-      this.match(Token.NUMBER),
+      this.addexpr([Token.NUMBER, Token.VARS]),
       this.match(','),
-      this.match(Token.NUMBER),
+      this.addexpr([Token.NUMBER, Token.VARS]),
       this.match(','),
-      this.match(Token.NUMBER)
+      this.addexpr([Token.NUMBER, Token.VARS])
     );
     if(alpha) {
       node.add(
         this.match(','),
-        this.match(Token.NUMBER)
+        this.addexpr([Token.NUMBER, Token.VARS])
       );
     }
     node.add(this.match(')'));
@@ -878,30 +878,32 @@ var Parser = IParser.extend(function(lexer) {
     node.add(
       this.match(),
       this.match('('),
-      this.match(Token.NUMBER),
+      this.addexpr([Token.NUMBER, Token.VARS]),
       this.match(',')
     );
     var isZero = this.look && this.look.content() == '0';
-    node.add(this.match(Token.NUMBER));
+    var isVar = this.look && this.look.type() == Token.VARS;
+    node.add(this.addexpr([Token.NUMBER, Token.VARS]));
     if(this.look && this.look.content() == '%') {
       node.add(this.match());
     }
-    else if(!isZero) {
+    else if(!isZero && !isVar) {
       this.error();
     }
     node.add(this.match(','));
     var isZero = this.look && this.look.content() == '0';
-    node.add(this.match(Token.NUMBER));
+    var isVar = this.look && this.look.type() == Token.VARS;
+    node.add(this.addexpr([Token.NUMBER, Token.VARS]));
     if(this.look && this.look.content() == '%') {
       node.add(this.match());
     }
-    else if(!isZero) {
+    else if(!isZero && !isVar) {
       this.error();
     }
     if(alpha) {
       node.add(
         this.match(','),
-        this.match(Token.NUMBER)
+        this.match(this.addexpr([Token.NUMBER, Token.VARS]))
       );
     }
     node.add(this.match(')'));
@@ -924,7 +926,7 @@ var Parser = IParser.extend(function(lexer) {
       node.add(
         this.match('url'),
         this.match('('),
-        this.addexpr([Token.VARS, Token.STRING]),
+        this.addexpr([Token.VARS, Token.STRING, Token.NUMBER]),
         this.match(')')
       );
     }
@@ -934,7 +936,7 @@ var Parser = IParser.extend(function(lexer) {
     var node = new Node(Node.FORMAT);
     node.add(this.match());
     node.add(this.match('('));
-    node.add(this.addexpr([Token.VARS, Token.STRING]));
+    node.add(this.addexpr([Token.VARS, Token.STRING, Token.NUMBER]));
     node.add(this.match(')'));
     return node;
   },
