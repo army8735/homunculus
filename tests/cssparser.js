@@ -172,6 +172,11 @@ describe('cssparser', function() {
       var node = parser.parse('@media \\0screen\\,screen\\9');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.MEDIA,["@media",CssNode.MEDIAQLIST,[CssNode.MEDIAQUERY,[CssNode.MEDIATYPE,["\\0","screen","\\,","screen","\\9"]]]]]]);
     });
+    it('@media hack 3', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@media \\03D\\,3D\\9');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.MEDIA,["@media",CssNode.MEDIAQLIST,[CssNode.MEDIAQUERY,[CssNode.MEDIATYPE,["\\0","3", "D","\\,","3", "D","\\9"]]]]]]);
+    });
     it('@media error 1', function() {
       var parser = homunculus.getParser('css');
       expect(function() {
@@ -564,6 +569,17 @@ describe('cssparser', function() {
       var node = parser.parse('body{&:hover{}}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["&",":hover"]],CssNode.BLOCK,["{","}"]],"}"]]]]);
     });
+    it('no value is error', function() {
+      var parser = homunculus.getParser('css');
+      expect(function() {
+        parser.parse('body{width}');
+      }).to.throwError();
+    });
+    it('$ no value is right', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('body{$a}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{","$a","}"]]]]);
+    });
   });
   describe('operate', function() {
     it('add in url()', function() {
@@ -605,6 +621,16 @@ describe('cssparser', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('@document url-prefix($a+$b){}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.DOC,["@document","url-prefix","(",CssNode.ADDEXPR,["$a","+","$b"],")",CssNode.BLOCK,["{","}"]]]]);
+    });
+    it('in @media', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@media all and ($a){}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.MEDIA,["@media",CssNode.MEDIAQLIST,[CssNode.MEDIAQUERY,[CssNode.MEDIATYPE,["all"],"and",CssNode.EXPR,["(",CssNode.KEY,["$a"],")"]]],CssNode.BLOCK,["{","}"]]]]);
+    });
+    it('in @media value', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@media all and ($a:$b){}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.MEDIA,["@media",CssNode.MEDIAQLIST,[CssNode.MEDIAQUERY,[CssNode.MEDIATYPE,["all"],"and",CssNode.EXPR,["(",CssNode.KEY,["$a"],":",CssNode.VALUE,["$b"],")"]]],CssNode.BLOCK,["{","}"]]]]);
     });
   });
   describe('lib test', function() {

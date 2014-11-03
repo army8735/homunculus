@@ -4,6 +4,7 @@ var Lexer = require('../../lexer/Lexer');
 var Rule = require('../../lexer/rule/CssRule');
 var Token = require('../../lexer/Token');
 var Node = require('./Node');
+var needValue = require('./needValue');
 var S = {};
 S[Token.BLANK] = S[Token.TAB] = S[Token.COMMENT] = S[Token.LINE] = true;
 var MQL = {
@@ -258,17 +259,25 @@ var Parser = IParser.extend(function(lexer) {
     if(this.look && this.look.type() == Token.HACK) {
       node.add(this.match());
     }
-    while(this.look
-      && [Token.ID, Token.NUMBER].indexOf(this.look.type()) > -1
-      && !MT.hasOwnProperty(this.look.content().toLowerCase())) {
+    if(this.look && MT.hasOwnProperty(this.look.content().toLowerCase())) {
       node.add(this.match());
     }
-    node.add(this.match());
-    if(this.look && this.look.type() == Token.HACK) {
+    else {
+      while(this.look
+      && [Token.ID, Token.NUMBER, Token.UNITS, Token.PROPERTY].indexOf(this.look.type()) > -1
+      && !MT.hasOwnProperty(this.look.content().toLowerCase())) {
+        node.add(this.match());
+      }
+    }
+    while(this.look && this.look.type() == Token.HACK) {
       node.add(this.match());
       if(this.look && MT.hasOwnProperty(this.look.content().toLowerCase())) {
         node.add(this.match());
-        if(this.look && this.look.type() == Token.HACK) {
+      }
+      else {
+        while(this.look
+        && [Token.ID, Token.NUMBER, Token.UNITS, Token.PROPERTY].indexOf(this.look.type()) > -1
+        && !MT.hasOwnProperty(this.look.content().toLowerCase())) {
           node.add(this.match());
         }
       }
@@ -278,7 +287,9 @@ var Parser = IParser.extend(function(lexer) {
   expr: function() {
     var node = new Node(Node.EXPR);
     node.add(this.match('('));
-    node.add(this.key());
+    var k = this.key();
+    node.add(k);
+    //有可能整个变量作为一个键值，无需再有:value部分
     if(this.look && this.look.content() == ':') {
       node.add(this.match(':'));
       node.add(this.value());
@@ -572,9 +583,13 @@ var Parser = IParser.extend(function(lexer) {
   },
   style: function(name, noP, noS) {
     var node = new Node(Node.STYLE);
-    node.add(this.key(name));
-    node.add(this.match(':'));
-    node.add(this.value());
+    var k = this.key(name);
+    node.add(k);
+    if(needValue(k)
+      || this.look && this.look.content() == ':') {
+      node.add(this.match(':'));
+      node.add(this.value());
+    }
     while(this.look && this.look.type() == Token.HACK) {
       node.add(this.match());
     }
@@ -588,7 +603,8 @@ var Parser = IParser.extend(function(lexer) {
     while(this.look && this.look.type() == Token.HACK) {
       node.add(this.match());
     }
-    node.add(this.match(name || Token.KEYWORD));
+    keyIsVar = false;
+    node.add(this.addexpr([name || Token.KEYWORD, Token.VARS, Token.NUMBER]));
     return node;
   },
   value: function(noComma) {
@@ -995,6 +1011,9 @@ var Parser = IParser.extend(function(lexer) {
     return node;
   },
   addexpr: function(accepts) {
+    if(accepts && !Array.isArray(accepts)) {
+      accepts = [accepts];
+    }
     var node = new Node(Node.ADDEXPR);
     var mtplexpr = this.mtplexpr(accepts);
     if(this.look && ['+', '-'].indexOf(this.look.content()) != -1) {
