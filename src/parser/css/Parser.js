@@ -644,10 +644,13 @@ var Parser = IParser.extend(function(lexer) {
         case 'calc':
           node.add(this.calc());
           break;
-        //counter和attr语法完全一样
+        //这几个语法完全一样
+        //cycle是toggle的老版本写法
+        case 'cycle':
+        case 'toggle':
         case 'counter':
         case 'attr':
-          node.add(this.counter());
+          node.add(this.counter(s));
           break;
         case 'linear-gradient':
         case 'repeating-linear-gradient':
@@ -703,6 +706,17 @@ var Parser = IParser.extend(function(lexer) {
             break;
           case 'max':
             node.add(this.minmax(true));
+            break;
+          case 'calc':
+            node.add(this.calc());
+            break;
+          //这几个语法完全一样
+          //cycle是toggle的老版本写法
+          case 'cycle':
+          case 'toggle':
+          case 'counter':
+          case 'attr':
+            node.add(this.counter(s));
             break;
           case 'linear-gradient':
           case 'repeating-linear-gradient':
@@ -944,8 +958,8 @@ var Parser = IParser.extend(function(lexer) {
     node.add(this.match(')'));
     return node;
   },
-  counter: function() {
-    var node = new Node(Node.COUNTER);
+  counter: function(name) {
+    var node = new Node(Node[name.toUpperCase()]);
     node.add(
       this.match(),
       this.match('('),

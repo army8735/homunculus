@@ -590,6 +590,26 @@ describe('cssparser', function() {
       var node = parser.parse('body{content:counter($a, 2)}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["content"],":",CssNode.VALUE,[CssNode.COUNTER,["counter","(",CssNode.PARAM,["$a"],",",CssNode.PARAM,["2"],")"]]],"}"]]]]);
     });
+    it('attr', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('body{content:attr(item)}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["content"],":",CssNode.VALUE,[CssNode.ATTR,["attr","(",CssNode.PARAM,["item"],")"]]],"}"]]]]);
+    });
+    it('attr multi', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('body{content:attr($a, 2)}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["content"],":",CssNode.VALUE,[CssNode.ATTR,["attr","(",CssNode.PARAM,["$a"],",",CssNode.PARAM,["2"],")"]]],"}"]]]]);
+    });
+    it('toggle', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('body{content:toggle(item)}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["content"],":",CssNode.VALUE,[CssNode.TOGGLE,["toggle","(",CssNode.PARAM,["item"],")"]]],"}"]]]]);
+    });
+    it('toggle multi', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('body{content:toggle($a, 2)}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["content"],":",CssNode.VALUE,[CssNode.TOGGLE,["toggle","(",CssNode.PARAM,["$a"],",",CssNode.PARAM,["2"],")"]]],"}"]]]]);
+    });
     it('calc', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('body{width:calc(100-2)}');
