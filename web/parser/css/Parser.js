@@ -289,7 +289,7 @@ var Parser = IParser.extend(function(lexer) {
   charset: function() {
     var node = new Node(Node.CHARSET);
     node.add(this.match());
-    node.add(this.match(Token.STRING));
+    node.add(this.addexpr([Token.STRING, Token.VARS]));
     node.add(this.match(';'));
     return node;
   },
@@ -903,7 +903,7 @@ var Parser = IParser.extend(function(lexer) {
     if(alpha) {
       node.add(
         this.match(','),
-        this.match(this.addexpr([Token.NUMBER, Token.VARS]))
+        this.addexpr([Token.NUMBER, Token.VARS])
       );
     }
     node.add(this.match(')'));

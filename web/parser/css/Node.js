@@ -51,6 +51,7 @@ var Node = INode.extend(function(type, children) {
   CNDT: 'cndt',
   ADDEXPR: 'addexpr',
   MTPLEXPR: 'mtplexpr',
+  PARAM: 'param',
   getKey: function(s) {
     if(!s) {
       throw new Error('empty value');

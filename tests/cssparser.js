@@ -195,6 +195,11 @@ describe('cssparser', function() {
       var node = parser.parse('@charset "arail";');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.CHARSET,["@charset","\"arail\"",";"]]]);
     });
+    it('@charset vars', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@charset $a;');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.CHARSET,["@charset","$a",";"]]]);
+    });
     it('@charset error 1', function() {
       var parser = homunculus.getParser('css');
       expect(function() {
@@ -465,12 +470,12 @@ describe('cssparser', function() {
     it('max', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('p{color:max(1+2, 100)}');
-      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["p"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["color"],":",CssNode.VALUE,[CssNode.MAX,["max","(",CssNode.PARAM,["1","+","2"],",",CssNode.PARAM,["100"],")"]]],"}"]]]]);
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["p"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["color"],":",CssNode.VALUE,[CssNode.MAX,["max","(",CssNode.PARAM,[CssNode.ADDEXPR,["1","+","2"]],",",CssNode.PARAM,["100"],")"]]],"}"]]]]);
     });
     it('min', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('p{color:min(1+2, 100)}');
-      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["p"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["color"],":",CssNode.VALUE,[CssNode.MIN,["min","(",CssNode.PARAM,["1","+","2"],",",CssNode.PARAM,["100"],")"]]],"}"]]]]);
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["p"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["color"],":",CssNode.VALUE,[CssNode.MIN,["min","(",CssNode.PARAM,[CssNode.ADDEXPR,["1","+","2"]],",",CssNode.PARAM,["100"],")"]]],"}"]]]]);
     });
     it('linear-gradient 1', function() {
       var parser = homunculus.getParser('css');
