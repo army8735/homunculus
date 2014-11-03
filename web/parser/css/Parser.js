@@ -413,7 +413,7 @@ var Parser = IParser.extend(function(lexer) {
     if(this.look && this.look.type() == Token.ID) {
       node.add(this.match());
     }
-    node.add(this.match(Token.STRING));
+    node.add(this.addexpr([Token.STRING, Token.VARS]));
     node.add(this.match(';'));
     return node;
   },
@@ -421,11 +421,30 @@ var Parser = IParser.extend(function(lexer) {
     var node = new Node(Node.DOC);
     node.add(
       this.match(),
-      this.match(Token.ID),
-      this.match('('),
-      this.match(')'),
-      this.block()
+      this.match([Token.ID, Token.PROPERTY]),
+      this.match('(')
     );
+    if(this.look
+      && (this.look.type() == Token.STRING
+        || this.look.type() == Token.VARS)) {
+      node.add(this.addexpr([Token.STRING, Token.VARS]));
+    }
+    node.add(this.match(')'));
+    while(this.look && this.look.content() == ',') {
+      node.add(
+        this.match(),
+        this.match([Token.ID, Token.PROPERTY]),
+        this.match('(')
+      );
+      if(this.look
+        && (this.look.type() == Token.STRING
+        || this.look.type() == Token.VARS)) {
+        node.add(this.addexpr([Token.STRING, Token.VARS]));
+      }
+    }
+    if(this.look && this.look.content() == '{') {
+      node.add(this.block());
+    }
     return node;
   },
   vardecl: function() {

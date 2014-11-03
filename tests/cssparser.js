@@ -318,6 +318,21 @@ describe('cssparser', function() {
       var node = parser.parse('@-moz-document url-prefix(){}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.DOC,["@-moz-document","url-prefix","(",")",CssNode.BLOCK,["{","}"]]]]);
     });
+    it('@document string', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@document url-prefix("test"){}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.DOC,["@document","url-prefix","(",'"test"',")",CssNode.BLOCK,["{","}"]]]]);
+    });
+    it('@document var', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@document url-prefix($a){}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.DOC,["@document","url-prefix","(","$a",")",CssNode.BLOCK,["{","}"]]]]);
+    });
+    it('@document multi', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@document url-prefix($a),url(){}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.DOC,["@document","url-prefix","(","$a",")",",","url","("],")","{","}"]]);
+    });
     it('@document error 1', function() {
       var parser = homunculus.getParser('css');
       expect(function() {
@@ -580,6 +595,11 @@ describe('cssparser', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('@font-face{$a:$b+1}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.FONTFACE,["@font-face",CssNode.BLOCK,["{","$a",":",CssNode.VALUE,[CssNode.ADDEXPR,["$b","+","1"]],"}"]]]]);
+    });
+    it('in @document', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@document url-prefix($a+$b){}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.DOC,["@document","url-prefix","(",CssNode.ADDEXPR,["$a","+","$b"],")",CssNode.BLOCK,["{","}"]]]]);
     });
   });
   describe('lib test', function() {
