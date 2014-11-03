@@ -596,6 +596,11 @@ describe('cssparser', function() {
       var node = parser.parse('@font-face{$a:$b+1}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.FONTFACE,["@font-face",CssNode.BLOCK,["{","$a",":",CssNode.VALUE,[CssNode.ADDEXPR,["$b","+","1"]],"}"]]]]);
     });
+    it('in @namespace', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@namespace $a*2;');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.NAMESPACE,["@namespace",CssNode.MTPLEXPR,["$a","*","2"],";"]]]);
+    });
     it('in @document', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('@document url-prefix($a+$b){}');
