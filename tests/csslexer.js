@@ -258,6 +258,18 @@ describe('csslexer', function() {
         expect(join(tokens)).to.eql(['@media', '(', 'min--moz-device-pixel-ratio', ':', 'no-repeat', ')']);
         expect(type(tokens)).to.eql([12, 8, 10, 8, 15, 8]);
       });
+      it('alpha width (', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('body{filter:alpha(opacity=50)}');
+        expect(join(tokens)).to.eql(['body', '{', 'filter', ':', 'alpha', '(', 'opacity', '=', '50', ')', '}']);
+        expect(type(tokens)).to.eql([21, 8, 10, 8, 15, 8, 10, 8, 4, 8, 8]);
+      });
+      it('alpha single', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('body{filter:alpha}');
+        expect(join(tokens)).to.eql(['body', '{', 'filter', ':', 'alpha', '}']);
+        expect(type(tokens)).to.eql([21, 8, 10, 8, 15, 8]);
+      });
     });
     describe('hack', function() {
       it('*-_', function() {

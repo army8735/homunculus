@@ -652,6 +652,9 @@ var Parser = IParser.extend(function(lexer) {
         case 'attr':
           node.add(this.counter(s));
           break;
+        case 'alpha':
+          node.add(this.alpha());
+          break;
         case 'linear-gradient':
         case 'repeating-linear-gradient':
           node.add(this.lg());
@@ -717,6 +720,9 @@ var Parser = IParser.extend(function(lexer) {
           case 'counter':
           case 'attr':
             node.add(this.counter(s));
+            break;
+          case 'alpha':
+            node.add(this.alpha());
             break;
           case 'linear-gradient':
           case 'repeating-linear-gradient':
@@ -970,6 +976,33 @@ var Parser = IParser.extend(function(lexer) {
         this.match(),
         this.param(true)
       );
+    }
+    node.add(this.match(')'));
+    return node;
+  },
+  alpha: function() {
+    var node = new Node(Node.ALPHA);
+    var isFn = false;
+    for(var i = this.index; i < this.length; i++) {
+      var t = this.tokens[i];
+      if(!S.hasOwnProperty(t.type())) {
+        isFn = t.content() == '(';
+        break;
+      }
+    }
+    if(!isFn) {
+      return this.match();
+    }
+    node.add(
+      this.match(),
+      this.match('(')
+    );
+    var k = this.key('opacity');
+    node.add(k);
+    //有可能整个变量作为一个键值，无需再有=value部分
+    if(this.look && this.look.content() == '=') {
+      node.add(this.match('='));
+      node.add(this.value());
     }
     node.add(this.match(')'));
     return node;
