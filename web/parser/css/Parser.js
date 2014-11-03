@@ -424,7 +424,7 @@ var Parser = IParser.extend(function(lexer) {
     if(this.look && this.look.type() == Token.ID) {
       node.add(this.match());
     }
-    node.add(this.addexpr([Token.STRING, Token.NUMBER, Token.VARS]));
+    node.add(this.addexpr([Token.STRING, Token.VARS]));
     node.add(this.match(';'));
     return node;
   },
@@ -438,7 +438,7 @@ var Parser = IParser.extend(function(lexer) {
     if(this.look
       && (this.look.type() == Token.STRING
         || this.look.type() == Token.VARS)) {
-      node.add(this.addexpr([Token.STRING, Token.NUMBER, Token.VARS]));
+      node.add(this.addexpr([Token.STRING, Token.VARS]));
     }
     node.add(this.match(')'));
     while(this.look && this.look.content() == ',') {
@@ -450,7 +450,7 @@ var Parser = IParser.extend(function(lexer) {
       if(this.look
         && (this.look.type() == Token.STRING
         || this.look.type() == Token.VARS)) {
-        node.add(this.addexpr([Token.STRING, Token.NUMBER, Token.VARS]));
+        node.add(this.addexpr([Token.STRING, Token.VARS]));
       }
     }
     if(this.look && this.look.content() == '{') {
@@ -603,8 +603,20 @@ var Parser = IParser.extend(function(lexer) {
     while(this.look && this.look.type() == Token.HACK) {
       node.add(this.match());
     }
-    keyIsVar = false;
-    node.add(this.addexpr([name || Token.KEYWORD, Token.VARS, Token.NUMBER]));
+    if(!this.look) {
+      this.error();
+    }
+    if(name) {
+      if(this.look.type() == Token.VARS) {
+        node.add(this.match());
+      }
+      else {
+        node.add(this.match(name));
+      }
+    }
+    else {
+      node.add(this.addexpr([Token.STRING, Token.KEYWORD, Token.VARS]));
+    }
     return node;
   },
   value: function(noComma) {
@@ -1080,7 +1092,7 @@ var Parser = IParser.extend(function(lexer) {
       node.add(
         this.match('url'),
         this.match('('),
-        this.addexpr([Token.VARS, Token.STRING, Token.NUMBER]),
+        this.addexpr([Token.VARS, Token.STRING]),
         this.match(')')
       );
     }
@@ -1090,7 +1102,7 @@ var Parser = IParser.extend(function(lexer) {
     var node = new Node(Node.FORMAT);
     node.add(this.match());
     node.add(this.match('('));
-    node.add(this.addexpr([Token.VARS, Token.STRING, Token.NUMBER]));
+    node.add(this.addexpr([Token.VARS, Token.STRING]));
     node.add(this.match(')'));
     return node;
   },
@@ -1102,6 +1114,9 @@ var Parser = IParser.extend(function(lexer) {
     var mtplexpr = this.mtplexpr(accepts);
     if(this.look && ['+', '-'].indexOf(this.look.content()) != -1) {
       node.add(mtplexpr);
+      if(accepts) {
+        accepts = accepts.concat([Token.NUMBER]);
+      }
       while(this.look && ['+', '-'].indexOf(this.look.content()) != -1) {
         node.add(
           this.match(),
@@ -1119,6 +1134,9 @@ var Parser = IParser.extend(function(lexer) {
     var temp = this.match(accepts);
     if(this.look && ['*', '/'].indexOf(this.look.content()) != -1) {
       node.add(temp);
+      if(accepts) {
+        accepts = accepts.concat([Token.NUMBER]);
+      }
       while(this.look && ['*', '/'].indexOf(this.look.content()) != -1) {
         node.add(
           this.match(),
