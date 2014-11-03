@@ -302,6 +302,32 @@ var Parser = IParser.extend(function(lexer) {
 
     outer:
     while(this.look) {
+      if(this.look.type() == Token.VARS) {
+        var isFnCall = false;
+        for(var i = this.index; i < this.length; i++) {
+          var t = this.tokens[i];
+          if(!S.hasOwnProperty(t.type())) {
+            isFnCall = t.content() == '(';
+            break;
+          }
+        }
+        if(isFnCall) {
+          node2.add(this.fnc());
+        }
+        else {
+          node2.add(this.addexpr());
+          if(this.look && this.look.content() == ':') {
+            node2.add(
+              this.match(),
+              this.value()
+            );
+          }
+          else {
+            node2.add(this.match(';'));
+          }
+        }
+        break;
+      }
       switch(this.look.content().toLowerCase()) {
         case 'font-family':
         case 'src':
@@ -506,7 +532,7 @@ var Parser = IParser.extend(function(lexer) {
           node.add(this.fnc());
         }
         else {
-          node.add(this.addexpr())
+          node.add(this.addexpr());
           if(this.look && this.look.content() == ':') {
             node.add(
               this.match(),
