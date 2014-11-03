@@ -227,6 +227,11 @@ describe('cssparser', function() {
       var node = parser.parse('@font-face{font-family:YH;src:url(a),url(b)}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.FONTFACE,["@font-face",CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["font-family"],":",CssNode.VALUE,["YH"],";"],CssNode.STYLE,[CssNode.KEY,["src"],":",CssNode.VALUE,[CssNode.URL,["url","(","a",")"],",",CssNode.URL,["url","(","b",")"]]],"}"]]]]);
     });
+    it.skip('@font-face only one var', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@font-face{$a}');
+      expect(tree(node)).to.eql([]);
+    });
     it('@font-face error', function() {
       var parser = homunculus.getParser('css');
       expect(function() {
@@ -555,6 +560,16 @@ describe('cssparser', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('.a{background:url($a+$b*$c)}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,[".a"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["background"],":",CssNode.VALUE,[CssNode.URL,["url","(",CssNode.ADDEXPR,["$a","+",CssNode.MTPLEXPR,["$b","*","$c"]],")"]]],"}"]]]]);
+    });
+    it('as a style', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('body{$a+$b}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.ADDEXPR,["$a","+","$b"],"}"]]]]);
+    });
+    it('as a key', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('body{$a+$b:1}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.ADDEXPR,["$a","+","$b"],":",CssNode.VALUE,["1"],"}"]]]]);
     });
   });
   describe('lib test', function() {

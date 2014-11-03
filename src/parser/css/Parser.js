@@ -506,7 +506,16 @@ var Parser = IParser.extend(function(lexer) {
           node.add(this.fnc());
         }
         else {
-          node.add(this.match(), this.match(';'));
+          node.add(this.addexpr())
+          if(this.look && this.look.content() == ':') {
+            node.add(
+              this.match(),
+              this.value()
+            );
+          }
+          else {
+            node.add(this.match(';'));
+          }
         }
       }
       else {
