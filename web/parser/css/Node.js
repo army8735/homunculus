@@ -53,6 +53,7 @@ var Node = INode.extend(function(type, children) {
   MTPLEXPR: 'mtplexpr',
   PARAM: 'param',
   COUNTER: 'counter',
+  CALC: 'calc',
   getKey: function(s) {
     if(!s) {
       throw new Error('empty value');

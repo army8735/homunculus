@@ -641,7 +641,12 @@ var Parser = IParser.extend(function(lexer) {
         case 'min':
           node.add(this.minmax());
           break;
+        case 'calc':
+          node.add(this.calc());
+          break;
+        //counter和attr语法完全一样
         case 'counter':
+        case 'attr':
           node.add(this.counter());
           break;
         case 'linear-gradient':
@@ -895,21 +900,20 @@ var Parser = IParser.extend(function(lexer) {
       this.match(),
       this.match('(')
     );
-    while(this.look && this.look.content() != ')') {
+    node.add(this.param());
+    while(this.look && this.look.content() == ',') {
+      node.add(this.match());
       node.add(this.param());
-      if(this.look && this.look.content() == ',') {
-        node.add(this.match());
-      }
     }
     node.add(this.match(')'));
     return node;
   },
-  param: function() {
+  param: function(expr) {
     var node = new Node(Node.PARAM);
     var s = this.look.content().toLowerCase();
     if([Token.COLOR, Token.HACK, Token.VARS, Token.ID, Token.PROPERTY, Token.NUMBER, Token.STRING, Token.HEAD, Token.SIGN, Token.UNITS, Token.KEYWORD].indexOf(this.look.type()) > -1
       && [';', '}', ')', ','].indexOf(s) == -1) {
-      node.add(this.match());
+      node.add(expr ? this.addexpr() : this.match());
     }
     else {
       this.error();
@@ -918,7 +922,7 @@ var Parser = IParser.extend(function(lexer) {
       s = this.look.content().toLowerCase();
       if([Token.COLOR, Token.HACK, Token.VARS, Token.ID, Token.PROPERTY, Token.NUMBER, Token.STRING, Token.HEAD, Token.KEYWORD, Token.SIGN, Token.UNITS, Token.KEYWORD].indexOf(this.look.type()) > -1
         && [';', '}', ')', ','].indexOf(this.look.content()) == -1) {
-        node.add(this.match());
+        node.add(expr ? this.addexpr() : this.match());
       }
       else {
         break;
@@ -926,17 +930,31 @@ var Parser = IParser.extend(function(lexer) {
     }
     return node;
   },
+  calc: function() {
+    var node = new Node(Node.CALC);
+    node.add(
+      this.match(),
+      this.match('(')
+    );
+    node.add(this.param());
+    while(this.look && this.look.content() == ',') {
+      node.add(this.match());
+      node.add(this.param());
+    }
+    node.add(this.match(')'));
+    return node;
+  },
   counter: function() {
     var node = new Node(Node.COUNTER);
     node.add(
       this.match(),
       this.match('('),
-      this.addexpr()
+      this.param(true)
     );
     while(this.look && this.look.content() == ',') {
       node.add(
         this.match(),
-        this.addexpr()
+        this.param(true)
       );
     }
     node.add(this.match(')'));

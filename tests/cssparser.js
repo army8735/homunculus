@@ -583,12 +583,17 @@ describe('cssparser', function() {
     it('counter', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('body{content:counter(item)}');
-      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["content"],":",CssNode.VALUE,[CssNode.COUNTER,["counter","(","item",")"]]],"}"]]]]);
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["content"],":",CssNode.VALUE,[CssNode.COUNTER,["counter","(",CssNode.PARAM,["item"],")"]]],"}"]]]]);
     });
     it('counter multi', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('body{content:counter($a, 2)}');
-      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["content"],":",CssNode.VALUE,[CssNode.COUNTER,["counter","(","$a",",","2",")"]]],"}"]]]]);
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["content"],":",CssNode.VALUE,[CssNode.COUNTER,["counter","(",CssNode.PARAM,["$a"],",",CssNode.PARAM,["2"],")"]]],"}"]]]]);
+    });
+    it('calc', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('body{width:calc(100-2)}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["width"],":",CssNode.VALUE,[CssNode.CALC,["calc","(",CssNode.PARAM,["100","-2"],")"]]],"}"]]]]);
     });
   });
   describe('operate', function() {
@@ -645,7 +650,7 @@ describe('cssparser', function() {
     it('counter', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('body{content:counter($a + 2)}');
-      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["content"],":",CssNode.VALUE,[CssNode.COUNTER,["counter","(",CssNode.ADDEXPR,["$a","+","2"],")"]]],"}"]]]]);
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["content"],":",CssNode.VALUE,[CssNode.COUNTER,["counter","(",CssNode.PARAM,[CssNode.ADDEXPR,["$a","+","2"]],")"]]],"}"]]]]);
     });
   });
   describe('lib test', function() {
