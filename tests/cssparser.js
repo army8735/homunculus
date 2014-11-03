@@ -580,6 +580,16 @@ describe('cssparser', function() {
       var node = parser.parse('body{$a}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{","$a","}"]]]]);
     });
+    it('counter', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('body{content:counter(item)}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["content"],":",CssNode.VALUE,[CssNode.COUNTER,["counter","(","item",")"]]],"}"]]]]);
+    });
+    it('counter multi', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('body{content:counter($a, 2)}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["content"],":",CssNode.VALUE,[CssNode.COUNTER,["counter","(","$a",",","2",")"]]],"}"]]]]);
+    });
   });
   describe('operate', function() {
     it('add in url()', function() {
@@ -631,6 +641,11 @@ describe('cssparser', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('@media all and ($a:$b){}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.MEDIA,["@media",CssNode.MEDIAQLIST,[CssNode.MEDIAQUERY,[CssNode.MEDIATYPE,["all"],"and",CssNode.EXPR,["(",CssNode.KEY,["$a"],":",CssNode.VALUE,["$b"],")"]]],CssNode.BLOCK,["{","}"]]]]);
+    });
+    it('counter', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('body{content:counter($a + 2)}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["content"],":",CssNode.VALUE,[CssNode.COUNTER,["counter","(",CssNode.ADDEXPR,["$a","+","2"],")"]]],"}"]]]]);
     });
   });
   describe('lib test', function() {

@@ -52,6 +52,7 @@ var Node = INode.extend(function(type, children) {
   ADDEXPR: 'addexpr',
   MTPLEXPR: 'mtplexpr',
   PARAM: 'param',
+  COUNTER: 'counter',
   getKey: function(s) {
     if(!s) {
       throw new Error('empty value');

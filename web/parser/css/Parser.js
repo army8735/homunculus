@@ -641,6 +641,9 @@ var Parser = IParser.extend(function(lexer) {
         case 'min':
           node.add(this.minmax());
           break;
+        case 'counter':
+          node.add(this.counter());
+          break;
         case 'linear-gradient':
         case 'repeating-linear-gradient':
           node.add(this.lg());
@@ -921,6 +924,22 @@ var Parser = IParser.extend(function(lexer) {
         break;
       }
     }
+    return node;
+  },
+  counter: function() {
+    var node = new Node(Node.COUNTER);
+    node.add(
+      this.match(),
+      this.match('('),
+      this.addexpr()
+    );
+    while(this.look && this.look.content() == ',') {
+      node.add(
+        this.match(),
+        this.addexpr()
+      );
+    }
+    node.add(this.match(')'));
     return node;
   },
   rgb: function(alpha) {
