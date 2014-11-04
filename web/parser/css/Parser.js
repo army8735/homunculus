@@ -1049,7 +1049,7 @@ var Parser = IParser.extend(function(lexer) {
     );
     var isZero = this.look && this.look.content() == '0';
     var isVar = this.look && this.look.type() == Token.VARS;
-    node.add(this.addexpr([Token.NUMBER, Token.VARS]));
+    node.add(this.addexpr([Token.NUMBER, Token.VARS], true));
     if(this.look && this.look.content() == '%') {
       node.add(this.match());
     }
@@ -1059,7 +1059,7 @@ var Parser = IParser.extend(function(lexer) {
     node.add(this.match(','));
     var isZero = this.look && this.look.content() == '0';
     var isVar = this.look && this.look.type() == Token.VARS;
-    node.add(this.addexpr([Token.NUMBER, Token.VARS]));
+    node.add(this.addexpr([Token.NUMBER, Token.VARS], true));
     if(this.look && this.look.content() == '%') {
       node.add(this.match());
     }
@@ -1106,22 +1106,25 @@ var Parser = IParser.extend(function(lexer) {
     node.add(this.match(')'));
     return node;
   },
-  addexpr: function(accepts) {
+  addexpr: function(accepts, noUnit) {
     if(accepts && !Array.isArray(accepts)) {
       accepts = [accepts];
     }
+    if(accepts && accepts.indexOf(Token.NUMBER) == -1) {
+      accepts = accepts.concat([Token.NUMBER]);
+    }
     var node = new Node(Node.ADDEXPR);
-    var mtplexpr = this.mtplexpr(accepts);
+    var mtplexpr = this.mtplexpr(accepts, noUnit);
     if(this.look && ['+', '-'].indexOf(this.look.content()) != -1) {
       node.add(mtplexpr);
-      if(accepts) {
-        accepts = accepts.concat([Token.NUMBER]);
-      }
       while(this.look && ['+', '-'].indexOf(this.look.content()) != -1) {
         node.add(
           this.match(),
-          this.mtplexpr(accepts)
+          this.mtplexpr(accepts, noUnit)
         );
+        if(!noUnit && this.look && this.look.type() == Token.UNITS) {
+          node.add(this.match());
+        }
       }
     }
     else {
@@ -1129,19 +1132,22 @@ var Parser = IParser.extend(function(lexer) {
     }
     return node;
   },
-  mtplexpr: function(accepts) {
+  mtplexpr: function(accepts, noUnit) {
     var node = new Node(Node.MTPLEXPR);
     var temp = this.match(accepts);
+    if(!noUnit && this.look && this.look.type() == Token.UNITS) {
+      temp = [temp, this.match()];
+    }
     if(this.look && ['*', '/'].indexOf(this.look.content()) != -1) {
       node.add(temp);
-      if(accepts) {
-        accepts = accepts.concat([Token.NUMBER]);
-      }
       while(this.look && ['*', '/'].indexOf(this.look.content()) != -1) {
         node.add(
           this.match(),
           this.match(accepts)
         );
+        if(!noUnit && this.look && this.look.type() == Token.UNITS) {
+          node.add(this.match());
+        }
       }
     }
     else {

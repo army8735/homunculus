@@ -270,6 +270,18 @@ describe('csslexer', function() {
         expect(join(tokens)).to.eql(['body', '{', 'filter', ':', 'alpha', '}']);
         expect(type(tokens)).to.eql([21, 8, 10, 8, 15, 8]);
       });
+      it('operate', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('body{margin:0 -.25em}');
+        expect(join(tokens)).to.eql(['body', '{', 'margin', ':', '0', ' ', '-.25', 'em', '}']);
+        expect(type(tokens)).to.eql([21, 8, 10, 8, 4, 1, 4, 20, 8]);
+      });
+      it('operate with ()', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('body{margin:0 3-(.25em)}');
+        expect(join(tokens)).to.eql(['body', '{', 'margin', ':', '0', ' ', '3', '-', '(', '.25', 'em', ')', '}']);
+        expect(type(tokens)).to.eql([21, 8, 10, 8, 4, 1, 4, 8, 8, 4, 20, 8, 8]);
+      });
     });
     describe('hack', function() {
       it('*-_', function() {

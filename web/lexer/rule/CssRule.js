@@ -32,7 +32,7 @@ var CssRule = Rule.extend(function() {
   self.addMatch(new LineParse(Token.STRING, "'", "'", false));
 
   self.addMatch(new RegMatch(Token.NUMBER, /^-?\d+\.?\d*/i));
-  self.addMatch(new RegMatch(Token.NUMBER, /^\.\d+/i));
+  self.addMatch(new RegMatch(Token.NUMBER, /^-?\.\d+/i));
   self.addMatch(new CompleteEqual(Token.UNITS, '%', null, true));
 
   self.addMatch(new CompleteEqual(Token.HACK, '\\9\\0'));

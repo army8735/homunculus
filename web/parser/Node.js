@@ -49,13 +49,26 @@ var Node = Class(function(type, children) {
     var self = this;
     var args = Array.prototype.slice.call(arguments, 0);
     args.forEach(function(node) {
-      node.parent(self);
-      var last = self.children[self.children.length - 1];
-      if(last) {
-        last.next(node);
-        node.prev(last);
+      if(Array.isArray(node)) {
+        node.forEach(function(node2) {
+          node2.parent(self);
+          var last = self.children[self.children.length - 1];
+          if(last) {
+            last.next(node2);
+            node2.prev(last);
+          }
+          self.children.push(node2);
+        });
       }
-      self.children.push(node);
+      else {
+        node.parent(self);
+        var last = self.children[self.children.length - 1];
+        if(last) {
+          last.next(node);
+          node.prev(last);
+        }
+        self.children.push(node);
+      }
     });
     return self;
   },
