@@ -675,7 +675,7 @@ var Parser = IParser.extend(function(lexer) {
         case 'alpha':
         case 'blur':
         case 'chroma':
-        case 'dropShadow':
+        case 'dropshadow':
         case 'fliph':
         case 'flipv':
         case 'glow':
@@ -758,7 +758,7 @@ var Parser = IParser.extend(function(lexer) {
           case 'alpha':
           case 'blur':
           case 'chroma':
-          case 'dropShadow':
+          case 'dropshadow':
           case 'fliph':
           case 'flipv':
           case 'glow':
