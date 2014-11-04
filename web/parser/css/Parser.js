@@ -58,7 +58,6 @@ var Parser = IParser.extend(function(lexer) {
     this.index = 0;
     this.length = 0;
     this.ignores = {};
-    this.invalids = {};
     this.tree = {};
   },
   parse: function(code) {
@@ -1016,14 +1015,10 @@ var Parser = IParser.extend(function(lexer) {
     var node = new Node(Node.CALC);
     node.add(
       this.match(),
-      this.match('(')
+      this.match('('),
+      this.addexpr(),
+      this.match(')')
     );
-    node.add(this.param());
-    while(this.look && this.look.content() == ',') {
-      node.add(this.match());
-      node.add(this.param());
-    }
-    node.add(this.match(')'));
     return node;
   },
   counter: function(name) {
@@ -1206,7 +1201,7 @@ var Parser = IParser.extend(function(lexer) {
     return node;
   },
   prmrexpr: function(accepts, noUnit) {
-    var node = new Node(Node.MTPLEXPR);
+    var node = new Node(Node.PRMREXPR);
     if(this.look && this.look.content() == '(') {
       node.add(
         this.match('('),
@@ -1344,9 +1339,6 @@ var Parser = IParser.extend(function(lexer) {
   },
   ignore: function() {
     return this.ignores;
-  },
-  invalid: function() {
-    return this.invalids;
   }
 });
 module.exports = Parser;});

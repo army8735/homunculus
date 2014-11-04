@@ -227,6 +227,11 @@ describe('cssparser', function() {
       var node = parser.parse('@font-face{font-family:YH;src:url(xx),format("embedded-opentype")}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.FONTFACE,["@font-face",CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["font-family"],":",CssNode.VALUE,["YH"],";"],CssNode.STYLE,[CssNode.KEY,["src"],":",CssNode.VALUE,[CssNode.URL,["url","(","xx",")"],",",CssNode.FORMAT,["format","(","\"embedded-opentype\"",")"]]],"}"]]]]);
     });
+    it('@font-face format first', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@font-face{font-family:YH;src:format("embedded-opentype")}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.FONTFACE,["@font-face",CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["font-family"],":",CssNode.VALUE,["YH"],";"],CssNode.STYLE,[CssNode.KEY,["src"],":",CssNode.VALUE,[CssNode.FORMAT,["format","(","\"embedded-opentype\"",")"]]],"}"]]]]);
+    });
     it('@font-face mulit', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('@font-face{font-family:YH;src:url(a),url(b)}');
@@ -522,6 +527,12 @@ describe('cssparser', function() {
       var node = parser.parse('p{background:linear-gradient(45deg,#fff 10%,transparent)}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["p"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["background"],":",CssNode.VALUE,[CssNode.LINEARGRADIENT,["linear-gradient","(",CssNode.POINT,["45","deg"],",",CssNode.COLORSTOP,["#fff","10","%"],",",CssNode.COLORSTOP,["transparent"],")"]]],"}"]]]]);
     });
+    it('linear-gradient miss % error', function() {
+      var parser = homunculus.getParser('css');
+      expect(function() {
+        parser.parse('p{color:radial-gradient(50, 10% 20%,rgb(0,0,0))}');
+      }).to.throwError();
+    });
     it('radial-gradient 1', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('p{color:radial-gradient(circle,#f00,#ff0,#080)}');
@@ -531,6 +542,22 @@ describe('cssparser', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('p{color:radial-gradient(50%, 10% 20%,#f00,#ff0,#080)}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["p"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["color"],":",CssNode.VALUE,[CssNode.RADIOGRADIENT,["radial-gradient","(",CssNode.POS,[CssNode.LEN,["50","%"]],",",CssNode.LEN,["10","%"],CssNode.LEN,["20","%"],",",CssNode.COLORSTOP,["#f00"],",",CssNode.COLORSTOP,["#ff0"],",",CssNode.COLORSTOP,["#080"],")"]]],"}"]]]]);
+    });
+    it('radial-gradient 3', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('p{color:radial-gradient(50%, 10% 20%,rgb(0,0,0),hsla(0, 5%, 100%, 0))}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["p"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["color"],":",CssNode.VALUE,[CssNode.RADIOGRADIENT,["radial-gradient","(",CssNode.POS,[CssNode.LEN,["50","%"]],",",CssNode.LEN,["10","%"],CssNode.LEN,["20","%"],",",CssNode.COLORSTOP,[CssNode.RGB,["rgb","(","0",",","0",",","0",")"]],",",CssNode.COLORSTOP,[CssNode.HSLA,["hsla","(","0",",","5","%",",","100","%",",","0",")"]],")"]]],"}"]]]]);
+    });
+    it(') error', function() {
+      var parser = homunculus.getParser('css');
+      expect(function() {
+        parser.parse('p{color:)}');
+      }).to.throwError();
+    });
+    it('multi fn()', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('p{color:#f00 max(1) min(2) hsl(0, 5%, 100%) hsla(0, 5%, 100%, 0) calc(1+1) var(a) rgb(0,0,0) repeating-radial-gradient(circle,#f00,#ff0,#080)}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["p"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["color"],":",CssNode.VALUE,["#f00",CssNode.MAX,["max","(",CssNode.PARAM,["1"],")"],CssNode.MIN,["min","(",CssNode.PARAM,["2"],")"],CssNode.HSL,["hsl","(","0",",","5","%",",","100","%",")"],CssNode.HSLA,["hsla","(","0",",","5","%",",","100","%",",","0",")"],CssNode.CALC,["calc","(",CssNode.ADDEXPR,["1","+","1"],")"],CssNode.VARS,["var","(","a",")"],CssNode.RGB,["rgb","(","0",",","0",",","0",")"],CssNode.RADIOGRADIENT,["repeating-radial-gradient","(","circle",",",CssNode.COLORSTOP,["#f00"],",",CssNode.COLORSTOP,["#ff0"],",",CssNode.COLORSTOP,["#080"],")"]]],"}"]]]]);
     });
     it('new kw', function() {
       var parser = homunculus.getParser('css');
@@ -612,8 +639,13 @@ describe('cssparser', function() {
     });
     it('calc', function() {
       var parser = homunculus.getParser('css');
-      var node = parser.parse('body{width:calc(100-2)}');
-      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["width"],":",CssNode.VALUE,[CssNode.CALC,["calc","(",CssNode.PARAM,["100","-2"],")"]]],"}"]]]]);
+      var node = parser.parse('body{width:calc(100 - 2)}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["width"],":",CssNode.VALUE,[CssNode.CALC,["calc","(",CssNode.ADDEXPR,["100","-","2"],")"]]],"}"]]]]);
+    });
+    it('calc complex', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('body{width:calc((100 - 2)*3)}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["width"],":",CssNode.VALUE,[CssNode.CALC,["calc","(",CssNode.MTPLEXPR,[CssNode.PRMREXPR,["(",CssNode.ADDEXPR,["100","-","2"],")"],"*","3"],")"]]],"}"]]]]);
     });
     it('filter()', function() {
       var parser = homunculus.getParser('css');
@@ -640,6 +672,12 @@ describe('cssparser', function() {
       var node = parser.parse('a{background-image: -webkit-gradient(linear, left top, right top, from(rgba(0, 0, 0, .5)), to(rgba(0, 0, 0, .0001)));}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["a"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["background-image"],":",CssNode.VALUE,["-webkit-",CssNode.BRACKET,["gradient","(","linear",",","left","top",",","right","top",",",CssNode.BRACKET,["from","(",CssNode.BRACKET,["rgba","(","0",",","0",",","0",",",".5",")"],")"],",",CssNode.BRACKET,["to","(",CssNode.BRACKET,["rgba","(","0",",","0",",","0",",",".0001",")"],")"],")"]],";"],"}"]]]]);
     });
+    it('param error', function() {
+      var parser = homunculus.getParser('css');
+      expect(function() {
+        parser.parse('a{margin:max(,)}');
+      }).to.throwError();
+    });
   });
   describe('operate', function() {
     it('add in url()', function() {
@@ -652,10 +690,20 @@ describe('cssparser', function() {
       var node = parser.parse('.a{background:url($a+"b")}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,[".a"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["background"],":",CssNode.VALUE,[CssNode.URL,["url","(",CssNode.ADDEXPR,["$a","+","\"b\""],")"]]],"}"]]]]);
     });
+    it('add with units', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('.a{margin:2 + 3px + 2px}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,[".a"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["margin"],":",CssNode.VALUE,[CssNode.ADDEXPR,["2","+","3","px","+","2","px"]]],"}"]]]]);
+    });
     it('mtpl in url()', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('.a{background:url($a+$b*$c)}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,[".a"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["background"],":",CssNode.VALUE,[CssNode.URL,["url","(",CssNode.ADDEXPR,["$a","+",CssNode.MTPLEXPR,["$b","*","$c"]],")"]]],"}"]]]]);
+    });
+    it('mtpl with units', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('.a{margin:2 * 3px * 2px}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,[".a"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["margin"],":",CssNode.VALUE,[CssNode.MTPLEXPR,["2","*","3","px","*","2","px"]]],"}"]]]]);
     });
     it('as a style', function() {
       var parser = homunculus.getParser('css');
@@ -706,6 +754,11 @@ describe('cssparser', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('body{filter:alpha($a=$b+2)}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["filter"],":",CssNode.VALUE,[CssNode.FILTER,["alpha","(",CssNode.PARAM,["$a","=",CssNode.ADDEXPR,["$b","+","2"]],")"]]],"}"]]]]);
+    });
+    it('()', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('body{margin:0 (1+2)*3}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["margin"],":",CssNode.VALUE,["0",CssNode.MTPLEXPR,[CssNode.PRMREXPR,["(",CssNode.ADDEXPR,["1","+","2"],")"],"*","3"]]],"}"]]]]);
     });
   });
   describe('lib test', function() {
