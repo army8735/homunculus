@@ -300,7 +300,7 @@ var Parser = IParser.extend(function(lexer) {
   charset: function() {
     var node = new Node(Node.CHARSET);
     node.add(this.match());
-    node.add(this.addexpr([Token.STRING, Token.VARS]));
+    node.add(this.addexpr(Token.STRING));
     node.add(this.match(';'));
     return node;
   },
@@ -424,7 +424,7 @@ var Parser = IParser.extend(function(lexer) {
     if(this.look && this.look.type() == Token.ID) {
       node.add(this.match());
     }
-    node.add(this.addexpr([Token.STRING, Token.VARS]));
+    node.add(this.addexpr(Token.STRING));
     node.add(this.match(';'));
     return node;
   },
@@ -438,7 +438,7 @@ var Parser = IParser.extend(function(lexer) {
     if(this.look
       && (this.look.type() == Token.STRING
         || this.look.type() == Token.VARS)) {
-      node.add(this.addexpr([Token.STRING, Token.VARS]));
+      node.add(this.addexpr(Token.STRING));
     }
     node.add(this.match(')'));
     while(this.look && this.look.content() == ',') {
@@ -450,7 +450,7 @@ var Parser = IParser.extend(function(lexer) {
       if(this.look
         && (this.look.type() == Token.STRING
         || this.look.type() == Token.VARS)) {
-        node.add(this.addexpr([Token.STRING, Token.VARS]));
+        node.add(this.addexpr(Token.STRING));
       }
     }
     if(this.look && this.look.content() == '{') {
@@ -615,7 +615,7 @@ var Parser = IParser.extend(function(lexer) {
       }
     }
     else {
-      node.add(this.addexpr([Token.STRING, Token.KEYWORD, Token.VARS]));
+      node.add(this.addexpr([Token.STRING, Token.KEYWORD]));
     }
     return node;
   },
@@ -629,6 +629,9 @@ var Parser = IParser.extend(function(lexer) {
     if([Token.COLOR, Token.HACK, Token.VARS, Token.ID, Token.PROPERTY, Token.NUMBER, Token.STRING, Token.HEAD, Token.SIGN, Token.UNITS, Token.KEYWORD].indexOf(this.look.type()) > -1
       && [';', '}'].indexOf(s) == -1) {
       switch(s) {
+        case 'var':
+          node.add(this.vars());
+          break;
         case 'url':
           node.add(this.url());
           break;
@@ -662,6 +665,9 @@ var Parser = IParser.extend(function(lexer) {
         case 'toggle':
         case 'counter':
         case 'attr':
+        case 'translate':
+        case 'rect':
+        case 'translate3d':
           node.add(this.counter(s));
           break;
         case 'linear-gradient':
@@ -675,7 +681,7 @@ var Parser = IParser.extend(function(lexer) {
         case 'alpha':
         case 'blur':
         case 'chroma':
-        case 'dropShadow':
+        case 'dropshadow':
         case 'fliph':
         case 'flipv':
         case 'glow':
@@ -712,6 +718,9 @@ var Parser = IParser.extend(function(lexer) {
       if([Token.COLOR, Token.HACK, Token.VARS, Token.ID, Token.PROPERTY, Token.NUMBER, Token.STRING, Token.HEAD, Token.KEYWORD, Token.SIGN, Token.UNITS, Token.KEYWORD].indexOf(this.look.type()) > -1
         && [';', '}'].indexOf(this.look.content()) == -1) {
         switch(s) {
+          case 'var':
+            node.add(this.vars());
+            break;
           case 'url':
             node.add(this.url());
             break;
@@ -745,6 +754,9 @@ var Parser = IParser.extend(function(lexer) {
           case 'toggle':
           case 'counter':
           case 'attr':
+          case 'translate':
+          case 'rect':
+          case 'translate3d':
             node.add(this.counter(s));
             break;
           case 'linear-gradient':
@@ -758,7 +770,7 @@ var Parser = IParser.extend(function(lexer) {
           case 'alpha':
           case 'blur':
           case 'chroma':
-          case 'dropShadow':
+          case 'dropshadow':
           case 'fliph':
           case 'flipv':
           case 'glow':
@@ -990,6 +1002,16 @@ var Parser = IParser.extend(function(lexer) {
     }
     return node;
   },
+  vars: function() {
+    var node = new Node(Node.VARS);
+    node.add(
+      this.match(),
+      this.match('('),
+      this.addexpr(),
+      this.match(')')
+    );
+    return node;
+  },
   calc: function() {
     var node = new Node(Node.CALC);
     node.add(
@@ -1052,16 +1074,16 @@ var Parser = IParser.extend(function(lexer) {
     node.add(
       this.match(),
       this.match('('),
-      this.addexpr([Token.NUMBER, Token.VARS]),
+      this.addexpr(Token.NUMBER),
       this.match(','),
-      this.addexpr([Token.NUMBER, Token.VARS]),
+      this.addexpr(Token.NUMBER),
       this.match(','),
-      this.addexpr([Token.NUMBER, Token.VARS])
+      this.addexpr(Token.NUMBER)
     );
     if(alpha) {
       node.add(
         this.match(','),
-        this.addexpr([Token.NUMBER, Token.VARS])
+        this.addexpr(Token.NUMBER)
       );
     }
     node.add(this.match(')'));
@@ -1072,12 +1094,12 @@ var Parser = IParser.extend(function(lexer) {
     node.add(
       this.match(),
       this.match('('),
-      this.addexpr([Token.NUMBER, Token.VARS]),
+      this.addexpr(Token.NUMBER),
       this.match(',')
     );
     var isZero = this.look && this.look.content() == '0';
     var isVar = this.look && this.look.type() == Token.VARS;
-    node.add(this.addexpr([Token.NUMBER, Token.VARS], true));
+    node.add(this.addexpr(Token.NUMBER, true));
     if(this.look && this.look.content() == '%') {
       node.add(this.match());
     }
@@ -1087,7 +1109,7 @@ var Parser = IParser.extend(function(lexer) {
     node.add(this.match(','));
     var isZero = this.look && this.look.content() == '0';
     var isVar = this.look && this.look.type() == Token.VARS;
-    node.add(this.addexpr([Token.NUMBER, Token.VARS], true));
+    node.add(this.addexpr(Token.NUMBER, true));
     if(this.look && this.look.content() == '%') {
       node.add(this.match());
     }
@@ -1097,7 +1119,7 @@ var Parser = IParser.extend(function(lexer) {
     if(alpha) {
       node.add(
         this.match(','),
-        this.addexpr([Token.NUMBER, Token.VARS])
+        this.addexpr(Token.NUMBER)
       );
     }
     node.add(this.match(')'));
@@ -1120,7 +1142,7 @@ var Parser = IParser.extend(function(lexer) {
       node.add(
         this.match('url'),
         this.match('('),
-        this.addexpr([Token.VARS, Token.STRING]),
+        this.addexpr(Token.STRING),
         this.match(')')
       );
     }
@@ -1130,13 +1152,16 @@ var Parser = IParser.extend(function(lexer) {
     var node = new Node(Node.FORMAT);
     node.add(this.match());
     node.add(this.match('('));
-    node.add(this.addexpr([Token.VARS, Token.STRING]));
+    node.add(this.addexpr(Token.STRING));
     node.add(this.match(')'));
     return node;
   },
   addexpr: function(accepts, noUnit) {
     if(accepts && !Array.isArray(accepts)) {
       accepts = [accepts];
+    }
+    if(accepts && accepts.indexOf(Token.VARS) == -1) {
+      accepts = accepts.concat([Token.VARS]);
     }
     if(accepts && accepts.indexOf(Token.NUMBER) == -1) {
       accepts = accepts.concat([Token.NUMBER]);
@@ -1162,12 +1187,9 @@ var Parser = IParser.extend(function(lexer) {
   },
   mtplexpr: function(accepts, noUnit) {
     var node = new Node(Node.MTPLEXPR);
-    var temp = this.match(accepts);
-    if(!noUnit && this.look && this.look.type() == Token.UNITS) {
-      temp = [temp, this.match()];
-    }
+    var prmrexpr = this.prmrexpr(accepts, noUnit);
     if(this.look && ['*', '/'].indexOf(this.look.content()) != -1) {
-      node.add(temp);
+      node.add(prmrexpr);
       while(this.look && ['*', '/'].indexOf(this.look.content()) != -1) {
         node.add(
           this.match(),
@@ -1179,8 +1201,42 @@ var Parser = IParser.extend(function(lexer) {
       }
     }
     else {
-      return temp;
+      return prmrexpr;
     }
+    return node;
+  },
+  prmrexpr: function(accepts, noUnit) {
+    var node = new Node(Node.MTPLEXPR);
+    if(this.look && this.look.content() == '(') {
+      node.add(
+        this.match('('),
+        this.addexpr(accepts, noUnit),
+        this.match(')')
+      );
+      return node;
+    }
+    //紧接着的(说明这是个未知的css内置id()
+    var next = this.tokens[this.index];
+    if(next && next.content() == '('
+      && [Token.PROPERTY, Token.ID].indexOf(this.look.type()) > -1) {
+      return this.bracket();
+    }
+    var temp = this.match(accepts);
+    if(!noUnit && this.look && this.look.type() == Token.UNITS) {
+      temp = [temp, this.match()];
+    }
+    return temp;
+  },
+  bracket: function() {
+    var node = new Node(Node.BRACKET);
+    node.add(
+      this.match(),
+      this.match('(')
+    );
+    while(this.look && this.look.content() != ')') {
+      node.add(this.addexpr());
+    }
+    node.add(this.match(')'));
     return node;
   },
   match: function(type, msg) {

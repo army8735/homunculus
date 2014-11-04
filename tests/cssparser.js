@@ -277,7 +277,7 @@ describe('cssparser', function() {
     it('@keyframes from to', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('@keyframes testanimations{from{transform:translate(0,0)}to{transform:translate(100,20)}}');
-      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.KEYFRAMES,["@keyframes","testanimations",CssNode.BLOCK,["{",CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["from"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["transform"],":",CssNode.VALUE,["translate","(","0",",","0",")"]],"}"]],CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["to"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["transform"],":",CssNode.VALUE,["translate","(","100",",","20",")"]],"}"]],"}"]]]]);
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.KEYFRAMES,["@keyframes","testanimations",CssNode.BLOCK,["{",CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["from"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["transform"],":",CssNode.VALUE,[CssNode.TRANSLATE,["translate","(",CssNode.PARAM,["0"],",",CssNode.PARAM,["0"],")"]]],"}"]],CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["to"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["transform"],":",CssNode.VALUE,[CssNode.TRANSLATE,["translate","(",CssNode.PARAM,["100"],",",CssNode.PARAM,["20"],")"]]],"}"]],"}"]]]]);
     });
     it('@keyframes percent', function() {
       var parser = homunculus.getParser('css');
@@ -403,10 +403,10 @@ describe('cssparser', function() {
       var node = parser.parse(':root{var-companyblue:#369;var-lighterblue:powderblue;}');
       expect(tree(node)).to.eql([CssNode.SHEET,[":root","{",CssNode.VARDECL,["var-companyblue",":",CssNode.VALUE,["#369"],";"],CssNode.VARDECL,["var-lighterblue",":",CssNode.VALUE,["powderblue"],";"],"}"]]);
     });
-    it('css3 cal()', function() {
+    it('css3 var()', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('h3{color:var(lighterblue);}');
-      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["h3"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["color"],":",CssNode.VALUE,["var","(","lighterblue",")"],";"],"}"]]]]);
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["h3"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["color"],":",CssNode.VALUE,[CssNode.VARS,["var","(","lighterblue",")"]],";"],"}"]]]]);
     });
     it('vardecl', function() {
       var parser = homunculus.getParser('css');
@@ -629,6 +629,16 @@ describe('cssparser', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('body{filter:Glow(Color="#6699CC",Strength="5")}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["filter"],":",CssNode.VALUE,[CssNode.FILTER,["Glow","(",CssNode.PARAM,["Color","=","\"#6699CC\""],",",CssNode.PARAM,["Strength","=","\"5\""],")"]]],"}"]]]]);
+    });
+    it('unknow bracket', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('body{margin:unknow(xxx,xxx)}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["margin"],":",CssNode.VALUE,[CssNode.BRACKET,["unknow","(","xxx",",","xxx",")"]]],"}"]]]]);
+    });
+    it('unknow bracket multi', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('a{background-image: -webkit-gradient(linear, left top, right top, from(rgba(0, 0, 0, .5)), to(rgba(0, 0, 0, .0001)));}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["a"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["background-image"],":",CssNode.VALUE,["-webkit-",CssNode.BRACKET,["gradient","(","linear",",","left","top",",","right","top",",",CssNode.BRACKET,["from","(",CssNode.BRACKET,["rgba","(","0",",","0",",","0",",",".5",")"],")"],",",CssNode.BRACKET,["to","(",CssNode.BRACKET,["rgba","(","0",",","0",",","0",",",".0001",")"],")"],")"]],";"],"}"]]]]);
     });
   });
   describe('operate', function() {

@@ -51,12 +51,16 @@ var Node = INode.extend(function(type, children) {
   CNDT: 'cndt',
   ADDEXPR: 'addexpr',
   MTPLEXPR: 'mtplexpr',
+  PRMREXPR: 'prmrexpr',
   PARAM: 'param',
   COUNTER: 'counter',
   CALC: 'calc',
   TOGGLE: 'toggle',
   ATTR: 'attr',
   FILTER: 'filter',
+  TRANSLATE: 'translate',
+  VARS: 'vars',
+  BRACKET: 'bracket',
   getKey: function(s) {
     if(!s) {
       throw new Error('empty value');

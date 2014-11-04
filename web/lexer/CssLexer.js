@@ -67,6 +67,12 @@ var CssLexer = Lexer.extend(function(rule) {
 
           var s = token.content().toLowerCase();
           switch(token.type()) {
+            //单位必须紧跟数字，否则便不是单位
+            case Token.BLANK:
+            case Token.TAB:
+            case Token.LINE:
+              this.number = false;
+              break;
             //@import和@media之后进入值状态
             case Token.HEAD:
               s = s.replace(/^@(-moz-|-o-|-ms-|-webkit-|-vx-|-hp-|-khtml-|mso-|-prince-|-rim-|-ro-|-tc-|-wap-|-apple-|-atsc-|-ah-)/, '@');
