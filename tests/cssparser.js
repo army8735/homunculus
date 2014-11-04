@@ -615,27 +615,15 @@ describe('cssparser', function() {
       var node = parser.parse('body{width:calc(100-2)}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["width"],":",CssNode.VALUE,[CssNode.CALC,["calc","(",CssNode.PARAM,["100","-2"],")"]]],"}"]]]]);
     });
-    it('alpha()', function() {
+    it('filter()', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('body{filter:alpha(opacity=50)}');
-      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["filter"],":",CssNode.VALUE,[CssNode.ALPHA,["alpha","(",CssNode.KEY,["opacity"],"=",CssNode.VALUE,["50"],")"]]],"}"]]]]);
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["filter"],":",CssNode.VALUE,[CssNode.FILTER,["alpha","(",CssNode.PARAM,["opacity","=","50"],")"]]],"}"]]]]);
     });
-    it('alpha single', function() {
+    it('filter single', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('body{filter:alpha}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["filter"],":",CssNode.VALUE,["alpha"]],"}"]]]]);
-    });
-    it('alpha must append opacity', function() {
-      var parser = homunculus.getParser('css');
-      expect(function() {
-        parser.parse('body{filter:alpha(width=1)}');
-      }).to.throwError();
-    });
-    it('alpha must append =', function() {
-      var parser = homunculus.getParser('css');
-      expect(function() {
-        parser.parse('body{filter:alpha(opacity:1)}');
-      }).to.throwError();
     });
   });
   describe('operate', function() {
@@ -697,12 +685,12 @@ describe('cssparser', function() {
     it('alpha 1', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('body{filter:alpha($a)}');
-      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["filter"],":",CssNode.VALUE,[CssNode.ALPHA,["alpha","(",CssNode.KEY,["$a"],")"]]],"}"]]]]);
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["filter"],":",CssNode.VALUE,[CssNode.FILTER,["alpha","(",CssNode.PARAM,["$a"],")"]]],"}"]]]]);
     });
     it('alpha 2', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('body{filter:alpha($a=$b+2)}');
-      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["filter"],":",CssNode.VALUE,[CssNode.ALPHA,["alpha","(",CssNode.KEY,["$a"],"=",CssNode.VALUE,[CssNode.ADDEXPR,["$b","+","2"]],")"]]],"}"]]]]);
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["filter"],":",CssNode.VALUE,[CssNode.FILTER,["alpha","(",CssNode.PARAM,["$a","=",CssNode.ADDEXPR,["$b","+","2"]],")"]]],"}"]]]]);
     });
   });
   describe('lib test', function() {

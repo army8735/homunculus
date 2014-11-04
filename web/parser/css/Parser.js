@@ -664,9 +664,6 @@ var Parser = IParser.extend(function(lexer) {
         case 'attr':
           node.add(this.counter(s));
           break;
-        case 'alpha':
-          node.add(this.alpha());
-          break;
         case 'linear-gradient':
         case 'repeating-linear-gradient':
           node.add(this.lg());
@@ -674,6 +671,22 @@ var Parser = IParser.extend(function(lexer) {
         case 'radial-gradient':
         case 'repeating-radial-gradient':
           node.add(this.rg());
+          break;
+        case 'alpha':
+        case 'blur':
+        case 'chroma':
+        case 'dropShadow':
+        case 'fliph':
+        case 'flipv':
+        case 'glow':
+        case 'gray':
+        case 'invert':
+        case 'light':
+        case 'mask':
+        case 'shadow':
+        case 'wave':
+        case 'xray':
+          node.add(this.filter());
           break;
         default:
           if(s == '(') {
@@ -733,9 +746,6 @@ var Parser = IParser.extend(function(lexer) {
           case 'attr':
             node.add(this.counter(s));
             break;
-          case 'alpha':
-            node.add(this.alpha());
-            break;
           case 'linear-gradient':
           case 'repeating-linear-gradient':
             node.add(this.lg());
@@ -743,6 +753,22 @@ var Parser = IParser.extend(function(lexer) {
           case 'radial-gradient':
           case 'repeating-radial-gradient':
             node.add(this.rg());
+            break;
+          case 'alpha':
+          case 'blur':
+          case 'chroma':
+          case 'dropShadow':
+          case 'fliph':
+          case 'flipv':
+          case 'glow':
+          case 'gray':
+          case 'invert':
+          case 'light':
+          case 'mask':
+          case 'shadow':
+          case 'wave':
+          case 'xray':
+            node.add(this.filter());
             break;
           default:
             if(s == '(') {
@@ -992,8 +1018,8 @@ var Parser = IParser.extend(function(lexer) {
     node.add(this.match(')'));
     return node;
   },
-  alpha: function() {
-    var node = new Node(Node.ALPHA);
+  filter: function() {
+    var node = new Node(Node.FILTER);
     var isFn = false;
     for(var i = this.index; i < this.length; i++) {
       var t = this.tokens[i];
@@ -1009,12 +1035,12 @@ var Parser = IParser.extend(function(lexer) {
       this.match(),
       this.match('(')
     );
-    var k = this.key('opacity');
-    node.add(k);
-    //有可能整个变量作为一个键值，无需再有=value部分
-    if(this.look && this.look.content() == '=') {
-      node.add(this.match('='));
-      node.add(this.value());
+    node.add(this.param(true));
+    while(this.look && this.look.content() == ',') {
+      node.add(
+        this.match(),
+        this.param(true)
+      );
     }
     node.add(this.match(')'));
     return node;

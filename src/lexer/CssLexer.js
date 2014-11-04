@@ -26,7 +26,6 @@ var CssLexer = Lexer.extend(function(rule) {
   this.doc = false;
   this.supports = false;
   this.extend = false;
-  this.alpha = false;
   this.depth = 0;
 }).methods({
   //@override
@@ -187,7 +186,6 @@ var CssLexer = Lexer.extend(function(rule) {
                   token.type(Token.PROPERTY);
                   this.url = s == 'url' || s == 'format';
                   this.var = s == 'var';
-                  this.alpha = s == 'alpha';
                 }
                 this.kw = false;
                 this.sel = false;
@@ -269,16 +267,15 @@ var CssLexer = Lexer.extend(function(rule) {
                   this.var = false;
                   break;
                 case '(':
-                  if(this.alpha || this.media || this.import || this.doc) {
+                  if(this.media || this.import || this.doc) {
                     this.value = false;
                   }
                   this.parenthese = true;
                   this.sel = false;
                   break;
                 case ')':
-                  if(this.alpha || this.media || this.import || this.doc) {
+                  if(this.media || this.import || this.doc) {
                     this.value = true;
-                    this.alpha = false;
                   }
                   this.url = false;
                   this.parenthese = false;

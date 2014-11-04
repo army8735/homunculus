@@ -56,7 +56,7 @@ var Node = INode.extend(function(type, children) {
   CALC: 'calc',
   TOGGLE: 'toggle',
   ATTR: 'attr',
-  ALPHA: 'alpha',
+  FILTER: 'filter',
   getKey: function(s) {
     if(!s) {
       throw new Error('empty value');
