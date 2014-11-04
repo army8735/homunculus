@@ -1188,7 +1188,7 @@ var Parser = IParser.extend(function(lexer) {
       while(this.look && ['*', '/'].indexOf(this.look.content()) != -1) {
         node.add(
           this.match(),
-          this.match(accepts)
+          this.prmrexpr(accepts)
         );
         if(!noUnit && this.look && this.look.type() == Token.UNITS) {
           node.add(this.match());

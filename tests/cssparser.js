@@ -760,6 +760,11 @@ describe('cssparser', function() {
       var node = parser.parse('body{margin:0 (1+2)*3}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["margin"],":",CssNode.VALUE,["0",CssNode.MTPLEXPR,[CssNode.PRMREXPR,["(",CssNode.ADDEXPR,["1","+","2"],")"],"*","3"]]],"}"]]]]);
     });
+    it('in var', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('$a: $b*($c + 2);');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.VARDECL,["$a",":",CssNode.VALUE,[CssNode.MTPLEXPR,["$b","*",CssNode.PRMREXPR,["(",CssNode.ADDEXPR,["$c","+","2"],")"]]],";"]]]);
+    });
   });
   describe('lib test', function() {
     it('bootstrap', function() {
