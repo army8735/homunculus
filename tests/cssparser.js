@@ -625,6 +625,11 @@ describe('cssparser', function() {
       var node = parser.parse('body{filter:alpha}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["filter"],":",CssNode.VALUE,["alpha"]],"}"]]]]);
     });
+    it('filter() multi', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('body{filter:Glow(Color="#6699CC",Strength="5")}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["filter"],":",CssNode.VALUE,[CssNode.FILTER,["Glow","(",CssNode.PARAM,["Color","=","\"#6699CC\""],",",CssNode.PARAM,["Strength","=","\"5\""],")"]]],"}"]]]]);
+    });
   });
   describe('operate', function() {
     it('add in url()', function() {

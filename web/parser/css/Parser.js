@@ -686,6 +686,7 @@ var Parser = IParser.extend(function(lexer) {
         case 'shadow':
         case 'wave':
         case 'xray':
+        case 'dximagetransform.microsoft.gradient':
           node.add(this.filter());
           break;
         default:
@@ -768,6 +769,7 @@ var Parser = IParser.extend(function(lexer) {
           case 'shadow':
           case 'wave':
           case 'xray':
+          case 'dximagetransform.microsoft.gradient':
             node.add(this.filter());
             break;
           default:
