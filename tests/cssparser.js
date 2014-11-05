@@ -195,6 +195,12 @@ describe('cssparser', function() {
         parser.parse('@media (notkeyword:1)');
       }).to.throwError();
     });
+    it('@media error 4', function() {
+      var parser = homunculus.getParser('css');
+      expect(function() {
+        parser.parse('@media only');
+      }).to.throwError();
+    });
     it('@charset string', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('@charset "arail";');
@@ -246,6 +252,16 @@ describe('cssparser', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('@font-face{$a:$b}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.FONTFACE,["@font-face",CssNode.BLOCK,["{","$a",":",CssNode.VALUE,["$b"],"}"]]]]);
+    });
+    it('@font-face width fnc', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@font-face{$a()}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.FONTFACE,["@font-face",CssNode.BLOCK,["{",CssNode.FNC,["$a",CssNode.CPARAMS,["(",")"]],"}"]]]]);
+    });
+    it('@font-face width styleset', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@font-face{margin:0}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.FONTFACE,["@font-face",CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["margin"],":",CssNode.VALUE,["0"]],"}"]]]]);
     });
     it('@font-face error', function() {
       var parser = homunculus.getParser('css');
@@ -326,22 +342,32 @@ describe('cssparser', function() {
     it('@document normal', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('@-moz-document url-prefix(){}');
-      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.DOC,["@-moz-document","url-prefix","(",")",CssNode.BLOCK,["{","}"]]]]);
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.DOC,["@-moz-document",CssNode.URLPREFIX,["url-prefix","(",")"],CssNode.BLOCK,["{","}"]]]]);
     });
     it('@document string', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('@document url-prefix("test"){}');
-      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.DOC,["@document","url-prefix","(",'"test"',")",CssNode.BLOCK,["{","}"]]]]);
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.DOC,["@document",CssNode.URLPREFIX,["url-prefix","(","\"test\"",")"],CssNode.BLOCK,["{","}"]]]]);
     });
     it('@document var', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('@document url-prefix($a){}');
-      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.DOC,["@document","url-prefix","(","$a",")",CssNode.BLOCK,["{","}"]]]]);
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.DOC,["@document",CssNode.URLPREFIX,["url-prefix","(","$a",")"],CssNode.BLOCK,["{","}"]]]]);
     });
     it('@document multi', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('@document url-prefix($a),url(){}');
-      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.DOC,["@document","url-prefix","(","$a",")",",","url","(",")",CssNode.BLOCK,["{","}"]]]]);
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.DOC,["@document",CssNode.URLPREFIX,["url-prefix","(","$a",")"],",",CssNode.URL,["url","(",")"],CssNode.BLOCK,["{","}"]]]]);
+    });
+    it('@document multi var', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@document url-prefix($a),url($b+2),domain(aaa){}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.DOC,["@document",CssNode.URLPREFIX,["url-prefix","(","$a",")"],",",CssNode.URL,["url","(",CssNode.ADDEXPR,["$b","+","2"],")"],",",CssNode.DOMAIN,["domain","(","aaa",")"],CssNode.BLOCK,["{","}"]]]]);
+    });
+    it('@document url()', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@document url(),url(){}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.DOC,["@document",CssNode.URL,["url","(",")"],",",CssNode.URL,["url","(",")"],CssNode.BLOCK,["{","}"]]]]);
     });
     it('@document error 1', function() {
       var parser = homunculus.getParser('css');
@@ -365,6 +391,18 @@ describe('cssparser', function() {
       var parser = homunculus.getParser('css');
       expect(function() {
         parser.parse('@-moz-document a({}');
+      }).to.throwError();
+    });
+    it('@document error 5', function() {
+      var parser = homunculus.getParser('css');
+      expect(function() {
+        parser.parse('@document url(),xxx(){}');
+      }).to.throwError();
+    });
+    it('@document error 6', function() {
+      var parser = homunculus.getParser('css');
+      expect(function() {
+        parser.parse('@document url(),');
       }).to.throwError();
     });
     it('@viewport', function() {
@@ -438,6 +476,12 @@ describe('cssparser', function() {
       var parser = homunculus.getParser('css');
       expect(function() {
         parser.parse('$a:');
+      }).to.throwError();
+    });
+    it('vardecl error 3', function() {
+      var parser = homunculus.getParser('css');
+      expect(function() {
+        parser.parse('$a/');
       }).to.throwError();
     });
     it('nesting {}', function() {
@@ -542,6 +586,11 @@ describe('cssparser', function() {
       var node = parser.parse('p{background:linear-gradient(45deg,#fff 10%,transparent)}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["p"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["background"],":",CssNode.VALUE,[CssNode.LINEARGRADIENT,["linear-gradient","(",CssNode.POINT,["45","deg"],",",CssNode.COLORSTOP,["#fff","10","%"],",",CssNode.COLORSTOP,["transparent"],")"]]],"}"]]]]);
     });
+    it('linear-gradient 4', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('p{background:-moz-linear-gradient(left center,#000 20%,#f00 50%,#090 0)}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["p"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["background"],":",CssNode.VALUE,["-moz-",CssNode.LINEARGRADIENT,["linear-gradient","(",CssNode.POINT,["left","center"],",",CssNode.COLORSTOP,["#000","20","%"],",",CssNode.COLORSTOP,["#f00","50","%"],",",CssNode.COLORSTOP,["#090","0"],")"]]],"}"]]]]);
+    });
     it('linear-gradient miss % error', function() {
       var parser = homunculus.getParser('css');
       expect(function() {
@@ -562,6 +611,16 @@ describe('cssparser', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('p{color:radial-gradient(50%, 10% 20%,rgb(0,0,0),hsla(0, 5%, 100%, 0))}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["p"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["color"],":",CssNode.VALUE,[CssNode.RADIOGRADIENT,["radial-gradient","(",CssNode.POS,[CssNode.LEN,["50","%"]],",",CssNode.LEN,["10","%"],CssNode.LEN,["20","%"],",",CssNode.COLORSTOP,[CssNode.RGB,["rgb","(","0",",","0",",","0",")"]],",",CssNode.COLORSTOP,[CssNode.HSLA,["hsla","(","0",",","5","%",",","100","%",",","0",")"]],")"]]],"}"]]]]);
+    });
+    it('radial-gradient 4', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('p{color:radial-gradient(center,circle,#f00,#ff0,hsl(0, 5%, 100%));}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["p"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["color"],":",CssNode.VALUE,[CssNode.RADIOGRADIENT,["radial-gradient","(",CssNode.POS,["center"],",","circle",",",CssNode.COLORSTOP,["#f00"],",",CssNode.COLORSTOP,["#ff0"],",",CssNode.COLORSTOP,[CssNode.HSL,["hsl","(","0",",","5","%",",","100","%",")"]],")"]],";"],"}"]]]]);
+    });
+    it('radial-gradient 5', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('p{color:-webkit-radial-gradient(left top,cover,#f00 20%,#ff0 50%,#080 0)}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["p"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["color"],":",CssNode.VALUE,["-webkit-",CssNode.RADIOGRADIENT,["radial-gradient","(",CssNode.POS,["left","top"],",","cover",",",CssNode.COLORSTOP,["#f00","20","%"],",",CssNode.COLORSTOP,["#ff0","50","%"],",",CssNode.COLORSTOP,["#080","0"],")"]]],"}"]]]]);
     });
     it(') error', function() {
       var parser = homunculus.getParser('css');
@@ -772,7 +831,7 @@ describe('cssparser', function() {
     it('in @document', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('@document url-prefix($a+$b){}');
-      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.DOC,["@document","url-prefix","(",CssNode.ADDEXPR,["$a","+","$b"],")",CssNode.BLOCK,["{","}"]]]]);
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.DOC,["@document",CssNode.URLPREFIX,["url-prefix","(",CssNode.ADDEXPR,["$a","+","$b"],")"],CssNode.BLOCK,["{","}"]]]]);
     });
     it('in @media', function() {
       var parser = homunculus.getParser('css');

@@ -61,6 +61,9 @@ var Node = INode.extend(function(type, children) {
   TRANSLATE: 'translate',
   VARS: 'vars',
   BRACKET: 'bracket',
+  URLPREFIX: 'ulrprefix',
+  DOMAIN: 'domain',
+  REGEXP: 'regexp',
   getKey: function(s) {
     if(!s) {
       throw new Error('empty value');

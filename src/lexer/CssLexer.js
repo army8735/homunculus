@@ -190,7 +190,7 @@ var CssLexer = Lexer.extend(function(rule) {
                 else if(this.rule.keyWords().hasOwnProperty(s)
                   || this.rule.values().hasOwnProperty(s)) {
                   token.type(Token.PROPERTY);
-                  this.url = s == 'url' || s == 'format';
+                  this.url = ['url', 'format', 'url-prefix', 'domain', 'regexp'].indexOf(s) > -1;
                   this.var = s == 'var';
                 }
                 this.kw = false;

@@ -433,33 +433,55 @@ var Parser = IParser.extend(function(lexer) {
   },
   doc: function() {
     var node = new Node(Node.DOC);
-    node.add(
-      this.match(),
-      this.match([Token.ID, Token.PROPERTY]),
-      this.match('(')
-    );
-    if(this.look
-      && (this.look.type() == Token.STRING
-        || this.look.type() == Token.VARS)) {
-      node.add(this.addexpr(Token.STRING));
+    node.add(this.match());
+    if(!this.look) {
+      this.error();
     }
-    node.add(this.match(')'));
+    switch(this.look.content().toLowerCase()) {
+      case 'url-prefix':
+      case 'domain':
+      case 'regexp':
+        node.add(this.urlPrefix(this.look.content().toUpperCase().replace('-', '')));
+        break;
+      case 'url':
+        node.add(this.url());
+        break;
+      default:
+        this.error();
+    }
     while(this.look && this.look.content() == ',') {
-      node.add(
-        this.match(),
-        this.match([Token.ID, Token.PROPERTY]),
-        this.match('(')
-      );
-      if(this.look
-        && (this.look.type() == Token.STRING
-        || this.look.type() == Token.VARS)) {
-        node.add(this.addexpr(Token.STRING));
+      node.add(this.match());
+      if(!this.look) {
+        this.error();
       }
-      node.add(this.match(')'));
+      switch(this.look.content().toLowerCase()) {
+        case 'url-prefix':
+        case 'domain':
+        case 'regexp':
+          node.add(this.urlPrefix(this.look.content().toUpperCase().replace('-', '')));
+          break;
+        case 'url':
+          node.add(this.url());
+          break;
+        default:
+          this.error();
+      }
     }
     if(this.look && this.look.content() == '{') {
       node.add(this.block());
     }
+    return node;
+  },
+  urlPrefix: function(name) {
+    var node = new Node(Node[name]);
+    node.add(
+      this.match(),
+      this.match('(')
+    );
+    if(this.look && this.look.content() != ')') {
+      node.add(this.addexpr(Token.STRING));
+    }
+    node.add(this.match(')'));
     return node;
   },
   vardecl: function() {
@@ -873,7 +895,7 @@ var Parser = IParser.extend(function(lexer) {
       if(this.look.type() == Token.NUMBER) {
         node.add(this.len());
       }
-      else if(['left', 'center', 'right'].indexOf(this.look.content().toLowerCase()) > -1){
+      else if(['top', 'center', 'bottom'].indexOf(this.look.content().toLowerCase()) > -1){
         node.add(this.match());
       }
     }
@@ -934,12 +956,12 @@ var Parser = IParser.extend(function(lexer) {
       if(this.look && this.look.content().toLowerCase() == 'to') {
         node.add(this.match());
       }
-      node.add(this.match(['left', 'right', 'top', 'bottom']));
+      node.add(this.match(['left', 'right', 'top', 'bottom', 'center']));
       if(this.look && this.look.content().toLowerCase() == 'to') {
         node.add(this.match());
       }
       if(this.look && this.look.type() == Token.PROPERTY) {
-        node.add(this.match(['left', 'right', 'top', 'bottom']));
+        node.add(this.match(['left', 'right', 'top', 'bottom', 'center']));
       }
     }
     return node;
@@ -1154,10 +1176,12 @@ var Parser = IParser.extend(function(lexer) {
     else {
       node.add(
         this.match('url'),
-        this.match('('),
-        this.addexpr(Token.STRING),
-        this.match(')')
+        this.match('(')
       );
+      if(this.look && this.look.content() != ')') {
+        node.add(this.addexpr(Token.STRING));
+      }
+      node.add(this.match(')'));
     }
     return node;
   },
@@ -1243,7 +1267,7 @@ var Parser = IParser.extend(function(lexer) {
   bracket: function() {
     var node = new Node(Node.BRACKET);
     node.add(
-      this.match(),
+      this.match([Token.ID, Token.PROPERTY]),
       this.match('(')
     );
     while(this.look && this.look.content() != ')') {
