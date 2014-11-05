@@ -72,6 +72,33 @@ var Node = Class(function(type, children) {
     });
     return self;
   },
+  addFirst: function() {
+    var self = this;
+    var args = Array.prototype.slice.call(arguments, 0);
+    args.forEach(function(node) {
+      if(Array.isArray(node)) {
+        node.forEach(function(node2) {
+          node2.parent(self);
+          var last = self.children[0];
+          if(last) {
+            last.next(node2);
+            node2.prev(last);
+          }
+          self.children.unshift(node2);
+        });
+      }
+      else {
+        node.parent(self);
+        var last = self.children[0];
+        if(last) {
+          last.next(node);
+          node.prev(last);
+        }
+        self.children.unshift(node);
+      }
+    });
+    return self;
+  },
   token: function() {
     return this.children;
   },

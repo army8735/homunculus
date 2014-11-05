@@ -177,7 +177,7 @@ var Parser = IParser.extend(function(lexer) {
         );
         break;
       default:
-        node.add(this.style(null, true, true));
+        node.add(this.style(null, true));
         break;
     }
     return node;
@@ -473,7 +473,7 @@ var Parser = IParser.extend(function(lexer) {
       this.error();
     }
     if(this.look.type() == Token.KEYWORD) {
-      node.add(this.style(null, null, true));
+      node.add(this.style(null, true));
     }
     else {
       node.add(this.value());
@@ -484,6 +484,14 @@ var Parser = IParser.extend(function(lexer) {
   styleset: function(kf) {
     var node = new Node(Node.STYLESET);
     node.add(this.selectors(kf));
+    //兼容less的继承写法，即只写一个选择器
+    if(this.look && [';', '}'].indexOf(this.look.content()) > -1) {
+      node.name(Node.EXTEND);
+      var extend = new Token(Token.VIRTUAL, '@extend');
+      extend = new Node(Node.TOKEN, extend);
+      node.addFirst(extend);
+      return node;
+    }
     node.add(this.block());
     return node;
   },
@@ -580,7 +588,7 @@ var Parser = IParser.extend(function(lexer) {
     node.add(this.match('}'));
     return node;
   },
-  style: function(name, noP, noS) {
+  style: function(name, noS) {
     var node = new Node(Node.STYLE);
     var k = this.key(name);
     node.add(k);

@@ -678,6 +678,11 @@ describe('cssparser', function() {
         parser.parse('a{margin:max(,)}');
       }).to.throwError();
     });
+    it('omit @extend for compatible less', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('.a{.b}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,[".a"]],CssNode.BLOCK,["{",CssNode.EXTEND,[CssNode.SELECTORS,[CssNode.SELECTOR,[".b"]]],"}"]]]]);
+    });
   });
   describe('operate', function() {
     it('add in url()', function() {
