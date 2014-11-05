@@ -341,7 +341,7 @@ describe('cssparser', function() {
     it('@document multi', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('@document url-prefix($a),url(){}');
-      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.DOC,["@document","url-prefix","(","$a",")",",","url","("],")","{","}"]]);
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.DOC,["@document","url-prefix","(","$a",")",",","url","(",")",CssNode.BLOCK,["{","}"]]]]);
     });
     it('@document error 1', function() {
       var parser = homunculus.getParser('css');
@@ -380,7 +380,12 @@ describe('cssparser', function() {
     it('@supports', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('@supports not(transform-origin:2px){}');
-      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.SUPPORTS,["@supports",CssNode.CNDT,["not",CssNode.CNDT,["(",CssNode.CNDT,[CssNode.STYLE,[CssNode.KEY,["transform-origin"],":",CssNode.VALUE,["2","px"]]],")"]],CssNode.SHEET,["}"]]]]);
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.SUPPORTS,["@supports",CssNode.CNDT,["not",CssNode.CNDT,["(",CssNode.CNDT,[CssNode.STYLE,[CssNode.KEY,["transform-origin"],":",CssNode.VALUE,["2","px"]]],")"]],CssNode.BLOCK,["{","}"]]]]);
+    });
+    it('@keyframes in @supports', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@supports(animation-name:test){@keyframes a{}}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.SUPPORTS,["@supports",CssNode.CNDT,["(",CssNode.CNDT,[CssNode.STYLE,[CssNode.KEY,["animation-name"],":",CssNode.VALUE,["test"]]],")"],CssNode.BLOCK,["{",CssNode.KEYFRAMES,["@keyframes","a",CssNode.BLOCK,["{","}"]],"}"]]]]);
     });
     it('@supports error', function() {
       var parser = homunculus.getParser('css');
@@ -406,7 +411,7 @@ describe('cssparser', function() {
     it('css3 variable', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse(':root{var-companyblue:#369;var-lighterblue:powderblue;}');
-      expect(tree(node)).to.eql([CssNode.SHEET,[":root","{",CssNode.VARDECL,["var-companyblue",":",CssNode.VALUE,["#369"],";"],CssNode.VARDECL,["var-lighterblue",":",CssNode.VALUE,["powderblue"],";"],"}"]]);
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,[":root"]],CssNode.BLOCK,["{",CssNode.VARDECL,["var-companyblue",":",CssNode.VALUE,["#369"],";"],CssNode.VARDECL,["var-lighterblue",":",CssNode.VALUE,["powderblue"],";"],"}"]]]]);
     });
     it('css3 var()', function() {
       var parser = homunculus.getParser('css');
@@ -417,6 +422,11 @@ describe('cssparser', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('$a:1;@b=2;');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.VARDECL,["$a",":",CssNode.VALUE,["1"],";"],CssNode.VARDECL,["@b","=",CssNode.VALUE,["2"],";"]]]);
+    });
+    it('vardecl in block', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('.a{$a=1;$b:background:#FFF}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,[".a"]],CssNode.BLOCK,["{",CssNode.VARDECL,["$a","=",CssNode.VALUE,["1"],";"],CssNode.VARDECL,["$b",":",CssNode.STYLE,[CssNode.KEY,["background"],":",CssNode.VALUE,["#FFF"]]],"}"]]]]);
     });
     it('vardecl error 1', function() {
       var parser = homunculus.getParser('css');
@@ -459,6 +469,11 @@ describe('cssparser', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('a[hidden]{}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["a","[","hidden","]"]],CssNode.BLOCK,["{","}"]]]]);
+    });
+    it('pseudo first', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse(':hover{margin:0}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,[":hover"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["margin"],":",CssNode.VALUE,["0"]],"}"]]]]);
     });
     it('hack', function() {
       var parser = homunculus.getParser('css');
@@ -682,6 +697,30 @@ describe('cssparser', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('.a{.b}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,[".a"]],CssNode.BLOCK,["{",CssNode.EXTEND,[CssNode.SELECTORS,[CssNode.SELECTOR,[".b"]]],"}"]]]]);
+    });
+    it('miss {', function() {
+      var parser = homunculus.getParser('css');
+      expect(function() {
+        parser.parse('a}');
+      }).to.throwError();
+    });
+    it('miss }', function() {
+      var parser = homunculus.getParser('css');
+      expect(function() {
+        parser.parse('a{');
+      }).to.throwError();
+    });
+    it('extra {', function() {
+      var parser = homunculus.getParser('css');
+      expect(function() {
+        parser.parse('a{{}');
+      }).to.throwError();
+    });
+    it('extra }', function() {
+      var parser = homunculus.getParser('css');
+      expect(function() {
+        parser.parse('a}}');
+      }).to.throwError();
     });
   });
   describe('operate', function() {

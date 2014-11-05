@@ -98,10 +98,14 @@ var Parser = IParser.extend(function(lexer) {
         }
         return isFn ? this.fn() : this.vardecl();
       case Token.SELECTOR:
+      case Token.PSEUDO:
         return this.styleset();
       default:
         if(this.look.content() == '[' && this.look.type() != Token.HACK) {
           return this.styleset();
+        }
+        if(['{', '}'].indexOf(this.look.content()) > -1) {
+          this.error();
         }
         return this.match();
     }
@@ -154,7 +158,7 @@ var Parser = IParser.extend(function(lexer) {
     while(this.look && this.look.content() != '{') {
       node.add(this.cndt());
     }
-    node.add(this.sheet());
+    node.add(this.block());
     return node;
   },
   cndt: function() {
@@ -451,6 +455,7 @@ var Parser = IParser.extend(function(lexer) {
         || this.look.type() == Token.VARS)) {
         node.add(this.addexpr(Token.STRING));
       }
+      node.add(this.match(')'));
     }
     if(this.look && this.look.content() == '{') {
       node.add(this.block());
@@ -558,15 +563,20 @@ var Parser = IParser.extend(function(lexer) {
       }
       else if(this.look.type() == Token.VARS) {
         var isFnCall = false;
+        var isDecl = false;
         for(var i = this.index; i < this.length; i++) {
           var t = this.tokens[i];
           if(!S.hasOwnProperty(t.type())) {
             isFnCall = t.content() == '(';
+            isDecl = [':', '='].indexOf(t.content()) > -1;
             break;
           }
         }
         if(isFnCall) {
           node.add(this.fnc());
+        }
+        else if(isDecl) {
+          node.add(this.vardecl());
         }
         else {
           node.add(this.addexpr());
