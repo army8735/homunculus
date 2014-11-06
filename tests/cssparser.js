@@ -868,6 +868,16 @@ describe('cssparser', function() {
       var node = parser.parse('$a: $b*($c + 2);');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.VARDECL,["$a",":",CssNode.VALUE,[CssNode.MTPLEXPR,["$b","*",CssNode.PRMREXPR,["(",CssNode.ADDEXPR,["$c","+","2"],")"]]],";"]]]);
     });
+    it('unit after ()', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('a{padding:(1+2)px}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["a"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["padding"],":",CssNode.VALUE,[CssNode.PRMREXPR,["(",CssNode.ADDEXPR,["1","+","2"],")"],"px"]],"}"]]]]);
+    });
+    it('no blank between unit and ()', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('body{margin:(1+2) px}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["margin"],":",CssNode.VALUE,[CssNode.PRMREXPR,["(",CssNode.ADDEXPR,["1","+","2"],")"],"px"]],"}"]]]]);
+    });
   });
   describe('lib test', function() {
     it('bootstrap', function() {

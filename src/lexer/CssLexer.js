@@ -263,6 +263,7 @@ var CssLexer = Lexer.extend(function(rule) {
               this.doc = false;
               break;
             case Token.SIGN:
+              this.number = false;
               switch(s) {
                 case ':':
                   if(this.kw) {
@@ -287,6 +288,8 @@ var CssLexer = Lexer.extend(function(rule) {
                   this.parenthese = false;
                   this.sel = false;
                   this.var = false;
+                  //)之后可能跟单位，比如margin:(1+2)px
+                  this.number = true;
                   break;
                 case '[':
                   if(!this.value) {
@@ -389,7 +392,6 @@ var CssLexer = Lexer.extend(function(rule) {
                   this.var = false;
                   break;
               }
-              this.number = false;
               this.kw = false;
               this.page = false;
               this.kf = false;
