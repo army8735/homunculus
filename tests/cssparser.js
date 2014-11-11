@@ -514,6 +514,11 @@ describe('cssparser', function() {
       var node = parser.parse('a[hidden]{}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["a","[","hidden","]"]],CssNode.BLOCK,["{","}"]]]]);
     });
+    it('selector +', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('a>b+c{}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["a",">","b","+","c"]],CssNode.BLOCK,["{","}"]]]]);
+    });
     it('pseudo first', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse(':hover{margin:0}');
@@ -785,6 +790,11 @@ describe('cssparser', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('.a{margin:+2px -1px}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,[".a"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["margin"],":",CssNode.VALUE,["+2","px","-1","px"]],"}"]]]]);
+    });
+    it('value can contain +', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('a{unicode-range:U+1000-1212}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["a"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["unicode-range"],":",CssNode.VALUE,["U+1000-1212"]],"}"]]]]);
     });
   });
   describe('operate', function() {

@@ -208,6 +208,18 @@ describe('csslexer', function() {
         expect(join(tokens)).to.eql(['[', 'class', '*=', 'block-grid-', ']']);
         expect(type(tokens)).to.eql([8, 22, 8, 22, 8]);
       });
+      it('> and +', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('a>b+c{}');
+        expect(join(tokens)).to.eql(['a', '>', 'b', '+', 'c', '{', '}']);
+        expect(type(tokens)).to.eql([21, 8, 21, 8, 21, 8, 8]);
+      });
+      it('> and + with blank', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('a > b + c{}');
+        expect(join(tokens)).to.eql(['a', ' ', '>', ' ', 'b', ' ', '+', ' ', 'c', '{', '}']);
+        expect(type(tokens)).to.eql([21, 1, 8, 1, 21, 1, 8, 1, 21, 8, 8]);
+      });
     });
     describe('style', function() {
       it('background', function() {
@@ -299,6 +311,12 @@ describe('csslexer', function() {
         var tokens = lexer.parse('body{margin:(1 + 2) px}');
         expect(join(tokens)).to.eql(['body', '{', 'margin', ':', '(', '1', ' ', '+', ' ', '2', ')', ' ', 'px', '}']);
         expect(type(tokens)).to.eql([21, 8, 10, 8, 8, 4, 1, 8, 1, 4, 8, 1, 5, 8]);
+      });
+      it('value can contain +', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('body{unicode-range:U+1000-1212}');
+        expect(join(tokens)).to.eql(['body', '{', 'unicode-range', ':', 'U+1000-1212', '}']);
+        expect(type(tokens)).to.eql([21, 8, 10, 8, 5, 8]);
       });
     });
     describe('hack', function() {
