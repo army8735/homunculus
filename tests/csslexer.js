@@ -284,15 +284,21 @@ describe('csslexer', function() {
       });
       it('unit after ()', function() {
         var lexer = homunculus.getLexer('css');
-        var tokens = lexer.parse('body{margin:(1+2)px}');
-        expect(join(tokens)).to.eql(['body', '{', 'margin', ':', '(', '1', '+', '2', ')', 'px', '}']);
-        expect(type(tokens)).to.eql([21, 8, 10, 8, 8, 4, 8, 4, 8, 20, 8]);
+        var tokens = lexer.parse('body{margin:(1 + 2)px}');
+        expect(join(tokens)).to.eql(['body', '{', 'margin', ':', '(', '1', ' ', '+', ' ', '2', ')', 'px', '}']);
+        expect(type(tokens)).to.eql([21, 8, 10, 8, 8, 4, 1, 8, 1, 4, 8, 20, 8]);
       });
       it('no blank between unit and ()', function() {
         var lexer = homunculus.getLexer('css');
-        var tokens = lexer.parse('body{margin:(1+2) px}');
-        expect(join(tokens)).to.eql(['body', '{', 'margin', ':', '(', '1', '+', '2', ')', ' ', 'px', '}']);
-        expect(type(tokens)).to.eql([21, 8, 10, 8, 8, 4, 8, 4, 8, 1, 5, 8]);
+        var tokens = lexer.parse('.a{margin:+2px -1px}');
+        expect(join(tokens)).to.eql(['.a', '{', 'margin', ':', '+2', 'px', ' ', '-1', 'px', '}']);
+        expect(type(tokens)).to.eql([21, 8, 10, 8, 4, 20, 1, 4, 20, 8]);
+      });
+      it('+number, -number', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('body{margin:(1 + 2) px}');
+        expect(join(tokens)).to.eql(['body', '{', 'margin', ':', '(', '1', ' ', '+', ' ', '2', ')', ' ', 'px', '}']);
+        expect(type(tokens)).to.eql([21, 8, 10, 8, 8, 4, 1, 8, 1, 4, 8, 1, 5, 8]);
       });
     });
     describe('hack', function() {

@@ -361,7 +361,7 @@ describe('cssparser', function() {
     });
     it('@document multi var', function() {
       var parser = homunculus.getParser('css');
-      var node = parser.parse('@document url-prefix($a),url($b+2),domain(aaa){}');
+      var node = parser.parse('@document url-prefix($a),url($b + 2),domain(aaa){}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.DOC,["@document",CssNode.URLPREFIX,["url-prefix","(","$a",")"],",",CssNode.URL,["url","(",CssNode.ADDEXPR,["$b","+","2"],")"],",",CssNode.DOMAIN,["domain","(","aaa",")"],CssNode.BLOCK,["{","}"]]]]);
     });
     it('@document url()', function() {
@@ -563,12 +563,12 @@ describe('cssparser', function() {
     });
     it('max', function() {
       var parser = homunculus.getParser('css');
-      var node = parser.parse('p{color:max(1+2, 100)}');
+      var node = parser.parse('p{color:max(1 + 2, 100)}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["p"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["color"],":",CssNode.VALUE,[CssNode.MAX,["max","(",CssNode.PARAM,["1","+","2"],",",CssNode.PARAM,["100"],")"]]],"}"]]]]);
     });
     it('min', function() {
       var parser = homunculus.getParser('css');
-      var node = parser.parse('p{color:min(1+2, 100)}');
+      var node = parser.parse('p{color:min(1 + 2, 100)}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["p"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["color"],":",CssNode.VALUE,[CssNode.MIN,["min","(",CssNode.PARAM,["1","+","2"],",",CssNode.PARAM,["100"],")"]]],"}"]]]]);
     });
     it('linear-gradient 1', function() {
@@ -630,7 +630,7 @@ describe('cssparser', function() {
     });
     it('multi fn()', function() {
       var parser = homunculus.getParser('css');
-      var node = parser.parse('p{color:#f00 max(1) min(2) hsl(0, 5%, 100%) hsla(0, 5%, 100%, 0) calc(1+1) var(a) rgb(0,0,0) repeating-radial-gradient(circle,#f00,#ff0,#080)}');
+      var node = parser.parse('p{color:#f00 max(1) min(2) hsl(0, 5%, 100%) hsla(0, 5%, 100%, 0) calc(1 + 1) var(a) rgb(0,0,0) repeating-radial-gradient(circle,#f00,#ff0,#080)}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["p"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["color"],":",CssNode.VALUE,["#f00",CssNode.MAX,["max","(",CssNode.PARAM,["1"],")"],CssNode.MIN,["min","(",CssNode.PARAM,["2"],")"],CssNode.HSL,["hsl","(","0",",","5","%",",","100","%",")"],CssNode.HSLA,["hsla","(","0",",","5","%",",","100","%",",","0",")"],CssNode.CALC,["calc","(",CssNode.ADDEXPR,["1","+","1"],")"],CssNode.VARS,["var","(","a",")"],CssNode.RGB,["rgb","(","0",",","0",",","0",")"],CssNode.RADIOGRADIENT,["repeating-radial-gradient","(","circle",",",CssNode.COLORSTOP,["#f00"],",",CssNode.COLORSTOP,["#ff0"],",",CssNode.COLORSTOP,["#080"],")"]]],"}"]]]]);
     });
     it('new kw', function() {
@@ -781,6 +781,11 @@ describe('cssparser', function() {
         parser.parse('a}}');
       }).to.throwError();
     });
+    it('+number, -number', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('.a{margin:+2px -1px}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,[".a"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["margin"],":",CssNode.VALUE,["+2","px","-1","px"]],"}"]]]]);
+    });
   });
   describe('operate', function() {
     it('add in url()', function() {
@@ -820,7 +825,7 @@ describe('cssparser', function() {
     });
     it('in @font-face', function() {
       var parser = homunculus.getParser('css');
-      var node = parser.parse('@font-face{$a:$b+1}');
+      var node = parser.parse('@font-face{$a:$b + 1}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.FONTFACE,["@font-face",CssNode.BLOCK,["{","$a",":",CssNode.VALUE,[CssNode.ADDEXPR,["$b","+","1"]],"}"]]]]);
     });
     it('in @namespace', function() {
@@ -855,12 +860,12 @@ describe('cssparser', function() {
     });
     it('alpha 2', function() {
       var parser = homunculus.getParser('css');
-      var node = parser.parse('body{filter:alpha($a=$b+2)}');
+      var node = parser.parse('body{filter:alpha($a=$b + 2)}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["filter"],":",CssNode.VALUE,[CssNode.FILTER,["alpha","(",CssNode.PARAM,["$a","=",CssNode.ADDEXPR,["$b","+","2"]],")"]]],"}"]]]]);
     });
     it('()', function() {
       var parser = homunculus.getParser('css');
-      var node = parser.parse('body{margin:0 (1+2)*3}');
+      var node = parser.parse('body{margin:0 (1 + 2)*3}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["margin"],":",CssNode.VALUE,["0",CssNode.MTPLEXPR,[CssNode.PRMREXPR,["(",CssNode.ADDEXPR,["1","+","2"],")"],"*","3"]]],"}"]]]]);
     });
     it('in var', function() {
@@ -870,12 +875,12 @@ describe('cssparser', function() {
     });
     it('unit after ()', function() {
       var parser = homunculus.getParser('css');
-      var node = parser.parse('a{padding:(1+2)px}');
+      var node = parser.parse('a{padding:(1 + 2)px}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["a"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["padding"],":",CssNode.VALUE,[CssNode.PRMREXPR,["(",CssNode.ADDEXPR,["1","+","2"],")"],"px"]],"}"]]]]);
     });
     it('no blank between unit and ()', function() {
       var parser = homunculus.getParser('css');
-      var node = parser.parse('body{margin:(1+2) px}');
+      var node = parser.parse('body{margin:(1 + 2) px}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["margin"],":",CssNode.VALUE,[CssNode.PRMREXPR,["(",CssNode.ADDEXPR,["1","+","2"],")"],"px"]],"}"]]]]);
     });
   });
