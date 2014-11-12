@@ -519,6 +519,11 @@ describe('cssparser', function() {
       var node = parser.parse('a>b+c{}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["a",">","b","+","c"]],CssNode.BLOCK,["{","}"]]]]);
     });
+    it('selector with hack', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('_:-ms-fullscreen,:root input[type="date"],_:-ms-fullscreen{}');
+      expect(tree(node)).to.eql([CssNode.SHEET,["_",CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,[":-ms-fullscreen"],",",CssNode.SELECTOR,[":root","input","[","type","=","\"date\"","]"],",",CssNode.SELECTOR,["_",":-ms-fullscreen"]],CssNode.BLOCK,["{","}"]]]]);
+    });
     it('pseudo first', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse(':hover{margin:0}');

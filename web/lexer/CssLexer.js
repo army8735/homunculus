@@ -387,7 +387,7 @@ var CssLexer = Lexer.extend(function(rule) {
                   break;
                 case '-':
                 case '_':
-                  if(this.depth && !this.value) {
+                  if(!this.value) {
                     token.type(Token.HACK);
                   }
                   this.url = false;

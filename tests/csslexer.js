@@ -326,17 +326,23 @@ describe('csslexer', function() {
         expect(join(tokens)).to.eql(['p', '{', '_', 'margin', ':', '0', ';', '*', 'padding', ':', '0', ';', '-', 'margin', ':', '0', '}']);
         expect(type(tokens)).to.eql([21, 8, 17, 10, 8, 4, 8, 17, 10, 8, 4, 8, 17, 10, 8, 4, 8]);
       });
+      it('_ out of {}', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('_:-ms-fullscreen{}');
+        expect(join(tokens)).to.eql(['_', ':-ms-fullscreen', '{', '}']);
+        expect(type(tokens)).to.eql([17, 19, 8, 8]);
+      });
       it('\\9 \\0 \\9\\0', function() {
         var lexer = homunculus.getLexer('css');
         var tokens = lexer.parse('p{margin:0\\9;margin:0\\0;margin:0\\9\\0}');
         expect(join(tokens)).to.eql(['p', '{', 'margin', ':', '0', '\\9', ';', 'margin', ':', '0', '\\0', ';', 'margin', ':', '0', '\\9\\0', '}']);
         expect(type(tokens)).to.eql([21, 8, 10, 8, 4, 17, 8, 10, 8, 4, 17, 8, 10, 8, 4, 17, 8]);
       });
-      it('out of {} is usefull', function() {
+      it('out of {}', function() {
         var lexer = homunculus.getLexer('css');
         var tokens = lexer.parse('-_\\9');
         expect(join(tokens)).to.eql(['-', '_', '\\9']);
-        expect(type(tokens)).to.eql([8, 8, 17]);
+        expect(type(tokens)).to.eql([17, 17, 17]);
       });
       it('* out of {} is selector', function() {
         var lexer = homunculus.getLexer('css');
@@ -398,6 +404,12 @@ describe('csslexer', function() {
         expect(join(tokens)).to.eql(['.a', '{', 'filter', ':', ' ', 'progid', ':', 'DXImageTransform.Microsoft.gradient',
           '(', 'enabled', ' ', '=', ' ', 'false', ')', ';', '}' ]);
         expect(type(tokens)).to.eql([21, 8, 10, 8, 1, 5, 8, 5, 8, 15, 1, 8, 1, 15, 8, 8, 8]);
+      });
+      it('!ie like', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('a{margin:0!ie;padding:0!other}');
+        expect(join(tokens)).to.eql(['a', '{', 'margin', ':', '0', '!ie', ';', 'padding', ':', '0', '!other', '}']);
+        expect(type(tokens)).to.eql([21, 8, 10, 8, 4, 17, 8, 10, 8, 4, 17, 8]);
       });
     });
     describe('unknow', function() {
