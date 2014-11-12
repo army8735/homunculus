@@ -386,6 +386,7 @@ var CssLexer = Lexer.extend(function(rule) {
                   this.var = false;
                   break;
                 case '-':
+                case '/':
                   if(!this.value) {
                     token.type(Token.HACK);
                   }

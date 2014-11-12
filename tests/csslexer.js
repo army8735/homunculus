@@ -435,6 +435,12 @@ describe('csslexer', function() {
         expect(join(tokens)).to.eql(['p', '{', '?', 'margin', ':', '0', '}']);
         expect(type(tokens)).to.eql([21, 8, 17, 10, 8, 4, 8]);
       });
+      it('/', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('p{/margin:0}');
+        expect(join(tokens)).to.eql(['p', '{', '/', 'margin', ':', '0', '}']);
+        expect(type(tokens)).to.eql([21, 8, 17, 10, 8, 4, 8]);
+      });
     });
     describe('unknow', function() {
       it('with ;', function() {
