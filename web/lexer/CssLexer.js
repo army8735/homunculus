@@ -406,12 +406,7 @@ var CssLexer = Lexer.extend(function(rule) {
               this.doc = false;
               break;
             case Token.NUMBER:
-              if(!this.value && token.content().charAt(0) == '#') {
-                token.type(Token.SELECTOR);
-              }
-              else {
-                this.number = true;
-              }
+              this.number = true;
               this.url = false;
               this.var = false;
               this.page = false;
