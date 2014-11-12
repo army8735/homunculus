@@ -801,6 +801,16 @@ describe('cssparser', function() {
       var node = parser.parse('a{unicode-range:U+1000-1212}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["a"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["unicode-range"],":",CssNode.VALUE,["U+1000-1212"]],"}"]]]]);
     });
+    it('~ in value', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('p{margin:~"1,2"}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["p"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["margin"],":",CssNode.VALUE,["~","\"1,2\""]],"}"]]]]);
+    });
+    it('~ out value', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('p{~margin:1}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["p"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["~","margin"],":",CssNode.VALUE,["1"]],"}"]]]]);
+    });
   });
   describe('operate', function() {
     it('add in url()', function() {

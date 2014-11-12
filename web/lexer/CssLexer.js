@@ -394,6 +394,10 @@ var CssLexer = Lexer.extend(function(rule) {
                   this.sel = false;
                   this.var = false;
                   break;
+                case '~':
+                  if(!this.value) {
+                    token.type(Token.HACK);
+                  }
                 default:
                   this.url = false;
                   this.var = false;

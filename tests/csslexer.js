@@ -324,6 +324,12 @@ describe('csslexer', function() {
         expect(join(tokens)).to.eql(['body', '{', 'unicode-range', ':', 'U+1000-1212', '}']);
         expect(type(tokens)).to.eql([21, 8, 10, 8, 5, 8]);
       });
+      it('~', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('p{margin:~"1,2"}');
+        expect(join(tokens)).to.eql(['p', '{', 'margin', ':', '~', '"1,2"', '}']);
+        expect(type(tokens)).to.eql([21, 8, 10, 8, 8, 7, 8]);
+      });
     });
     describe('hack', function() {
       it('*-_', function() {

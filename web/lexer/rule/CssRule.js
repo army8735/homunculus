@@ -109,8 +109,8 @@ var CssRule = Rule.extend(function() {
   self.addMatch(new RegMatch(Token.VARS, /^\$[\w\-\u4e00-\u9fa5]+/));
   self.addMatch(new RegMatch(Token.VARS, /^\$\{[\w\-\u4e00-\u9fa5]+\}/));
 
-  self.addMatch(new CharacterSet(Token.SIGN, '{},:();-{}><+/[]=*'));
-  self.addMatch(new CharacterSet(Token.HACK, '_~`?|%'));
+  self.addMatch(new CharacterSet(Token.SIGN, '{},:();-{}><+/[]=*~'));
+  self.addMatch(new CharacterSet(Token.HACK, '_`?|%'));
 }).methods({
   values: function() {
     return this.vl;
