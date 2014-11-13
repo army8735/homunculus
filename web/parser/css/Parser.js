@@ -413,7 +413,12 @@ var Parser = IParser.extend(function(lexer) {
     var node = new Node(Node.CPARAMS);
     node.add(this.match('('));
     while(this.look && this.look.content() != ')') {
-      node.add(this.value(true));
+      if(this.look.type() == Token.KEYWORD) {
+        node.add(this.style(null, true, true));
+      }
+      else {
+        node.add(this.value(true));
+      }
       if(this.look && this.look.content() == ',') {
         node.add(this.match());
       }
@@ -620,14 +625,14 @@ var Parser = IParser.extend(function(lexer) {
     node.add(this.match('}'));
     return node;
   },
-  style: function(name, noS) {
+  style: function(name, noS, noC) {
     var node = new Node(Node.STYLE);
     var k = this.key(name);
     node.add(k);
     if(needValue(k)
       || this.look && this.look.content() == ':') {
       node.add(this.match(':'));
-      node.add(this.value());
+      node.add(this.value(noC));
     }
     while(this.look && this.look.type() == Token.HACK) {
       node.add(this.match());
@@ -744,7 +749,25 @@ var Parser = IParser.extend(function(lexer) {
           else if(noComma && s == ',') {
             this.error();
           }
-          node.add(this.addexpr());
+          //LL2确定是否是fncall
+          var fncall = false;
+          if(this.look.type() == Token.VARS) {
+            for(var i = this.index; i < this.length; i++) {
+              var t = this.tokens[i];
+              if(!S.hasOwnProperty(t.type())) {
+                if(t.content() == '(') {
+                  fncall = true;
+                }
+                break;
+              }
+            }
+          }
+          if(fncall) {
+            node.add(this.fnc());
+          }
+          else {
+            node.add(this.addexpr());
+          }
           break;
       }
     }
@@ -836,7 +859,25 @@ var Parser = IParser.extend(function(lexer) {
             else if(noComma && s == ',') {
               break outer;
             }
-            node.add(this.addexpr());
+            //LL2确定是否是fncall
+            var fncall = false;
+            if(this.look.type() == Token.VARS) {
+              for(var i = this.index; i < this.length; i++) {
+                var t = this.tokens[i];
+                if(!S.hasOwnProperty(t.type())) {
+                  if(t.content() == '(') {
+                    fncall = true;
+                  }
+                  break;
+                }
+              }
+            }
+            if(fncall) {
+              node.add(this.fnc());
+            }
+            else {
+              node.add(this.addexpr());
+            }
             break;
         }
       }

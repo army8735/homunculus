@@ -676,10 +676,45 @@ describe('cssparser', function() {
       var node = parser.parse('fn($a, $b){margin:$a;$b;$c()}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.FN,["fn",CssNode.PARAMS,["(","$a",",","$b",")"],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["margin"],":",CssNode.VALUE,["$a"],";"],"$b",";",CssNode.FNC,["$c",CssNode.CPARAMS,["(",")"]],"}"]]]]);
     });
-    it('fn call', function() {
+    it('fn call a value', function() {
       var parser = homunculus.getParser('css');
-      var node = parser.parse('body{fn(background:url(xxx), #fff)}');
-      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.FNC,["fn",CssNode.CPARAMS,["(",CssNode.VALUE,["background",":",CssNode.URL,["url","(","xxx",")"]],",",CssNode.VALUE,["#fff"],")"]],"}"]]]]);
+      var node = parser.parse('body{fn(#FFF)}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.FNC,["fn",CssNode.CPARAMS,["(",CssNode.VALUE,["#FFF"],")"]],"}"]]]]);
+    });
+    it('fn call multi value', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('body{fn(#FFF, 3, id)}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.FNC,["fn",CssNode.CPARAMS,["(",CssNode.VALUE,["#FFF"],",",CssNode.VALUE,["3"],",",CssNode.VALUE,["id"],")"]],"}"]]]]);
+    });
+    it('fn call a kw value', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('body{fn(background)}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.FNC,["fn",CssNode.CPARAMS,["(",CssNode.VALUE,["background"],")"]],"}"]]]]);
+    });
+    it('fn call complex', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('body{fn(background:#FFF, margin, 3px, padding:0)}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.FNC,["fn",CssNode.CPARAMS,["(",CssNode.STYLE,[CssNode.KEY,["background"],":",CssNode.VALUE,["#FFF"]],",",CssNode.VALUE,["margin"],",",CssNode.VALUE,["3","px"],",",CssNode.STYLE,[CssNode.KEY,["padding"],":",CssNode.VALUE,["0"]],")"]],"}"]]]]);
+    });
+    it('fn call in value', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('a{margin:$fn(1)}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["a"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["margin"],":",CssNode.VALUE,[CssNode.FNC,["$fn",CssNode.CPARAMS,["(",CssNode.VALUE,["1"],")"]]]],"}"]]]]);
+    });
+    it('fn call in value multi value', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('a{margin:$fn(1, #FFF)}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["a"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["margin"],":",CssNode.VALUE,[CssNode.FNC,["$fn",CssNode.CPARAMS,["(",CssNode.VALUE,["1"],",",CssNode.VALUE,["#FFF"],")"]]]],"}"]]]]);
+    });
+    it('fn call in value a kw value', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('a{margin:$fn(background)}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["a"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["margin"],":",CssNode.VALUE,[CssNode.FNC,["$fn",CssNode.CPARAMS,["(",CssNode.VALUE,["background"],")"]]]],"}"]]]]);
+    });
+    it('fn call in value complex', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('body{margin:$fn(background:#FFF,margin,3px,padding:0)}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["margin"],":",CssNode.VALUE,[CssNode.FNC,["$fn",CssNode.CPARAMS,["(",CssNode.STYLE,[CssNode.KEY,["background"],":",CssNode.VALUE,["#FFF"]],",",CssNode.VALUE,["margin"],",",CssNode.VALUE,["3","px"],",",CssNode.STYLE,[CssNode.KEY,["padding"],":",CssNode.VALUE,["0"]],")"]]]],"}"]]]]);
     });
     it('@extend', function() {
       var parser = homunculus.getParser('css');

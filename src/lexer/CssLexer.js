@@ -28,6 +28,7 @@ var CssLexer = Lexer.extend(function(rule) {
   this.doc = false;
   this.supports = false;
   this.extend = false;
+  this.param = false;
   this.depth = 0;
 }).methods({
   //@override
@@ -138,7 +139,7 @@ var CssLexer = Lexer.extend(function(rule) {
               }
               break;
             case Token.COLOR:
-              if(!this.value) {
+              if(!this.value && !this.param) {
                 token.type(Token.SELECTOR);
               }
               break;
@@ -177,6 +178,32 @@ var CssLexer = Lexer.extend(function(rule) {
                 else {
                   token.type(Token.PROPERTY);
                 }
+              }
+              else if(this.param) {
+                //value时id可以带+号，必须紧跟
+                if(this.code.charAt(this.index) == '+') {
+                  ADD_VALUE.match(this.peek, this.code, this.index);
+                  token = new Token(ADD_VALUE.tokenType(), ADD_VALUE.content(), ADD_VALUE.val(), this.index - 1);
+                  matchLen = ADD_VALUE.content().length;
+                }
+                if(this.rule.keyWords().hasOwnProperty(s)) {
+                  //LL2确定后面如果是:说明是关键字（$var:keyword:）
+                  for(var j = this.index + matchLen - 1; j < length; j++) {
+                    var c = this.code.charAt(j);
+                    if(!S.hasOwnProperty(c)) {
+                      if(c == ':') {
+                        token.type(Token.KEYWORD);
+                        this.kw = true;
+                      }
+                      else {
+                        token.type(Token.PROPERTY);
+                        this.value = true;
+                      }
+                      break;
+                    }
+                  }
+                }
+                this.sel = false;
               }
               else if(this.value) {
                 //value时id可以带+号，必须紧跟
@@ -296,6 +323,19 @@ var CssLexer = Lexer.extend(function(rule) {
                   if(this.media || this.import || this.doc) {
                     this.value = false;
                   }
+                  //fncall只会出现在block中
+                  else if(this.depth > 0) {
+                    //向前确定此(之后是fncall的param
+                    for(var j = this.tokenList.length - 1; j >= 2; j--) {
+                      var t = this.tokenList[j];
+                      if([Token.IGNORE, Token.BLANK, Token.LINE, Token.VIRTUAL, Token.COMMENT].indexOf(t.type()) == -1) {
+                        if(t.type() == Token.VARS) {
+                          this.param = true;
+                        }
+                        break;
+                      }
+                    }
+                  }
                   this.parenthese = true;
                   this.sel = false;
                   break;
@@ -309,6 +349,7 @@ var CssLexer = Lexer.extend(function(rule) {
                   this.var = false;
                   //)之后可能跟单位，比如margin:(1+2)px
                   this.number = true;
+                  this.param = false;
                   break;
                 case '[':
                   if(!this.value) {
@@ -347,6 +388,7 @@ var CssLexer = Lexer.extend(function(rule) {
                   this.var = false;
                   this.cvar = false;
                   this.extend = false;
+                  this.param = false;
                   break;
                 case '{':
                   this.depth++;
@@ -359,6 +401,7 @@ var CssLexer = Lexer.extend(function(rule) {
                   this.supports = false;
                   this.cvar = false;
                   this.extend = false;
+                  this.param = false;
                   break;
                 case '}':
                   this.value = false;
@@ -370,6 +413,7 @@ var CssLexer = Lexer.extend(function(rule) {
                   this.var = false;
                   this.cvar = false;
                   this.extend = false;
+                  this.param = false;
                   break;
                 case '*':
                   if(this.depth) {
