@@ -185,8 +185,20 @@ var CssLexer = Lexer.extend(function(rule) {
                   token = new Token(ADD_VALUE.tokenType(), ADD_VALUE.content(), ADD_VALUE.val(), this.index - 1);
                   matchLen = ADD_VALUE.content().length;
                 }
-                else if(this.cvar && this.rule.keyWords().hasOwnProperty(s)) {
-                  token.type(Token.KEYWORD);
+                if(this.cvar && this.rule.keyWords().hasOwnProperty(s)) {
+                  //LL2确定后面如果是:说明是关键字（$var:keyword:）
+                  for(var j = this.index + matchLen - 1; j < length; j++) {
+                    var c = this.code.charAt(j);
+                    if(!S.hasOwnProperty(c)) {
+                      if(c == ':') {
+                        token.type(Token.KEYWORD);
+                      }
+                      else {
+                        token.type(Token.PROPERTY);
+                      }
+                      break;
+                    }
+                  }
                   this.cvar = false;
                 }
                 else if(this.rule.colors().hasOwnProperty(s)) {
@@ -428,7 +440,10 @@ var CssLexer = Lexer.extend(function(rule) {
               this.kf = false;
               this.ns = false;
               this.doc = false;
-              this.cvar = true;
+              //非值时的$是声明
+              if(!this.value && ['$', '@'].indexOf(s.charAt(0)) > -1) {
+                this.cvar = true;
+              }
               break;
           }
 

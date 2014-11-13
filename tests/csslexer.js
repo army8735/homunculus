@@ -636,6 +636,24 @@ describe('csslexer', function() {
         expect(join(tokens)).to.eql(['$中文', '(', ')', '{', '}']);
         expect(type(tokens)).to.eql([16, 8, 8, 8, 8]);
       });
+      it('vardecl is a kw value', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('$a:background;');
+        expect(join(tokens)).to.eql(['$a', ':', 'background', ';']);
+        expect(type(tokens)).to.eql([16, 8, 15, 8]);
+      });
+      it('vardecl is a style', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('$a:background:#FFF;');
+        expect(join(tokens)).to.eql(['$a', ':', 'background', ':', '#FFF', ';']);
+        expect(type(tokens)).to.eql([16, 8, 10, 8, 23, 8]);
+      });
+      it('vardecl no ;', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('$a:background');
+        expect(join(tokens)).to.eql(['$a', ':', 'background']);
+        expect(type(tokens)).to.eql([16, 8, 5]);
+      });
     });
   });
   describe('operate', function() {

@@ -461,6 +461,16 @@ describe('cssparser', function() {
       var node = parser.parse('$a:1;@b=2;');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.VARDECL,["$a",":",CssNode.VALUE,["1"],";"],CssNode.VARDECL,["@b","=",CssNode.VALUE,["2"],";"]]]);
     });
+    it('vardecl a kw value', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('$a:background;');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.VARDECL,["$a",":",CssNode.VALUE,["background"],";"]]]);
+    });
+    it('vardecl a style', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('$a:background:#FFF;');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.VARDECL,["$a",":",CssNode.STYLE,[CssNode.KEY,["background"],":",CssNode.VALUE,["#FFF"]],";"]]]);
+    });
     it('vardecl in block', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('.a{$a=1;$b:background:#FFF}');
@@ -482,6 +492,12 @@ describe('cssparser', function() {
       var parser = homunculus.getParser('css');
       expect(function() {
         parser.parse('$a/');
+      }).to.throwError();
+    });
+    it('vardecl error no ;', function() {
+      var parser = homunculus.getParser('css');
+      expect(function() {
+        parser.parse('$a:1');
       }).to.throwError();
     });
     it('nesting {}', function() {
