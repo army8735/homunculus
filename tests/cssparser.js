@@ -471,10 +471,16 @@ describe('cssparser', function() {
       var node = parser.parse('$a:background:#FFF;');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.VARDECL,["$a",":",CssNode.STYLE,[CssNode.KEY,["background"],":",CssNode.VALUE,["#FFF"]],";"]]]);
     });
-    it('vardecl hack', function() {
+    it('vardecl hack error', function() {
       var parser = homunculus.getParser('css');
-      var node = parser.parse('$a:*background;');
-      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.VARDECL,["$a",":",CssNode.VALUE,["*","background"],";"]]]);
+      expect(function() {
+        parser.parse('$a:*background;');
+      }).to.throwError();
+    });
+    it('vardecl hack value', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('$a:*background:url(xxx);');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.VARDECL,["$a",":",CssNode.STYLE,[CssNode.KEY,["*","background"],":",CssNode.VALUE,[CssNode.URL,["url","(","xxx",")"]]],";"]]]);
     });
     it('vardecl add', function() {
       var parser = homunculus.getParser('css');
@@ -801,6 +807,22 @@ describe('cssparser', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('body{margin:$fn(1 * 2)}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["margin"],":",CssNode.VALUE,[CssNode.FNC,["$fn",CssNode.CPARAMS,["(",CssNode.VALUE,[CssNode.MTPLEXPR,["1","*","2"]],")"]]]],"}"]]]]);
+    });
+    it('fn hack error', function() {
+      var parser = homunculus.getParser('css');
+      expect(function() {
+        parser.parse('body{fn(*margin)}');
+      }).to.throwError();
+    });
+    it('fn hack value', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('body{fn(*margin:a)}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.FNC,["fn",CssNode.CPARAMS,["(",CssNode.STYLE,[CssNode.KEY,["*","margin"],":",CssNode.VALUE,["a"]],")"]],"}"]]]]);
+    });
+    it('fn hack in value', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('body{margin:$fn(*background:url(xxx))}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["margin"],":",CssNode.VALUE,[CssNode.FNC,["$fn",CssNode.CPARAMS,["(",CssNode.STYLE,[CssNode.KEY,["*","background"],":",CssNode.VALUE,[CssNode.URL,["url","(","xxx",")"]]],")"]]]],"}"]]]]);
     });
     it('@extend', function() {
       var parser = homunculus.getParser('css');

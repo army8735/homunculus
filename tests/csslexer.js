@@ -696,6 +696,30 @@ describe('csslexer', function() {
         expect(join(tokens)).to.eql(['body', '{', 'margin', ':', '$fn', '(', '"1"', ' ', '+', ' ', '2', ')', '}']);
         expect(type(tokens)).to.eql([21, 8, 10, 8, 16, 8, 7, 1, 8, 1, 4, 8, 8]);
       });
+      it('fn call hack', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('body{fn(*margin)}');
+        expect(join(tokens)).to.eql(['body', '{', 'fn', '(', '*', 'margin', ')', '}']);
+        expect(type(tokens)).to.eql([21, 8, 16, 8, 17, 10, 8, 8]);
+      });
+      it('fn call hack value', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('body{fn(*margin:a)}');
+        expect(join(tokens)).to.eql(['body', '{', 'fn', '(', '*', 'margin', ':', 'a', ')', '}']);
+        expect(type(tokens)).to.eql([21, 8, 16, 8, 17, 10, 8, 5, 8, 8]);
+      });
+      it('fn call hack in value', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('body{margin:$fn(*margin)}');
+        expect(join(tokens)).to.eql(['body', '{', 'margin', ':', '$fn', '(', '*', 'margin', ')', '}']);
+        expect(type(tokens)).to.eql([21, 8, 10, 8, 16, 8, 17, 10, 8, 8]);
+      });
+      it('fn call hack value in value', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('body{margin:$fn(*margin:a)}');
+        expect(join(tokens)).to.eql(['body', '{', 'margin', ':', '$fn', '(', '*', 'margin', ':', 'a', ')', '}']);
+        expect(type(tokens)).to.eql([21, 8, 10, 8, 16, 8, 17, 10, 8, 5, 8, 8]);
+      });
       it('@extend', function() {
         var lexer = homunculus.getLexer('css');
         var tokens = lexer.parse('body{@extend a;}');
@@ -749,6 +773,12 @@ describe('csslexer', function() {
         var tokens = lexer.parse('$a:*background;');
         expect(join(tokens)).to.eql(['$a', ':', '*', 'background', ';']);
         expect(type(tokens)).to.eql([16, 8, 17, 10, 8]);
+      });
+      it('vardecl hack value', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('$a:*margin:a;');
+        expect(join(tokens)).to.eql(['$a', ':', '*', 'margin', ':', 'a', ';']);
+        expect(type(tokens)).to.eql([16, 8, 17, 10, 8, 5, 8]);
       });
       it('vardecl add', function() {
         var lexer = homunculus.getLexer('css');

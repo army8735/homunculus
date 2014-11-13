@@ -190,6 +190,7 @@ var CssLexer = Lexer.extend(function(rule) {
                   //前面是hack也作为关键字
                   if(this.tokenList[this.tokenList.length - 1].type() == Token.HACK) {
                     token.type(Token.KEYWORD);
+                    this.kw = true;
                   }
                   else {
                     //LL2确定后面如果是:说明是关键字（$var:keyword:）
@@ -413,6 +414,18 @@ var CssLexer = Lexer.extend(function(rule) {
                 case '*':
                   if(this.cvar && !this.value) {
                     token.type(Token.HACK);
+                  }
+                  else if(this.param) {
+                    //向前如果是(则为hack
+                    for(var j = this.tokenList.length - 1; j >= 2; j--) {
+                      var t = this.tokenList[j];
+                      if([Token.IGNORE, Token.BLANK, Token.LINE, Token.VIRTUAL, Token.COMMENT].indexOf(t.type()) == -1) {
+                        if(t.content() == '(') {
+                          token.type(Token.HACK);
+                        }
+                        break;
+                      }
+                    }
                   }
                   else if(this.depth && !this.value) {
                     //LL2确定是selector还是hack

@@ -413,7 +413,7 @@ var Parser = IParser.extend(function(lexer) {
     var node = new Node(Node.CPARAMS);
     node.add(this.match('('));
     while(this.look && this.look.content() != ')') {
-      if(this.look.type() == Token.KEYWORD) {
+      if(this.look.type() == Token.KEYWORD || this.look.type() == Token.HACK) {
         node.add(this.style(null, true, true));
       }
       else {
@@ -504,7 +504,7 @@ var Parser = IParser.extend(function(lexer) {
     if(!this.look) {
       this.error();
     }
-    if(this.look.type() == Token.KEYWORD) {
+    if(this.look.type() == Token.KEYWORD || this.look.type() == Token.HACK) {
       node.add(this.style(null, true));
     }
     else {
