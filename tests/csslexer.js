@@ -630,6 +630,12 @@ describe('csslexer', function() {
         expect(join(tokens)).to.eql(['body', '{', 'fn', '(', 'background', ':', '#FFF', ',', 'margin', ',', '3', 'px', ',', 'padding', ':', '0', ')', '}']);
         expect(type(tokens)).to.eql([21, 8, 16, 8, 10, 8, 23, 8, 15, 8, 4, 20, 8, 10, 8, 4, 8, 8]);
       });
+      it('fn call url()', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('body{fn(background:url(xxx),margin)}');
+        expect(join(tokens)).to.eql(['body', '{', 'fn', '(', 'background', ':', 'url', '(', 'xxx', ')', ',', 'margin', ')', '}']);
+        expect(type(tokens)).to.eql([21, 8, 16, 8, 10, 8, 15, 8, 7, 8, 8, 15, 8, 8]);
+      });
       it('fn call in value', function() {
         var lexer = homunculus.getLexer('css');
         var tokens = lexer.parse('a{margin:$fn(1)}');
@@ -653,6 +659,42 @@ describe('csslexer', function() {
         var tokens = lexer.parse('body{margin:$fn(background:#FFF,margin,3px,padding:0)}');
         expect(join(tokens)).to.eql(['body', '{', 'margin', ':', '$fn', '(', 'background', ':', '#FFF', ',', 'margin', ',', '3', 'px', ',', 'padding', ':', '0', ')', '}']);
         expect(type(tokens)).to.eql([21, 8, 10, 8, 16, 8, 10, 8, 23, 8, 15, 8, 4, 20, 8, 10, 8, 4, 8, 8]);
+      });
+      it('fn call add', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('body{fn(1 + 2)}');
+        expect(join(tokens)).to.eql(['body', '{', 'fn', '(', '1', ' ', '+', ' ', '2', ')', '}']);
+        expect(type(tokens)).to.eql([21, 8, 16, 8, 4, 1, 8, 1, 4, 8, 8]);
+      });
+      it('fn call add in value', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('body{margin:$fn(1 + 2)}');
+        expect(join(tokens)).to.eql(['body', '{', 'margin', ':', '$fn', '(', '1', ' ', '+', ' ', '2', ')', '}']);
+        expect(type(tokens)).to.eql([21, 8, 10, 8, 16, 8, 4, 1, 8, 1, 4, 8, 8]);
+      });
+      it('fn call mtpl', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('body{fn(1 * 2)}');
+        expect(join(tokens)).to.eql(['body', '{', 'fn', '(', '1', ' ', '*', ' ', '2', ')', '}']);
+        expect(type(tokens)).to.eql([21, 8, 16, 8, 4, 1, 8, 1, 4, 8, 8]);
+      });
+      it('fn call mtpl in value', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('body{margin:$fn(1 * 2)}');
+        expect(join(tokens)).to.eql(['body', '{', 'margin', ':', '$fn', '(', '1', ' ', '*', ' ', '2', ')', '}']);
+        expect(type(tokens)).to.eql([21, 8, 10, 8, 16, 8, 4, 1, 8, 1, 4, 8, 8]);
+      });
+      it('fn call string add', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('body{fn("1" + 2)}');
+        expect(join(tokens)).to.eql(['body', '{', 'fn', '(', '"1"', ' ', '+', ' ', '2', ')', '}']);
+        expect(type(tokens)).to.eql([21, 8, 16, 8, 7, 1, 8, 1, 4, 8, 8]);
+      });
+      it('fn call string add in value', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('body{margin:$fn("1" + 2)}');
+        expect(join(tokens)).to.eql(['body', '{', 'margin', ':', '$fn', '(', '"1"', ' ', '+', ' ', '2', ')', '}']);
+        expect(type(tokens)).to.eql([21, 8, 10, 8, 16, 8, 7, 1, 8, 1, 4, 8, 8]);
       });
       it('@extend', function() {
         var lexer = homunculus.getLexer('css');
@@ -719,6 +761,18 @@ describe('csslexer', function() {
         var tokens = lexer.parse('$a:1*2;');
         expect(join(tokens)).to.eql(['$a', ':', '1', '*', '2', ';']);
         expect(type(tokens)).to.eql([16, 8, 4, 8, 4, 8]);
+      });
+      it('vardecl string add', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('$a:"1"+ 2;');
+        expect(join(tokens)).to.eql(['$a', ':', '"1"', '+', ' ', '2', ';']);
+        expect(type(tokens)).to.eql([16, 8, 7, 8, 1, 4, 8]);
+      });
+      it('vardecl string mtpl', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('$a:"1"*2;');
+        expect(join(tokens)).to.eql(['$a', ':', '"1"', '*', '2', ';']);
+        expect(type(tokens)).to.eql([16, 8, 7, 8, 4, 8]);
       });
       it('vardecl url()', function() {
         var lexer = homunculus.getLexer('css');

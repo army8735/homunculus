@@ -314,6 +314,7 @@ var CssLexer = Lexer.extend(function(rule) {
                   this.var = false;
                   break;
                 case '(':
+                  this.parenthese = true;
                   if(this.media || this.import || this.doc) {
                     this.value = false;
                   }
@@ -325,12 +326,12 @@ var CssLexer = Lexer.extend(function(rule) {
                       if([Token.IGNORE, Token.BLANK, Token.LINE, Token.VIRTUAL, Token.COMMENT].indexOf(t.type()) == -1) {
                         if(t.type() == Token.VARS) {
                           this.param = true;
+                          this.parenthese = false;
                         }
                         break;
                       }
                     }
                   }
-                  this.parenthese = true;
                   this.sel = false;
                   break;
                 case ')':
@@ -468,7 +469,12 @@ var CssLexer = Lexer.extend(function(rule) {
               this.kf = false;
               this.ns = false;
               this.doc = false;
-              if(this.cvar) {
+              if(this.cvar || this.param) {
+                this.value = true;
+              }
+              break;
+            case Token.STRING:
+              if(this.cvar || this.param) {
                 this.value = true;
               }
               break;
