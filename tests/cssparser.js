@@ -768,6 +768,11 @@ describe('cssparser', function() {
       var node = parser.parse('body{fn(background:url(xxx),margin)}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.FNC,["fn",CssNode.CPARAMS,["(",CssNode.STYLE,[CssNode.KEY,["background"],":",CssNode.VALUE,[CssNode.URL,["url","(","xxx",")"]]],",",CssNode.VALUE,["margin"],")"]],"}"]]]]);
     });
+    it('not at first value fn call', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('body{margin:1 $fn(#FFF)}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["margin"],":",CssNode.VALUE,["1",CssNode.FNC,["$fn",CssNode.CPARAMS,["(",CssNode.VALUE,["#FFF"],")"]]]],"}"]]]]);
+    });
     it('fn add', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('body{fn(1 + 2)}');
@@ -833,6 +838,12 @@ describe('cssparser', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('body[type=text]{@extend .a, input[type=text]}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body","[","type","=","text","]"]],CssNode.BLOCK,["{",CssNode.EXTEND,["@extend",CssNode.SELECTORS,[CssNode.SELECTOR,[".a"],",",CssNode.SELECTOR,["input","[","type","=","text","]"]]],"}"]]]]);
+    });
+    it('@extend error', function() {
+      var parser = homunculus.getParser('css');
+      expect(function() {
+        parser.parse('body{@extend');
+      }).to.throwError();
     });
     it('&', function() {
       var parser = homunculus.getParser('css');
@@ -959,6 +970,16 @@ describe('cssparser', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('a{unicode-range:U+1000-1212}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["a"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["unicode-range"],":",CssNode.VALUE,["U+1000-1212"]],"}"]]]]);
+    });
+    it('vardecl value contain +', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('$a:unicode-range:U+1000-1212;');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.VARDECL,["$a",":",CssNode.STYLE,[CssNode.KEY,["unicode-range"],":",CssNode.VALUE,["U+1000-1212"]],";"]]]);
+    });
+    it('vardecl contain +', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('$a:U+1000-1212;');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.VARDECL,["$a",":",CssNode.VALUE,["U+1000-1212"],";"]]]);
     });
     it('~ in value', function() {
       var parser = homunculus.getParser('css');
