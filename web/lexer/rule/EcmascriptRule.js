@@ -19,6 +19,7 @@ var EcmascriptRule = Rule.extend(function() {
   self.addMatch(new CompleteEqual(Token.LINE, character.LINE));
 
   self.addMatch(new LineSearch(Token.COMMENT, '//', [character.ENTER + character.LINE, character.ENTER, character.LINE]));
+  self.addMatch(new LineSearch(Token.COMMENT, '<!--', [character.ENTER + character.LINE, character.ENTER, character.LINE]));
   self.addMatch(new LineSearch(Token.COMMENT, '/*', '*/', true));
   self.addMatch(new LineParse(Token.STRING, '"', '"', false, Lexer.IS_REG));
   self.addMatch(new LineParse(Token.STRING, "'", "'", false, Lexer.IS_REG));
