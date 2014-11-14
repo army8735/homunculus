@@ -69,7 +69,12 @@ var Lexer = Class(function(rule) {
 
             //回调可自定义处理匹配的token
             if(match.callback) {
-              match.callback(token);
+              match.callback.call(match, token, this.tokenList);
+            }
+            //回调特殊处理忽略掉此次匹配
+            if(match.cancel) {
+              token.cancel();
+              continue;
             }
 
             if(this.last) {

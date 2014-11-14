@@ -20,6 +20,20 @@ var EcmascriptRule = Rule.extend(function() {
 
   self.addMatch(new LineSearch(Token.COMMENT, '//', [character.ENTER + character.LINE, character.ENTER, character.LINE]));
   self.addMatch(new LineSearch(Token.COMMENT, '<!--', [character.ENTER + character.LINE, character.ENTER, character.LINE]));
+  var htmlEndComment =  new LineSearch(Token.COMMENT, '-->', [character.ENTER + character.LINE, character.ENTER, character.LINE]);
+  htmlEndComment.callback = function(token, tokenList) {
+    for(var i = tokenList.length - 1; i >= 0; i--) {
+      var t = tokenList[i];
+      if([Token.LINE, Token.ENTER].indexOf(t.type()) > -1) {
+        return;
+      }
+      else if([Token.COMMENT, Token.BLANK, Token.TAB].indexOf(t.type()) == -1) {
+        this.cancel = true;
+        return;
+      }
+    }
+  };
+  self.addMatch(htmlEndComment);
   self.addMatch(new LineSearch(Token.COMMENT, '/*', '*/', true));
   self.addMatch(new LineParse(Token.STRING, '"', '"', false, Lexer.IS_REG));
   self.addMatch(new LineParse(Token.STRING, "'", "'", false, Lexer.IS_REG));

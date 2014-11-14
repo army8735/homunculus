@@ -126,10 +126,15 @@ describe('jslexer', function() {
       var tokens = lexer.parse('/*comment\\*/ /*comment\ncc*/');
       expect(join(tokens)).to.eql(['/*comment\\*/', ' ', '/*comment\ncc*/']);
     });
-    it('html comment', function() {
+    it('html start comment', function() {
       var lexer = homunculus.getLexer('js');
       var tokens = lexer.parse('<!--comment\n123<!--comment');
       expect(join(tokens)).to.eql(['<!--comment', '\n', '123', '<!--comment']);
+    });
+    it('html end comment', function() {
+      var lexer = homunculus.getLexer('js');
+      var tokens = lexer.parse('-->comment\n -->comment\n\t-->comment\n/**/-->comment\n1-->not');
+      expect(join(tokens)).to.eql(['-->comment', '\n', ' ', '-->comment', '\n', '\t', '-->comment', '\n', '/**/', '-->comment', '\n', '1', '--', '>', 'not' ]);
     });
     it('multi line comment no end', function() {
       var lexer = homunculus.getLexer('js');
