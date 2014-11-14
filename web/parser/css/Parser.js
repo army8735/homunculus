@@ -417,7 +417,7 @@ var Parser = IParser.extend(function(lexer) {
         node.add(this.style(null, true, true));
       }
       else {
-        node.add(this.value(true));
+        node.add(this.value(null, true));
       }
       if(this.look && this.look.content() == ',') {
         node.add(this.match());
@@ -629,10 +629,11 @@ var Parser = IParser.extend(function(lexer) {
     var node = new Node(Node.STYLE);
     var k = this.key(name);
     node.add(k);
+    name = k.first().token().content().toLowerCase();
     if(needValue(k)
       || this.look && this.look.content() == ':') {
       node.add(this.match(':'));
-      node.add(this.value(noC));
+      node.add(this.value(name, noC));
     }
     while(this.look && this.look.type() == Token.HACK) {
       node.add(this.match());
@@ -663,7 +664,7 @@ var Parser = IParser.extend(function(lexer) {
     }
     return node;
   },
-  value: function(noComma) {
+  value: function(name, noComma) {
     var node = new Node(Node.VALUE);
     if(!this.look) {
       this.error();
@@ -764,6 +765,9 @@ var Parser = IParser.extend(function(lexer) {
           }
           if(fncall) {
             node.add(this.fnc());
+          }
+          else if(name == 'font') {
+            node.add(this.addexpr(undefined, null, true));
           }
           else {
             node.add(this.addexpr());
@@ -874,6 +878,9 @@ var Parser = IParser.extend(function(lexer) {
             }
             if(fncall) {
               node.add(this.fnc());
+            }
+            else if(name == 'font') {
+              node.add(this.addexpr(undefined, null, true));
             }
             else {
               node.add(this.addexpr());
@@ -1234,7 +1241,7 @@ var Parser = IParser.extend(function(lexer) {
     node.add(this.match(')'));
     return node;
   },
-  addexpr: function(accepts, noUnit) {
+  addexpr: function(accepts, noUnit, noMtpl) {
     if(accepts && !Array.isArray(accepts)) {
       accepts = [accepts];
     }
@@ -1245,13 +1252,13 @@ var Parser = IParser.extend(function(lexer) {
       accepts = accepts.concat([Token.NUMBER]);
     }
     var node = new Node(Node.ADDEXPR);
-    var mtplexpr = this.mtplexpr(accepts, noUnit);
+    var mtplexpr = this.mtplexpr(accepts, noUnit, noMtpl);
     if(this.look && ['+', '-'].indexOf(this.look.content()) != -1) {
       node.add(mtplexpr);
       while(this.look && ['+', '-'].indexOf(this.look.content()) != -1) {
         node.add(
           this.match(),
-          this.mtplexpr(accepts, noUnit)
+          this.mtplexpr(accepts, noUnit, noMtpl)
         );
         if(!noUnit && this.look && this.look.type() == Token.UNITS) {
           node.add(this.match());
@@ -1263,10 +1270,10 @@ var Parser = IParser.extend(function(lexer) {
     }
     return node;
   },
-  mtplexpr: function(accepts, noUnit) {
+  mtplexpr: function(accepts, noUnit, noMtpl) {
     var node = new Node(Node.MTPLEXPR);
     var prmrexpr = this.prmrexpr(accepts, noUnit);
-    if(this.look && ['*', '/'].indexOf(this.look.content()) != -1) {
+    if(!noMtpl && this.look && ['*', '/'].indexOf(this.look.content()) != -1) {
       node.add(prmrexpr);
       while(this.look && ['*', '/'].indexOf(this.look.content()) != -1) {
         node.add(

@@ -1088,6 +1088,11 @@ describe('cssparser', function() {
       var node = parser.parse('body{margin:(1 + 2) px}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["margin"],":",CssNode.VALUE,[CssNode.PRMREXPR,["(",CssNode.ADDEXPR,["1","+","2"],")"],"px"]],"}"]]]]);
     });
+    it('ignore in font', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('body{font:0/0;font:bold 12px/3;}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["font"],":",CssNode.VALUE,["0","/","0"],";"],CssNode.STYLE,[CssNode.KEY,["font"],":",CssNode.VALUE,["bold","12","px","/","3"],";"],"}"]]]]);
+    });
   });
   describe('lib test', function() {
     it('bootstrap', function() {
