@@ -71,6 +71,7 @@ var Token = Class(function(type, content, val, sIndex) {
     tid--;
   }
 }).statics({
+  //公用
   IGNORE: -2,
   VIRTUAL: -1,
   OTHER: 0,
@@ -82,12 +83,17 @@ var Token = Class(function(type, content, val, sIndex) {
   COMMENT: 6,
   STRING: 7,
   SIGN: 8,
+  //js部分
   REG: 9,
   KEYWORD: 10,
-  ANNOT: 11,
   HEAD: 12,
+  //es6
   TEMPLATE: 13,
+  //仅java
+  ANNOT: 11,
+  //基本无用
   ENTER: 14,
+  //css部分
   PROPERTY: 15,
   VARS: 16,
   HACK: 17,
@@ -97,6 +103,7 @@ var Token = Class(function(type, content, val, sIndex) {
   SELECTOR: 21,
   ATTR: 22,
   COLOR: 23,
+  //html部分
   DATA: 24,
   TEXT: 25,
   MARK: 26,
