@@ -1,6 +1,6 @@
 {
   "name": "homunculus",
-  "version": "0.6.7",
+  "version": "0.7.0",
   "description": "A lexer&parser by Javascript",
   "maintainers": [
     {
@@ -23,7 +23,8 @@
         "src/lexer/rule/EcmascriptRule",
         "src/lexer/rule/CssRule",
         "src/lexer/rule/HtmlRule",
-        "src/parser"
+        "src/parser",
+        "src/util/walk"
       ]
     }
   },

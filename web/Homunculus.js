@@ -24,6 +24,8 @@ var HtmlNode = require('./parser/html/Node');
 
 var JsContext = require('./parser/js/Context');
 
+var walk = require('./util/walk');
+
 exports.getClass = function (type, lan) {
   type = (type || '').toLowerCase();
   lan = (lan || '').toLowerCase();
@@ -125,6 +127,8 @@ exports.getClass = function (type, lan) {
         default:
           throw new Error('Unsupport Language Context: ' + lan);
       }
+    case 'walk':
+      return walk;
     default:
       throw new Error('Unsupport Class Type: ' + type);
   }

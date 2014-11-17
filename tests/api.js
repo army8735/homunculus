@@ -11,7 +11,10 @@ var JsNode = require('../src/parser/js/Node');
 var Es6Node = require('../src/parser/es6/Node');
 var CssNode = require('../src/parser/css/Node');
 var Token = require('../src/lexer/Token');
+var CssToken = require('../src/lexer/CssToken');
+var HtmlToken = require('../src/lexer/HtmlToken');
 var JsContext = require('../src/parser/js/Context');
+var walk = require('../src/util/walk');
 
 describe('api of homunculus', function() {
   it('#getClass', function() {
@@ -57,6 +60,8 @@ describe('api of homunculus', function() {
     }).to.throwError();
 
     expect(homunculus.getClass('token')).to.be(Token);
+    expect(homunculus.getClass('token', 'css')).to.be(CssToken);
+    expect(homunculus.getClass('token', 'html')).to.be(HtmlToken);
 
     expect(homunculus.getClass('context', 'js')).to.be(JsContext);
     expect(homunculus.getClass('context', 'javascript')).to.be(JsContext);
@@ -70,6 +75,8 @@ describe('api of homunculus', function() {
     expect(function() {
       homunculus.getClass('unknow', 'unknow');
     }).to.throwError();
+
+    expect(homunculus.getClass('walk')).to.be(walk);
   });
   it('#getLexer', function() {
     expect(homunculus.getLexer('js')).to.be.a(Lexer);
