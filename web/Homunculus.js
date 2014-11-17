@@ -10,6 +10,7 @@ var HtmlRule = require('./lexer/rule/HtmlRule');
 
 var Token = require('./lexer/Token');
 var CssToken = require('./lexer/CssToken');
+var HtmlToken = require('./lexer/HtmlToken');
 
 var JsParser = require('./parser/js/Parser');
 var Es6Parser = require('./parser/es6/Parser');
@@ -101,6 +102,9 @@ exports.getClass = function (type, lan) {
       switch (lan) {
         case 'css':
           return CssToken;
+        case 'htm':
+        case 'html':
+          return HtmlToken;
         default:
           return Token;
       }

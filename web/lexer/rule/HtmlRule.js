@@ -3,7 +3,7 @@ var LineSearch = require('../match/LineSearch');
 var CompleteEqual = require('../match/CompleteEqual');
 var RegMatch = require('../match/RegMatch');
 var character = require('../../util/character');
-var Token = require('../Token');
+var Token = require('../HtmlToken');
 var HtmlRule = Rule.extend(function() {
   var self = this;
   Rule.call(self, HtmlRule.KEYWORDS);

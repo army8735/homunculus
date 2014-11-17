@@ -1,6 +1,6 @@
 define(function(require, exports, module) {var Class = require('../util/Class');
 var character = require('../util/character');
-var Token = require('./Token');
+var Token = require('./HtmlToken');
 var HtmlLexer = Class(function(rule) {
   this.rule = rule; //当前语法规则
   this.init();

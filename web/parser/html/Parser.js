@@ -2,7 +2,7 @@ define(function(require, exports, module) {var IParser = require('../Parser');
 var character = require('../../util/character');
 var Lexer = require('../../lexer/HtmlLexer');
 var Rule = require('../../lexer/rule/HtmlRule');
-var Token = require('../../lexer/Token');
+var Token = require('../../lexer/HtmlToken');
 var Node = require('./Node');
 var S = {};
 S[Token.BLANK] = S[Token.TAB] = S[Token.COMMENT] = S[Token.LINE] = S[Token.ENTER] = true;

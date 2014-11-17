@@ -86,27 +86,12 @@ var Token = Class(function(type, content, val, sIndex) {
   //js部分
   REG: 9,
   KEYWORD: 10,
-  HEAD: 12,
   //es6
   TEMPLATE: 13,
   //仅java
   ANNOT: 11,
   //基本无用
   ENTER: 14,
-  //css部分
-  PROPERTY: 15,
-  VARS: 16,
-  HACK: 17,
-  IMPORTANT: 18,
-  PSEUDO: 19,
-  UNITS: 20,
-  SELECTOR: 21,
-  ATTR: 22,
-  COLOR: 23,
-  //html部分
-  DATA: 24,
-  TEXT: 25,
-  MARK: 26,
   type: function(tag) {
     if(character.isUndefined(types)) {
       types = [];
