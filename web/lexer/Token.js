@@ -70,9 +70,6 @@ var Token = Class(function(type, content, val, sIndex) {
   cancel: function() {
     tid--;
   },
-  isIgnore: function() {
-    return this.t == Token.IGNORE;
-  },
   isVirtual: function() {
     return this.t == Token.VIRTUAL;
   }
@@ -89,9 +86,9 @@ var Token = Class(function(type, content, val, sIndex) {
   COMMENT: 6,
   STRING: 7,
   SIGN: 8,
+  KEYWORD: 10,
   //js部分
   REG: 9,
-  KEYWORD: 10,
   //es6
   TEMPLATE: 13,
   //仅java

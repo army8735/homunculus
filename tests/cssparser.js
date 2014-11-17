@@ -4,7 +4,7 @@ var expect = require('expect.js');
 var fs = require('fs');
 var path = require('path');
 
-var Token = homunculus.getClass('token');
+var Token = homunculus.getClass('token', 'css');
 var Parser = homunculus.getClass('parser', 'css');
 var CssNode = homunculus.getClass('node', 'css');
 

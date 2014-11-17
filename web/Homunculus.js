@@ -114,6 +114,7 @@ exports.getClass = function (type, lan) {
         case 'javascript':
         case 'es':
         case 'es5':
+        case 'es6':
         case 'ecmascript':
           return EcmascriptRule;
         case 'css':
