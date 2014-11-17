@@ -21,9 +21,9 @@ function jion(node, ignore) {
   return res;
 }
 function recursion(node, ignore) {
-  var isToken = node.name() == JsNode.TOKEN;
-  var isVirtual = isToken && node.token().type() == Token.VIRTUAL;
+  var isToken = node.isToken();
   if(isToken) {
+    var isVirtual = node.token().isVirtual();
     if(!isVirtual) {
       var token = node.token();
       res += token.content();

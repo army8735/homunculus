@@ -41,9 +41,9 @@ function recursion(node, ignore) {
 
 function tree(node, arr) {
   arr = arr || [];
-  var isToken = node.name() == JsNode.TOKEN;
-  var isVirtual = isToken && node.token().type() == Token.VIRTUAL;
+  var isToken = node.isToken();
   if(isToken) {
+    var isVirtual = node.token().isVirtual();
     if(!isVirtual) {
       var token = node.token();
       arr.push(token.content());

@@ -69,6 +69,12 @@ var Token = Class(function(type, content, val, sIndex) {
   },
   cancel: function() {
     tid--;
+  },
+  isIgnore: function() {
+    return this.t == Token.IGNORE;
+  },
+  isVirtual: function() {
+    return this.t == Token.VIRTUAL;
   }
 }).statics({
   //公用
