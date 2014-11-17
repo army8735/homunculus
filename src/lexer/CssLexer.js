@@ -1,5 +1,5 @@
 var Lexer = require('./Lexer');
-var Token = require('./Token');
+var Token = require('./CssToken');
 var character = require('../util/character');
 var RegMatch = require('./match/RegMatch');
 var S = {

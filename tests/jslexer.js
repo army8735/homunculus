@@ -272,7 +272,7 @@ describe('jslexer', function() {
   });
   describe('other tests', function() {
     it('Token#type', function() {
-      expect(Token.type(18)).to.eql('IMPORTANT');
+      expect(Token.type(5)).to.eql('ID');
     });
     it('Token#content', function() {
       var token = new Token(Token.STRING, '', 0);

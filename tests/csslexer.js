@@ -3,7 +3,7 @@ var homunculus = require('../');
 var expect = require('expect.js');
 var path = require('path');
 
-var Token = homunculus.getClass('token');
+var Token = homunculus.getClass('token', 'css');
 var Lexer = homunculus.getClass('lexer', 'css');
 
 function join(tokens) {
