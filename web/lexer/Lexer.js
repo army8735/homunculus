@@ -1,6 +1,7 @@
 define(function(require, exports, module) {var Class = require('../util/Class');
 var character = require('../util/character');
 var Token = require('./Token');
+var walk = require('../util/walk');
 var Lexer = Class(function(rule) {
   this.rule = rule; //当前语法规则
   this.init();
@@ -30,7 +31,10 @@ var Lexer = Class(function(rule) {
     this.scan(temp);
     return temp;
   },
-  tokens: function() {
+  tokens: function(plainObject) {
+    if(plainObject) {
+      return walk.plainObject(this.tokenList);
+    }
     return this.tokenList;
   },
   scan: function(temp) {

@@ -75,10 +75,16 @@ describe('js', function() {
     expect(nodes).to.eql([JsNode.PROGRAM, JsNode.VARSTMT, JsNode.VARDECL]);
     expect(tokens).to.eql([Token.KEYWORD, Token.ID]);
   });
-  it('plainObject', function() {
+  it('ast plainObject', function() {
     var parser = homunculus.getParser('js');
     var node = parser.parse('var a = 1');
     var plainObject = walk.plainObject(node);
     expect(plainObject).to.eql(["PROGRAM",["VARSTMT",["var","VARDECL",["a","ASSIGN",["=","PRMREXPR",["1"]]]]]]);
+  });
+  it('token plainObject', function() {
+    var lexer = homunculus.getLexer('js');
+    var tokens = lexer.parse('var a = 1');
+    var plainObject = walk.plainObject(tokens);
+    expect(plainObject).to.eql(['var', ' ', 'a', ' ', '=', ' ', '1']);
   });
 });

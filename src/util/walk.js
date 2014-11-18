@@ -80,6 +80,17 @@ function toPlainObject(node, res) {
   return res;
 }
 
-exports.plainObject = function(ast) {
-  return toPlainObject(ast, []);
+exports.plainObject = function(obj) {
+  //token
+  if(Array.isArray(obj)) {
+    var res = [];
+    obj.forEach(function(token) {
+      res.push(token.content());
+    });
+    return res;
+  }
+  //ast
+  else {
+    return toPlainObject(obj, []);
+  }
 };

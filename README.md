@@ -93,7 +93,7 @@ npm install homunculus
 #### 方法
 * constructor(lexer:Lexer) 传入词法分析器
 * parse(code:String):Node 传入代码解析并返回语法树
-* ast():Node 返回已解析好的语法树
+* ast(plainObject:Boolean = false):Node 返回已解析好的语法树
 * ignore():Node 返回解析中被忽略掉的空白注释等内容
 
 ### lexer/Token

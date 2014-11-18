@@ -337,5 +337,10 @@ describe('jslexer', function() {
       expect(tokens[0].next()).to.eql(tokens[1]);
       expect(tokens[2].next()).to.eql(null);
     });
+    it('plainObject', function() {
+      var lexer = homunculus.getLexer('js');
+      lexer.parse('var a = 1');
+      expect(lexer.tokens(true)).to.eql(['var', ' ', 'a', ' ', '=', ' ', '1']);
+    });
   });
 });
