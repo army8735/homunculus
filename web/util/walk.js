@@ -25,7 +25,11 @@ function recursion(node, ignore, nodeVisitors, tokenVisitors) {
   }
 }
 
-exports.simple = function(node, ignore, nodeVisitors, tokenVisitors) {
+exports.simple = function(node, nodeVisitors, tokenVisitors) {
+  exports.simpleIgnore(node, {}, nodeVisitors, tokenVisitors)
+};
+
+exports.simpleIgnore = function(node, ignore, nodeVisitors, tokenVisitors) {
   index = 0;
   while(ignore[index]) {
     ignore[index++];
@@ -33,4 +37,25 @@ exports.simple = function(node, ignore, nodeVisitors, tokenVisitors) {
   nodeVisitors = nodeVisitors || {};
   tokenVisitors = tokenVisitors || {};
   recursion(node, ignore, nodeVisitors, tokenVisitors);
+};
+
+function rcs(node, callback) {
+  var isToken = node.isToken();
+  if(isToken) {
+    var token = node.token();
+    var isVirtual = token.isVirtual();
+    if(!isVirtual) {
+      callback(token, true);
+    }
+  }
+  else {
+    callback(node);
+    node.leaves().forEach(function(leaf) {
+      rcs(leaf, callback);
+    });
+  }
+}
+
+exports.recursion = function(node, callback) {
+  rcs(node, callback);
 };});
