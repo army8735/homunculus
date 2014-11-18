@@ -1,4 +1,5 @@
 define(function(require, exports, module) {var Class = require('../util/Class');
+var walk = require('../util/walk');
 var Parser = Class(function(lexer) {
   this.lexer = lexer;
   this.tree =  {};
@@ -8,7 +9,10 @@ var Parser = Class(function(lexer) {
   parse: function(code) {
     return this.tree;
   },
-  ast: function() {
+  ast: function(plainObject) {
+    if(plainObject) {
+      return walk.plainObject(this.tree);
+    }
     return this.tree;
   },
   ignore: function() {

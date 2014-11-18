@@ -1056,5 +1056,10 @@ describe('jsparser', function() {
         JsNode.getKey('');
       }).to.throwError();
     });
+    it('plainObject', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('var a');
+      expect(parser.ast(true)).to.eql(["PROGRAM",["VARSTMT",["var","VARDECL",["a"]]]]);
+    });
   });
 });

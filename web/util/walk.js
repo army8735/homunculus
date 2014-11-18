@@ -58,4 +58,28 @@ function rcs(node, callback) {
 
 exports.recursion = function(node, callback) {
   rcs(node, callback);
+};
+
+function toPlainObject(node, res) {
+  var isToken = node.isToken();
+  if(isToken) {
+    var token = node.token();
+    var isVirtual = token.isVirtual();
+    if(!isVirtual) {
+      res.push(token.content());
+    }
+  }
+  else {
+    res.push(node.name().toUpperCase());
+    var childs = [];
+    res.push(childs);
+    node.leaves().forEach(function(leaf) {
+      toPlainObject(leaf, childs);
+    });
+  }
+  return res;
+}
+
+exports.plainObject = function(ast) {
+  return toPlainObject(ast, []);
 };});
