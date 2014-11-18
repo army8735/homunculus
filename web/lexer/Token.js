@@ -96,11 +96,12 @@ var Token = Class(function(type, content, val, sIndex) {
   //基本无用
   ENTER: 14,
   type: function(tag) {
+    var self = this;
     if(character.isUndefined(types)) {
-      types = [];
-      Object.keys(Token).forEach(function(o) {
-        if(typeof Token[o] == 'number') {
-          types[Token[o]] = o;
+      types = [];console.log(self)
+      Object.keys(self).forEach(function(o) {
+        if(typeof self[o] == 'number') {
+          types[self[o]] = o;
         }
       });
     }
