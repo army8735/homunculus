@@ -98,7 +98,7 @@ var Token = Class(function(type, content, val, sIndex) {
   type: function(tag) {
     var self = this;
     if(character.isUndefined(types)) {
-      types = [];console.log(self)
+      types = [];
       Object.keys(self).forEach(function(o) {
         if(typeof self[o] == 'number') {
           types[self[o]] = o;
