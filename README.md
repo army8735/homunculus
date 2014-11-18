@@ -106,6 +106,7 @@ npm install homunculus
 * tag(t:int):String 读取/设置类型，返回的是类型额字符串形式
 * tid(t:int):int 读取/设置token索引，默认所有token自增形式添加索引
 * sIndex(i:int):int 读取/设置token在code中的字符索引
+* isVirtual():Boolean 返回此token是否是虚拟不存在的
 
 #### 静态属性
 * type(t:int):String 返回类型的字符串形式
@@ -122,6 +123,7 @@ npm install homunculus
 * isEmpty():Boolean 返回是否没有子节点
 * add(...node:Node):void 添加若干个子节点
 * token():Token 实际同leaves()一样，不过当name()为Token时children存储的是终结符Token
+* isToken():Boolean 返回此节点是否是Token节点
 * parent():Node 返回父节点
 * prev():Node 返回兄弟前一个节点
 * next():Node 返回兄弟后一个节点
