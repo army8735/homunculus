@@ -145,7 +145,7 @@ seajs.use(['../index.js', './jssc'], function(Homunculus, jssc) {
     var JsNode = Homunculus.getClass('node', 'es5');
     var Token = Homunculus.getClass('token');
     var ast = parser.parse(s);
-    draw(ast);console.log(ast.leaf(0).toString())
+    draw(ast);
     s = JSON.stringify(tree(ast));
     s = s.replace(/(['"])(JsNode\.\w+)\1/g, '$2');
     console.log(s);

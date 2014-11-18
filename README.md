@@ -26,6 +26,7 @@ npm install homunculus
     * context
     * token
     * rule
+    * walk
   * lan: 
     * js
     * javascript
@@ -78,7 +79,7 @@ npm install homunculus
 #### 方法
 * constructor(Rule:lexer/rule/Rule) 传入语法规则Rule
 * parse(code:String):Array<lexer/Token> 传入代码并返回解析后的此法单元token列表
-* tokens():Array<lexer/Token> 返回已解析好的此番单元token列表
+* tokens(plainObject:Boolean = false):Array<lexer/Token> 返回已解析好的此番单元token列表，如果plainObject为true则传回普通对象
 * cache(line:init):void 设置缓冲解析行，每次最多解析几行代码，防止code过大卡死
 * finish():Boolean 设置cache有用，当前是否解析完毕
 * line():int code有多少行
@@ -93,8 +94,8 @@ npm install homunculus
 #### 方法
 * constructor(lexer:Lexer) 传入词法分析器
 * parse(code:String):Node 传入代码解析并返回语法树
-* ast(plainObject:Boolean = false):Node 返回已解析好的语法树
-* ignore():Node 返回解析中被忽略掉的空白注释等内容
+* ast(plainObject:Boolean = false):Node 返回已解析好的语法树，如果plainObject为true则传回普通对象
+* ignore():Object 返回解析中被忽略掉的空白注释等内容
 
 ### lexer/Token
 #### 方法
@@ -129,6 +130,14 @@ npm install homunculus
 #### 方法
 * constructor(keyWords:Array<String>, supportPerlReg:Boolean = false) 关键字列表和是否支持perl风格的正则表达式
 * addKeyWord(kw:String):Object 添加未知关键字并返回关键字hash，仅限此次对象分析
+
+### util/walk
+#### 方法
+* simple(node:Node, nodeVisitors:Object, tokenVisitors:Object) 遍历语法树工具。nodeVisitors以树节点名做键，回调做值，回调参数为树节点；tokenVisitors以token类型做键，回调做值，回调参数为token
+* simpleIgnore(node:Node, ignore:Object, nodeVisitors:Object, tokenVisitors:Object) 同上，增加第2个参数为忽略掉的空白符等。tokenVisitors的回调增加第2个参数为此token后面的忽略的token数组
+* recursion(node:Node, callback:Function) 递归工具，深度遍历语法树，回调每个节点。回调参数第1个为节点或者token，第2个参数标明是否是token
+* plainObject(node:Node):Array 序列化语法树结果为普通类型
+* plainObject(tokens:Array<Token>):Array 序列化tokens结果为普通类型
 
 #### 特别的，对于css还可以设置添加属性和颜色别名
 * addValue(v:String):Object 添加未知属性并返回属性hash，仅限此次对象分析
