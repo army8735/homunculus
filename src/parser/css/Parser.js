@@ -1329,25 +1329,16 @@ var Parser = IParser.extend(function(lexer) {
       this.match('('),
       this.addexpr(),
       this.match(')'),
-      this.blocks()
+      this.block()
     );
     if(this.look) {
       if(this.look.content() == '@elseif') {
         node.add(this.ifstmt());
       }
       else if(this.look.content() == '@else') {
-        node.add(this.match(), this.blocks());
+        node.add(this.match(), this.block());
       }
     }
-    return node;
-  },
-  blocks: function() {
-    var node = new Node(Node.BLOCKS);
-    node.add(this.match('{'));
-    while(this.look && this.look.content() != '}') {
-      node.add(this.styleset());
-    }
-    node.add(this.match('}'));
     return node;
   },
   match: function(type, msg) {
