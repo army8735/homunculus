@@ -64,6 +64,8 @@ var Node = INode.extend(function(type, children) {
   URLPREFIX: 'ulrprefix',
   DOMAIN: 'domain',
   REGEXP: 'regexp',
+  IFSTMT: 'ifstmt',
+  BLOCKS: 'blocks',
   getKey: function(s) {
     if(!s) {
       throw new Error('empty value');

@@ -137,8 +137,10 @@ var Parser = IParser.extend(function(lexer) {
         return this.supports();
       case '@extend':
         return this.extend();
+      case '@if':
+        return this.ifstmt();
       default:
-        this.error();
+        this.error('unknow head');
     }
   },
   extend: function() {
@@ -1318,6 +1320,34 @@ var Parser = IParser.extend(function(lexer) {
       node.add(this.addexpr());
     }
     node.add(this.match(')'));
+    return node;
+  },
+  ifstmt: function() {
+    var node = new Node(Node.IFSTMT);
+    node.add(
+      this.match(),
+      this.match('('),
+      this.addexpr(),
+      this.match(')'),
+      this.blocks()
+    );
+    if(this.look) {
+      if(this.look.content() == '@elseif') {
+        node.add(this.ifstmt());
+      }
+      else if(this.look.content() == '@else') {
+        node.add(this.match(), this.blocks());
+      }
+    }
+    return node;
+  },
+  blocks: function() {
+    var node = new Node(Node.BLOCKS);
+    node.add(this.match('{'));
+    while(this.look && this.look.content() != '}') {
+      node.add(this.styleset());
+    }
+    node.add(this.match('}'));
     return node;
   },
   match: function(type, msg) {

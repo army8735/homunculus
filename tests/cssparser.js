@@ -1094,6 +1094,40 @@ describe('cssparser', function() {
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["font"],":",CssNode.VALUE,["0","/","0"],";"],CssNode.STYLE,[CssNode.KEY,["font"],":",CssNode.VALUE,["bold","12","px","/","3"],";"],"}"]]]]);
     });
   });
+  describe('@ifstmt', function() {
+    it('only @if', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@if($b){}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.IFSTMT,["@if","(","$b",")",CssNode.BLOCKS,["{","}"]]]]);
+    });
+    it('@elseif', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@if($b){}@elseif($a){}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.IFSTMT,["@if","(","$b",")",CssNode.BLOCKS,["{","}"],CssNode.IFSTMT,["@elseif","(","$a",")",CssNode.BLOCKS,["{","}"]]]]]);
+    });
+    it('@else', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@if($b){}@else{}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.IFSTMT,["@if","(","$b",")",CssNode.BLOCKS,["{","}"],"@else",CssNode.BLOCKS,["{","}"]]]]);
+    });
+    it('addexpr', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@if($b + 1){}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.IFSTMT,["@if","(",CssNode.ADDEXPR,["$b","+","1"],")",CssNode.BLOCKS,["{","}"]]]]);
+    });
+    it('no @if error 1', function() {
+      var parser = homunculus.getParser('css');
+      expect(function() {
+        parser.parse('@else{}');
+      }).to.throwError();
+    });
+    it('no @if error 2', function() {
+      var parser = homunculus.getParser('css');
+      expect(function() {
+        parser.parse('@elseif($a){}');
+      }).to.throwError();
+    });
+  });
   describe('lib test', function() {
     it('bootstrap', function() {
       var parser = homunculus.getParser('css');

@@ -98,7 +98,11 @@ var CssRule = Rule.extend(function() {
       '@top-left': true,
       '@top-center': true,
       '@top-right': true,
-      '@extend': true
+      '@extend': true,
+      '@if': true,
+      '@elseif': true,
+      '@else': true,
+      '@each': true
     }.hasOwnProperty(s)) {
       token.type(Token.VARS);
     }
