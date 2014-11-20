@@ -102,7 +102,7 @@ var CssRule = Rule.extend(function() {
       '@if': true,
       '@elseif': true,
       '@else': true,
-      '@each': true
+      '@for': true
     }.hasOwnProperty(s)) {
       token.type(Token.VARS);
     }
