@@ -106,6 +106,9 @@ var Token = Class(function(type, content, val, sIndex) {
       });
     }
     return types[tag];
+  },
+  reset: function() {
+    tid = 0;
   }
 });
 module.exports = Token;});

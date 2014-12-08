@@ -119,4 +119,7 @@ describe('api of homunculus', function() {
       homunculus.getContext('unknow');
     }).to.throwError();
   });
+  it('#reset', function() {
+    expect(homunculus.reset).to.be.a(Function);
+  });
 });

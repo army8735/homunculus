@@ -74,6 +74,7 @@ npm install homunculus
     * es
     * es5
     * ecmascript
+* reset():void 重置Token的tid
 
 ### lexer/Lexer
 #### 方法
@@ -110,6 +111,7 @@ npm install homunculus
 
 #### 静态属性
 * type(t:int):String 返回类型的字符串形式
+* reset():Void 重置tid
 
 ### parser/Node
 #### 方法

@@ -196,4 +196,8 @@ exports.getContext = function (lan) {
     default:
       throw new Error('Unsupport Language Context: ' + lan);
   }
+};
+
+exports.reset = function() {
+  Token.reset();
 };});
