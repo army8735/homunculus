@@ -1093,6 +1093,11 @@ describe('cssparser', function() {
       var node = parser.parse('body{font:0/0;font:bold 12px/3;}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["font"],":",CssNode.VALUE,["0","/","0"],";"],CssNode.STYLE,[CssNode.KEY,["font"],":",CssNode.VALUE,["bold","12","px","/","3"],";"],"}"]]]]);
     });
+    it('ignore in border-image', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('body{border-image: url(https://i.alipayobjects.com/i/localhost/png/201411/3qhQSLX7dl.png) 0 4/4px round;}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["border-image"],":",CssNode.VALUE,[CssNode.URL,["url","(","https://i.alipayobjects.com/i/localhost/png/201411/3qhQSLX7dl.png",")"],"0","4","/","4","px","round"],";"],"}"]]]]);
+    });
   });
   describe('@ifstmt', function() {
     it('only @if', function() {
