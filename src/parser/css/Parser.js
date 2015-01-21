@@ -764,7 +764,7 @@ var Parser = IParser.extend(function(lexer) {
           if(fncall) {
             node.add(this.fnc());
           }
-          else if(name == 'font') {
+          else if(name == 'font' || name == 'border-image') {
             node.add(this.addexpr(undefined, null, true));
           }
           else {
@@ -877,7 +877,7 @@ var Parser = IParser.extend(function(lexer) {
             if(fncall) {
               node.add(this.fnc());
             }
-            else if(name == 'font') {
+            else if(name == 'font' || name == 'border-image') {
               node.add(this.addexpr(undefined, null, true));
             }
             else {
