@@ -856,6 +856,13 @@ var Parser = IParser.extend(function(lexer) {
       this.match('default'),
       this.match(':')
     );
+    while(this.look && this.look.content() == 'case') {
+      node.add(
+        this.match('case'),
+        this.expr(),
+        this.match(':')
+      );
+    }
     while(this.look && this.look.content() != '}') {
       node.add(this.stmt(yYield));
     }

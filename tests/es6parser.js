@@ -1241,6 +1241,11 @@ describe('es6parser', function() {
       var node = parser.parse('switch(a){case 1:case 2:;break;default:;}');
       expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.SWCHSTMT,["switch","(",JsNode.PRMREXPR,["a"],")",JsNode.CASEBLOCK,["{",JsNode.CASECLAUSE,["case",JsNode.PRMREXPR,["1"],":"],JsNode.CASECLAUSE,["case",JsNode.PRMREXPR,["2"],":",JsNode.EMPTSTMT,[";"],JsNode.BRKSTMT,["break",";"]],JsNode.DFTCLAUSE,["default",":",JsNode.EMPTSTMT,[";"]],"}"]]]]]);
     });
+    it('defaultstmt', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('switch(a){default:case 1:break;}');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.SWCHSTMT,["switch","(",JsNode.PRMREXPR,["a"],")",JsNode.CASEBLOCK,["{",JsNode.DFTCLAUSE,["default",":","case",JsNode.PRMREXPR,["1"],":",JsNode.BRKSTMT,["break",";"]],"}"]]]]]);
+    });
     it('withstmt', function() {
       var parser = homunculus.getParser('es6');
       var node = parser.parse('with(a){}');
