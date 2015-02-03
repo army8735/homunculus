@@ -61,6 +61,7 @@
     "gulp-util": "^2.2.14",
     "mocha": "^1.18.2",
     "mocha-lcov-reporter": "0.0.1",
-    "through2": "^0.4.2"
+    "through2": "^0.4.2",
+    "unicode-7.0.0": "^0.1.5"
   }
 }
