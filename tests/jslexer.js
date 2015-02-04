@@ -48,6 +48,11 @@ describe('jslexer', function() {
       var tokens = lexer.parse('var a = 1;var b');
       expect(join(tokens)).to.eql(['var', ' ', 'a', ' ', '=', ' ', '1', ';', 'var', ' ', 'b']);
     });
+    it('unicode id', function() {
+      var lexer = homunculus.getLexer('js');
+      var tokens = lexer.parse('var 中文');
+      expect(join(tokens)).to.eql(['var', ' ', '中文']);
+    });
     it('perl style regular 1', function() {
       var lexer = homunculus.getLexer('js');
       var tokens = lexer.parse('/.*\d[^a-z]\\//g, /[/]/');
