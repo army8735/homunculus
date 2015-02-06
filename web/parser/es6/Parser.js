@@ -632,7 +632,7 @@ var Parser = IParser.extend(function(lexer) {
                 var end2 = false;
                 for(var j = i + 1; j < this.length; j++) {
                   var next = this.tokens[j];
-                  if(!S[token.type()]) {
+                  if(!S[next.type()]) {
                     if(['in', 'of'].indexOf(next.content()) > -1) {
                       node.add(
                         this.match(),
@@ -683,18 +683,57 @@ var Parser = IParser.extend(function(lexer) {
           }
         }
         else if(['let', 'const'].indexOf(this.look.content()) > -1) {
-          node.add(
-            this.match(),
-            this.forbind()
-          );
-          if(!this.look || ['in', 'of'].indexOf(this.look.content()) == -1) {
-            this.error();
+          outer:
+          for(var i = this.index; i < this.length; i++) {
+            var token = this.tokens[i];
+            if(!S[token.type()]) {
+              //直接指向LexicalDeclaration
+              if(['{', '['].indexOf(token.content()) > -1) {
+                node.add(this.lexdecl(yYield));
+                if(this.look && this.look.content() != ';') {
+                  node.add(this.expr());
+                }
+                node.add(this.match(';'));
+                if(this.look && this.look.content() != ')') {
+                  node.add(this.expr());
+                }
+                break;
+              }
+              //仅一个id之后跟着of或in也是LexicalDeclaration
+              else if(token.type() == Token.ID) {
+                for(var j = i + 1; j < this.length; j++) {
+                  var next = this.tokens[j];
+                  if(!S[next.type()]) {
+                    if(['in', 'of'].indexOf(next.content()) > -1) {
+                      node.add(
+                        this.match(),
+                        this.forbind()
+                      );
+                      var isOf = next.content() == 'of';
+                      node.add(
+                        this.match(),
+                        isOf ? this.assignexpr() : this.expr()
+                      );
+                    }
+                    else {
+                      node.add(this.lexdecl(yYield));
+                      if(this.look && this.look.content() != ';') {
+                        node.add(this.expr());
+                      }
+                      node.add(this.match(';'));
+                      if(this.look && this.look.content() != ')') {
+                        node.add(this.expr());
+                      }
+                    }
+                    break outer;
+                  }
+                }
+              }
+              else {
+                this.error();
+              }
+            }
           }
-          var isOf = this.look.content() == 'of';
-          node.add(
-            this.match(),
-            isOf ? this.assignexpr() : this.expr()
-          );
         }
         else {
           if(['in', 'of'].indexOf(this.look.content()) > -1) {
