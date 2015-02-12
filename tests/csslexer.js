@@ -570,6 +570,12 @@ describe('csslexer', function() {
         expect(join(tokens)).to.eql(['$a', ':', '1']);
         expect(type(tokens)).to.eql([16, 8, 4]);
       });
+      it('unicode', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('$中文:1');
+        expect(join(tokens)).to.eql(['$中文', ':', '1']);
+        expect(type(tokens)).to.eql([16, 8, 4]);
+      });
       it('css3', function() {
         var lexer = homunculus.getLexer('css');
         var tokens = lexer.parse('var-a:1');
