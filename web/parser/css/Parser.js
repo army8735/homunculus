@@ -4,8 +4,10 @@ var Lexer = require('../../lexer/Lexer');
 var Rule = require('../../lexer/rule/CssRule');
 var Token = require('../../lexer/CssToken');
 var Node = require('./Node');
+
 var S = {};
 S[Token.BLANK] = S[Token.TAB] = S[Token.COMMENT] = S[Token.LINE] = true;
+
 var MQL = {
   'only': true,
   'not': true,
@@ -21,6 +23,7 @@ var MQL = {
   'tv': true,
   '(': true
 };
+
 var MT = {
   'all': true,
   'aural': true,
@@ -33,6 +36,18 @@ var MT = {
   'embossed': true,
   'tv': true
 };
+
+var NO_MTPL = {
+  'font': true,
+  'border-image': true,
+  'device-aspect-ratio': true,
+  'device-pixel-ratio': true,
+  'min-device-pixel-ratio': true,
+  'max-device-pixel-ratio': true,
+  'min--moz-device-pixel-ratio': true,
+  'max--moz-device-pixel-ratio': true
+};
+
 var Parser = IParser.extend(function(lexer) {
   IParser.call(this, lexer);
   this.init(lexer);
@@ -773,7 +788,7 @@ var Parser = IParser.extend(function(lexer) {
           if(fncall) {
             node.add(this.fnc());
           }
-          else if(name == 'font' || name == 'border-image' || name == 'device-aspect-ratio') {
+          else if(NO_MTPL.hasOwnProperty(name)) {
             node.add(this.addexpr(undefined, null, true));
           }
           else {
@@ -886,7 +901,7 @@ var Parser = IParser.extend(function(lexer) {
             if(fncall) {
               node.add(this.fnc());
             }
-            else if(name == 'font' || name == 'border-image' || name == 'device-aspect-ratio') {
+            else if(NO_MTPL.hasOwnProperty(name)) {
               node.add(this.addexpr(undefined, null, true));
             }
             else {
