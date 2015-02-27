@@ -79,8 +79,8 @@ npm install homunculus
 ### lexer/Lexer
 #### 方法
 * constructor(Rule:lexer/rule/Rule) 传入语法规则Rule
-* parse(code:String):Array<lexer/Token> 传入代码并返回解析后的此法单元token列表
-* tokens(plainObject:Boolean = false):Array<lexer/Token> 返回已解析好的此番单元token列表，如果plainObject为true则传回普通对象
+* parse(code:String):Array\<lexer/Token> 传入代码并返回解析后的此法单元token列表
+* tokens(plainObject:Boolean = false):Array\<lexer/Token> 返回已解析好的此番单元token列表，如果plainObject为true则传回普通对象
 * cache(line:init):void 设置缓冲解析行，每次最多解析几行代码，防止code过大卡死
 * finish():Boolean 设置cache有用，当前是否解析完毕
 * line():int code有多少行
@@ -115,9 +115,9 @@ npm install homunculus
 
 ### parser/Node
 #### 方法
-* constructor(type:String, children:Node/Array<Node> = null) 传入类型和子节点
+* constructor(type:String, children:Node/Array\<Node> = null) 传入类型和子节点
 * name(t:String):String 读取/设置节点类型
-* leaves():Array<Node> 返回子节点列表
+* leaves():Array\<Node> 返回子节点列表
 * leaf(i:int):Node 返回第i个子节点
 * size():int 返回有几个子节点
 * first():Node 返回第一个子节点
@@ -132,7 +132,7 @@ npm install homunculus
 
 ### lexer/rule/Rule
 #### 方法
-* constructor(keyWords:Array<String>, supportPerlReg:Boolean = false) 关键字列表和是否支持perl风格的正则表达式
+* constructor(keyWords:Array\<String>, supportPerlReg:Boolean = false) 关键字列表和是否支持perl风格的正则表达式
 * addKeyWord(kw:String):Object 添加未知关键字并返回关键字hash，仅限此次对象分析
 
 ### util/walk
@@ -141,20 +141,20 @@ npm install homunculus
 * simpleIgnore(node:Node, ignore:Object, nodeVisitors:Object, tokenVisitors:Object) 同上，增加第2个参数为忽略掉的空白符等。tokenVisitors的回调增加第2个参数为此token后面的忽略的token数组
 * recursion(node:Node, callback:Function) 递归工具，深度遍历语法树，回调每个节点。回调参数第1个为节点或者token，第2个参数标明是否是token
 * plainObject(node:Node):Array 序列化语法树结果为普通类型
-* plainObject(tokens:Array<Token>):Array 序列化tokens结果为普通类型
+* plainObject(tokens:Array\<Token>):Array 序列化tokens结果为普通类型
 
 #### 特别的，对于css还可以设置添加属性和颜色别名
 * addValue(v:String):Object 添加未知属性并返回属性hash，仅限此次对象分析
 * addColor(c:String):Object 添加未知颜色并返回颜色hash，仅限此次对象分析
 
 #### 亦可使用静态方法统一添加关键字等，一劳永逸
-* addKeyWord(kw:String):Array<String>
-* addValue(v:String):Array<String>
-* addColor(c:String):Array<String>
+* addKeyWord(kw:String):Array\<String>
+* addValue(v:String):Array\<String>
+* addColor(c:String):Array\<String>
 
 ## AST
-当调用语法分析器解析后，会返回生成ast，这是一个树状数据结构，每个节点都是对应语法解析器目录下的Node.js的实例。<br/>
-demo目录下是一个用js的parser分析输入js代码并画出ast形状的页面。<br/>
+当调用语法分析器解析后，会返回生成ast，这是一个树状数据结构，每个节点都是对应语法解析器目录下的Node.js的实例。\<br/>
+demo目录下是一个用js的parser分析输入js代码并画出ast形状的页面。\<br/>
 你也可以在线尝试它：http://army8735.me/homunculus
 
 ## License
