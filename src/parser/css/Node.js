@@ -65,6 +65,7 @@ var Node = INode.extend(function(type, children) {
   DOMAIN: 'domain',
   REGEXP: 'regexp',
   IFSTMT: 'ifstmt',
+  FORSTMT: 'forstmt',
   getKey: function(s) {
     if(!s) {
       throw new Error('empty value');

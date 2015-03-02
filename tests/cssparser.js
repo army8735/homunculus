@@ -1143,6 +1143,9 @@ describe('cssparser', function() {
       }).to.throwError();
     });
   });
+  describe('@forstmt', function() {
+
+  });
   describe('lib test', function() {
     it('bootstrap', function() {
       var parser = homunculus.getParser('css');

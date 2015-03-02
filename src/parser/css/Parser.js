@@ -154,6 +154,8 @@ var Parser = IParser.extend(function(lexer) {
         return this.extend();
       case '@if':
         return this.ifstmt();
+      case '@for':
+        return this.forstmt();
       default:
         this.error('unknow head');
     }
@@ -1363,6 +1365,15 @@ var Parser = IParser.extend(function(lexer) {
         node.add(this.match(), this.block());
       }
     }
+    return node;
+  },
+  forstmt: function() {
+    var node = new Node(Node.FORSTMT);
+    node.add(
+      this.match(),
+      this.match('(')
+    );
+    //in和of和普通语句三种区分
     return node;
   },
   match: function(type, msg) {
