@@ -66,6 +66,15 @@ var Node = INode.extend(function(type, children) {
   REGEXP: 'regexp',
   IFSTMT: 'ifstmt',
   FORSTMT: 'forstmt',
+  VARSTMT: 'varstmt',
+  EQSTMT: 'eqstmt',
+  RELSTMT: 'relstmt',
+  ADDSTMT: 'addstmt',
+  MTPLSTMT: 'mtplstmt',
+  POSTFIXSTMT: 'postfixstmt',
+  MMBSTMT: 'mmbstmt',
+  PRMRSTMT: 'prmrstmt',
+  ARRLTR: 'arrltr',
   getKey: function(s) {
     if(!s) {
       throw new Error('empty value');

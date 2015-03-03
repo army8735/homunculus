@@ -154,6 +154,8 @@ var Parser = IParser.extend(function(lexer) {
         return this.extend();
       case '@if':
         return this.ifstmt();
+      case '@for':
+        return this.forstmt();
       default:
         this.error('unknow head');
     }
@@ -1363,6 +1365,140 @@ var Parser = IParser.extend(function(lexer) {
         node.add(this.match(), this.block());
       }
     }
+    return node;
+  },
+  forstmt: function() {
+    var node = new Node(Node.FORSTMT);
+    node.add(
+      this.match(),
+      this.match('(')
+    );
+    var type = 0; //0为普通，1为in，2为of
+    //in和of和普通语句三种区分
+    //debugger
+    for(var i = this.index; i < this.length; i++) {
+      var token = this.tokens[i];
+      if(!S[token.type()]) {
+        if(token.content() == 'in') {
+          type = 1;
+        }
+        else if(token.content() == 'of') {
+          type = 2;
+        }
+        break;
+      }
+    }
+    if(type == 0) {
+      //@for(varstmt ; expr ; epxr)
+      if(this.look.content() != ';') {
+        node.add(this.varstmt());
+      }
+      node.add(this.match(';'));
+      if(this.look.content() != ';') {
+        node.add(this.eqstmt());
+      }
+      node.add(this.match(';'));
+      if(this.look.content() != ')') {
+        node.add(this.addstmt());
+      }
+      node.add(this.match(')'));
+    }
+    node.add(this.block());
+    return node;
+  },
+  varstmt: function() {
+    var node = new Node(Node.VARSTMT);
+    node.add(
+      this.match(Token.VARS),
+      this.match([':', '=']),
+      this.match([Token.NUMBER, Token.VARS])
+    );
+    return node;
+  },
+  eqstmt: function() {
+    var node = new Node(Node.EXPRSTMT);
+    var relstmt = this.relstmt();
+    if(this.look && {
+        '==': true,
+        '!=': true
+      }.hasOwnProperty(this.look.content())) {
+      node.add(
+        relstmt,
+        this.match(),
+        this.relstmt()
+      );
+    }
+    else {
+      return relstmt;
+    }
+    return node;
+  },
+  relstmt: function() {
+    var node = new Node(Node.RELSTMT);
+    node.add(
+      this.match([Token.NUMBER, Token.STRING, Token.VARS]),
+      this.match(['>', '<', '>=', '<=']),
+      this.match([Token.NUMBER, Token.STRING, Token.VARS])
+    );
+    return node;
+  },
+  addstmt: function() {
+    var node = new Node(Node.ADDSTMT);
+    var mtplstmt = this.mtplstmt();
+    return node;
+  },
+  mtplstmt: function() {
+    var node = new Node(Node.MTPLSTMT);
+    var postfixstmt = this.postfixstmt();
+    return node;
+  },
+  postfixstmt: function() {
+    var node = new Node(Node.POSTFIXSTMT);
+    var mmbstmt = this.mmbstmt();
+    return node;
+  },
+  mmbstmt: function() {
+    var node = new Node(Node.POSTFIXSTMT);
+    var prmrstmt = this.prmrstmt();
+    return node;
+  },
+  prmrstmt: function() {
+    var node = new Node(Node.PRMRSTMT);
+    switch(this.look.type()) {
+      case Token.VARS:
+      case Token.NUMBER:
+      case Token.STRING:
+        node.add(this.match());
+        break;
+      default:
+        switch(this.look.content()) {
+          case '(':
+            node.add(
+              this.match(),
+              this.expr(),
+              this.match(')')
+            );
+            break;
+          case '[':
+            return this.arrltr();
+          default:
+            this.error();
+        }
+    }
+    return node;
+  },
+  arrltr: function() {
+    var node = new Node(Node.ARRLTR);
+    node.add(this.match('['));
+    while(this.look && this.look.content() != ']') {
+      if(this.look.content() == ',') {
+        node.add(this.match());
+      }
+      else {
+        node.add(this.exprstmt());
+      }
+    }
+    node.add(this.match(']'));
     return node;
   },
   match: function(type, msg) {
