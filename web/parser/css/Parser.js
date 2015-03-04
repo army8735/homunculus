@@ -527,7 +527,10 @@ var Parser = IParser.extend(function(lexer) {
     if(!this.look) {
       this.error();
     }
-    if(this.look.type() == Token.KEYWORD || this.look.type() == Token.HACK) {
+    if(this.look.content() == '[') {
+      node.add(this.arrltr());
+    }
+    else if(this.look.type() == Token.KEYWORD || this.look.type() == Token.HACK) {
       node.add(this.style(null, true));
     }
     else {
@@ -695,6 +698,7 @@ var Parser = IParser.extend(function(lexer) {
     }
     var s = this.look.content().toLowerCase();
     var pCount = 0;
+    var bCount = 0;
     if([Token.COLOR, Token.HACK, Token.VARS, Token.ID, Token.PROPERTY, Token.NUMBER, Token.STRING, Token.HEAD, Token.SIGN, Token.UNITS, Token.KEYWORD].indexOf(this.look.type()) > -1
       && [';', '}'].indexOf(s) == -1) {
       switch(s) {
@@ -773,6 +777,15 @@ var Parser = IParser.extend(function(lexer) {
           }
           else if(noComma && s == ',') {
             this.error();
+          }
+          else if(s == '[') {
+            bCount++;
+          }
+          else if(s == ']') {
+            if(bCount == 0) {
+              return node;
+            }
+            bCount--;
           }
           //LL2确定是否是fncall
           var fncall = false;
@@ -886,6 +899,15 @@ var Parser = IParser.extend(function(lexer) {
             }
             else if(noComma && s == ',') {
               break outer;
+            }
+            else if(s == '[') {
+              bCount++;
+            }
+            else if(s == ']') {
+              if(bCount == 0) {
+                return node;
+              }
+              bCount--;
             }
             //LL2确定是否是fncall
             var fncall = false;
@@ -1494,8 +1516,14 @@ var Parser = IParser.extend(function(lexer) {
       if(this.look.content() == ',') {
         node.add(this.match());
       }
+      if(!this.look) {
+        this.error();
+      }
+      if(this.look.type() == Token.KEYWORD || this.look.type() == Token.HACK) {
+        node.add(this.style(null, true, true));
+      }
       else {
-        node.add(this.exprstmt());
+        node.add(this.value(null, true));
       }
     }
     node.add(this.match(']'));
