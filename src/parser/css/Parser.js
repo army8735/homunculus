@@ -110,7 +110,7 @@ var Parser = IParser.extend(function(lexer) {
             break;
           }
         }
-        return isFn ? this.fn() : this.vardecl();
+        return isFn ? this.fn() : this.varstmt();
       case Token.SELECTOR:
       case Token.PSEUDO:
         return this.styleset();
@@ -536,7 +536,6 @@ var Parser = IParser.extend(function(lexer) {
     else {
       node.add(this.value());
     }
-    node.add(this.match(';'));
     return node;
   },
   styleset: function(kf) {
@@ -629,7 +628,7 @@ var Parser = IParser.extend(function(lexer) {
           node.add(this.fnc());
         }
         else if(isDecl) {
-          node.add(this.vardecl());
+          node.add(this.varstmt());
         }
         else {
           node.add(this.addexpr());
@@ -1430,11 +1429,11 @@ var Parser = IParser.extend(function(lexer) {
   },
   varstmt: function() {
     var node = new Node(Node.VARSTMT);
-    node.add(
-      this.match(Token.VARS),
-      this.match([':', '=']),
-      this.match([Token.NUMBER, Token.VARS])
-    );
+    node.add(this.vardecl());
+    while(this.look && this.look.content() == ',') {
+      node.add(this.match(), this.vardecl());
+    }
+    node.add(this.match(';'));
     return node;
   },
   eqstmt: function() {
