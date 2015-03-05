@@ -531,10 +531,10 @@ var Parser = IParser.extend(function(lexer) {
       node.add(this.arrltr());
     }
     else if(this.look.type() == Token.KEYWORD || this.look.type() == Token.HACK) {
-      node.add(this.style(null, true));
+      node.add(this.style(null, true, true));
     }
     else {
-      node.add(this.value());
+      node.add(this.value(null, true));
     }
     return node;
   },
@@ -1414,13 +1414,15 @@ var Parser = IParser.extend(function(lexer) {
       if(this.look.content() != ';') {
         node.add(this.varstmt());
       }
-      node.add(this.match(';'));
+      else {
+        node.add(this.match(';'));
+      }
       if(this.look.content() != ';') {
         node.add(this.eqstmt());
       }
       node.add(this.match(';'));
       if(this.look.content() != ')') {
-        node.add(this.addstmt());
+        node.add(this.eqstmt());
       }
       node.add(this.match(')'));
     }
