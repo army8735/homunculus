@@ -1108,27 +1108,27 @@ describe('cssparser', function() {
     it('only @if', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('@if($b){}');
-      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.IFSTMT,["@if","(","$b",")",CssNode.BLOCK,["{","}"]]]]);
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.IFSTMT,["@if","(",CssNode.PRMRSTMT,["$b"],")",CssNode.BLOCK,["{","}"]]]]);
     });
     it('@elseif', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('@if($b){}@elseif($a){}');
-      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.IFSTMT,["@if","(","$b",")",CssNode.BLOCK,["{","}"],CssNode.IFSTMT,["@elseif","(","$a",")",CssNode.BLOCK,["{","}"]]]]]);
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.IFSTMT,["@if","(",CssNode.PRMRSTMT,["$b"],")",CssNode.BLOCK,["{","}"],CssNode.IFSTMT,["@elseif","(",CssNode.PRMRSTMT,["$a"],")",CssNode.BLOCK,["{","}"]]]]]);
     });
     it('@else', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('@if($b){}@else{}');
-      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.IFSTMT,["@if","(","$b",")",CssNode.BLOCK,["{","}"],"@else",CssNode.BLOCK,["{","}"]]]]);
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.IFSTMT,["@if","(",CssNode.PRMRSTMT,["$b"],")",CssNode.BLOCK,["{","}"],"@else",CssNode.BLOCK,["{","}"]]]]);
     });
     it('addexpr', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('@if($b + 1){}');
-      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.IFSTMT,["@if","(",CssNode.ADDEXPR,["$b","+","1"],")",CssNode.BLOCK,["{","}"]]]]);
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.IFSTMT,["@if","(",CssNode.ADDSTMT,[CssNode.PRMRSTMT,["$b"],"+",CssNode.PRMRSTMT,["1"]],")",CssNode.BLOCK,["{","}"]]]]);
     });
     it('within content', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('@if($a){color:#FFF;div{margin:$a}}');
-      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.IFSTMT,["@if","(","$a",")",CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["color"],":",CssNode.VALUE,["#FFF"],";"],CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["div"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["margin"],":",CssNode.VALUE,["$a"]],"}"]],"}"]]]]);
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.IFSTMT,["@if","(",CssNode.PRMRSTMT,["$a"],")",CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["color"],":",CssNode.VALUE,["#FFF"],";"],CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["div"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["margin"],":",CssNode.VALUE,["$a"]],"}"]],"}"]]]]);
     });
     it('no @if error 1', function() {
       var parser = homunculus.getParser('css');
@@ -1144,6 +1144,9 @@ describe('cssparser', function() {
     });
   });
   describe('@forstmt', function() {
+
+  });
+  describe('eqstmt', function() {
 
   });
   describe('lib test', function() {

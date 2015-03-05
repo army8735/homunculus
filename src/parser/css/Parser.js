@@ -1374,7 +1374,7 @@ var Parser = IParser.extend(function(lexer) {
     node.add(
       this.match(),
       this.match('('),
-      this.addexpr(),
+      this.eqstmt(),
       this.match(')'),
       this.block()
     );
@@ -1456,31 +1456,76 @@ var Parser = IParser.extend(function(lexer) {
   },
   relstmt: function() {
     var node = new Node(Node.RELSTMT);
-    node.add(
-      this.match([Token.NUMBER, Token.STRING, Token.VARS]),
-      this.match(['>', '<', '>=', '<=']),
-      this.match([Token.NUMBER, Token.STRING, Token.VARS])
-    );
+    var addstmt = this.addstmt();
+    if(this.look && {
+        '>': true,
+        '<': true,
+        '>=': true,
+        '<=': true
+      }.hasOwnProperty(this.look.content())) {
+      node.add(
+        addstmt,
+        this.match(),
+        this.addstmt()
+      );
+    }
+    else {
+      return addstmt;
+    }
     return node;
   },
   addstmt: function() {
     var node = new Node(Node.ADDSTMT);
     var mtplstmt = this.mtplstmt();
+    if(this.look && {
+        '+': true,
+        '-': true
+      }.hasOwnProperty(this.look.content())) {
+      node.add(
+        mtplstmt,
+        this.match(),
+        this.mtplstmt()
+      );
+    }
+    else {
+      return mtplstmt;
+    }
     return node;
   },
   mtplstmt: function() {
     var node = new Node(Node.MTPLSTMT);
     var postfixstmt = this.postfixstmt();
+    if(this.look && {
+        '*': true,
+        '/': true
+      }.hasOwnProperty(this.look.content())) {
+      node.add(
+        postfixstmt,
+        this.match(),
+        this.postfixstmt()
+      );
+    }
+    else {
+      return postfixstmt;
+    }
     return node;
   },
   postfixstmt: function() {
     var node = new Node(Node.POSTFIXSTMT);
-    var mmbstmt = this.mmbstmt();
-    return node;
-  },
-  mmbstmt: function() {
-    var node = new Node(Node.POSTFIXSTMT);
     var prmrstmt = this.prmrstmt();
+    if(this.look && {
+        '++': true,
+        '--': true
+      }.hasOwnProperty(this.look.content())) {
+      node.add(
+        prmrstmt,
+        this.match(),
+        this.prmrstmt()
+      );
+    }
+    else {
+      return prmrstmt;
+    }
     return node;
   },
   prmrstmt: function() {
@@ -1496,7 +1541,7 @@ var Parser = IParser.extend(function(lexer) {
           case '(':
             node.add(
               this.match(),
-              this.expr(),
+              this.eqstmt(),
               this.match(')')
             );
             break;
