@@ -1439,7 +1439,7 @@ var Parser = IParser.extend(function(lexer) {
     return node;
   },
   eqstmt: function() {
-    var node = new Node(Node.EXPRSTMT);
+    var node = new Node(Node.EQSTMT);
     var relstmt = this.relstmt();
     if(this.look && {
         '==': true,

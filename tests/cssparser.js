@@ -1171,7 +1171,36 @@ describe('cssparser', function() {
     });
   });
   describe('eqstmt', function() {
-
+    it('eq', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@if($a==1){}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.IFSTMT,["@if","(",CssNode.EQSTMT,[CssNode.PRMRSTMT,["$a"],"==",CssNode.PRMRSTMT,["1"]],")",CssNode.BLOCK,["{","}"]]]]);
+    });
+    it('rel', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@if($a>1){}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.IFSTMT,["@if","(",CssNode.RELSTMT,[CssNode.PRMRSTMT,["$a"],">",CssNode.PRMRSTMT,["1"]],")",CssNode.BLOCK,["{","}"]]]]);
+    });
+    it('add/mtpl', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@if($a + $b * 2){}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.IFSTMT,["@if","(",CssNode.ADDSTMT,[CssNode.PRMRSTMT,["$a"],"+",CssNode.MTPLSTMT,[CssNode.PRMRSTMT,["$b"],"*",CssNode.PRMRSTMT,["2"]]],")",CssNode.BLOCK,["{","}"]]]]);
+    });
+    it('postfix', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@if($a++){}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.IFSTMT,["@if","(",CssNode.POSTFIXSTMT,[CssNode.PRMRSTMT,["$a"],"++"],")",CssNode.BLOCK,["{","}"]]]]);
+    });
+    it('prmr', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@if($a){}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.IFSTMT,["@if","(",CssNode.PRMRSTMT,["$a"],")",CssNode.BLOCK,["{","}"]]]]);
+    });
+    it('arrltr', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('$a = [1,2];');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.VARSTMT,[CssNode.VARDECL,["$a","=",CssNode.ARRLTR,["[",CssNode.VALUE,["1"],",",CssNode.VALUE,["2"],"]"]],";"]]]);
+    });
   });
   describe('lib test', function() {
     it('bootstrap', function() {
