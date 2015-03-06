@@ -75,6 +75,7 @@ var Node = INode.extend(function(type, children) {
   MMBSTMT: 'mmbstmt',
   PRMRSTMT: 'prmrstmt',
   ARRLTR: 'arrltr',
+  DIR: 'dir',
   getKey: function(s) {
     if(!s) {
       throw new Error('empty value');

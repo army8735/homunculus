@@ -1202,6 +1202,13 @@ describe('cssparser', function() {
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.VARSTMT,[CssNode.VARDECL,["$a","=",CssNode.ARRLTR,["[",CssNode.VALUE,["1"],",",CssNode.VALUE,["2"],"]"]],";"]]]);
     });
   });
+  describe('global fn @', function() {
+    it('@dir', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('$a = @dir("test");');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.VARSTMT,[CssNode.VARDECL,["$a","=",CssNode.DIR,["@dir",CssNode.CPARAMS,["(",CssNode.VALUE,["\"test\""],")"]]],";"]]]);
+    });
+  });
   describe('lib test', function() {
     it('bootstrap', function() {
       var parser = homunculus.getParser('css');

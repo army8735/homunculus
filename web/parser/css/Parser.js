@@ -530,6 +530,9 @@ var Parser = IParser.extend(function(lexer) {
     if(this.look.content() == '[') {
       node.add(this.arrltr());
     }
+    else if(this.look.content() == '@dir') {
+      node.add(this.dir());
+    }
     else if(this.look.type() == Token.KEYWORD || this.look.type() == Token.HACK) {
       node.add(this.style(null, true, true));
     }
@@ -1572,6 +1575,14 @@ var Parser = IParser.extend(function(lexer) {
       }
     }
     node.add(this.match(']'));
+    return node;
+  },
+  dir: function() {
+    var node = new Node(Node.DIR);
+    node.add(
+      this.match(),
+      this.cparams()
+    );
     return node;
   },
   match: function(type, msg) {
