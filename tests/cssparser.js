@@ -1146,6 +1146,16 @@ describe('cssparser', function() {
         parser.parse('@elseif($a){}');
       }).to.throwError();
     });
+    it('cross 1', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@if($a){@for(;;){}}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.IFSTMT,["@if","(",CssNode.PRMRSTMT,["$a"],")",CssNode.BLOCK,["{",CssNode.FORSTMT,["@for","(",";",";",")",CssNode.BLOCK,["{","}"]],"}"]]]]);
+    });
+    it('cross 2', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@if($a){@if($b){}}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.IFSTMT,["@if","(",CssNode.PRMRSTMT,["$a"],")",CssNode.BLOCK,["{",CssNode.IFSTMT,["@if","(",CssNode.PRMRSTMT,["$b"],")",CssNode.BLOCK,["{","}"]],"}"]]]]);
+    });
   });
   describe('@forstmt', function() {
     it('for(;;){}', function() {
