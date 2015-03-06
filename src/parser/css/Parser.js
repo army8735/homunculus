@@ -1521,8 +1521,7 @@ var Parser = IParser.extend(function(lexer) {
       }.hasOwnProperty(this.look.content())) {
       node.add(
         prmrstmt,
-        this.match(),
-        this.prmrstmt()
+        this.match()
       );
     }
     else {

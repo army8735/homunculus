@@ -1159,6 +1159,16 @@ describe('cssparser', function() {
       var node = parser.parse('@for($a=1,$b="2";;){}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.FORSTMT,["@for","(",CssNode.VARSTMT,[CssNode.VARDECL,["$a","=",CssNode.VALUE,["1"]],",",CssNode.VARDECL,["$b","=",CssNode.VALUE,["\"2\""]],";"],";",")",CssNode.BLOCK,["{","}"]]]]);
     });
+    it('for(;EQSTMT;){}', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@for(;$a>1;){}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.FORSTMT,["@for","(",";",CssNode.RELSTMT,[CssNode.PRMRSTMT,["$a"],">",CssNode.PRMRSTMT,["1"]],";",")",CssNode.BLOCK,["{","}"]]]]);
+    });
+    it('for(;;EQSTMT){}', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@for(;;$a++){}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.FORSTMT,["@for","(",";",";",CssNode.POSTFIXSTMT,[CssNode.PRMRSTMT,["$a"],"++"],")",CssNode.BLOCK,["{","}"]]]]);
+    });
   });
   describe('eqstmt', function() {
 
