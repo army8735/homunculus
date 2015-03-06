@@ -427,8 +427,7 @@ var Parser = IParser.extend(function(lexer) {
     var node = new Node(Node.FNC);
     node.add(
       this.match(),
-      this.cparams(),
-      this.match(';')
+      this.cparams()
     );
     return node;
   },

@@ -512,11 +512,10 @@ describe('cssparser', function() {
       var node = parser.parse('$a:unknow();');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.VARSTMT,[CssNode.VARDECL,["$a",":",CssNode.VALUE,[CssNode.BRACKET,["unknow","(",")"]]],";"]]]);
     });
-    it('vardecl error $fn()', function() {
+    it('vardecl $fn()', function() {
       var parser = homunculus.getParser('css');
-      expect(function() {
-        parser.parse('$a:$b();');
-      }).to.throwError();
+      var node = parser.parse('$a:$b();');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.VARSTMT,[CssNode.VARDECL,["$a",":",CssNode.VALUE,[CssNode.FNC,["$b",CssNode.CPARAMS,["(",")"]]]],";"]]]);
     });
     it('vardecl in block', function() {
       var parser = homunculus.getParser('css');
