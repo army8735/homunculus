@@ -1490,6 +1490,16 @@ var Parser = IParser.extend(function(lexer) {
         this.match(),
         this.mtplstmt()
       );
+      while(this.look && {
+        '+': true,
+        '-': true
+      }.hasOwnProperty(this.look.content())) {
+        node.add(
+          mtplstmt,
+          this.match(),
+          this.mtplstmt()
+        );
+      }
     }
     else {
       return mtplstmt;
@@ -1508,6 +1518,16 @@ var Parser = IParser.extend(function(lexer) {
         this.match(),
         this.postfixstmt()
       );
+      while(this.look && {
+        '*': true,
+        '/': true
+      }.hasOwnProperty(this.look.content())) {
+        node.add(
+          postfixstmt,
+          this.match(),
+          this.postfixstmt()
+        );
+      }
     }
     else {
       return postfixstmt;

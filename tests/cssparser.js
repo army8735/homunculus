@@ -1185,6 +1185,11 @@ describe('cssparser', function() {
       var node = parser.parse('@if($a + $b * 2){}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.IFSTMT,["@if","(",CssNode.ADDSTMT,[CssNode.PRMRSTMT,["$a"],"+",CssNode.MTPLSTMT,[CssNode.PRMRSTMT,["$b"],"*",CssNode.PRMRSTMT,["2"]]],")",CssNode.BLOCK,["{","}"]]]]);
     });
+    it('series add/mtpl', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@if($a + $b + $c){}@elseif($a * $b * $c){}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.IFSTMT,["@if","(",CssNode.ADDSTMT,[CssNode.PRMRSTMT,["$a"],"+",CssNode.PRMRSTMT,["$b"],CssNode.PRMRSTMT,["$a"],"+",CssNode.PRMRSTMT,["$c"]],")",CssNode.BLOCK,["{","}"],CssNode.IFSTMT,["@elseif","(",CssNode.MTPLSTMT,[CssNode.PRMRSTMT,["$a"],"*",CssNode.PRMRSTMT,["$b"],CssNode.PRMRSTMT,["$a"],"*",CssNode.PRMRSTMT,["$c"]],")",CssNode.BLOCK,["{","}"]]]]]);
+    });
     it('postfix', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('@if($a++){}');
@@ -1194,6 +1199,11 @@ describe('cssparser', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('@if($a){}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.IFSTMT,["@if","(",CssNode.PRMRSTMT,["$a"],")",CssNode.BLOCK,["{","}"]]]]);
+    });
+    it('()', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@if($a * ($b - 1)){}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.IFSTMT,["@if","(",CssNode.MTPLSTMT,[CssNode.PRMRSTMT,["$a"],"*",CssNode.PRMRSTMT,["(",CssNode.ADDSTMT,[CssNode.PRMRSTMT,["$b"],"-",CssNode.PRMRSTMT,["1"]],")"]],")",CssNode.BLOCK,["{","}"]]]]);
     });
     it('arrltr', function() {
       var parser = homunculus.getParser('css');
