@@ -1440,6 +1440,15 @@ var Parser = IParser.extend(function(lexer) {
     node.add(this.match(';'));
     return node;
   },
+  exprstmt: function() {
+    if(!this.look) {
+      this.error();
+    }
+    if(this.look.content() == '@dir') {
+      return this.dir();
+    }
+    return this.eqstmt();
+  },
   eqstmt: function() {
     var node = new Node(Node.EQSTMT);
     var relstmt = this.relstmt();
