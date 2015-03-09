@@ -1000,6 +1000,11 @@ describe('cssparser', function() {
       var node = parser.parse('p{fn(1);;;margin:0}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["p"]],CssNode.BLOCK,["{",CssNode.FNC,["fn",CssNode.CPARAMS,["(",CssNode.VALUE,["1"],")"]],";",";",";",CssNode.STYLE,[CssNode.KEY,["margin"],":",CssNode.VALUE,["0"]],"}"]]]]);
     });
+    it('build-in fn can be value', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('a{-webkit-transform:scale3d(.9,.9,.9) rotate3d(0,0,1,-3deg);animation-name: rotate;}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["a"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["-webkit-","transform"],":",CssNode.VALUE,[CssNode.SCALE3D,["scale3d","(",CssNode.PARAM,[".9"],",",CssNode.PARAM,[".9"],",",CssNode.PARAM,[".9"],")"],CssNode.ROTATE3D,["rotate3d","(",CssNode.PARAM,["0"],",",CssNode.PARAM,["0"],",",CssNode.PARAM,["1"],",",CssNode.PARAM,["-3","deg"],")"]],";"],CssNode.STYLE,[CssNode.KEY,["animation-name"],":",CssNode.VALUE,["rotate"],";"],"}"]]]]);
+    });
   });
   describe('operate', function() {
     it('add in url()', function() {

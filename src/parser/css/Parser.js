@@ -705,36 +705,38 @@ var Parser = IParser.extend(function(lexer) {
     var bCount = 0;
     if([Token.COLOR, Token.HACK, Token.VARS, Token.ID, Token.PROPERTY, Token.NUMBER, Token.STRING, Token.HEAD, Token.SIGN, Token.UNITS, Token.KEYWORD].indexOf(this.look.type()) > -1
       && [';', '}'].indexOf(s) == -1) {
+      //内置函数必须后跟(
+      var next = this.tokens[this.index] && this.tokens[this.index].content() == '(';
       switch(s) {
         case 'var':
-          node.add(this.vars());
+          node.add(next ? this.vars() : this.match());
           break;
         case 'url':
-          node.add(this.url());
+          node.add(next ? this.url() : this.match());
           break;
         case 'format':
-          node.add(this.format());
+          node.add(next ? this.format() : this.match());
           break;
         case 'rgb':
-          node.add(this.rgb());
+          node.add(next ? this.rgb() : this.match());
           break;
         case 'rgba':
-          node.add(this.rgb(true));
+          node.add(next ? this.rgb(true) : this.match());
           break;
         case 'hsl':
-          node.add(this.hsl());
+          node.add(next ? this.hsl() : this.match());
           break;
         case 'hsla':
-          node.add(this.hsl(true));
+          node.add(next ? this.hsl(true) : this.match());
           break;
         case 'max':
-          node.add(this.minmax(true));
+          node.add(next ? this.minmax(true) : this.match());
           break;
         case 'min':
-          node.add(this.minmax());
+          node.add(next ? this.minmax() : this.match());
           break;
         case 'calc':
-          node.add(this.calc());
+          node.add(next ? this.calc() : this.match());
           break;
         //这几个语法完全一样
         //cycle是toggle的老版本写法
@@ -745,15 +747,28 @@ var Parser = IParser.extend(function(lexer) {
         case 'translate':
         case 'rect':
         case 'translate3d':
-          node.add(this.counter(s));
+        case 'translatex':
+        case 'translatey':
+        case 'translatez':
+        case 'rotate':
+        case 'rotate3d':
+        case 'rotatex':
+        case 'rotatey':
+        case 'rotatez':
+        case 'scale':
+        case 'scale3d':
+        case 'scalex':
+        case 'scaley':
+        case 'scalez':
+          node.add(next ? this.counter(s) : this.match());
           break;
         case 'linear-gradient':
         case 'repeating-linear-gradient':
-          node.add(this.lg());
+          node.add(next ? this.lg() : this.match());
           break;
         case 'radial-gradient':
         case 'repeating-radial-gradient':
-          node.add(this.rg());
+          node.add(next ? this.rg() : this.match());
           break;
         case 'alpha':
         case 'blur':
@@ -770,7 +785,7 @@ var Parser = IParser.extend(function(lexer) {
         case 'wave':
         case 'xray':
         case 'dximagetransform.microsoft.gradient':
-          node.add(this.filter());
+          node.add(next ? this.filter() : this.match());
           break;
         default:
           if(s == '(') {
@@ -824,36 +839,38 @@ var Parser = IParser.extend(function(lexer) {
       s = this.look.content().toLowerCase();
       if([Token.COLOR, Token.HACK, Token.VARS, Token.ID, Token.PROPERTY, Token.NUMBER, Token.STRING, Token.HEAD, Token.KEYWORD, Token.SIGN, Token.UNITS, Token.KEYWORD].indexOf(this.look.type()) > -1
         && [';', '}'].indexOf(this.look.content()) == -1) {
+        //内置函数必须后跟(
+        var next = this.tokens[this.index] && this.tokens[this.index].content() == '(';
         switch(s) {
           case 'var':
-            node.add(this.vars());
+            node.add(next ? this.vars() : this.match());
             break;
           case 'url':
-            node.add(this.url());
+            node.add(next ? this.url() : this.match());
             break;
           case 'format':
-            node.add(this.format());
+            node.add(next ? this.format() : this.match());
             break;
           case 'rgb':
-            node.add(this.rgb());
+            node.add(next ? this.rgb() : this.match());
             break;
           case 'rgba':
-            node.add(this.rgb(true));
+            node.add(next ? this.rgb(true) : this.match());
             break;
           case 'hsl':
-            node.add(this.hsl());
+            node.add(next ? this.hsl() : this.match());
             break;
           case 'hsla':
-            node.add(this.hsl(true));
+            node.add(next ? this.hsl(true) : this.match());
             break;
           case 'min':
-            node.add(this.minmax());
+            node.add(next ? this.minmax() : this.match());
             break;
           case 'max':
-            node.add(this.minmax(true));
+            node.add(next ? this.minmax(true) : this.match());
             break;
           case 'calc':
-            node.add(this.calc());
+            node.add(next ? this.calc() : this.match());
             break;
           //这几个语法完全一样
           //cycle是toggle的老版本写法
@@ -864,15 +881,28 @@ var Parser = IParser.extend(function(lexer) {
           case 'translate':
           case 'rect':
           case 'translate3d':
-            node.add(this.counter(s));
+          case 'translatex':
+          case 'translatey':
+          case 'translatez':
+          case 'rotate':
+          case 'rotate3d':
+          case 'rotatex':
+          case 'rotatey':
+          case 'rotatez':
+          case 'scale':
+          case 'scale3d':
+          case 'scalex':
+          case 'scaley':
+          case 'scalez':
+            node.add(next ? this.counter(s) : this.match());
             break;
           case 'linear-gradient':
           case 'repeating-linear-gradient':
-            node.add(this.lg());
+            node.add(next ? this.lg() : this.match());
             break;
           case 'radial-gradient':
           case 'repeating-radial-gradient':
-            node.add(this.rg());
+            node.add(next ? this.rg() : this.match());
             break;
           case 'alpha':
           case 'blur':
@@ -889,7 +919,7 @@ var Parser = IParser.extend(function(lexer) {
           case 'wave':
           case 'xray':
           case 'dximagetransform.microsoft.gradient':
-            node.add(this.filter());
+            node.add(next ? this.filter() : this.match());
             break;
           default:
             if(s == '(') {
