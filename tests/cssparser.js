@@ -1178,6 +1178,16 @@ describe('cssparser', function() {
       var node = parser.parse('@for(;;$a++){}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.FORSTMT,["@for","(",";",";",CssNode.POSTFIXSTMT,[CssNode.PRMRSTMT,["$a"],"++"],")",CssNode.BLOCK,["{","}"]]]]);
     });
+    it('for in', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@for($a in [1,2]){}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.FORSTMT,["@for","(","$a","in",CssNode.ARRLTR,["[",CssNode.VALUE,["1"],",",CssNode.VALUE,["2"],"]"],")",CssNode.BLOCK,["{","}"]]]]);
+    });
+    it('for of', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@for($a of @dir("test")){}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.FORSTMT,["@for","(","$a","of",CssNode.DIR,["@dir",CssNode.CPARAMS,["(",CssNode.VALUE,["\"test\""],")"]],")",CssNode.BLOCK,["{","}"]]]]);
+    });
   });
   describe('eqstmt', function() {
     it('eq', function() {

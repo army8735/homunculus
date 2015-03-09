@@ -1426,8 +1426,24 @@ var Parser = IParser.extend(function(lexer) {
       if(this.look.content() != ')') {
         node.add(this.eqstmt());
       }
-      node.add(this.match(')'));
     }
+    else if(type == 1) {
+      //@for($var in expr)
+      node.add(
+        this.match(Token.VARS),
+        this.match('in'),
+        this.exprstmt()
+      );
+    }
+    else if(type == 2) {
+      //@for($var of expr)
+      node.add(
+        this.match(Token.VARS),
+        this.match('of'),
+        this.exprstmt()
+      );
+    }
+    node.add(this.match(')'));
     node.add(this.block());
     return node;
   },
