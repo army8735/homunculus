@@ -995,6 +995,11 @@ describe('cssparser', function() {
       var node = parser.parse('p{~margin:1}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["p"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["~","margin"],":",CssNode.VALUE,["1"]],"}"]]]]);
     });
+    it(';', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('p{fn(1);;;margin:0}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["p"]],CssNode.BLOCK,["{",CssNode.FNC,["fn",CssNode.CPARAMS,["(",CssNode.VALUE,["1"],")"]],";",";",";",CssNode.STYLE,[CssNode.KEY,["margin"],":",CssNode.VALUE,["0"]],"}"]]]]);
+    });
   });
   describe('operate', function() {
     it('add in url()', function() {

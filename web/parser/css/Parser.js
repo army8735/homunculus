@@ -645,6 +645,9 @@ var Parser = IParser.extend(function(lexer) {
           }
         }
       }
+      else if(this.look.content() == ';') {
+        node.add(this.match());
+      }
       else {
         node.add(this.style());
       }
