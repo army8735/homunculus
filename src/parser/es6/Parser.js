@@ -1458,7 +1458,7 @@ var Parser = IParser.extend(function(lexer) {
   },
   bitandexpr: function(noIn, noOf, yYield, isConstructor) {
     var node = new Node(Node.BITANDEXPR),
-      eqexpr = this.eqexpr(noIn, noOf, yYield);
+      eqexpr = this.eqexpr(noIn, noOf, yYield, isConstructor);
     if(this.look && this.look.content() == '&') {
       node.add(eqexpr);
       while(this.look && this.look.content() == '&') {

@@ -650,6 +650,11 @@ describe('es6parser', function() {
         parser.parse('class A{f(){super()}}');
       }).to.throwError();
     });
+    it('super in constructor', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('class A{constructor(){super()}}');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.CLASSDECL,["class",JsNode.BINDID,["A"],"{",JsNode.CLASSBODY,[JsNode.CLASSELEM,[JsNode.METHOD,[JsNode.PROPTNAME,[JsNode.LTRPROPT,["constructor"]],"(",JsNode.FMPARAMS,[],")","{",JsNode.FNBODY,[JsNode.EXPRSTMT,[JsNode.CALLEXPR,["super",JsNode.ARGS,["(",JsNode.ARGLIST,[],")"]]]],"}"]]],"}"]]]]);
+    });
     it('mmbexpr 1', function() {
       var parser = homunculus.getParser('es6');
       var node = parser.parse('a.b.c');
