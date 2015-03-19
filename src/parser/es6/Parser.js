@@ -256,12 +256,12 @@ var Parser = IParser.extend(function(lexer) {
     }
     return node;
   },
-  stmtlitem: function(yYield) {
+  stmtlitem: function(yYield, isConstructor) {
     if(['function', 'class', 'let', 'const'].indexOf(this.look.content()) > -1) {
       return this.decl(yYield);
     }
     else {
-      return this.stmt(yYield);
+      return this.stmt(yYield, isConstructor);
     }
   },
   decl: function(yYield) {
@@ -291,7 +291,7 @@ var Parser = IParser.extend(function(lexer) {
         this.error();
     }
   },
-  stmt: function(yYield) {
+  stmt: function(yYield, isConstructor) {
     if(!this.look) {
       this.error();
     }
@@ -333,17 +333,17 @@ var Parser = IParser.extend(function(lexer) {
                 return this.labstmt();
               }
               else {
-                return this.exprstmt(yYield);
+                return this.exprstmt(yYield, isConstructor);
               }
             }
           }
         }
-        return this.exprstmt(yYield);
+        return this.exprstmt(yYield, isConstructor);
     }
   },
-  exprstmt: function(yYield) {
+  exprstmt: function(yYield, isConstructor) {
     var node = new Node(Node.EXPRSTMT);
-    node.add(this.expr(null, null, yYield), this.match(';'));
+    node.add(this.expr(null, null, yYield, isConstructor), this.match(';'));
     return node;
   },
   lexdecl: function(yYield) {
@@ -1083,10 +1083,10 @@ var Parser = IParser.extend(function(lexer) {
     }
     return node;
   },
-  fnbody: function(yYield) {
+  fnbody: function(yYield, isConstructor) {
     var node = new Node(Node.FNBODY);
     while(this.look && this.look.content() != '}') {
-      node.add(this.stmtlitem(yYield));
+      node.add(this.stmtlitem(yYield, isConstructor));
     }
     return node;
   },
@@ -1191,13 +1191,14 @@ var Parser = IParser.extend(function(lexer) {
       return this.genmethod(noIn, noOf);
     }
     else {
+      var isConstructor = this.look.type() == Token.ID && this.look.content() == 'constructor';
       node.add(
         this.proptname(noIn, noOf),
         this.match('('),
         this.fmparams(),
         this.match(')'),
         this.match('{'),
-        this.fnbody(),
+        this.fnbody(false, isConstructor),
         this.match('}')
       );
     }
@@ -1217,9 +1218,9 @@ var Parser = IParser.extend(function(lexer) {
     );
     return node;
   },
-  expr: function(noIn, noOf, yYield) {
+  expr: function(noIn, noOf, yYield, isConstructor) {
     var node = new Node(Node.EXPR),
-      assignexpr = this.assignexpr(noIn, noOf, yYield);
+      assignexpr = this.assignexpr(noIn, noOf, yYield, isConstructor);
     //LL2区分,后的...是否为cpeapl
     if(this.look && this.look.content() == ',') {
       for(var i = this.index; i < this.length; i++) {
@@ -1243,7 +1244,7 @@ var Parser = IParser.extend(function(lexer) {
             break;
           }
         }
-        node.add(this.match(), this.assignexpr(noIn, noOf, yYield));
+        node.add(this.match(), this.assignexpr(noIn, noOf, yYield, isConstructor));
       }
     }
     else {
@@ -1259,7 +1260,7 @@ var Parser = IParser.extend(function(lexer) {
     );
     return node;
   },
-  assignexpr: function(noIn, noOf, yYield) {
+  assignexpr: function(noIn, noOf, yYield, isConstructor) {
     var node = new Node(Node.ASSIGNEXPR);
     if(!this.look) {
       this.error();
@@ -1270,7 +1271,7 @@ var Parser = IParser.extend(function(lexer) {
       }
       return this.yieldexpr(noIn, noOf, yYield);
     }
-    var cndt = this.cndtexpr(noIn, noOf, yYield);
+    var cndt = this.cndtexpr(noIn, noOf, yYield, isConstructor);
     if(this.look
       && this.look.content() == '=>'
       && this.hasMoveLine == false
@@ -1304,7 +1305,7 @@ var Parser = IParser.extend(function(lexer) {
         '=': true
       }.hasOwnProperty(this.look.content())
       && !NOASSIGN.hasOwnProperty(cndt.name())) {
-      node.add(cndt, this.match(), this.assignexpr(noIn, noOf, yYield));
+      node.add(cndt, this.match(), this.assignexpr(noIn, noOf, yYield, isConstructor));
     }
     else {
       return cndt;
@@ -1370,16 +1371,16 @@ var Parser = IParser.extend(function(lexer) {
     }
     return node;
   },
-  cndtexpr: function(noIn, noOf, yYield) {
+  cndtexpr: function(noIn, noOf, yYield, isConstructor) {
     var node = new Node(Node.CNDTEXPR),
-      logorexpr = this.logorexpr(noIn, noOf, yYield);
+      logorexpr = this.logorexpr(noIn, noOf, yYield, isConstructor);
     if(this.look && this.look.content() == '?') {
       node.add(
         logorexpr,
         this.match(),
-        this.assignexpr(noIn, noOf, yYield),
+        this.assignexpr(noIn, noOf, yYield, isConstructor),
         this.match(':'),
-        this.assignexpr(noIn, noOf, yYield)
+        this.assignexpr(noIn, noOf, yYield, isConstructor)
       );
     }
     else {
@@ -1387,15 +1388,15 @@ var Parser = IParser.extend(function(lexer) {
     }
     return node;
   },
-  logorexpr: function(noIn, noOf, yYield) {
+  logorexpr: function(noIn, noOf, yYield, isConstructor) {
     var node = new Node(Node.LOGOREXPR),
-      logandexpr = this.logandexpr(noIn, noOf, yYield);
+      logandexpr = this.logandexpr(noIn, noOf, yYield, isConstructor);
     if(this.look && this.look.content() == '||') {
       node.add(logandexpr);
       while(this.look && this.look.content() == '||') {
         node.add(
           this.match(),
-          this.logandexpr(noIn, noOf, yYield)
+          this.logandexpr(noIn, noOf, yYield, isConstructor)
         );
       }
     }
@@ -1404,15 +1405,15 @@ var Parser = IParser.extend(function(lexer) {
     }
     return node;
   },
-  logandexpr: function(noIn, noOf, yYield) {
+  logandexpr: function(noIn, noOf, yYield, isConstructor) {
     var node = new Node(Node.LOGANDEXPR),
-      bitorexpr = this.bitorexpr(noIn, noOf);
+      bitorexpr = this.bitorexpr(noIn, noOf, yYield, isConstructor);
     if(this.look && this.look.content() == '&&') {
       node.add(bitorexpr);
       while(this.look && this.look.content() == '&&') {
         node.add(
           this.match(),
-          this.bitorexpr(noIn, noOf, yYield)
+          this.bitorexpr(noIn, noOf, yYield, isConstructor)
         );
       }
     }
@@ -1421,15 +1422,15 @@ var Parser = IParser.extend(function(lexer) {
     }
     return node;
   },
-  bitorexpr: function(noIn, noOf, yYield) {
+  bitorexpr: function(noIn, noOf, yYield, isConstructor) {
     var node = new Node(Node.BITOREXPR),
-      bitxorexpr = this.bitxorexpr(noIn, noOf, yYield);
+      bitxorexpr = this.bitxorexpr(noIn, noOf, yYield, isConstructor);
     if(this.look && this.look.content() == '|') {
       node.add(bitxorexpr);
       while(this.look && this.look.content() == '|') {
         node.add(
           this.match(),
-          this.bitxorexpr(noIn, noOf, yYield)
+          this.bitxorexpr(noIn, noOf, yYield, isConstructor)
         );
       }
     }
@@ -1438,15 +1439,15 @@ var Parser = IParser.extend(function(lexer) {
     }
     return node;
   },
-  bitxorexpr: function(noIn, noOf, yYield) {
+  bitxorexpr: function(noIn, noOf, yYield, isConstructor) {
     var node = new Node(Node.BITXOREXPR),
-      bitandexpr = this.bitandexpr(noIn, noOf, yYield);
+      bitandexpr = this.bitandexpr(noIn, noOf, yYield, isConstructor);
     if(this.look && this.look.content() == '^') {
       node.add(bitandexpr);
       while(this.look && this.look.content() == '^') {
         node.add(
           this.match(),
-          this.bitandexpr(noIn, noOf, yYield)
+          this.bitandexpr(noIn, noOf, yYield, isConstructor)
         );
       }
     }
@@ -1455,7 +1456,7 @@ var Parser = IParser.extend(function(lexer) {
     }
     return node;
   },
-  bitandexpr: function(noIn, noOf, yYield) {
+  bitandexpr: function(noIn, noOf, yYield, isConstructor) {
     var node = new Node(Node.BITANDEXPR),
       eqexpr = this.eqexpr(noIn, noOf, yYield);
     if(this.look && this.look.content() == '&') {
@@ -1463,7 +1464,7 @@ var Parser = IParser.extend(function(lexer) {
       while(this.look && this.look.content() == '&') {
         node.add(
           this.match(),
-          this.eqexpr(noIn, noOf, yYield)
+          this.eqexpr(noIn, noOf, yYield, isConstructor)
         );
       }
     }
@@ -1472,9 +1473,9 @@ var Parser = IParser.extend(function(lexer) {
     }
     return node;
   },
-  eqexpr: function(noIn, noOf, yYield) {
+  eqexpr: function(noIn, noOf, yYield, isConstructor) {
     var node = new Node(Node.EQEXPR),
-      reltexpr = this.reltexpr(noIn, noOf, yYield);
+      reltexpr = this.reltexpr(noIn, noOf, yYield, isConstructor);
     if(this.look && {
       '==': true,
       '===': true,
@@ -1490,7 +1491,7 @@ var Parser = IParser.extend(function(lexer) {
       }.hasOwnProperty(this.look.content())) {
         node.add(
           this.match(),
-          this.reltexpr(noIn, noOf, yYield)
+          this.reltexpr(noIn, noOf, yYield, isConstructor)
         );
       }
     }
@@ -1499,9 +1500,9 @@ var Parser = IParser.extend(function(lexer) {
     }
     return node;
   },
-  reltexpr: function(noIn, noOf, yYield) {
+  reltexpr: function(noIn, noOf, yYield, isConstructor) {
     var node = new Node(Node.RELTEXPR),
-      shiftexpr = this.shiftexpr();
+      shiftexpr = this.shiftexpr(noIn, noOf, yYield, isConstructor);
     if(this.look && ({
       '<': true,
       '>': true,
@@ -1521,7 +1522,7 @@ var Parser = IParser.extend(function(lexer) {
         || (!noIn && this.look.content() == 'in'))) {
         node.add(
           this.match(),
-          this.shiftexpr(noIn, noOf, yYield)
+          this.shiftexpr(noIn, noOf, yYield, isConstructor)
         );
       }
     }
@@ -1530,15 +1531,15 @@ var Parser = IParser.extend(function(lexer) {
     }
     return node;
   },
-  shiftexpr: function(noIn, noOf, yYield) {
+  shiftexpr: function(noIn, noOf, yYield, isConstructor) {
     var node = new Node(Node.SHIFTEXPR),
-      addexpr = this.addexpr(noIn, noOf, yYield);
+      addexpr = this.addexpr(noIn, noOf, yYield, isConstructor);
     if(this.look && ['<<', '>>', '>>>'].indexOf(this.look.content()) != -1) {
       node.add(addexpr);
       while(this.look && ['<<', '>>', '>>>'].indexOf(this.look.content()) != -1) {
         node.add(
           this.match(),
-          this.addexpr(noIn, noOf, yYield)
+          this.addexpr(noIn, noOf, yYield, isConstructor)
         );
       }
     }
@@ -1547,15 +1548,15 @@ var Parser = IParser.extend(function(lexer) {
     }
     return node;
   },
-  addexpr: function(noIn, noOf, yYield) {
+  addexpr: function(noIn, noOf, yYield, isConstructor) {
     var node = new Node(Node.ADDEXPR),
-      mtplexpr = this.mtplexpr(noIn, noOf, yYield);
+      mtplexpr = this.mtplexpr(noIn, noOf, yYield, isConstructor);
     if(this.look && ['+', '-'].indexOf(this.look.content()) != -1) {
       node.add(mtplexpr);
       while(this.look && ['+', '-'].indexOf(this.look.content()) != -1) {
         node.add(
           this.match(),
-          this.mtplexpr(noIn, noOf, yYield)
+          this.mtplexpr(noIn, noOf, yYield, isConstructor)
         );
       }
     }
@@ -1564,15 +1565,15 @@ var Parser = IParser.extend(function(lexer) {
     }
     return node;
   },
-  mtplexpr: function(noIn, noOf, yYield) {
+  mtplexpr: function(noIn, noOf, yYield, isConstructor) {
     var node = new Node(Node.MTPLEXPR),
-      unaryexpr = this.unaryexpr(noIn, noOf, yYield);
+      unaryexpr = this.unaryexpr(noIn, noOf, yYield, isConstructor);
     if(this.look && ['*', '/', '%'].indexOf(this.look.content()) != -1) {
       node.add(unaryexpr);
       while(this.look && ['*', '/', '%'].indexOf(this.look.content()) != -1) {
         node.add(
           this.match(),
-          this.unaryexpr(noIn, noOf, yYield)
+          this.unaryexpr(noIn, noOf, yYield, isConstructor)
         );
       }
     }
@@ -1581,7 +1582,7 @@ var Parser = IParser.extend(function(lexer) {
     }
     return node;
   },
-  unaryexpr: function(noIn, noOf, yYield) {
+  unaryexpr: function(noIn, noOf, yYield, isConstructor) {
     var node = new Node(Node.UNARYEXPR);
     if(!this.look) {
       this.error();
@@ -1591,7 +1592,7 @@ var Parser = IParser.extend(function(lexer) {
       case '--':
         node.add(
           this.match(),
-          this.leftexpr(noIn, noOf, yYield)
+          this.leftexpr(noIn, noOf, yYield, isConstructor)
         );
         break;
       case 'delete':
@@ -1603,17 +1604,17 @@ var Parser = IParser.extend(function(lexer) {
       case '!':
         node.add(
           this.match(),
-          this.unaryexpr(noIn, noOf, yYield)
+          this.unaryexpr(noIn, noOf, yYield, isConstructor)
         );
       break;
       default:
-        return this.postfixexpr(noIn, noOf, yYield);
+        return this.postfixexpr(noIn, noOf, yYield, isConstructor);
     }
     return node;
   },
-  postfixexpr: function(noIn, noOf, yYield) {
+  postfixexpr: function(noIn, noOf, yYield, isConstructor) {
     var node = new Node(Node.POSTFIXEXPR);
-    var leftexpr = this.leftexpr(noIn, noOf, yYield);
+    var leftexpr = this.leftexpr(noIn, noOf, yYield, isConstructor);
     if(this.look && ['++', '--'].indexOf(this.look.content()) > -1 && !this.hasMoveLine) {
       node.add(
         leftexpr,
@@ -1625,12 +1626,12 @@ var Parser = IParser.extend(function(lexer) {
     }
     return node;
   },
-  leftexpr: function(noIn, noOf, yYield) {
+  leftexpr: function(noIn, noOf, yYield, isConstructor) {
     if(this.look.content() == 'new') {
       return this.newexpr(0, noIn, noOf, yYield);
     }
     else {
-      return this.callexpr(null, noIn, noOf, yYield);
+      return this.callexpr(null, noIn, noOf, yYield, isConstructor);
     }
   },
   newexpr: function(depth, noIn, noOf, yYield) {
@@ -1698,7 +1699,7 @@ var Parser = IParser.extend(function(lexer) {
     }
     return node;
   },
-  callexpr: function(mmb, noIn, noOf, yYield) {
+  callexpr: function(mmb, noIn, noOf, yYield, isConstructor) {
     var node = new Node(Node.CALLEXPR);
     if(!mmb) {
       //根据LL2分辨是super()还是mmbexpr
@@ -1711,6 +1712,9 @@ var Parser = IParser.extend(function(lexer) {
                 this.match(),
                 this.args()
               );
+              if(!isConstructor) {
+                this.error('super call is only allowed in derived constructor');
+              }
               mmb = node;
               node = new Node(Node.CALLEXPR);
             }

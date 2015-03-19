@@ -644,6 +644,12 @@ describe('es6parser', function() {
         parser.parse('super super');
       }).to.throwError();
     });
+    it('super in method', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('class A{f(){super()}}');
+      }).to.throwError();
+    });
     it('mmbexpr 1', function() {
       var parser = homunculus.getParser('es6');
       var node = parser.parse('a.b.c');
