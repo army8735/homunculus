@@ -1708,13 +1708,14 @@ var Parser = IParser.extend(function(lexer) {
           var next = this.tokens[i];
           if(!S[next.type()]) {
             if(next.content() == '(') {
+              if(!isConstructor) {
+                node.add(this.match());
+                this.error('super call is only allowed in derived constructor');
+              }
               node.add(
                 this.match(),
                 this.args()
               );
-              if(!isConstructor) {
-                this.error('super call is only allowed in derived constructor');
-              }
               mmb = node;
               node = new Node(Node.CALLEXPR);
             }
@@ -2098,7 +2099,7 @@ var Parser = IParser.extend(function(lexer) {
         case Token.NUMBER:
         case Token.KEYWORD:
           node.add(
-            this.proptname(noIn, noOf),
+            this.proptname(cmpt, noIn, noOf),
             this.match(':', 'missing : after property id'),
             this.assignexpr(noIn, noOf)
           );

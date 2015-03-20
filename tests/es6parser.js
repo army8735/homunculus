@@ -1159,6 +1159,11 @@ describe('es6parser', function() {
       var node = parser.parse('for(let a = 1;;);');
       expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.ITERSTMT,["for","(",JsNode.LEXDECL,["let",JsNode.LEXBIND,[JsNode.BINDID,["a"],JsNode.INITLZ,["=",JsNode.PRMREXPR,["1"]]],";"],";",")",JsNode.EMPTSTMT,[";"]]]]]);
     });
+    it('forstmt 16', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('for({a:b=1} of o){}');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.ITERSTMT,["for","(",JsNode.PRMREXPR,[JsNode.OBJLTR,["{",JsNode.PROPTDEF,[JsNode.PROPTNAME,[JsNode.LTRPROPT,["a"]],":",JsNode.ASSIGNEXPR,[JsNode.PRMREXPR,["b"],"=",JsNode.PRMREXPR,["1"]]],"}"]],"of",JsNode.PRMREXPR,["o"],")",JsNode.BLOCKSTMT,[JsNode.BLOCK,["{","}"]]]]]]);
+    });
     it('forstmt missing expr', function() {
       var parser = homunculus.getParser('es6');
       expect(function() {
