@@ -37,6 +37,7 @@ var HtmlLexer = Class(function(rule) {
   scan: function(temp) {
     var length = this.code.length;
     var count = 0;
+    this.colNum = length ? 1 : 0;
     outer:
     while(this.index < length) {
       if(this.cacheLine > 0 && count >= this.cacheLine) {
@@ -50,7 +51,11 @@ var HtmlLexer = Class(function(rule) {
             var token = new Token(Token.MARK, this.peek + '>', this.peek + '>');
             temp.push(token);
             this.tokenList.push(token);
+            token.line(this.totalLine);
+            token.col(this.colNum);
             this.index2 = ++this.index;
+            this.colNum += 2;
+            this.colMax = Math.max(this.colMax, this.colNum);
             continue;
           }
           else {
@@ -62,7 +67,11 @@ var HtmlLexer = Class(function(rule) {
           var token = new Token(Token.MARK, this.peek, this.peek);
           temp.push(token);
           this.tokenList.push(token);
+          token.line(this.totalLine);
+          token.col(this.colNum);
           this.index2 = this.index;
+          this.colNum++;
+          this.colMax = Math.max(this.colMax, this.colNum);
           continue;
         }
         for(var i = 0, matches = this.rule.matches(), len = matches.length; i < len; i++) {
@@ -92,6 +101,8 @@ var HtmlLexer = Class(function(rule) {
 
             temp.push(token);
             this.tokenList.push(token);
+            token.line(this.totalLine);
+            token.col(this.colNum);
             this.index2 = this.index += matchLen - 1;
             var n = character.count(token.val(), character.LINE);
             count += n;
@@ -145,6 +156,8 @@ var HtmlLexer = Class(function(rule) {
           this.last = token;
           temp.push(token);
           this.tokenList.push(token);
+          token.line(this.totalLine);
+          token.col(this.colNum);
           this.index2 = this.index = end;
         }
         else if(c1 == '<') {
@@ -158,6 +171,8 @@ var HtmlLexer = Class(function(rule) {
             this.last = token;
             temp.push(token);
             this.tokenList.push(token);
+            token.line(this.totalLine);
+            token.col(this.colNum);
             this.index2 = this.index = idx + 2;
           }
           else if(character.isLetter(c2) || c2 == '!') {
@@ -176,6 +191,8 @@ var HtmlLexer = Class(function(rule) {
             this.last = token;
             temp.push(token);
             this.tokenList.push(token);
+            token.line(this.totalLine);
+            token.col(this.colNum);
             this.index2 = this.index = idx + 1;
           }
         }
@@ -204,6 +221,20 @@ var HtmlLexer = Class(function(rule) {
     this.last = token;
     temp.push(token);
     this.tokenList.push(token);
+    token.line(this.totalLine);
+    token.col(this.colNum);
+    var n = character.count(token.val(), character.LINE);
+    this.totalLine += n;
+    if(n) {
+      var j = s.indexOf(character.LINE);
+      var k = s.lastIndexOf(character.LINE);
+      this.colMax = Math.max(this.colMax, this.colNum + j);
+      this.colNum = s.length - k;
+    }
+    else {
+      this.colNum += s.length;
+    }
+    this.colMax = Math.max(this.colMax, this.colNum);
   },
   readch: function() {
     this.peek = this.code.charAt(this.index++);
