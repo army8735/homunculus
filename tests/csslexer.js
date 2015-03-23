@@ -875,4 +875,29 @@ describe('csslexer', function() {
       expect(lexer.finish()).to.eql(true);
     });
   });
+  describe('line && col', function() {
+    it('normal', function() {
+      var lexer = homunculus.getLexer('css');
+      var tokens = lexer.parse('div{\nmargin:0}');
+      var arr = tokens.map(function(item) {
+        return item.col();
+      });
+      //console.log(arr)
+      expect(tokens[0].line()).to.eql(1);
+      expect(tokens[1].line()).to.eql(1);
+      expect(tokens[2].line()).to.eql(1);
+      expect(tokens[3].line()).to.eql(2);
+      expect(tokens[4].line()).to.eql(2);
+      expect(tokens[5].line()).to.eql(2);
+      expect(tokens[6].line()).to.eql(2);
+
+      expect(tokens[0].col()).to.eql(1);
+      expect(tokens[1].col()).to.eql(4);
+      expect(tokens[2].col()).to.eql(5);
+      expect(tokens[3].col()).to.eql(1);
+      expect(tokens[4].col()).to.eql(7);
+      expect(tokens[5].col()).to.eql(8);
+      expect(tokens[6].col()).to.eql(9);
+    });
+  });
 });
