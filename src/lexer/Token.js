@@ -7,6 +7,8 @@ var Token = Class(function(type, content, val, sIndex) {
   this.c = content; //token的字面内容，string包括头尾的引号
   this.pr = null;
   this.ne = null;
+  this.li = -1;
+  this.co = -1;
   if(character.isNumber(val)) {
     sIndex = val;
     val = content;
@@ -72,6 +74,18 @@ var Token = Class(function(type, content, val, sIndex) {
   },
   isVirtual: function() {
     return this.t == Token.VIRTUAL;
+  },
+  line: function(i) {
+    if(i !== undefined) {
+      this.li = i;
+    }
+    return this.li;
+  },
+  col: function(i) {
+    if(i !== undefined) {
+      this.co = i;
+    }
+    return this.co;
   }
 }).statics({
   //公用

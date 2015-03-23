@@ -55,13 +55,13 @@ describe('jslexer', function() {
     });
     it('perl style regular 1', function() {
       var lexer = homunculus.getLexer('js');
-      var tokens = lexer.parse('/.*\d[^a-z]\\//g, /[/]/');
-      expect(join(tokens)).to.eql(['/.*\d[^a-z]\\//g', ',', ' ', '/[/]/']);
+      var tokens = lexer.parse('/.*\\d[^a-z]\\//g, /[/]/');
+      expect(join(tokens)).to.eql(['/.*\\d[^a-z]\\//g', ',', ' ', '/[/]/']);
     });
     it('perl style regular 2', function() {
       var lexer = homunculus.getLexer('js');
-      var tokens = lexer.parse('/.*\d[^a-z]\\//gi');
-      expect(join(tokens)).to.eql(['/.*\d[^a-z]\\//gi']);
+      var tokens = lexer.parse('/.*\\d[^a-z]\\//gi');
+      expect(join(tokens)).to.eql(['/.*\\d[^a-z]\\//gi']);
     });
     it('perl style regular with no { in if stmt', function() {
       var lexer = homunculus.getLexer('js');
