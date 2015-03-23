@@ -206,6 +206,8 @@ var Lexer = Class(function(rule) {
     this.last = token;
     temp.push(token);
     this.tokenList.push(token);
+    token.line(this.totalLine);
+    token.col(this.colNum);
     this.colNum += this.index - lastIndex;
     this.colMax = Math.max(this.colMax, this.colNum);
     return this;

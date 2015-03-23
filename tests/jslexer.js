@@ -351,7 +351,7 @@ describe('jslexer', function() {
   describe('line && col', function() {
     it('normal', function() {
       var lexer = homunculus.getLexer('js');
-      var tokens = lexer.parse('if(true){\na;\nb}');
+      var tokens = lexer.parse('if(true){\na;\n/reg/}');
       var arr = tokens.map(function(item) {
         return item.col();
       });
@@ -378,7 +378,7 @@ describe('jslexer', function() {
       expect(tokens[7].col()).to.eql(2);
       expect(tokens[8].col()).to.eql(3);
       expect(tokens[9].col()).to.eql(1);
-      expect(tokens[10].col()).to.eql(2);
+      expect(tokens[10].col()).to.eql(6);
     });
   });
 });
