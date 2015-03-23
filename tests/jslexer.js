@@ -348,4 +348,37 @@ describe('jslexer', function() {
       expect(lexer.tokens(true)).to.eql(['var', ' ', 'a', ' ', '=', ' ', '1']);
     });
   });
+  describe('line && col', function() {
+    it('normal', function() {
+      var lexer = homunculus.getLexer('js');
+      var tokens = lexer.parse('if(true){\na;\nb}');
+      var arr = tokens.map(function(item) {
+        return item.col();
+      });
+      //console.log(arr)
+      expect(tokens[0].line()).to.eql(1);
+      expect(tokens[1].line()).to.eql(1);
+      expect(tokens[2].line()).to.eql(1);
+      expect(tokens[3].line()).to.eql(1);
+      expect(tokens[4].line()).to.eql(1);
+      expect(tokens[5].line()).to.eql(1);
+      expect(tokens[6].line()).to.eql(2);
+      expect(tokens[7].line()).to.eql(2);
+      expect(tokens[8].line()).to.eql(2);
+      expect(tokens[9].line()).to.eql(3);
+      expect(tokens[10].line()).to.eql(3);
+
+      expect(tokens[0].col()).to.eql(1);
+      expect(tokens[1].col()).to.eql(3);
+      expect(tokens[2].col()).to.eql(4);
+      expect(tokens[3].col()).to.eql(8);
+      expect(tokens[4].col()).to.eql(9);
+      expect(tokens[5].col()).to.eql(10);
+      expect(tokens[6].col()).to.eql(1);
+      expect(tokens[7].col()).to.eql(2);
+      expect(tokens[8].col()).to.eql(3);
+      expect(tokens[9].col()).to.eql(1);
+      expect(tokens[10].col()).to.eql(2);
+    });
+  });
 });
