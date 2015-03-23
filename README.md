@@ -108,6 +108,8 @@ npm install homunculus
 * tid(t:int):int 读取/设置token索引，默认所有token自增形式添加索引
 * sIndex(i:int):int 读取/设置token在code中的字符索引
 * isVirtual():Boolean 返回此token是否是虚拟不存在的
+* line():int 此token位于多少行
+* col():int 此token位于多少列
 
 #### 静态属性
 * type(t:int):String 返回类型的字符串形式
