@@ -435,7 +435,10 @@ var Parser = IParser.extend(function(lexer) {
     var node = new Node(Node.CPARAMS);
     node.add(this.match('('));
     while(this.look && this.look.content() != ')') {
-      if(this.look.type() == Token.KEYWORD || this.look.type() == Token.HACK) {
+      if(this.look.content() == '~') {
+        node.add(this.unbox());
+      }
+      else if(this.look.type() == Token.KEYWORD || this.look.type() == Token.HACK) {
         node.add(this.style(null, true, true));
       }
       else {
@@ -531,6 +534,9 @@ var Parser = IParser.extend(function(lexer) {
     }
     else if(this.look.content() == '@dir') {
       node.add(this.dir());
+    }
+    else if(this.look.content() == '~') {
+      node.add(this.unbox());
     }
     else if(this.look.type() == Token.KEYWORD || this.look.type() == Token.HACK) {
       node.add(this.style(null, true, true));
@@ -1655,6 +1661,14 @@ var Parser = IParser.extend(function(lexer) {
     node.add(
       this.match(),
       this.cparams()
+    );
+    return node;
+  },
+  unbox: function() {
+    var node = new Node(Node.UNBOX);
+    node.add(
+      this.match('~'),
+      this.match(Token.STRING)
     );
     return node;
   },

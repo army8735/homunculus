@@ -1238,6 +1238,18 @@ describe('cssparser', function() {
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.VARSTMT,[CssNode.VARDECL,["$a","=",CssNode.DIR,["@dir",CssNode.CPARAMS,["(",CssNode.VALUE,["\"test\""],")"]]],";"]]]);
     });
   });
+  describe('unbox', function() {
+    it('vardecl', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('$a = ~"123";');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.VARSTMT,[CssNode.VARDECL,["$a","=",CssNode.UNBOX,["~","\"123\""]],";"]]]);
+    });
+    it('fn call', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('div{$fn(~"123")}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["div"]],CssNode.BLOCK,["{",CssNode.FNC,["$fn",CssNode.CPARAMS,["(",CssNode.UNBOX,["~","\"123\""],")"]],"}"]]]]);
+    });
+  });
   describe('lib test', function() {
     it('bootstrap', function() {
       var parser = homunculus.getParser('css');

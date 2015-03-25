@@ -90,6 +90,7 @@ var Node = INode.extend(function(type, children) {
   PRMRSTMT: 'prmrstmt',
   ARRLTR: 'arrltr',
   DIR: 'dir',
+  UNBOX: 'unbox',
   getKey: function(s) {
     if(!s) {
       throw new Error('empty value');
