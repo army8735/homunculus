@@ -1452,13 +1452,9 @@ var Parser = IParser.extend(function(lexer) {
       else {
         node.add(this.match(';'));
       }
-      if(this.look.content() != ';') {
-        node.add(this.eqstmt());
-      }
+      node.add(this.eqstmt());
       node.add(this.match(';'));
-      if(this.look.content() != ')') {
-        node.add(this.eqstmt());
-      }
+      node.add(this.eqstmt());
     }
     else if(type == 1) {
       //@for($var in expr)

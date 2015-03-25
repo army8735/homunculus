@@ -1158,8 +1158,8 @@ describe('cssparser', function() {
     });
     it('cross 1', function() {
       var parser = homunculus.getParser('css');
-      var node = parser.parse('@if($a){@for(;;){}}');
-      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.IFSTMT,["@if","(",CssNode.PRMRSTMT,["$a"],")",CssNode.BLOCK,["{",CssNode.FORSTMT,["@for","(",";",";",")",CssNode.BLOCK,["{","}"]],"}"]]]]);
+      var node = parser.parse('@if($a){@for(;$a>1;$a++){}}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.IFSTMT,["@if","(",CssNode.PRMRSTMT,["$a"],")",CssNode.BLOCK,["{",CssNode.FORSTMT,["@for","(",";",CssNode.RELSTMT,[CssNode.PRMRSTMT,["$a"],">",CssNode.PRMRSTMT,["1"]],";",CssNode.POSTFIXSTMT,[CssNode.PRMRSTMT,["$a"],"++"],")",CssNode.BLOCK,["{","}"]],"}"]]]]);
     });
     it('cross 2', function() {
       var parser = homunculus.getParser('css');
@@ -1168,25 +1168,15 @@ describe('cssparser', function() {
     });
   });
   describe('@forstmt', function() {
-    it('for(;;){}', function() {
+    it('for(VARSTMT;EQSTMT;EQSTMT){}', function() {
       var parser = homunculus.getParser('css');
-      var node = parser.parse('@for(;;){}');
-      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.FORSTMT,["@for","(",";",";",")",CssNode.BLOCK,["{","}"]]]]);
+      var node = parser.parse('@for($a=1,$b="2";$a>$b;$a++){}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.FORSTMT,["@for","(",CssNode.VARSTMT,[CssNode.VARDECL,["$a","=",CssNode.VALUE,["1"]],",",CssNode.VARDECL,["$b","=",CssNode.VALUE,["\"2\""]],";"],CssNode.RELSTMT,[CssNode.PRMRSTMT,["$a"],">",CssNode.PRMRSTMT,["$b"]],";",CssNode.POSTFIXSTMT,[CssNode.PRMRSTMT,["$a"],"++"],")",CssNode.BLOCK,["{","}"]]]]);
     });
-    it('for(VARSTMT;;){}', function() {
+    it('for(;EQSTMT;EQSTMT){}', function() {
       var parser = homunculus.getParser('css');
-      var node = parser.parse('@for($a=1,$b="2";;){}');
-      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.FORSTMT,["@for","(",CssNode.VARSTMT,[CssNode.VARDECL,["$a","=",CssNode.VALUE,["1"]],",",CssNode.VARDECL,["$b","=",CssNode.VALUE,["\"2\""]],";"],";",")",CssNode.BLOCK,["{","}"]]]]);
-    });
-    it('for(;EQSTMT;){}', function() {
-      var parser = homunculus.getParser('css');
-      var node = parser.parse('@for(;$a>1;){}');
-      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.FORSTMT,["@for","(",";",CssNode.RELSTMT,[CssNode.PRMRSTMT,["$a"],">",CssNode.PRMRSTMT,["1"]],";",")",CssNode.BLOCK,["{","}"]]]]);
-    });
-    it('for(;;EQSTMT){}', function() {
-      var parser = homunculus.getParser('css');
-      var node = parser.parse('@for(;;$a++){}');
-      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.FORSTMT,["@for","(",";",";",CssNode.POSTFIXSTMT,[CssNode.PRMRSTMT,["$a"],"++"],")",CssNode.BLOCK,["{","}"]]]]);
+      var node = parser.parse('@for(;$a!=$b;$a){}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.FORSTMT,["@for","(",";",CssNode.EQSTMT,[CssNode.PRMRSTMT,["$a"],"!=",CssNode.PRMRSTMT,["$b"]],";",CssNode.PRMRSTMT,["$a"],")",CssNode.BLOCK,["{","}"]]]]);
     });
     it('for in', function() {
       var parser = homunculus.getParser('css');
