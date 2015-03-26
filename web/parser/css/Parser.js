@@ -537,6 +537,18 @@ var Parser = IParser.extend(function(lexer) {
     else if(this.look.content() == '@dir') {
       node.add(this.dir());
     }
+    else if(this.look.content() == '@basename') {
+      return this.basename();
+    }
+    else if(this.look.content() == '@extname') {
+      return this.extname();
+    }
+    else if(this.look.content() == '@width') {
+      return this.width();
+    }
+    else if(this.look.content() == '@height') {
+      return this.height();
+    }
     else if(this.look.content() == '~'
       && this.tokens[this.index]
       && this.tokens[this.index].type() == Token.STRING) {
@@ -1502,6 +1514,18 @@ var Parser = IParser.extend(function(lexer) {
     if(this.look.content() == '@dir') {
       return this.dir();
     }
+    else if(this.look.content() == '@basename') {
+      return this.basename();
+    }
+    else if(this.look.content() == '@extname') {
+      return this.extname();
+    }
+    else if(this.look.content() == '@width') {
+      return this.width();
+    }
+    else if(this.look.content() == '@height') {
+      return this.height();
+    }
     return this.eqstmt();
   },
   eqstmt: function() {
@@ -1662,6 +1686,38 @@ var Parser = IParser.extend(function(lexer) {
   },
   dir: function() {
     var node = new Node(Node.DIR);
+    node.add(
+      this.match(),
+      this.cparams()
+    );
+    return node;
+  },
+  basename: function() {
+    var node = new Node(Node.BASENAME);
+    node.add(
+      this.match(),
+      this.cparams()
+    );
+    return node;
+  },
+  extname: function() {
+    var node = new Node(Node.EXTNAME);
+    node.add(
+      this.match(),
+      this.cparams()
+    );
+    return node;
+  },
+  width: function() {
+    var node = new Node(Node.WIDTH);
+    node.add(
+      this.match(),
+      this.cparams()
+    );
+    return node;
+  },
+  height: function() {
+    var node = new Node(Node.HEIGHT);
     node.add(
       this.match(),
       this.cparams()

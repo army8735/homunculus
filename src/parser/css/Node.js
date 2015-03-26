@@ -91,6 +91,10 @@ var Node = INode.extend(function(type, children) {
   ARRLTR: 'arrltr',
   DIR: 'dir',
   UNBOX: 'unbox',
+  BASENAME: 'basename',
+  EXTNAME: 'extname',
+  WIDTH: 'width',
+  HEIGHT: 'height',
   getKey: function(s) {
     if(!s) {
       throw new Error('empty value');

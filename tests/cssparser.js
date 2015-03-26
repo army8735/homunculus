@@ -1237,6 +1237,26 @@ describe('cssparser', function() {
       var node = parser.parse('$a = @dir("test");');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.VARSTMT,[CssNode.VARDECL,["$a","=",CssNode.DIR,["@dir",CssNode.CPARAMS,["(",CssNode.VALUE,["\"test\""],")"]]],";"]]]);
     });
+    it('@basename', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('$a = @basename("test");');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.VARSTMT,[CssNode.BASENAME,["@basename",CssNode.CPARAMS,["(",CssNode.VALUE,["\"test\""],")"]],";"]]]);
+    });
+    it('@extname', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('$a = @extname("test");');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.VARSTMT,[CssNode.EXTNAME,["@extname",CssNode.CPARAMS,["(",CssNode.VALUE,["\"test\""],")"]],";"]]]);
+    });
+    it('@width', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('$a = @width("test");');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.VARSTMT,[CssNode.WIDTH,["@width",CssNode.CPARAMS,["(",CssNode.VALUE,["\"test\""],")"]],";"]]]);
+    });
+    it('@height', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('$a = @height("test");');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.VARSTMT,[CssNode.HEIGHT,["@height",CssNode.CPARAMS,["(",CssNode.VALUE,["\"test\""],")"]],";"]]]);
+    });
   });
   describe('unbox', function() {
     it('vardecl', function() {
