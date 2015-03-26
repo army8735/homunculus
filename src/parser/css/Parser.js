@@ -592,7 +592,7 @@ var Parser = IParser.extend(function(lexer) {
         node.add(this.match(']'));
       }
       else {
-        node.add(this.match([Token.SELECTOR, Token.PSEUDO, Token.HACK]));
+        node.add(this.match([Token.SELECTOR, Token.PSEUDO, Token.HACK, Token.VARS]));
       }
       while(this.look && [',', ';', '{', '}'].indexOf(this.look.content()) == -1) {
         if(this.look.content() == '[' && this.look.type() != Token.HACK) {
@@ -603,7 +603,7 @@ var Parser = IParser.extend(function(lexer) {
           node.add(this.match(']'));
         }
         else {
-          node.add(this.match([Token.SELECTOR, Token.PSEUDO, Token.SIGN, Token.HACK]));
+          node.add(this.match([Token.SELECTOR, Token.PSEUDO, Token.SIGN, Token.HACK, Token.VARS]));
         }
       }
     }

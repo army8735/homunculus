@@ -41,6 +41,7 @@ var Lexer = Class(function(rule) {
     var perlReg = this.rule.perlReg();
     var length = this.code.length;
     var count = 0;
+    this.colNum = length ? 1 : 0;
     outer:
     while(this.index < length) {
       if(this.cacheLine > 0 && count >= this.cacheLine) {
@@ -89,6 +90,8 @@ var Lexer = Class(function(rule) {
             temp.push(token);
             this.tokenList.push(token);
             this.index += matchLen - 1;
+            token.line(this.totalLine);
+            token.col(this.colNum);
             var n = character.count(token.val(), character.LINE);
             count += n;
             this.totalLine += n;
@@ -203,6 +206,8 @@ var Lexer = Class(function(rule) {
     this.last = token;
     temp.push(token);
     this.tokenList.push(token);
+    token.line(this.totalLine);
+    token.col(this.colNum);
     this.colNum += this.index - lastIndex;
     this.colMax = Math.max(this.colMax, this.colNum);
     return this;
