@@ -1252,6 +1252,11 @@ describe('cssparser', function() {
       var node = parser.parse('@if(@basename("test") > "1"){}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.IFSTMT,["@if","(",CssNode.RELSTMT,[CssNode.BASENAME,["@basename",CssNode.CPARAMS,["(",CssNode.VALUE,["\"test\""],")"]],">",CssNode.PRMRSTMT,["\"1\""]],")",CssNode.BLOCK,["{","}"]]]]);
     });
+    it('@basename in value', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('div{margin:@basename("")}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["div"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["margin"],":",CssNode.VALUE,[CssNode.BASENAME,["@basename",CssNode.CPARAMS,["(",CssNode.VALUE,["\"\""],")"]]]],"}"]]]]);
+    });
     it('@extname', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('$a = @extname("test");');
@@ -1261,6 +1266,11 @@ describe('cssparser', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('@if(@extname("test") > "1"){}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.IFSTMT,["@if","(",CssNode.RELSTMT,[CssNode.EXTNAME,["@extname",CssNode.CPARAMS,["(",CssNode.VALUE,["\"test\""],")"]],">",CssNode.PRMRSTMT,["\"1\""]],")",CssNode.BLOCK,["{","}"]]]]);
+    });
+    it('@extname in value', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('div{margin:@extname("")}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["div"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["margin"],":",CssNode.VALUE,[CssNode.EXTNAME,["@extname",CssNode.CPARAMS,["(",CssNode.VALUE,["\"\""],")"]]]],"}"]]]]);
     });
     it('@width', function() {
       var parser = homunculus.getParser('css');
@@ -1272,6 +1282,11 @@ describe('cssparser', function() {
       var node = parser.parse('@if(@width("test") > 1){}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.IFSTMT,["@if","(",CssNode.RELSTMT,[CssNode.WIDTH,["@width",CssNode.CPARAMS,["(",CssNode.VALUE,["\"test\""],")"]],">",CssNode.PRMRSTMT,["1"]],")",CssNode.BLOCK,["{","}"]]]]);
     });
+    it('@width in value', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('div{margin:@width("") + 1}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["div"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["margin"],":",CssNode.VALUE,[CssNode.ADDEXPR,[CssNode.WIDTH,["@width",CssNode.CPARAMS,["(",CssNode.VALUE,["\"\""],")"]],"+","1"]]],"}"]]]]);
+    });
     it('@height', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('$a = @height("test");');
@@ -1281,6 +1296,11 @@ describe('cssparser', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('@if(@height("test") > 1){}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.IFSTMT,["@if","(",CssNode.RELSTMT,[CssNode.HEIGHT,["@height",CssNode.CPARAMS,["(",CssNode.VALUE,["\"test\""],")"]],">",CssNode.PRMRSTMT,["1"]],")",CssNode.BLOCK,["{","}"]]]]);
+    });
+    it('@height in value', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('div{margin:@height("") + 1}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["div"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["margin"],":",CssNode.VALUE,[CssNode.ADDEXPR,[CssNode.HEIGHT,["@height",CssNode.CPARAMS,["(",CssNode.VALUE,["\"\""],")"]],"+","1"]]],"}"]]]]);
     });
   });
   describe('unbox', function() {

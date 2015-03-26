@@ -1402,6 +1402,18 @@ var Parser = IParser.extend(function(lexer) {
       );
       return node;
     }
+    if(this.look.content() == '@basename') {
+      return this.basename();
+    }
+    else if(this.look.content() == '@extname') {
+      return this.extname();
+    }
+    else if(this.look.content() == '@width') {
+      return this.width();
+    }
+    else if(this.look.content() == '@height') {
+      return this.height();
+    }
     //紧接着的(说明这是个未知的css内置id()
     var next = this.tokens[this.index];
     if(next && next.content() == '('
