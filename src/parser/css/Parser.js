@@ -538,16 +538,16 @@ var Parser = IParser.extend(function(lexer) {
       node.add(this.dir());
     }
     else if(this.look.content() == '@basename') {
-      return this.basename();
+      node.add(this.basename());
     }
     else if(this.look.content() == '@extname') {
-      return this.extname();
+      node.add(this.extname());
     }
     else if(this.look.content() == '@width') {
-      return this.width();
+      node.add(this.width());
     }
     else if(this.look.content() == '@height') {
-      return this.height();
+      node.add(this.height());
     }
     else if(this.look.content() == '~'
       && this.tokens[this.index]
