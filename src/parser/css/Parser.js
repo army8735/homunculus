@@ -1514,18 +1514,6 @@ var Parser = IParser.extend(function(lexer) {
     if(this.look.content() == '@dir') {
       return this.dir();
     }
-    else if(this.look.content() == '@basename') {
-      return this.basename();
-    }
-    else if(this.look.content() == '@extname') {
-      return this.extname();
-    }
-    else if(this.look.content() == '@width') {
-      return this.width();
-    }
-    else if(this.look.content() == '@height') {
-      return this.height();
-    }
     return this.eqstmt();
   },
   eqstmt: function() {
@@ -1567,6 +1555,12 @@ var Parser = IParser.extend(function(lexer) {
     return node;
   },
   addstmt: function() {
+    if(this.look.content() == '@basename') {
+      return this.basename();
+    }
+    else if(this.look.content() == '@extname') {
+      return this.extname();
+    }
     var node = new Node(Node.ADDSTMT);
     var mtplstmt = this.mtplstmt();
     if(this.look && {
@@ -1623,6 +1617,12 @@ var Parser = IParser.extend(function(lexer) {
     return node;
   },
   postfixstmt: function() {
+    if(this.look.content() == '@width') {
+      return this.width();
+    }
+    else if(this.look.content() == '@height') {
+      return this.height();
+    }
     var node = new Node(Node.POSTFIXSTMT);
     var prmrstmt = this.prmrstmt();
     if(this.look && {

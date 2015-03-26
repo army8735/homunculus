@@ -1237,25 +1237,50 @@ describe('cssparser', function() {
       var node = parser.parse('$a = @dir("test");');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.VARSTMT,[CssNode.VARDECL,["$a","=",CssNode.DIR,["@dir",CssNode.CPARAMS,["(",CssNode.VALUE,["\"test\""],")"]]],";"]]]);
     });
+    it('@dir in exprstmt', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@for($a of @dir()){}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.FORSTMT,["@for","(","$a","of",CssNode.DIR,["@dir",CssNode.CPARAMS,["(",")"]],")",CssNode.BLOCK,["{","}"]]]]);
+    });
     it('@basename', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('$a = @basename("test");');
-      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.VARSTMT,[CssNode.BASENAME,["@basename",CssNode.CPARAMS,["(",CssNode.VALUE,["\"test\""],")"]],";"]]]);
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.VARSTMT,[CssNode.VARDECL,["$a","=",CssNode.BASENAME,["@basename",CssNode.CPARAMS,["(",CssNode.VALUE,["\"test\""],")"]]],";"]]]);
+    });
+    it('@basename in exprstmt', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@if(@basename("test") > "1"){}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.IFSTMT,["@if","(",CssNode.RELSTMT,[CssNode.BASENAME,["@basename",CssNode.CPARAMS,["(",CssNode.VALUE,["\"test\""],")"]],">",CssNode.PRMRSTMT,["\"1\""]],")",CssNode.BLOCK,["{","}"]]]]);
     });
     it('@extname', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('$a = @extname("test");');
-      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.VARSTMT,[CssNode.EXTNAME,["@extname",CssNode.CPARAMS,["(",CssNode.VALUE,["\"test\""],")"]],";"]]]);
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.VARSTMT,[CssNode.VARDECL,["$a","=",CssNode.EXTNAME,["@extname",CssNode.CPARAMS,["(",CssNode.VALUE,["\"test\""],")"]]],";"]]]);
+    });
+    it('@extname in exprstmt', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@if(@extname("test") > "1"){}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.IFSTMT,["@if","(",CssNode.RELSTMT,[CssNode.EXTNAME,["@extname",CssNode.CPARAMS,["(",CssNode.VALUE,["\"test\""],")"]],">",CssNode.PRMRSTMT,["\"1\""]],")",CssNode.BLOCK,["{","}"]]]]);
     });
     it('@width', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('$a = @width("test");');
-      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.VARSTMT,[CssNode.WIDTH,["@width",CssNode.CPARAMS,["(",CssNode.VALUE,["\"test\""],")"]],";"]]]);
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.VARSTMT,[CssNode.VARDECL,["$a","=",CssNode.WIDTH,["@width",CssNode.CPARAMS,["(",CssNode.VALUE,["\"test\""],")"]]],";"]]]);
+    });
+    it('@width in exprstmt', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@if(@width("test") > 1){}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.IFSTMT,["@if","(",CssNode.RELSTMT,[CssNode.WIDTH,["@width",CssNode.CPARAMS,["(",CssNode.VALUE,["\"test\""],")"]],">",CssNode.PRMRSTMT,["1"]],")",CssNode.BLOCK,["{","}"]]]]);
     });
     it('@height', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('$a = @height("test");');
-      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.VARSTMT,[CssNode.HEIGHT,["@height",CssNode.CPARAMS,["(",CssNode.VALUE,["\"test\""],")"]],";"]]]);
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.VARSTMT,[CssNode.VARDECL,["$a","=",CssNode.HEIGHT,["@height",CssNode.CPARAMS,["(",CssNode.VALUE,["\"test\""],")"]]],";"]]]);
+    });
+    it('@height in exprstmt', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@if(@height("test") > 1){}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.IFSTMT,["@if","(",CssNode.RELSTMT,[CssNode.HEIGHT,["@height",CssNode.CPARAMS,["(",CssNode.VALUE,["\"test\""],")"]],">",CssNode.PRMRSTMT,["1"]],")",CssNode.BLOCK,["{","}"]]]]);
     });
   });
   describe('unbox', function() {
