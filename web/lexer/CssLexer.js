@@ -461,7 +461,7 @@ var CssLexer = Lexer.extend(function(rule) {
                   this.var = false;
                   break;
                 case '~':
-                  if(!this.value && ['"', "'"].indexOf(this.code.charAt(this.index)) == -1) {
+                  if(!this.value && ['"', "'", '@', '$'].indexOf(this.code.charAt(this.index)) == -1) {
                     token.type(Token.HACK);
                   }
                 default:

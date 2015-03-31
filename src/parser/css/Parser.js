@@ -437,7 +437,7 @@ var Parser = IParser.extend(function(lexer) {
     while(this.look && this.look.content() != ')') {
       if(this.look.content() == '~'
         && this.tokens[this.index]
-        && this.tokens[this.index].type() == Token.STRING) {
+        && [Token.VARS, Token.STRING].indexOf(this.tokens[this.index].type()) > -1) {
         node.add(this.unbox());
       }
       else if(this.look.type() == Token.KEYWORD || this.look.type() == Token.HACK) {
@@ -551,7 +551,7 @@ var Parser = IParser.extend(function(lexer) {
     }
     else if(this.look.content() == '~'
       && this.tokens[this.index]
-      && this.tokens[this.index].type() == Token.STRING) {
+      && [Token.VARS, Token.STRING].indexOf(this.tokens[this.index].type()) > -1) {
       node.add(this.unbox());
     }
     else if(this.look.type() == Token.KEYWORD || this.look.type() == Token.HACK) {
@@ -828,6 +828,12 @@ var Parser = IParser.extend(function(lexer) {
             }
             bCount--;
           }
+          else if(s == '~'
+            && this.tokens[this.index]
+            && [Token.VARS, Token.STRING].indexOf(this.tokens[this.index].type()) > -1) {
+            node.add(this.unbox());
+            break;
+          }
           //LL2确定是否是fncall
           var fncall = false;
           if(this.look.type() == Token.VARS) {
@@ -964,6 +970,12 @@ var Parser = IParser.extend(function(lexer) {
                 return node;
               }
               bCount--;
+            }
+            else if(s == '~'
+              && this.tokens[this.index]
+              && [Token.VARS, Token.STRING].indexOf(this.tokens[this.index].type()) > -1) {
+              node.add(this.unbox());
+              break;
             }
             //LL2确定是否是fncall
             var fncall = false;
@@ -1740,7 +1752,7 @@ var Parser = IParser.extend(function(lexer) {
     var node = new Node(Node.UNBOX);
     node.add(
       this.match('~'),
-      this.match(Token.STRING)
+      this.match([Token.VARS, Token.STRING])
     );
     return node;
   },

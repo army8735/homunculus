@@ -841,9 +841,9 @@ describe('csslexer', function() {
   describe('~', function() {
     it('in value', function() {
       var lexer = homunculus.getLexer('css');
-      var tokens = lexer.parse('.a{margin:~""}');
-      expect(join(tokens)).to.eql(['.a', '{', 'margin', ':', '~', '""', '}']);
-      expect(type(tokens)).to.eql([21, 8, 10, 8, 8, 7, 8]);
+      var tokens = lexer.parse('.a{margin:~""~$a}');
+      expect(join(tokens)).to.eql(['.a', '{', 'margin', ':', '~', '""', '~', '$a', '}']);
+      expect(type(tokens)).to.eql([21, 8, 10, 8, 8, 7, 8, 16, 8]);
     });
     it('in style', function() {
       var lexer = homunculus.getLexer('css');
