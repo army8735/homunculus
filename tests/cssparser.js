@@ -708,7 +708,7 @@ describe('cssparser', function() {
     it('multi fn()', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('p{color:#f00 max(1) min(2) hsl(0, 5%, 100%) hsla(0, 5%, 100%, 0) calc(1 + 1) var(a) rgb(0,0,0) repeating-radial-gradient(circle,#f00,#ff0,#080)}');
-      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["p"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["color"],":",CssNode.VALUE,["#f00",CssNode.MAX,["max","(",CssNode.PARAM,["1"],")"],CssNode.MIN,["min","(",CssNode.PARAM,["2"],")"],CssNode.HSL,["hsl","(","0",",","5","%",",","100","%",")"],CssNode.HSLA,["hsla","(","0",",","5","%",",","100","%",",","0",")"],CssNode.CALC,["calc","(",CssNode.ADDEXPR,["1","+","1"],")"],CssNode.VARS,["var","(","a",")"],CssNode.RGB,["rgb","(","0",",","0",",","0",")"],CssNode.RADIOGRADIENT,["repeating-radial-gradient","(","circle",",",CssNode.COLORSTOP,["#f00"],",",CssNode.COLORSTOP,["#ff0"],",",CssNode.COLORSTOP,["#080"],")"]]],"}"]]]]);
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["p"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["color"],":",CssNode.VALUE,["#f00",CssNode.MAX,["max","(",CssNode.PARAM,["1"],")"],CssNode.MIN,["min","(",CssNode.PARAM,["2"],")"],CssNode.HSL,["hsl","(","0",",","5","%",",","100","%",")"],CssNode.HSLA,["hsla","(","0",",","5","%",",","100","%",",","0",")"],CssNode.CALC,["calc","(","1","+","1",")"],CssNode.VARS,["var","(","a",")"],CssNode.RGB,["rgb","(","0",",","0",",","0",")"],CssNode.RADIOGRADIENT,["repeating-radial-gradient","(","circle",",",CssNode.COLORSTOP,["#f00"],",",CssNode.COLORSTOP,["#ff0"],",",CssNode.COLORSTOP,["#080"],")"]]],"}"]]]]);
     });
     it('new kw', function() {
       var parser = homunculus.getParser('css');
@@ -898,12 +898,12 @@ describe('cssparser', function() {
     it('calc', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('body{width:calc(100 - 2)}');
-      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["width"],":",CssNode.VALUE,[CssNode.CALC,["calc","(",CssNode.ADDEXPR,["100","-","2"],")"]]],"}"]]]]);
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["width"],":",CssNode.VALUE,[CssNode.CALC,["calc","(","100","-","2",")"]]],"}"]]]]);
     });
     it('calc complex', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('body{width:calc((100 - 2)*3)}');
-      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["width"],":",CssNode.VALUE,[CssNode.CALC,["calc","(",CssNode.MTPLEXPR,[CssNode.PRMREXPR,["(",CssNode.ADDEXPR,["100","-","2"],")"],"*","3"],")"]]],"}"]]]]);
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["width"],":",CssNode.VALUE,[CssNode.CALC,["calc","(","(","100","-","2",")","*","3",")"]]],"}"]]]]);
     });
     it('filter()', function() {
       var parser = homunculus.getParser('css');

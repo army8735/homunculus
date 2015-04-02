@@ -1217,10 +1217,21 @@ var Parser = IParser.extend(function(lexer) {
     var node = new Node(Node.CALC);
     node.add(
       this.match(),
-      this.match('('),
-      this.addexpr(),
-      this.match(')')
+      this.match('(')
     );
+    var count = 0;
+    while(this.look) {
+      if(this.look.content() == '(') {
+        count++;
+      }
+      else if(this.look.content() == ')') {
+        if(count-- == 0) {
+          break;
+        }
+      }
+      node.add(this.match());
+    }
+    node.add(this.match(')'));
     return node;
   },
   counter: function(name) {
