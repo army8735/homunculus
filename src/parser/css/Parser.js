@@ -1221,10 +1221,14 @@ var Parser = IParser.extend(function(lexer) {
     );
     var count = 0;
     while(this.look) {
-      if(this.look.content() == '(') {
+      var s = this.look.content();
+      if([';', '}'].indexOf(s) > -1) {
+        this.error();
+      }
+      else if(s == '(') {
         count++;
       }
-      else if(this.look.content() == ')') {
+      else if(s == ')') {
         if(count-- == 0) {
           break;
         }

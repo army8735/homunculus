@@ -905,6 +905,12 @@ describe('cssparser', function() {
       var node = parser.parse('body{width:calc((100 - 2)*3)}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["width"],":",CssNode.VALUE,[CssNode.CALC,["calc","(","(","100","-","2",")","*","3",")"]]],"}"]]]]);
     });
+    it('calc error', function() {
+      var parser = homunculus.getParser('css');
+      expect(function() {
+        parser.parse('a{margin:calc(1+})}');
+      }).to.throwError();
+    });
     it('filter()', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('body{filter:alpha(opacity=50)}');
