@@ -1313,7 +1313,7 @@ describe('cssparser', function() {
     it('vardecl', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('$a = ~"123";');
-      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.VARSTMT,[CssNode.VARDECL,["$a","=",CssNode.UNBOX,["~","\"123\""]],";"]]]);
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.VARSTMT,[CssNode.VARDECL,["$a","=",CssNode.VALUE,[CssNode.UNBOX,["~","\"123\""]]],";"]]]);
     });
     it('var as hack', function() {
       var parser = homunculus.getParser('css');
