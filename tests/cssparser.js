@@ -1251,7 +1251,7 @@ describe('cssparser', function() {
     it('@basename', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('$a = @basename("test");');
-      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.VARSTMT,[CssNode.VARDECL,["$a","=",CssNode.BASENAME,["@basename",CssNode.CPARAMS,["(",CssNode.VALUE,["\"test\""],")"]]],";"]]]);
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.VARSTMT,[CssNode.VARDECL,["$a","=",CssNode.VALUE,[CssNode.BASENAME,["@basename",CssNode.CPARAMS,["(",CssNode.VALUE,["\"test\""],")"]]]],";"]]]);
     });
     it('@basename in exprstmt', function() {
       var parser = homunculus.getParser('css');
@@ -1266,7 +1266,7 @@ describe('cssparser', function() {
     it('@extname', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('$a = @extname("test");');
-      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.VARSTMT,[CssNode.VARDECL,["$a","=",CssNode.EXTNAME,["@extname",CssNode.CPARAMS,["(",CssNode.VALUE,["\"test\""],")"]]],";"]]]);
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.VARSTMT,[CssNode.VARDECL,["$a","=",CssNode.VALUE,[CssNode.EXTNAME,["@extname",CssNode.CPARAMS,["(",CssNode.VALUE,["\"test\""],")"]]]],";"]]]);
     });
     it('@extname in exprstmt', function() {
       var parser = homunculus.getParser('css');
@@ -1281,7 +1281,7 @@ describe('cssparser', function() {
     it('@width', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('$a = @width("test");');
-      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.VARSTMT,[CssNode.VARDECL,["$a","=",CssNode.WIDTH,["@width",CssNode.CPARAMS,["(",CssNode.VALUE,["\"test\""],")"]]],";"]]]);
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.VARSTMT,[CssNode.VARDECL,["$a","=",CssNode.VALUE,[CssNode.WIDTH,["@width",CssNode.CPARAMS,["(",CssNode.VALUE,["\"test\""],")"]]]],";"]]]);
     });
     it('@width in exprstmt', function() {
       var parser = homunculus.getParser('css');
@@ -1296,7 +1296,7 @@ describe('cssparser', function() {
     it('@height', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('$a = @height("test");');
-      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.VARSTMT,[CssNode.VARDECL,["$a","=",CssNode.HEIGHT,["@height",CssNode.CPARAMS,["(",CssNode.VALUE,["\"test\""],")"]]],";"]]]);
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.VARSTMT,[CssNode.VARDECL,["$a","=",CssNode.VALUE,[CssNode.HEIGHT,["@height",CssNode.CPARAMS,["(",CssNode.VALUE,["\"test\""],")"]]]],";"]]]);
     });
     it('@height in exprstmt', function() {
       var parser = homunculus.getParser('css');

@@ -537,18 +537,6 @@ var Parser = IParser.extend(function(lexer) {
     else if(this.look.content() == '@dir') {
       node.add(this.dir());
     }
-    else if(this.look.content() == '@basename') {
-      node.add(this.basename());
-    }
-    else if(this.look.content() == '@extname') {
-      node.add(this.extname());
-    }
-    else if(this.look.content() == '@width') {
-      node.add(this.width());
-    }
-    else if(this.look.content() == '@height') {
-      node.add(this.height());
-    }
     else if(this.look.content() == '~'
       && this.tokens[this.index]
       && [Token.VARS, Token.STRING].indexOf(this.tokens[this.index].type()) > -1) {
