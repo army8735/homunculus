@@ -706,6 +706,12 @@ var Parser = IParser.extend(function(lexer) {
       this.error();
     }
     var s = this.look.content().toLowerCase();
+    if(s == '~'
+      && this.tokens[this.index]
+      && [Token.VARS, Token.STRING].indexOf(this.tokens[this.index].type()) > -1) {
+      node.add(this.unbox());
+      return node;
+    }
     var pCount = 0;
     var bCount = 0;
     if([Token.COLOR, Token.HACK, Token.VARS, Token.ID, Token.PROPERTY, Token.NUMBER, Token.STRING, Token.HEAD, Token.SIGN, Token.UNITS, Token.KEYWORD].indexOf(this.look.type()) > -1
@@ -810,12 +816,6 @@ var Parser = IParser.extend(function(lexer) {
               return node;
             }
             bCount--;
-          }
-          else if(s == '~'
-            && this.tokens[this.index]
-            && [Token.VARS, Token.STRING].indexOf(this.tokens[this.index].type()) > -1) {
-            node.add(this.unbox());
-            break;
           }
           //LL2确定是否是fncall
           var fncall = false;

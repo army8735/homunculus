@@ -1332,8 +1332,14 @@ describe('cssparser', function() {
     });
     it('in value', function() {
       var parser = homunculus.getParser('css');
-      var node = parser.parse('div{margin:~""~$a}');
-      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["div"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["margin"],":",CssNode.VALUE,[CssNode.UNBOX,["~","\"\""],CssNode.UNBOX,["~","$a"]]],"}"]]]]);
+      var node = parser.parse('div{margin:~"";padding:~$a}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["div"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["margin"],":",CssNode.VALUE,[CssNode.UNBOX,["~","\"\""]],";"],CssNode.STYLE,[CssNode.KEY,["padding"],":",CssNode.VALUE,[CssNode.UNBOX,["~","$a"]]],"}"]]]]);
+    });
+    it('only one unbxo in value', function() {
+      var parser = homunculus.getParser('css');
+      expect(function() {
+        parser.parse('div{margin:~""~""}');
+      }).to.throwError();
     });
   });
   describe('lib test', function() {
