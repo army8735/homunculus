@@ -833,6 +833,16 @@ describe('cssparser', function() {
       var node = parser.parse('body{margin:$fn(*background:url(xxx))}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["body"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["margin"],":",CssNode.VALUE,[CssNode.FNC,["$fn",CssNode.CPARAMS,["(",CssNode.STYLE,[CssNode.KEY,["*","background"],":",CssNode.VALUE,[CssNode.URL,["url","(","xxx",")"]]],")"]]]],"}"]]]]);
     });
+    it('fn arr', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('div{$fn([1,2])}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["div"]],CssNode.BLOCK,["{",CssNode.FNC,["$fn",CssNode.CPARAMS,["(",CssNode.ARRLTR,["[",CssNode.VALUE,["1"],",",CssNode.VALUE,["2"],"]"],")"]],"}"]]]]);
+    });
+    it('fn @dir', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('div{$fn(@dir(""))}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["div"]],CssNode.BLOCK,["{",CssNode.FNC,["$fn",CssNode.CPARAMS,["(",CssNode.DIR,["@dir",CssNode.CPARAMS,["(",CssNode.VALUE,["\"\""],")"]],")"]],"}"]]]]);
+    });
     it('@extend', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('body{@extend a}');

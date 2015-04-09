@@ -440,6 +440,12 @@ var Parser = IParser.extend(function(lexer) {
         && [Token.VARS, Token.STRING].indexOf(this.tokens[this.index].type()) > -1) {
         node.add(this.unbox());
       }
+      else if(this.look.content() == '[') {
+        node.add(this.arrltr());
+      }
+      else if(this.look.content() == '@dir') {
+        node.add(this.dir());
+      }
       else if(this.look.type() == Token.KEYWORD || this.look.type() == Token.HACK) {
         node.add(this.style(null, true, true));
       }
