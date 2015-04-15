@@ -50,7 +50,7 @@
 </head>
 <body>
 <pre>
-<code class="brush:js;max-height:400;">
+<code class="brush:jsx;max-height:400;">
 </code>
 </pre>
 <textarea id="ta" autocomplete="true"></textarea>
@@ -137,7 +137,7 @@
     input.onclick = function() {
       console.clear();
       var s = ta.value;
-      $('code').html(s);
+      $('code').text(s);
       $('div.jssc').remove();
       location.hash = encodeURIComponent(s);
       jssc.cache(100).time(10).exec();

@@ -8,7 +8,6 @@ var CssRule = require('./lexer/rule/CssRule');
 var JavaRule = require('./lexer/rule/JavaRule');
 var CRule = require('./lexer/rule/CRule');
 var HtmlRule = require('./lexer/rule/HtmlRule');
-var JSXRule = require('./lexer/rule/JSXRule');
 
 var Token = require('./lexer/Token');
 var CssToken = require('./lexer/CssToken');
@@ -138,7 +137,7 @@ exports.getClass = function (type, lan) {
         case 'html':
           return HtmlRule;
         case 'jsx':
-          return JSXRule;
+          return EcmascriptRule;
         default:
           throw new Error('Unsupport Language Context: ' + lan);
       }
@@ -174,7 +173,7 @@ exports.getLexer = function (lan) {
     case 'htm':
       return new HtmlLexer(new HtmlRule());
     case 'jsx':
-      return new JSXLexer(new JSXRule());
+      return new JSXLexer(new EcmascriptRule());
     default:
       throw new Error('Unsupport Language Lexer: ' + lan);
   }
