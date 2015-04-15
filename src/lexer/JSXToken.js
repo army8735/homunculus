@@ -5,7 +5,7 @@ var JSXToken = Token.extend(function(type, content, val, sIndex) {
 }).statics({
   MARK: 26,
   ELEM: 27,
-  ATTR: 28,
+  PROPERTY: 15,
   TEXT: 25
 });
 

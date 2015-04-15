@@ -19,7 +19,7 @@ var JSXMatch = [
   new LineSearch(JSXToken.STRING, "'", "'", true),
   new CompleteEqual(JSXToken.SIGN, '=', null, true),
   new RegMatch(JSXToken.NUMBER, /^\d+(?:\.\d*)?/),
-  new RegMatch(JSXToken.ATTR, /^[a-z]+(?:-\w+)*/i)
+  new RegMatch(JSXToken.PROPERTY, /^[a-z]+(?:-\w+)*/i)
 ];
 
 var JSXLexer = Class(function(rule) {
@@ -138,6 +138,7 @@ var JSXLexer = Class(function(rule) {
                     this.colNum += matchLen;
                   }
                   this.colMax = Math.max(this.colMax, this.colNum);
+                  continue outer;
                 }
               }
               //如果有未匹配的，说明规则不完整，抛出错误
