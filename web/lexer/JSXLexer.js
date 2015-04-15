@@ -87,7 +87,7 @@ var JSXLexer = Class(function(rule) {
                 token.col(this.colNum);
                 this.colNum += 2;
                 this.colMax = Math.max(this.colMax, this.colNum);
-                this.index++; //不要忘了多读了个>
+                this.readch(); //不要忘了多读了个>
               }
               else {
                 this.error();
@@ -153,7 +153,7 @@ var JSXLexer = Class(function(rule) {
                 idx = length;
                 if(idx > this.index) {
                   this.addText(this.code.slice(this.index - 1, idx), temp);
-                  this.readch();
+                  this.index = length;
                 }
                 return this;
               }
@@ -163,7 +163,6 @@ var JSXLexer = Class(function(rule) {
               if(s == '<!--') {
                 if(idx > this.index) {
                   this.addText(this.code.slice(this.index - 1, idx), temp);
-                  this.readch();
                 }
                 var end = this.code.indexOf('-->', idx + 4);
                 if(end == -1) {
@@ -193,7 +192,6 @@ var JSXLexer = Class(function(rule) {
                 if(c1 == '/' && character.isLetter(c2)) {
                   if(idx > this.index) {
                     this.addText(this.code.slice(this.index - 1, idx), temp);
-                    this.readch();
                   }
                   this.state = true;
                   //</
@@ -208,7 +206,8 @@ var JSXLexer = Class(function(rule) {
                   token.line(this.totalLine);
                   token.col(this.colNum);
                   this.colNum += 2;
-                  this.index += 2;
+                  this.index = idx + 2;
+                  this.readch();
                   //\w elem
                   ELEM.match(this.peek, this.code, this.index);
                   var token = new JSXToken(ELEM.tokenType(), ELEM.content(), ELEM.val(), this.index - 1);
@@ -229,7 +228,6 @@ var JSXLexer = Class(function(rule) {
                 else if(character.isLetter(c1)) {
                   if(idx > this.index) {
                     this.addText(this.code.slice(this.index - 1, idx), temp);
-                    this.readch();
                   }
                   this.state = true;
                   //<
@@ -244,7 +242,8 @@ var JSXLexer = Class(function(rule) {
                   token.line(this.totalLine);
                   token.col(this.colNum);
                   this.colNum++;
-                  this.index++;
+                  this.index = idx + 1;
+                  this.readch();
                   //\w elem
                   ELEM.match(this.peek, this.code, this.index);
                   var token = new JSXToken(ELEM.tokenType(), ELEM.content(), ELEM.val(), this.index - 1);
@@ -283,10 +282,10 @@ var JSXLexer = Class(function(rule) {
           this.last = token;
           temp.push(token);
           this.tokenList.push(token);
-          this.index++;
           token.line(this.totalLine);
           token.col(this.colNum);
           this.colNum++;
+          this.readch();
           //\w elem
           ELEM.match(this.peek, this.code, this.index);
           var token = new JSXToken(ELEM.tokenType(), ELEM.content(), ELEM.val(), this.index - 1);
@@ -485,7 +484,6 @@ var JSXLexer = Class(function(rule) {
       this.colNum += s.length;
     }
     this.colMax = Math.max(this.colMax, this.colNum);
-    this.index += s.length;
   },
   cache: function(i) {
     if(!character.isUndefined(i) && i !== null) {
