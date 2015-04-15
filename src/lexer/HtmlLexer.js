@@ -159,6 +159,19 @@ var HtmlLexer = Class(function(rule) {
           token.line(this.totalLine);
           token.col(this.colNum);
           this.index2 = this.index = end;
+          var n = character.count(s, character.LINE);
+          count += n;
+          this.totalLine += n;
+          if(n) {
+            var j = s.indexOf(character.LINE);
+            var k = s.lastIndexOf(character.LINE);
+            this.colMax = Math.max(this.colMax, this.colNum + j);
+            this.colNum = s.length - k;
+          }
+          else {
+            this.colNum += s;
+          }
+          this.colMax = Math.max(this.colMax, this.colNum);
         }
         else if(c1 == '<') {
           if(c2 == '/') {
