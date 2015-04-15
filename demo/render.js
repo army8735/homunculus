@@ -2,12 +2,16 @@ define(function(require, exports, module) {
 	var Token = require('lexer/Token');
 	var CssToken = require('./lexer/CssToken');
 	var HtmlToken = require('./lexer/HtmlToken');
+	var JSXToken = require('./lexer/JSXToken');
 	Object.keys(CssToken).forEach(function(k) {
 		Token[k] = Token[k] || CssToken[k];
 	});
 	Object.keys(HtmlToken).forEach(function(k) {
 		Token[k] = Token[k] || HtmlToken[k];
 	});
+  Object.keys(JSXToken).forEach(function(k) {
+    Token[k] = Token[k] || JSXToken[k];
+  });
 	function escapeHtml(str) {
 		var xmlchar = {
 			"&": "&amp;",

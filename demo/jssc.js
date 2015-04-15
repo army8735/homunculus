@@ -1,6 +1,6 @@
 define(function(require, exports) {
 	var factory = require('./factory'),
-		Token = require('./lexer/JSXToken'),
+		Token = require('./lexer/Token'),
 		render = require('./render'),
 		cacheLine = 0,
 		cacheTime = 0,
