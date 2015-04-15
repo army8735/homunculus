@@ -301,6 +301,7 @@ var JSXLexer = Class(function(rule) {
           token.col(this.colNum);
           this.colNum += matchLen;
           this.colMax = Math.max(this.colMax, this.colNum);
+          this.isReg = JSXLexer.NOT_REG;
         }
         //perl风格正则
         else if(perlReg
