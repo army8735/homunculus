@@ -177,7 +177,7 @@ var Lexer = Class(function(rule) {
           'u': true,
           'y': true
         };
-        //正则的flag中有gimuy4种，大小写敏感且不能重复
+        //正则的flag中有gimuy5种，大小写敏感且不能重复
         do {
           this.readch();
           if(character.isLetter(this.peek)) {
