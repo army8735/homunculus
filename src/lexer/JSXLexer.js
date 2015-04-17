@@ -41,6 +41,8 @@ var JSXLexer = Class(function(rule) {
     this.last = null;
     this.html = false; //目前是否为解析html状态
     this.state = false; //是否在<>中
+    this.hStack = []; //当mark开始时++，减少时--，以此得知jsx部分结束回归js
+    this.jStack = []; //当{开始时++，减少时--，以此得知js部分结束回归jsx
   },
   parse: function(code) {
     this.code = code || '';
@@ -77,6 +79,11 @@ var JSXLexer = Class(function(rule) {
             if(this.peek == '/') {
               if(this.code.charAt(this.index) == '>') {
                 this.state = false;
+                this.hStack[this.hStack.length - 1]--;
+                if(this.hStack[this.hStack.length - 1] == 0) {
+                  this.hStack.pop();
+                  this.html = false;
+                }
                 var token = new JSXToken(JSXToken.MARK, this.peek + '>', this.peek + '>');
                 token.prev(this.last);
                 this.last.next(token);
@@ -96,6 +103,9 @@ var JSXLexer = Class(function(rule) {
             //>
             else if(this.peek == '>') {
               this.state = false;
+              if(!this.hStack.length) {
+                this.html = false;
+              }
               var token = new JSXToken(JSXToken.MARK, this.peek, this.peek);
               token.prev(this.last);
               this.last.next(token);
@@ -145,6 +155,7 @@ var JSXLexer = Class(function(rule) {
               this.error('unknow jsx token');
             }
           }
+          //<>外面
           else {
             //<之前的text部分
             var idx = this.code.indexOf('<', this.index);
@@ -195,6 +206,10 @@ var JSXLexer = Class(function(rule) {
                     this.addText(this.code.slice(this.index - 1, idx), temp);
                   }
                   this.state = true;
+                  this.hStack[this.hStack.length - 1]--;
+                  if(this.hStack[this.hStack.length - 1] == 0) {
+                    this.hStack.pop();
+                  }
                   //</
                   var token = new JSXToken(JSXToken.MARK, '</', '</');
                   if(this.last) {
@@ -231,6 +246,7 @@ var JSXLexer = Class(function(rule) {
                     this.addText(this.code.slice(this.index - 1, idx), temp);
                   }
                   this.state = true;
+                  this.hStack[this.hStack.length - 1]++;
                   //<
                   var token = new JSXToken(JSXToken.MARK, '<', '<');
                   if(this.last) {
@@ -272,6 +288,8 @@ var JSXLexer = Class(function(rule) {
         else if(this.isReg == JSXLexer.IS_REG
           && this.peek == '<'
           && character.isLetter(this.code.charAt(this.index))) {
+          //新的jsx开始，深度++
+          this.hStack.push(1);
           this.html = true;
           this.state = true;
           //<
@@ -301,7 +319,6 @@ var JSXLexer = Class(function(rule) {
           token.col(this.colNum);
           this.colNum += matchLen;
           this.colMax = Math.max(this.colMax, this.colNum);
-          this.isReg = JSXLexer.NOT_REG;
         }
         //perl风格正则
         else if(perlReg

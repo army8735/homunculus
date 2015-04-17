@@ -3,6 +3,8 @@ var Node = Es6Node.extend(function(type, children) {
   Es6Node.call(this, type, children);
   return this;
 }).statics({
+  JSXELEM: 'jsxelem',
+  PROPERTY: 'property',
   getKey: function(s) {
     if(!s) {
       throw new Error('empty value');
