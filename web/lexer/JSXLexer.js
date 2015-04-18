@@ -120,6 +120,10 @@ var JSXLexer = Class(function(rule) {
               this.colNum++;
               this.colMax = Math.max(this.colMax, this.colNum);
             }
+            //{递归进入js状态
+            else if(this.peek == '{') {
+              //
+            }
             else {
               for(var i = 0, len = JSXMatch.length; i < len; i++) {
                 var match = JSXMatch[i];
@@ -240,6 +244,37 @@ var JSXLexer = Class(function(rule) {
                   token.line(this.totalLine);
                   token.col(this.colNum);
                   this.colNum += matchLen;
+                  //ELEM:ELEM
+                  if(this.code.charAt(this.index) == ':') {
+                    this.readch();
+                    token = new JSXToken(JSXToken.SIGN, this.peek, this.peek, this.index - 1);
+                    matchLen = 1;
+                    token.prev(this.last);
+                    this.last.next(token);
+                    this.last = token;
+                    temp.push(token);
+                    this.tokenList.push(token);
+                    this.index += matchLen - 1;
+                    token.line(this.totalLine);
+                    token.col(this.colNum);
+                    this.colNum += matchLen;
+                    if(!character.isLetter(this.code.charAt(this.index))) {
+                      this.error('need jsx identifier');
+                    }
+                    this.readch();
+                    ELEM.match(this.peek, this.code, this.index);
+                    token = new JSXToken(ELEM.tokenType(), ELEM.content(), ELEM.val(), this.index - 1);
+                    matchLen = ELEM.content().length;
+                    token.prev(this.last);
+                    this.last.next(token);
+                    this.last = token;
+                    temp.push(token);
+                    this.tokenList.push(token);
+                    this.index += matchLen - 1;
+                    token.line(this.totalLine);
+                    token.col(this.colNum);
+                    this.colNum += matchLen;
+                  }
                   this.colMax = Math.max(this.colMax, this.colNum);
                   break;
                 }
@@ -277,6 +312,37 @@ var JSXLexer = Class(function(rule) {
                   token.line(this.totalLine);
                   token.col(this.colNum);
                   this.colNum += matchLen;
+                  //ELEM:ELEM
+                  if(this.code.charAt(this.index) == ':') {
+                    this.readch();
+                    token = new JSXToken(JSXToken.SIGN, this.peek, this.peek, this.index - 1);
+                    matchLen = 1;
+                    token.prev(this.last);
+                    this.last.next(token);
+                    this.last = token;
+                    temp.push(token);
+                    this.tokenList.push(token);
+                    this.index += matchLen - 1;
+                    token.line(this.totalLine);
+                    token.col(this.colNum);
+                    this.colNum += matchLen;
+                    if(!character.isLetter(this.code.charAt(this.index))) {
+                      this.error('need jsx identifier');
+                    }
+                    this.readch();
+                    ELEM.match(this.peek, this.code, this.index);
+                    token = new JSXToken(ELEM.tokenType(), ELEM.content(), ELEM.val(), this.index - 1);
+                    matchLen = ELEM.content().length;
+                    token.prev(this.last);
+                    this.last.next(token);
+                    this.last = token;
+                    temp.push(token);
+                    this.tokenList.push(token);
+                    this.index += matchLen - 1;
+                    token.line(this.totalLine);
+                    token.col(this.colNum);
+                    this.colNum += matchLen;
+                  }
                   this.colMax = Math.max(this.colMax, this.colNum);
                   break;
                 }
@@ -336,7 +402,7 @@ var JSXLexer = Class(function(rule) {
             token.col(this.colNum);
             this.colNum += matchLen;
             if(!character.isLetter(this.code.charAt(this.index))) {
-              this.error('need jsx dentifier');
+              this.error('need jsx identifier');
             }
             this.readch();
             ELEM.match(this.peek, this.code, this.index);
