@@ -22,8 +22,11 @@ var Parser = Es6Parser.extend(function(lexer) {
       this.match(),
       this.jsxelemname()
     );
-    while(this.look && this.look.type() == Token.PROPERTY) {
-      node.add(this.property());
+    while(this.look
+      &&
+      (this.look.type() == Token.PROPERTY
+        || this.look.content() == '{')) {
+      node.add(this.attr());
     }
     if(!this.look) {
       this.error();
@@ -46,10 +49,45 @@ var Parser = Es6Parser.extend(function(lexer) {
     //TODO: JSXElementName
     return this.match(Token.ELEM);
   },
-  property: function() {
+  attr: function() {
+    if(this.look.content() == '{') {
+      return this.spreadattr();
+    }
     //TODO: JSXElementName
-    var node = new Node(Node.JSXElementName);
+    var node = new Node(Node.JSXAttribute);
+    node.add(
+      this.attrname(),
+      this.match('='),
+      this.attrval()
+    );
     return node;
+  },
+  spreadattr: function() {
+    //TODO: JSXSpreadAttribute
+  },
+  attrname: function() {
+    var id = this.match(Token.PROPERTY);
+    if(this.look && this.look.content() == ':') {
+      var node = new Node(Node.JSXNamespacedName);
+      node.add(id,
+        this.match(),
+        this.match(Token.PROPERTY)
+      );
+      return node;
+    }
+    return id;
+  },
+  attrval: function() {
+    if(!this.look) {
+      this.error();
+    }
+    if(this.look.content() == '{') {
+      //TODO: { AssignmentExpression }
+    }
+    else if(this.look.type() == Token.STRING) {
+      return this.match();
+    }
+    return this.jsxelem();
   },
   jsxchild: function() {
     switch(this.look.type()) {
@@ -72,7 +110,6 @@ var Parser = Es6Parser.extend(function(lexer) {
     )
     return node;
   },
-
   match: function(type, line, msg) {
     if(typeof type == 'boolean') {
       msg = line;

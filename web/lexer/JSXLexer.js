@@ -6,6 +6,7 @@ var walk = require('../util/walk');
 var RegMatch = require('./match/RegMatch');
 var CompleteEqual = require('./match/CompleteEqual');
 var LineSearch = require('./match/LineSearch');
+var CharacterSet = require('./match/CharacterSet');
 
 var ELEM = new RegMatch(JSXToken.ELEM, /^[a-z]\w*(?:-\w+)*/i);
 var JSXMatch = [
@@ -17,7 +18,7 @@ var JSXMatch = [
   new CompleteEqual(JSXToken.SIGN, character.DECIMAL),
   new LineSearch(JSXToken.STRING, '"', '"', true),
   new LineSearch(JSXToken.STRING, "'", "'", true),
-  new CompleteEqual(JSXToken.SIGN, '=', null, true),
+  new CharacterSet(JSXToken.SIGN, '=:'),
   new RegMatch(JSXToken.NUMBER, /^\d+(?:\.\d*)?/),
   new RegMatch(JSXToken.PROPERTY, /^[a-z]+(?:-\w+)*/i)
 ];

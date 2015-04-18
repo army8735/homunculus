@@ -9,6 +9,9 @@ var Node = Es6Node.extend(function(type, children) {
   JSXOpeningElement: 'JSXOpeningElement',
   JSXClosingElement: 'JSXClosingElement',
   JSXChild: 'JSXChild',
+  JSXSpreadAttribute: 'JSXSpreadAttribute',
+  JSXAttribute: 'JSXAttribute',
+  JSXNamespacedName: 'JSXNamespacedName',
   getKey: function(s) {
     if(!s) {
       throw new Error('empty value');
