@@ -80,6 +80,7 @@ var JSXLexer = Class(function(rule) {
             if(this.peek == '/') {
               if(this.code.charAt(this.index) == '>') {
                 this.state = false;
+                // />结束时，html深度--，如到0，说明html状态结束
                 this.hStack[this.hStack.length - 1]--;
                 if(this.hStack[this.hStack.length - 1] == 0) {
                   this.hStack.pop();
@@ -104,6 +105,7 @@ var JSXLexer = Class(function(rule) {
             //>
             else if(this.peek == '>') {
               this.state = false;
+              //>结束时，html深度若为0，说明html状态结束
               if(!this.hStack.length) {
                 this.html = false;
               }
@@ -289,7 +291,7 @@ var JSXLexer = Class(function(rule) {
         else if(this.isReg == JSXLexer.IS_REG
           && this.peek == '<'
           && character.isLetter(this.code.charAt(this.index))) {
-          //新的jsx开始，深度++
+          //新的jsx开始，html深度++，html状态开始，同时为非text状态
           this.hStack.push(1);
           this.html = true;
           this.state = true;
@@ -319,6 +321,37 @@ var JSXLexer = Class(function(rule) {
           token.line(this.totalLine);
           token.col(this.colNum);
           this.colNum += matchLen;
+          //ELEM:ELEM
+          if(this.code.charAt(this.index) == ':') {
+            this.readch();
+            token = new JSXToken(JSXToken.SIGN, this.peek, this.peek, this.index - 1);
+            matchLen = 1;
+            token.prev(this.last);
+            this.last.next(token);
+            this.last = token;
+            temp.push(token);
+            this.tokenList.push(token);
+            this.index += matchLen - 1;
+            token.line(this.totalLine);
+            token.col(this.colNum);
+            this.colNum += matchLen;
+            if(!character.isLetter(this.code.charAt(this.index))) {
+              this.error('need jsx dentifier');
+            }
+            this.readch();
+            ELEM.match(this.peek, this.code, this.index);
+            token = new JSXToken(ELEM.tokenType(), ELEM.content(), ELEM.val(), this.index - 1);
+            matchLen = ELEM.content().length;
+            token.prev(this.last);
+            this.last.next(token);
+            this.last = token;
+            temp.push(token);
+            this.tokenList.push(token);
+            this.index += matchLen - 1;
+            token.line(this.totalLine);
+            token.col(this.colNum);
+            this.colNum += matchLen;
+          }
           this.colMax = Math.max(this.colMax, this.colNum);
         }
         //perl风格正则
