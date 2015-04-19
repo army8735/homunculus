@@ -174,6 +174,51 @@ describe('jslexer', function() {
         lexer.parse('€');
       }).to.throwError();
     });
+    it('block with reg 1', function() {
+      var lexer = homunculus.getLexer('js');
+      var tokens = lexer.parse('var a = {} / 2');
+      expect(join(tokens)).to.eql(['var', ' ', 'a', ' ', '=', ' ', '{', '}', ' ', '/', ' ', '2']);
+    });
+    it('block with reg 2', function() {
+      var lexer = homunculus.getLexer('js');
+      var tokens = lexer.parse('({}+1)');
+      expect(join(tokens)).to.eql(['(', '{', '}', '+', '1', ')']);
+    });
+    it('block with reg 3', function() {
+      var lexer = homunculus.getLexer('js');
+      var tokens = lexer.parse('if(true){}');
+      expect(join(tokens)).to.eql(['if', '(', 'true', ')', '{', '}']);
+    });
+    it('block with reg 4', function() {
+      var lexer = homunculus.getLexer('js');
+      var tokens = lexer.parse('delete{}/1');
+      expect(join(tokens)).to.eql(['delete', '{', '}', '/', '1']);
+    });
+    it('block with reg 5', function() {
+      var lexer = homunculus.getLexer('js');
+      var tokens = lexer.parse('1?{}/1:{}/2');
+      expect(join(tokens)).to.eql(['1', '?', '{', '}', '/', '1', ':', '{', '}', '/', '2']);
+    });
+    it('block with reg 6', function() {
+      var lexer = homunculus.getLexer('js');
+      var tokens = lexer.parse('2>>>{}/1');
+      expect(join(tokens)).to.eql(['2', '>>>', '{', '}', '/', '1']);
+    });
+    it('block with reg & return 1', function() {
+      var lexer = homunculus.getLexer('js');
+      var tokens = lexer.parse('return{}/1');
+      expect(join(tokens)).to.eql(['return', '{', '}', '/', '1']);
+    });
+    it('block with reg & return 2', function() {
+      var lexer = homunculus.getLexer('js');
+      var tokens = lexer.parse('return\n{}/1/');
+      expect(join(tokens)).to.eql(['return', '\n', '{', '}', '/1/']);
+    });
+    it('block with reg & return 3', function() {
+      var lexer = homunculus.getLexer('js');
+      var tokens = lexer.parse('return/*\n*/{}/1/');
+      expect(join(tokens)).to.eql(['return', '/*\n*/', '{', '}', '/1/']);
+    });
   });
   describe('complex test', function() {
     it('test 1', function() {

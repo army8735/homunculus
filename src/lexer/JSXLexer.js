@@ -122,7 +122,17 @@ var JSXLexer = Class(function(rule) {
             }
             //{递归进入js状态
             else if(this.peek == '{') {
-              //
+              this.html = false;
+              var token = new JSXToken(JSXToken.MARK, this.peek, this.peek);
+              token.prev(this.last);
+              this.last.next(token);
+              this.last = token;
+              temp.push(token);
+              this.tokenList.push(token);
+              token.line(this.totalLine);
+              token.col(this.colNum);
+              this.colNum++;
+              this.colMax = Math.max(this.colMax, this.colNum);
             }
             else {
               for(var i = 0, len = JSXMatch.length; i < len; i++) {
@@ -259,7 +269,7 @@ var JSXLexer = Class(function(rule) {
                     token.col(this.colNum);
                     this.colNum += matchLen;
                     if(!character.isLetter(this.code.charAt(this.index))) {
-                      this.error('need jsx identifier');
+                      this.error('missing jsx identifier');
                     }
                     this.readch();
                     ELEM.match(this.peek, this.code, this.index);
@@ -327,7 +337,7 @@ var JSXLexer = Class(function(rule) {
                     token.col(this.colNum);
                     this.colNum += matchLen;
                     if(!character.isLetter(this.code.charAt(this.index))) {
-                      this.error('need jsx identifier');
+                      this.error('missing jsx identifier');
                     }
                     this.readch();
                     ELEM.match(this.peek, this.code, this.index);
@@ -402,7 +412,7 @@ var JSXLexer = Class(function(rule) {
             token.col(this.colNum);
             this.colNum += matchLen;
             if(!character.isLetter(this.code.charAt(this.index))) {
-              this.error('need jsx identifier');
+              this.error('missing jsx identifier');
             }
             this.readch();
             ELEM.match(this.peek, this.code, this.index);

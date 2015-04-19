@@ -14,10 +14,13 @@ var Lexer = Class(function(rule) {
     this.tokenList = []; //结果的token列表
     this.parentheseState = false; //(开始时标记之前终结符是否为if/for/while等关键字
     this.parentheseStack = []; //圆括号深度记录当前是否为if/for/while等语句内部
+    this.braceState = false; //{是object还是block
+    this.braceStack = []; //深度记录
     this.cacheLine = 0; //行缓存值
     this.totalLine = 1; //总行数
     this.colNum = 0; //列
     this.colMax = 0; //最大列数
+    this.isReturn = false; //当出现return，后面有换行则自动插入;，影响{的语意
     this.last = null;
   },
   parse: function(code) {
@@ -123,6 +126,86 @@ var Lexer = Class(function(rule) {
               }
               else {
                 this.parentheseState = match.parenthese();
+              }
+            }
+
+            //处理{
+            if(match.content() == '{') {
+              if(this.isReturn) {
+                this.braceState = true;
+              }
+              this.braceStack.push(this.braceState);
+              this.isReturn = false;
+            }
+            else if(match.content() == '}') {
+              this.braceState = this.braceStack.pop();
+              if(this.braceState) {
+                this.isReg = false;
+              }
+              this.isReturn = false;
+            }
+            else if(token.type() == Token.SIGN) {
+              this.braceState = {
+                '*=': true,
+                '/=': true,
+                '%=': true,
+                '+=': true,
+                '-=': true,
+                '<<=': true,
+                '>>=': true,
+                '>>>=': true,
+                '&=': true,
+                '^=': true,
+                '|=': true,
+                '=': true,
+                '?': true,
+                ':': true,
+                '||': true,
+                '&&': true,
+                '|': true,
+                '^': true,
+                '&': true,
+                '==': true,
+                '===': true,
+                '!==': true,
+                '!=': true,
+                '<': true,
+                '>': true,
+                '>=': true,
+                '<=': true,
+                '<<': true,
+                '>>': true,
+                '>>>': true,
+                '+': true,
+                '-': true,
+                '*': true,
+                '/': true,
+                '%': true,
+                '~': true,
+                '!': true,
+                '(': true
+              }.hasOwnProperty(match.content());
+              this.isReturn = false;
+            }
+            else if(token.type() == Token.KEYWORD) {
+              this.braceState = {
+                'instanceof': true,
+                'delete': true,
+                'void': true,
+                'typeof': true,
+                'return': true
+              }.hasOwnProperty(match.content());
+              this.isReturn = match.content() == 'return';
+            }
+            else if([Token.BLANK, Token.TAB, Token.LINE, Token.COMMENT].indexOf(token.type()) == -1) {
+              this.braceState = false;
+            }
+            else if(token.type() == Token.LINE
+              || token.type() == Token.COMMENT
+                && match.content().indexOf('\n') > -1) {
+              if(this.isReturn) {
+                this.braceState = false;
+                this.isReturn = false;
               }
             }
             continue outer;
