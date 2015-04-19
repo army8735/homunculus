@@ -289,18 +289,8 @@ var Lexer = Class(function(rule) {
         this.code.slice(lastIndex, this.index - 1));
     }
     var token = new Token(Token.REG, this.code.slice(lastIndex, --this.index), lastIndex);
-    if(this.last) {
-      token.prev(this.last);
-      this.last.next(token);
-    }
-    this.last = token;
-    temp.push(token);
-    this.tokenList.push(token);
-    token.line(this.totalLine);
-    token.col(this.colNum);
-    this.colNum += this.index - lastIndex;
-    this.colMax = Math.max(this.colMax, this.colNum);
-    return this;
+    this.index = lastIndex + 1;
+    this.dealToken(token, token.content().length, 0, temp);
   },
   readch: function() {
     this.peek = this.code.charAt(this.index++);
