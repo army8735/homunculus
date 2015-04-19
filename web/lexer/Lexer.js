@@ -2,6 +2,7 @@ define(function(require, exports, module) {var Class = require('../util/Class');
 var character = require('../util/character');
 var Token = require('./Token');
 var walk = require('../util/walk');
+
 var Lexer = Class(function(rule) {
   this.rule = rule; //当前语法规则
   this.init();
@@ -85,129 +86,17 @@ var Lexer = Class(function(rule) {
               continue;
             }
 
-            if(this.last) {
-              token.prev(this.last);
-              this.last.next(token);
-            }
-            this.last = token;
-            temp.push(token);
-            this.tokenList.push(token);
-            this.index += matchLen - 1;
-            token.line(this.totalLine);
-            token.col(this.colNum);
             var n = character.count(token.val(), character.LINE);
             count += n;
-            this.totalLine += n;
-            if(n) {
-              var j = match.content().indexOf(character.LINE);
-              var k = match.content().lastIndexOf(character.LINE);
-              this.colMax = Math.max(this.colMax, this.colNum + j);
-              this.colNum = match.content().length - k;
-            }
-            else {
-              this.colNum += matchLen;
-            }
-            this.colMax = Math.max(this.colMax, this.colNum);
-
+            //处理token
+            this.dealToken(token, matchLen, n, temp);
             //支持perl正则需判断关键字、圆括号对除号语义的影响
             if(perlReg && match.perlReg() != Lexer.IGNORE) {
-              if(match.perlReg() == Lexer.SPECIAL) {
-                this.isReg = match.special();
-              }
-              else {
-                this.isReg = match.perlReg();
-              }
-              if(this.peek == character.LEFT_PARENTHESE) {
-                this.parentheseStack.push(this.parentheseState);
-                this.parentheseState = false;
-              }
-              else if(this.peek == character.RIGHT_PARENTHESE) {
-                this.isReg = this.parentheseStack.pop() ? Lexer.IS_REG : Lexer.NOT_REG;
-              }
-              else {
-                this.parentheseState = match.parenthese();
-              }
+              this.stateReg(match);
             }
-
             //处理{
-            if(match.content() == '{') {
-              if(this.isReturn) {
-                this.braceState = true;
-              }
-              this.braceStack.push(this.braceState);
-              this.isReturn = false;
-            }
-            else if(match.content() == '}') {
-              this.braceState = this.braceStack.pop();
-              if(this.braceState) {
-                this.isReg = false;
-              }
-              this.isReturn = false;
-            }
-            else if(token.type() == Token.SIGN) {
-              this.braceState = {
-                '*=': true,
-                '/=': true,
-                '%=': true,
-                '+=': true,
-                '-=': true,
-                '<<=': true,
-                '>>=': true,
-                '>>>=': true,
-                '&=': true,
-                '^=': true,
-                '|=': true,
-                '=': true,
-                '?': true,
-                ':': true,
-                '||': true,
-                '&&': true,
-                '|': true,
-                '^': true,
-                '&': true,
-                '==': true,
-                '===': true,
-                '!==': true,
-                '!=': true,
-                '<': true,
-                '>': true,
-                '>=': true,
-                '<=': true,
-                '<<': true,
-                '>>': true,
-                '>>>': true,
-                '+': true,
-                '-': true,
-                '*': true,
-                '/': true,
-                '%': true,
-                '~': true,
-                '!': true,
-                '(': true
-              }.hasOwnProperty(match.content());
-              this.isReturn = false;
-            }
-            else if(token.type() == Token.KEYWORD) {
-              this.braceState = {
-                'instanceof': true,
-                'delete': true,
-                'void': true,
-                'typeof': true,
-                'return': true
-              }.hasOwnProperty(match.content());
-              this.isReturn = match.content() == 'return';
-            }
-            else if([Token.BLANK, Token.TAB, Token.LINE, Token.COMMENT].indexOf(token.type()) == -1) {
-              this.braceState = false;
-            }
-            else if(token.type() == Token.LINE
-              || token.type() == Token.COMMENT
-                && match.content().indexOf('\n') > -1) {
-              if(this.isReturn) {
-                this.braceState = false;
-                this.isReturn = false;
-              }
-            }
+            this.stateBrace(match.content(), token.type());
+
             continue outer;
           }
         }
@@ -217,8 +106,126 @@ var Lexer = Class(function(rule) {
     }
     return this;
   },
-  readch: function() {
-    this.peek = this.code.charAt(this.index++);
+  dealToken: function(token, matchLen, count, temp) {
+    if(this.last) {
+      token.prev(this.last);
+      this.last.next(token);
+    }
+    this.last = token;
+    temp.push(token);
+    this.tokenList.push(token);
+    this.index += matchLen - 1;
+    token.line(this.totalLine);
+    token.col(this.colNum);
+    this.totalLine += count;
+    if(count) {
+      var j = token.content().indexOf(character.LINE);
+      var k = token.content().lastIndexOf(character.LINE);
+      this.colMax = Math.max(this.colMax, this.colNum + j);
+      this.colNum = token.content().length - k;
+    }
+    else {
+      this.colNum += matchLen;
+    }
+    this.colMax = Math.max(this.colMax, this.colNum);
+  },
+  stateReg: function(match) {
+    if(match.perlReg() == Lexer.SPECIAL) {
+      this.isReg = match.special();
+    }
+    else {
+      this.isReg = match.perlReg();
+    }
+    if(this.peek == character.LEFT_PARENTHESE) {
+      this.parentheseStack.push(this.parentheseState);
+      this.parentheseState = false;
+    }
+    else if(this.peek == character.RIGHT_PARENTHESE) {
+      this.isReg = this.parentheseStack.pop() ? Lexer.IS_REG : Lexer.NOT_REG;
+    }
+    else {
+      this.parentheseState = match.parenthese();
+    }
+  },
+  stateBrace: function(content, type) {
+    if(content == '{') {
+      if(this.isReturn) {
+        this.braceState = true;
+      }
+      this.braceStack.push(this.braceState);
+      this.isReturn = false;
+    }
+    else if(content == '}') {
+      this.braceState = this.braceStack.pop();
+      if(this.braceState) {
+        this.isReg = false;
+      }
+      this.isReturn = false;
+    }
+    else if(type == Token.SIGN) {
+      this.braceState = {
+        '*=': true,
+        '/=': true,
+        '%=': true,
+        '+=': true,
+        '-=': true,
+        '<<=': true,
+        '>>=': true,
+        '>>>=': true,
+        '&=': true,
+        '^=': true,
+        '|=': true,
+        '=': true,
+        '?': true,
+        ':': true,
+        '||': true,
+        '&&': true,
+        '|': true,
+        '^': true,
+        '&': true,
+        '==': true,
+        '===': true,
+        '!==': true,
+        '!=': true,
+        '<': true,
+        '>': true,
+        '>=': true,
+        '<=': true,
+        '<<': true,
+        '>>': true,
+        '>>>': true,
+        '+': true,
+        '-': true,
+        '*': true,
+        '/': true,
+        '%': true,
+        '~': true,
+        '!': true,
+        '(': true
+      }.hasOwnProperty(content);
+      this.isReturn = false;
+    }
+    else if(type == Token.KEYWORD) {
+      this.braceState = {
+        'instanceof': true,
+        'delete': true,
+        'void': true,
+        'typeof': true,
+        'return': true
+      }.hasOwnProperty(content);
+      this.isReturn = content == 'return';
+    }
+    else if([Token.BLANK, Token.TAB, Token.LINE, Token.COMMENT].indexOf(type) == -1) {
+      this.braceState = false;
+    }
+    else if(type == Token.LINE
+      || type == Token.COMMENT
+        && content.indexOf('\n') > -1) {
+      if(this.isReturn) {
+        this.braceState = false;
+        this.isReturn = false;
+      }
+    }
   },
   dealReg: function(temp, length) {
     var lastIndex = this.index - 1;
@@ -294,6 +301,9 @@ var Lexer = Class(function(rule) {
     this.colNum += this.index - lastIndex;
     this.colMax = Math.max(this.colMax, this.colNum);
     return this;
+  },
+  readch: function() {
+    this.peek = this.code.charAt(this.index++);
   },
   cache: function(i) {
     if(!character.isUndefined(i) && i !== null) {
