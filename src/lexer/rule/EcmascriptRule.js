@@ -59,7 +59,7 @@ var EcmascriptRule = Rule.extend(function() {
 
   self.addMatch(new CompleteEqual(Token.SIGN, ']', Lexer.NOT_REG));
 
-  ['*=', '/=', '+=', '-=', '%=', '^=', '&=', '|=', '&&', '--', '++', '===', '==', '!==', '!=', '||', '>>>=', '<<<=', '<<<', '>>>', '>>=', '<<=', '<<', '>>', '>=', '<=', '...', '?:', '=>'].forEach(function(o) {
+  ['*=', '/=', '+=', '-=', '%=', '^=', '&=', '|=', '&&', '--', '++', '===', '==', '!==', '!=', '||', '>>>=', '<<<=', '<<<', '>>>', '>>=', '<<=', '<<', '>>', '>=', '<=', '...', '=>'].forEach(function(o) {
     self.addMatch(new CompleteEqual(Token.SIGN, o, Lexer.IS_REG));
   });
   var sign = new CharacterSet(Token.SIGN, ':;/?.,[{}~!^|%=-+*()~><&\\', Lexer.IS_REG);
