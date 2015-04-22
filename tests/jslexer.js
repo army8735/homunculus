@@ -219,6 +219,26 @@ describe('jslexer', function() {
       var tokens = lexer.parse('return/*\n*/{}/1/');
       expect(join(tokens)).to.eql(['return', '/*\n*/', '{', '}', '/1/']);
     });
+    it('block with reg & return 4', function() {
+      var lexer = homunculus.getLexer('js');
+      var tokens = lexer.parse('{}\n{}/1/');
+      expect(join(tokens)).to.eql(['{', '}', '\n', '{', '}', '/1/']);
+    });
+    it('block with reg & return 5', function() {
+      var lexer = homunculus.getLexer('js');
+      var tokens = lexer.parse('{}\n{}/1/');
+      expect(join(tokens)).to.eql(['{', '}', '\n', '{', '}', '/1/']);
+    });
+    it('block with reg & return 6', function() {
+      var lexer = homunculus.getLexer('js');
+      var tokens = lexer.parse('(1)\n{}/1/');
+      expect(join(tokens)).to.eql(['(', '1', ')', '\n', '{', '}', '/1/']);
+    });
+    it('block with reg & return 7', function() {
+      var lexer = homunculus.getLexer('js');
+      var tokens = lexer.parse('()=>{}/1/');
+      expect(join(tokens)).to.eql(['(', ')', '=>', '{', '}', '/1/']);
+    });
   });
   describe('complex test', function() {
     it('test 1', function() {

@@ -163,45 +163,13 @@ var Lexer = Class(function(rule) {
       this.isReturn = false;
     }
     else if(type == Token.SIGN) {
-      this.braceState = {
-        '*=': true,
-        '/=': true,
-        '%=': true,
-        '+=': true,
-        '-=': true,
-        '<<=': true,
-        '>>=': true,
-        '>>>=': true,
-        '&=': true,
-        '^=': true,
-        '|=': true,
-        '=': true,
-        '?': true,
-        ':': true,
-        '||': true,
-        '&&': true,
-        '|': true,
-        '^': true,
-        '&': true,
-        '==': true,
-        '===': true,
-        '!==': true,
-        '!=': true,
-        '<': true,
-        '>': true,
-        '>=': true,
-        '<=': true,
-        '<<': true,
-        '>>': true,
-        '>>>': true,
-        '+': true,
-        '-': true,
-        '*': true,
-        '/': true,
-        '%': true,
-        '~': true,
-        '!': true,
-        '(': true
+      //反向设置，符号大多出现expr中，后跟{表示object；某些不能跟；以下（换行）跟表示block
+      this.braceState = !{
+        '--': true,
+        '++': true,
+        '=>': true,
+        ';': true,
+        ')': true
       }.hasOwnProperty(content);
       this.isReturn = false;
     }
