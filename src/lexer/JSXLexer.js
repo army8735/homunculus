@@ -154,24 +154,7 @@ var JSXLexer = Lexer.extend(function(rule) {
                   this.index = idx + 2;
                   this.readch();
                   //\w elem
-                  ELEM.match(this.peek, this.code, this.index);
-                  var token = new JSXToken(ELEM.tokenType(), ELEM.content(), ELEM.val(), this.index - 1);
-                  var matchLen = ELEM.content().length;
-                  this.dealToken(token, matchLen, 0, temp);
-                  //ELEM:ELEM
-                  if(this.code.charAt(this.index) == ':') {
-                    this.readch();
-                    token = new JSXToken(JSXToken.SIGN, this.peek, this.peek, this.index - 1);
-                    this.dealToken(token, 1, 0, temp);
-                    if(!character.isLetter(this.code.charAt(this.index))) {
-                      this.error('missing jsx identifier');
-                    }
-                    this.readch();
-                    ELEM.match(this.peek, this.code, this.index);
-                    token = new JSXToken(ELEM.tokenType(), ELEM.content(), ELEM.val(), this.index - 1);
-                    this.dealToken(token, matchLen, 0, temp);
-                  }
-                  this.colMax = Math.max(this.colMax, this.colNum);
+                  this.dealTag(temp);
                   break;
                 }
                 //<\w
@@ -186,24 +169,7 @@ var JSXLexer = Lexer.extend(function(rule) {
                   this.dealToken(token, 1, 0, temp);
                   this.readch();
                   //\w elem
-                  ELEM.match(this.peek, this.code, this.index);
-                  var token = new JSXToken(ELEM.tokenType(), ELEM.content(), ELEM.val(), this.index - 1);
-                  var matchLen = ELEM.content().length;
-                  this.dealToken(token, matchLen, 0, temp);
-                  //ELEM:ELEM
-                  if(this.code.charAt(this.index) == ':') {
-                    this.readch();
-                    token = new JSXToken(JSXToken.SIGN, this.peek, this.peek, this.index - 1);
-                    this.dealToken(token, 1, 0, temp);
-                    if(!character.isLetter(this.code.charAt(this.index))) {
-                      this.error('missing jsx identifier');
-                    }
-                    this.readch();
-                    ELEM.match(this.peek, this.code, this.index);
-                    token = new JSXToken(ELEM.tokenType(), ELEM.content(), ELEM.val(), this.index - 1);
-                    matchLen = ELEM.content().length;
-                    this.dealToken(token, matchLen, 0, temp);
-                  }
+                  this.dealTag(temp);
                   break;
                 }
                 else {
@@ -226,25 +192,7 @@ var JSXLexer = Lexer.extend(function(rule) {
           this.dealToken(token, 1, 0, temp);
           this.readch();
           //\w elem
-          ELEM.match(this.peek, this.code, this.index);
-          var token = new JSXToken(ELEM.tokenType(), ELEM.content(), ELEM.val(), this.index - 1);
-          var matchLen = ELEM.content().length;
-          this.dealToken(token, matchLen, 0, temp);
-          //ELEM:ELEM
-          if(this.code.charAt(this.index) == ':') {
-            this.readch();
-            token = new JSXToken(JSXToken.SIGN, this.peek, this.peek, this.index - 1);
-            this.dealToken(token, 1, 0, temp);
-            if(!character.isLetter(this.code.charAt(this.index))) {
-              this.error('missing jsx identifier');
-            }
-            this.readch();
-            ELEM.match(this.peek, this.code, this.index);
-            token = new JSXToken(ELEM.tokenType(), ELEM.content(), ELEM.val(), this.index - 1);
-            matchLen = ELEM.content().length;
-            this.dealToken(token, matchLen, 0, temp);
-          }
-          this.colMax = Math.max(this.colMax, this.colNum);
+          this.dealTag(temp);
         }
         //perl风格正则
         else if(perlReg
@@ -304,6 +252,25 @@ var JSXLexer = Lexer.extend(function(rule) {
     var token = new JSXToken(JSXToken.TEXT, s, s);
     var n = character.count(token.val(), character.LINE);
     this.dealToken(token, s.length, n, temp);
+  },
+  dealTag: function(temp) {
+    ELEM.match(this.peek, this.code, this.index);
+    var token = new JSXToken(ELEM.tokenType(), ELEM.content(), ELEM.val(), this.index - 1);
+    var matchLen = ELEM.content().length;
+    this.dealToken(token, matchLen, 0, temp);
+    //ELEM:ELEM
+    if(this.code.charAt(this.index) == ':') {
+      this.readch();
+      token = new JSXToken(JSXToken.SIGN, this.peek, this.peek, this.index - 1);
+      this.dealToken(token, 1, 0, temp);
+      if(!character.isLetter(this.code.charAt(this.index))) {
+        this.error('missing jsx identifier');
+      }
+      this.readch();
+      ELEM.match(this.peek, this.code, this.index);
+      token = new JSXToken(ELEM.tokenType(), ELEM.content(), ELEM.val(), this.index - 1);
+      this.dealToken(token, matchLen, 0, temp);
+    }
   }
 });
 module.exports = JSXLexer;
