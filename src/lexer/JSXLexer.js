@@ -171,6 +171,7 @@ var JSXLexer = Lexer.extend(function(rule) {
                   //<
                   var token = new JSXToken(JSXToken.MARK, '<', '<');
                   this.dealToken(token, 1, 0, temp);
+                  this.index++;
                   this.readch();
                   //\w elem
                   this.dealTag(temp);
