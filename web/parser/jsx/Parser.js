@@ -22,12 +22,23 @@ var Parser = Es6Parser.extend(function(lexer) {
       this.match(),
       this.jsxelemname()
     );
-    var name = node.last().token().content();
+    //id只有1个，member和namespace有多个
+    var type = node.last().size() > 1 ? node.last().name() : null;
+    var name;
+    if(type) {
+      name = [];
+      node.leaves().forEach(function(leaf) {
+        name.push(leaf.token().content());
+      });
+    }
+    else {
+      name = node.last().token().content();
+    }
     while(this.look
       &&
       (this.look.type() == Token.PROPERTY
         || this.look.content() == '{')) {
-      node.add(this.attr());
+      node.add(this.attrs());
     }
     if(!this.look) {
       this.error();
@@ -43,19 +54,48 @@ var Parser = Es6Parser.extend(function(lexer) {
     while(this.look && this.look.content() != '</') {
       n.add(this.jsxchild());
     }
-    n.add(this.close(name));
+    n.add(this.close(name, type));
     return n;
   },
-  jsxelemname: function(name) {
+  jsxelemname: function(name, type) {
     if(name) {
-      if(Array.isArray(name)) {
-        return this.jsxmember(name);
+      if(type) {
+        var node = new Node(type);
+        var self = this;
+        name.forEach(function(na) {
+          node.add(self.match(na));
+        });
+        return node;
       }
       else {
         return this.match(name);
       }
     }
-    return this.match(Token.ELEM);
+    else {
+      var node = new Node(Node.JSXMemberExpression);
+      node.add(this.match());
+      if(!this.look) {
+        this.error();
+      }
+      if(this.look.content() == '.') {
+        while(this.look && this.look.content() == '.') {
+          node.add(
+            this.match(),
+            this.match(Token.ELEM)
+          );
+        }
+      }
+      else if(this.look.content() == ':') {
+        node.add(
+          this.match(),
+          this.match(Token.ELEM)
+        );
+      }
+      else {
+        return node.first();
+      }
+      return node;
+    }
   },
   jsxmember: function(names) {
     var node = new Node(Node.JSXMemberExpression);
@@ -64,11 +104,20 @@ var Parser = Es6Parser.extend(function(lexer) {
     });
     return node;
   },
-  attr: function() {
-    if(this.look.content() == '{') {
+  attrs: function() {
+    if(this.look && this.look.content() == '{') {
       return this.spreadattr();
     }
-    //TODO: JSXElementName
+    var node = new Node(Node.JSXAttributes);
+    while(this.look && this.look.type() == Token.PROPERTY) {
+      node.add(this.attr());
+    }
+    if(this.look && this.look.content() == '{') {
+      node.add(this.spreadattr());
+    }
+    return node;
+  },
+  attr: function() {
     var node = new Node(Node.JSXAttribute);
     node.add(
       this.attrname(),
@@ -78,7 +127,14 @@ var Parser = Es6Parser.extend(function(lexer) {
     return node;
   },
   spreadattr: function() {
-    //TODO: JSXSpreadAttribute
+    var node = new Node(Node.JSXSpreadAttribute);
+    node.add(
+      this.match(),
+      this.match('...'),
+      this.assignexpr(),
+      this.match('}')
+    );
+    return node;
   },
   attrname: function() {
     var id = this.match(Token.PROPERTY);
@@ -124,11 +180,11 @@ var Parser = Es6Parser.extend(function(lexer) {
         return node;
     }
   },
-  close: function(name) {
+  close: function(name, type) {
     var node = new Node(Node.JSXClosingElement);
     node.add(
       this.match('</'),
-      this.jsxelemname(name),
+      this.jsxelemname(name, type),
       this.match('>')
     )
     return node;
