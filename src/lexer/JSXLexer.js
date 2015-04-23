@@ -57,12 +57,13 @@ var JSXLexer = Lexer.extend(function(rule) {
                 if(this.hStack[this.hStack.length - 1] == 0) {
                   this.hStack.pop();
                   this.html = false;
+                  this.isReg = false;
                 }
                 var token = new JSXToken(JSXToken.MARK, this.peek + '>', this.peek + '>');
                 this.dealToken(token, 2, 0, temp);
               }
               else {
-                this.error();
+                this.error('unknow jsx token: / ');
               }
             }
             //>
@@ -71,6 +72,7 @@ var JSXLexer = Lexer.extend(function(rule) {
               //>结束时，html深度若为0，说明html状态结束
               if(!this.hStack.length) {
                 this.html = false;
+                this.isReg = false;
               }
               var token = new JSXToken(JSXToken.MARK, this.peek, this.peek);
               this.dealToken(token, 1, 0, temp);
@@ -78,8 +80,10 @@ var JSXLexer = Lexer.extend(function(rule) {
             //{递归进入js状态
             else if(this.peek == '{') {
               this.html = false;
+              this.jStack.push(1);
               var token = new JSXToken(JSXToken.MARK, this.peek, this.peek);
               this.dealToken(token, 1, 0, temp);
+              this.stateBrace(this.peek);
             }
             else {
               for(var i = 0, len = JSXMatch.length; i < len; i++) {
@@ -193,6 +197,7 @@ var JSXLexer = Lexer.extend(function(rule) {
           this.readch();
           //\w elem
           this.dealTag(temp);
+          this.braceState = false;
         }
         //perl风格正则
         else if(perlReg
@@ -238,6 +243,7 @@ var JSXLexer = Lexer.extend(function(rule) {
               }
               //处理{
               this.stateBrace(match.content(), token.type());
+              this.xBrace(match.content());
 
               continue outer;
             }
@@ -270,6 +276,22 @@ var JSXLexer = Lexer.extend(function(rule) {
       ELEM.match(this.peek, this.code, this.index);
       token = new JSXToken(ELEM.tokenType(), ELEM.content(), ELEM.val(), this.index - 1);
       this.dealToken(token, matchLen, 0, temp);
+    }
+  },
+  xBrace: function(content) {
+    if(content == '{') {
+      if(this.jStack.length) {
+        this.jStack[this.jStack.length - 1]++;
+      }
+    }
+    else if(content == '}') {
+      if(this.jStack.length) {
+        this.jStack[this.jStack.length - 1]++;
+        if(this.jStack[this.jStack.length - 1] == 0) {
+          this.html = true;
+          this.jStack.pop();
+        }
+      }
     }
   }
 });
