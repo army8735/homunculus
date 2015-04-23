@@ -22,6 +22,7 @@ var Parser = Es6Parser.extend(function(lexer) {
       this.match(),
       this.jsxelemname()
     );
+    var name = node.last().token().content();
     while(this.look
       &&
       (this.look.type() == Token.PROPERTY
@@ -39,15 +40,29 @@ var Parser = Es6Parser.extend(function(lexer) {
     node.add(this.match('>'));
     var n = new Node(Node.JSXElement);
     n.add(node);
-    while(this.look && this.look.type() != Token.MARK) {
+    while(this.look && this.look.content() != '</') {
       n.add(this.jsxchild());
     }
-    n.add(this.close());
+    n.add(this.close(name));
     return n;
   },
-  jsxelemname: function() {
-    //TODO: JSXElementName
+  jsxelemname: function(name) {
+    if(name) {
+      if(Array.isArray(name)) {
+        return this.jsxmember(name);
+      }
+      else {
+        return this.match(name);
+      }
+    }
     return this.match(Token.ELEM);
+  },
+  jsxmember: function(names) {
+    var node = new Node(Node.JSXMemberExpression);
+    names.forEach(function(name) {
+      node.add(this.match(name));
+    });
+    return node;
   },
   attr: function() {
     if(this.look.content() == '{') {
@@ -82,7 +97,11 @@ var Parser = Es6Parser.extend(function(lexer) {
       this.error();
     }
     if(this.look.content() == '{') {
-      //TODO: { AssignmentExpression }
+      node.add(this.match('{'));
+      if(this.look && this.look.content() != '}') {
+        node.add(this.assignexpr());
+      }
+      node.add(this.match('}'));
     }
     else if(this.look.type() == Token.STRING) {
       return this.match();
@@ -96,16 +115,20 @@ var Parser = Es6Parser.extend(function(lexer) {
       case Token.MARK:
         return this.jsxelem();
       default:
-        //TODO: { AssignmentExpressionopt }
         var node = new Node(Node.JSXChild);
+        node.add(this.match('{'));
+        if(this.look && this.look.content() != '}') {
+          node.add(this.assignexpr());
+        }
+        node.add(this.match('}'));
         return node;
     }
   },
-  close: function() {
+  close: function(name) {
     var node = new Node(Node.JSXClosingElement);
     node.add(
       this.match('</'),
-      this.jsxelemname(),
+      this.jsxelemname(name),
       this.match('>')
     )
     return node;
