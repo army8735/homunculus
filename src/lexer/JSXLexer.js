@@ -107,7 +107,7 @@ var JSXLexer = Lexer.extend(function(rule) {
           //<>外面
           else {
             //<之前的text部分
-            var idx = this.code.indexOf('<', this.index);
+            var idx = this.code.indexOf('<', this.index - 1);
             while(true) {
               //找不到<
               if(idx == -1) {
