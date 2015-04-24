@@ -69,10 +69,13 @@ var JSXLexer = Lexer.extend(function(rule) {
             //>
             else if(this.peek == '>') {
               this.state = false;
-              //>结束时，html深度若为0，说明html状态结束
-              if(!this.hStack.length) {
+              //>结束时，html深度若为0，说明html状态结束，或者栈最后一个计数器为0，也结束
+              if(!this.hStack.length || !this.hStack[this.hStack.length - 1]) {
                 this.html = false;
                 this.isReg = false;
+                if(this.hStack.length) {
+                  this.hStack.pop();
+                }
               }
               var token = new JSXToken(JSXToken.MARK, this.peek, this.peek);
               this.dealToken(token, 1, 0, temp);
@@ -110,95 +113,65 @@ var JSXLexer = Lexer.extend(function(rule) {
             //<之前的text部分或{}js部分
             var idx = this.code.indexOf('<', this.index - 1);
             var idx2 = this.code.indexOf('{', this.index - 1);
-            while(true) {
-              //找不到<
-              if(idx == -1 && idx2 == -1) {
-                idx = length;
+            //找不到<和{
+            if(idx == -1 && idx2 == -1) {
+              idx = length;
+              if(idx > this.index - 1) {
+                this.addText(this.code.slice(this.index - 1, idx), temp);
+                this.index = length;
+              }
+              return this;
+            }
+            //找到<
+            if(idx2 == -1 || idx2 > idx) {
+              var c1 = this.code.charAt(idx + 1);
+              var c2 = this.code.charAt(idx + 2);
+              //</\w
+              if(c1 == '/' && character.isLetter(c2)) {
+                if(idx > this.index - 1) {
+                  this.addText(this.code.slice(this.index - 1, idx), temp);
+                }
+                this.state = true;
+                this.hStack[this.hStack.length - 1]--;
+                //</
+                var token = new JSXToken(JSXToken.MARK, '</', '</');
+                this.dealToken(token, 2, 0, temp);
+                this.index = idx + 2;
+                this.readch();
+                //\w elem
+                this.dealTag(temp);
+              }
+              //<\w
+              else if(character.isLetter(c1)) {
                 if(idx > this.index) {
                   this.addText(this.code.slice(this.index - 1, idx), temp);
-                  this.index = length;
                 }
-                return this;
-              }
-              //找到<
-              if(idx2 == -1 || idx2 > idx) {
-                var s = this.code.slice(idx, idx + 4).toLowerCase();
-                //<!--注释
-                if(s == '<!--') {
-                  if(idx > this.index) {
-                    this.addText(this.code.slice(this.index - 1, idx), temp);
-                  }
-                  var end = this.code.indexOf('-->', idx + 4);
-                  if(end == -1) {
-                    end = length;
-                  }
-                  else {
-                    end += 3;
-                  }
-                  s = this.code.slice(idx, end);
-                  var token = new JSXToken(JSXToken.COMMENT, s, s);
-                  var n = character.count(token.val(), character.LINE);
-                  this.dealToken(token, s.length, n, temp);
-                  this.index = end;
-                }
+                this.state = true;
+                this.hStack[this.hStack.length - 1]++;
                 //<
-                else {
-                  var c1 = this.code.charAt(idx + 1);
-                  var c2 = this.code.charAt(idx + 2);
-                  //</\w
-                  if(c1 == '/' && character.isLetter(c2)) {
-                    if(idx > this.index) {
-                      this.addText(this.code.slice(this.index - 1, idx), temp);
-                    }
-                    this.state = true;
-                    this.hStack[this.hStack.length - 1]--;
-                    if(this.hStack[this.hStack.length - 1] == 0) {
-                      this.hStack.pop();
-                    }
-                    //</
-                    var token = new JSXToken(JSXToken.MARK, '</', '</');
-                    this.dealToken(token, 2, 0, temp);
-                    this.index = idx + 2;
-                    this.readch();
-                    //\w elem
-                    this.dealTag(temp);
-                    break;
-                  }
-                  //<\w
-                  else if(character.isLetter(c1)) {
-                    if(idx > this.index) {
-                      this.addText(this.code.slice(this.index - 1, idx), temp);
-                    }
-                    this.state = true;
-                    this.hStack[this.hStack.length - 1]++;
-                    //<
-                    var token = new JSXToken(JSXToken.MARK, '<', '<');
-                    this.dealToken(token, 1, 0, temp);
-                    this.index++;
-                    this.readch();
-                    //\w elem
-                    this.dealTag(temp);
-                    break;
-                  }
-                  else {
-                    idx = this.code.indexOf('<', idx + 1);
-                  }
-                }
-              }
-              //{block
-              else {
-                if(idx2 > this.index) {
-                  this.addText(this.code.slice(this.index - 1, idx2), temp);
-                  this.readch();
-                }
-                this.jStack.push(1);
-                this.html = false;
-                this.braceState = false;
-                var token = new JSXToken(JSXToken.SIGN, this.peek, this.peek);
+                var token = new JSXToken(JSXToken.MARK, '<', '<');
                 this.dealToken(token, 1, 0, temp);
-                this.stateBrace(this.peek);
-                break;
+                this.index++;
+                this.readch();
+                //\w elem
+                this.dealTag(temp);
               }
+              else {
+                this.error();
+              }
+            }
+            //{block
+            else {
+              if(idx2 > this.index) {
+                this.addText(this.code.slice(this.index - 1, idx2), temp);
+                this.readch();
+              }
+              this.jStack.push(1);
+              this.html = false;
+              this.braceState = false;
+              var token = new JSXToken(JSXToken.SIGN, this.peek, this.peek);
+              this.dealToken(token, 1, 0, temp);
+              this.stateBrace(this.peek);
             }
           }
         }
