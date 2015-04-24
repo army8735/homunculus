@@ -189,6 +189,7 @@ var JSXLexer = Lexer.extend(function(rule) {
               else {
                 if(idx2 > this.index) {
                   this.addText(this.code.slice(this.index - 1, idx2), temp);
+                  this.readch();
                 }
                 this.jStack.push(1);
                 this.html = false;
