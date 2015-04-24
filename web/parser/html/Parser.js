@@ -75,9 +75,8 @@ var Parser = IParser.extend(function(lexer) {
   },
   element: function(first) {
     var node;
-    if(this.look.type() == Token.TEXT) {
-      node = new Node(Node.TEXT);
-      node.add(this.match());
+    if(this.look.type() == Token.TEXT || this.look.type() == Token.COMMENT) {
+      return this.match();
     }
     else if(this.look.type() == Token.MARK) {
       return this.mark(first);
@@ -95,12 +94,12 @@ var Parser = IParser.extend(function(lexer) {
       node.add(this.match());
     }
     else {
-      node.add(this.match(Token.KEYWORD));
+      node.add(this.match(Token.ELEM));
     }
     tagName = tagName.content().toLowerCase();
     while(this.look
       && this.look.type() != Token.MARK
-      && this.look.type() != Token.KEYWORD) {
+      && this.look.type() != Token.ELEM) {
       node.add(this.attr());
     }
     if(!this.look) {
