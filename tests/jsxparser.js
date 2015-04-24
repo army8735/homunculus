@@ -60,7 +60,7 @@ function tree(node, arr) {
   return arr;
 }
 
-describe('es6parser', function() {
+describe('jsxparser', function() {
   describe('simple test', function() {
     it('single close', function() {
       var parser = homunculus.getParser('jsx');
