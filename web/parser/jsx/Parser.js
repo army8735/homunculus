@@ -27,7 +27,7 @@ var Parser = Es6Parser.extend(function(lexer) {
     var name;
     if(type) {
       name = [];
-      node.leaves().forEach(function(leaf) {
+      node.last().leaves().forEach(function(leaf) {
         name.push(leaf.token().content());
       });
     }
@@ -85,10 +85,12 @@ var Parser = Es6Parser.extend(function(lexer) {
         }
       }
       else if(this.look.content() == ':') {
-        node.add(
-          this.match(),
-          this.match(Token.ELEM)
-        );
+        while(this.look && this.look.content() == ':') {
+          node.add(
+            this.match(),
+            this.match(Token.ELEM)
+          );
+        }
       }
       else {
         return node.first();

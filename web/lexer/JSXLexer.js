@@ -1,7 +1,5 @@
-define(function(require, exports, module) {var Class = require('../util/Class');
-var character = require('../util/character');
+define(function(require, exports, module) {var character = require('../util/character');
 var JSXToken = require('./JSXToken');
-var walk = require('../util/walk');
 var Lexer = require('./Lexer');
 
 var RegMatch = require('./match/RegMatch');
@@ -59,7 +57,7 @@ var JSXLexer = Lexer.extend(function(rule) {
                   this.html = false;
                   this.isReg = false;
                 }
-                var token = new JSXToken(JSXToken.MARK, this.peek + '>', this.peek + '>');
+                var token = new JSXToken(JSXToken.MARK, this.peek + '>', this.peek + '>', this.index - 1);
                 this.dealToken(token, 2, 0, temp);
               }
               else {
@@ -77,7 +75,7 @@ var JSXLexer = Lexer.extend(function(rule) {
                   this.hStack.pop();
                 }
               }
-              var token = new JSXToken(JSXToken.MARK, this.peek, this.peek);
+              var token = new JSXToken(JSXToken.MARK, this.peek, this.peek, this.index - 1);
               this.dealToken(token, 1, 0, temp);
             }
             //{递归进入js状态
@@ -100,6 +98,7 @@ var JSXLexer = Lexer.extend(function(rule) {
                   }
                   var matchLen = match.content().length;
                   var n = character.count(token.val(), character.LINE);
+                  count += n;
                   this.dealToken(token, matchLen, n, temp);
                   continue outer;
                 }
@@ -134,7 +133,7 @@ var JSXLexer = Lexer.extend(function(rule) {
                 this.state = true;
                 this.hStack[this.hStack.length - 1]--;
                 //</
-                var token = new JSXToken(JSXToken.MARK, '</', '</');
+                var token = new JSXToken(JSXToken.MARK, '</', '</', this.index - 1);
                 this.dealToken(token, 2, 0, temp);
                 this.index = idx + 2;
                 this.readch();
@@ -143,13 +142,13 @@ var JSXLexer = Lexer.extend(function(rule) {
               }
               //<\w
               else if(character.isLetter(c1)) {
-                if(idx > this.index) {
+                if(idx > this.index - 1) {
                   this.addText(this.code.slice(this.index - 1, idx), temp);
                 }
                 this.state = true;
                 this.hStack[this.hStack.length - 1]++;
                 //<
-                var token = new JSXToken(JSXToken.MARK, '<', '<');
+                var token = new JSXToken(JSXToken.MARK, '<', '<', this.index - 1);
                 this.dealToken(token, 1, 0, temp);
                 this.index++;
                 this.readch();
@@ -162,14 +161,14 @@ var JSXLexer = Lexer.extend(function(rule) {
             }
             //{block
             else {
-              if(idx2 > this.index) {
+              if(idx2 > this.index - 1) {
                 this.addText(this.code.slice(this.index - 1, idx2), temp);
                 this.readch();
               }
               this.jStack.push(1);
               this.html = false;
               this.braceState = false;
-              var token = new JSXToken(JSXToken.SIGN, this.peek, this.peek);
+              var token = new JSXToken(JSXToken.SIGN, this.peek, this.peek, this.index - 1);
               this.dealToken(token, 1, 0, temp);
               this.stateBrace(this.peek);
             }
@@ -247,7 +246,7 @@ var JSXLexer = Lexer.extend(function(rule) {
     return this;
   },
   addText: function(s, temp) {
-    var token = new JSXToken(JSXToken.TEXT, s, s);
+    var token = new JSXToken(JSXToken.TEXT, s, s, this.index - 1);
     var n = character.count(token.val(), character.LINE);
     this.dealToken(token, s.length, n, temp);
   },
@@ -256,18 +255,44 @@ var JSXLexer = Lexer.extend(function(rule) {
     var token = new JSXToken(ELEM.tokenType(), ELEM.content(), ELEM.val(), this.index - 1);
     var matchLen = ELEM.content().length;
     this.dealToken(token, matchLen, 0, temp);
-    //ELEM:ELEM
-    if(this.code.charAt(this.index) == ':') {
-      this.readch();
-      token = new JSXToken(JSXToken.SIGN, this.peek, this.peek, this.index - 1);
-      this.dealToken(token, 1, 0, temp);
-      if(!character.isLetter(this.code.charAt(this.index))) {
-        this.error('missing jsx identifier');
+    var c = this.code.charAt(this.index);
+    if(c == '.') {
+      while(true) {
+        this.readch();
+        token = new JSXToken(JSXToken.SIGN, this.peek, this.peek, this.index - 1);
+        this.dealToken(token, 1, 0, temp);
+        this.readch();
+        if(!character.isLetter(this.peek)) {
+          this.error('missing jsx identifier');
+        }
+        ELEM.match(this.peek, this.code, this.index);
+        token = new JSXToken(ELEM.tokenType(), ELEM.content(), ELEM.val(), this.index - 1);
+        matchLen = ELEM.content().length;
+        this.dealToken(token, matchLen, 0, temp);
+        c = this.code.charAt(this.index);
+        if(c != '.') {
+          break;
+        }
       }
-      this.readch();
-      ELEM.match(this.peek, this.code, this.index);
-      token = new JSXToken(ELEM.tokenType(), ELEM.content(), ELEM.val(), this.index - 1);
-      this.dealToken(token, matchLen, 0, temp);
+    }
+    else if(c == ':') {
+      while(true) {
+        this.readch();
+        token = new JSXToken(JSXToken.SIGN, this.peek, this.peek, this.index - 1);
+        this.dealToken(token, 1, 0, temp);
+        this.readch();
+        if(!character.isLetter(this.peek)) {
+          this.error('missing jsx identifier');
+        }
+        ELEM.match(this.peek, this.code, this.index);
+        token = new JSXToken(ELEM.tokenType(), ELEM.content(), ELEM.val(), this.index - 1);
+        matchLen = ELEM.content().length;
+        this.dealToken(token, matchLen, 0, temp);
+        c = this.code.charAt(this.index);
+        if(c != ':') {
+          break;
+        }
+      }
     }
   },
   xBrace: function(content) {

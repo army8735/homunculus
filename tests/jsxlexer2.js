@@ -41,7 +41,17 @@ describe('jsxlexer2', function() {
       var tokens = lexer.parse('<a href="#" data={a++}/>');
       expect(join(tokens)).to.eql(['<', 'a', ' ', 'href', '=', '"#"', ' ', 'data', '=', '{', 'a', '++', '}', '/>']);
     });
-    it('text with js', function() {
+    it('empty text with js', function() {
+      var lexer = homunculus.getLexer('jsx');
+      var tokens = lexer.parse('<a>1{}2</a>');
+      expect(join(tokens)).to.eql(['<', 'a', '>', '1', '{', '}', '2', '</', 'a', '>']);
+    });
+    it('text with js 1', function() {
+      var lexer = homunculus.getLexer('jsx');
+      var tokens = lexer.parse('<a>1{b}2</a>');
+      expect(join(tokens)).to.eql(['<', 'a', '>', '1', '{', 'b', '}', '2', '</', 'a', '>']);
+    });
+    it('text with js 2', function() {
       var lexer = homunculus.getLexer('jsx');
       var tokens = lexer.parse('<a>111{a?b:c}222</a>');
       expect(join(tokens)).to.eql(['<', 'a', '>', '111', '{', 'a', '?', 'b', ':', 'c', '}', '222', '</', 'a', '>']);
@@ -67,6 +77,27 @@ describe('jsxlexer2', function() {
       expect(function() {
         lexer.parse('<a><</a>');
       }).to.throwError();
+    });
+    it('member mark', function() {
+      var lexer = homunculus.getLexer('jsx');
+      var tokens = lexer.parse('<a.b></a.b>');
+      expect(join(tokens)).to.eql(['<', 'a', '.', 'b', '>', '</', 'a', '.', 'b', '>']);
+    });
+    it('namespace mark', function() {
+      var lexer = homunculus.getLexer('jsx');
+      var tokens = lexer.parse('<a:b></a:b>');
+      expect(join(tokens)).to.eql(['<', 'a', ':', 'b', '>', '</', 'a', ':', 'b', '>']);
+    });
+  });
+  describe('line && col', function() {
+    it('normal', function() {
+      var lexer = homunculus.getLexer('jsx');
+      var tokens = lexer.parse('<a href="#" data={}>1{assign}2</a>');
+      var arr = tokens.map(function(item) {
+        return item.col();
+      });
+      //console.log(arr)
+      expect(arr).to.eql([1, 2, 3, 4, 8, 9, 12, 13, 17, 18, 19, 20, 21, 22, 23, 29, 30, 31, 33, 34]);
     });
   });
 });
