@@ -70,22 +70,28 @@ describe('jsxparser2', function() {
     it('with one attr', function() {
       var parser = homunculus.getParser('jsx');
       var node = parser.parse('<a href="#"/>');
-      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.JSXSelfClosingElement,["<","a",JsNode.JSXAttributes,[JsNode.JSXAttribute,["href","=","\"#\""]],"/>"]]]]]);
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.JSXSelfClosingElement,["<","a",JsNode.JSXAttribute,["href","=","\"#\""],"/>"]]]]]);
     });
     it('with servel attr', function() {
       var parser = homunculus.getParser('jsx');
       var node = parser.parse('<a href="#" name="test" data-num=123/>');
-      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.JSXSelfClosingElement,["<","a",JsNode.JSXAttributes,[JsNode.JSXAttribute,["href","=","\"#\""],JsNode.JSXAttribute,["name","=","\"test\""],JsNode.JSXAttribute,["data-num","=","123"]],"/>"]]]]]);
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.JSXSelfClosingElement,["<","a",JsNode.JSXAttribute,["href","=","\"#\""],JsNode.JSXAttribute,["name","=","\"test\""],JsNode.JSXAttribute,["data-num","=","123"],"/>"]]]]]);
     });
     it('with spread attr', function() {
       var parser = homunculus.getParser('jsx');
       var node = parser.parse('<a href="#" {...somedata}/>');
-      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.JSXSelfClosingElement,["<","a",JsNode.JSXAttributes,[JsNode.JSXAttribute,["href","=","\"#\""],JsNode.JSXSpreadAttribute,["{","...",JsNode.PRMREXPR,["somedata"],"}"]],"/>"]]]]]);
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.JSXSelfClosingElement,["<","a",JsNode.JSXAttribute,["href","=","\"#\""],JsNode.JSXSpreadAttribute,["{","...",JsNode.PRMREXPR,["somedata"],"}"],"/>"]]]]]);
     });
     it('with js attr value', function() {
       var parser = homunculus.getParser('jsx');
       var node = parser.parse('<a href="#" data={a++}/>');
-      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.JSXSelfClosingElement,["<","a",JsNode.JSXAttributes,[JsNode.JSXAttribute,["href","=","\"#\""],JsNode.JSXAttribute,["data","=",JsNode.JSXAttributeValue,["{",JsNode.POSTFIXEXPR,[JsNode.PRMREXPR,["a"],"++"],"}"]]],"/>"]]]]]);
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.JSXSelfClosingElement,["<","a",JsNode.JSXAttribute,["href","=","\"#\""],JsNode.JSXAttribute,["data","=",JsNode.JSXAttributeValue,["{",JsNode.POSTFIXEXPR,[JsNode.PRMREXPR,["a"],"++"],"}"]],"/>"]]]]]);
+    });
+    it('spread must be last', function() {
+      var parser = homunculus.getParser('jsx');
+      expect(function() {
+        parser.parse('<a {...spread}href="#"/>');
+      }).to.throwError();
     });
     it('empty text with js', function() {
       var parser = homunculus.getParser('jsx');

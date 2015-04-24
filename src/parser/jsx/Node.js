@@ -4,7 +4,6 @@ var Node = Es6Node.extend(function(type, children) {
   return this;
 }).statics({
   JSXElement: 'JSXElement',
-  JSXElementName: 'JSXElementName',
   JSXSelfClosingElement: 'JSXSelfClosingElement',
   JSXOpeningElement: 'JSXOpeningElement',
   JSXClosingElement: 'JSXClosingElement',
@@ -14,7 +13,6 @@ var Node = Es6Node.extend(function(type, children) {
   JSXNamespacedName: 'JSXNamespacedName',
   JSXMemberExpression: 'JSXMemberExpression',
   JSXAttributes: 'JSXAttributes',
-  JSXSpreadAttribute: 'JSXSpreadAttribute',
   JSXAttributeValue: 'JSXAttributeValue',
   getKey: function(s) {
     if(!s) {

@@ -34,10 +34,11 @@ var Parser = Es6Parser.extend(function(lexer) {
     else {
       name = node.last().token().content();
     }
-    while(this.look
-      && (this.look.type() == Token.PROPERTY
-        || this.look.content() == '{')) {
-      node.add(this.attrs());
+    while(this.look && this.look.type() == Token.PROPERTY) {
+      node.add(this.attr());
+    }
+    if(this.look && this.look.content() == '{') {
+      node.add(this.spreadattr());
     }
     if(!this.look) {
       this.error();
@@ -103,19 +104,6 @@ var Parser = Es6Parser.extend(function(lexer) {
     names.forEach(function(name) {
       node.add(this.match(name));
     });
-    return node;
-  },
-  attrs: function() {
-    if(this.look && this.look.content() == '{') {
-      return this.spreadattr();
-    }
-    var node = new Node(Node.JSXAttributes);
-    while(this.look && this.look.type() == Token.PROPERTY) {
-      node.add(this.attr());
-    }
-    if(this.look && this.look.content() == '{') {
-      node.add(this.spreadattr());
-    }
     return node;
   },
   attr: function() {
