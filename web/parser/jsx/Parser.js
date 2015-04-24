@@ -35,8 +35,7 @@ var Parser = Es6Parser.extend(function(lexer) {
       name = node.last().token().content();
     }
     while(this.look
-      &&
-      (this.look.type() == Token.PROPERTY
+      && (this.look.type() == Token.PROPERTY
         || this.look.content() == '{')) {
       node.add(this.attrs());
     }
@@ -153,13 +152,15 @@ var Parser = Es6Parser.extend(function(lexer) {
       this.error();
     }
     if(this.look.content() == '{') {
+      var node = new Node(Node.JSXAttributeValue);
       node.add(this.match('{'));
       if(this.look && this.look.content() != '}') {
         node.add(this.assignexpr());
       }
       node.add(this.match('}'));
+      return node;
     }
-    else if(this.look.type() == Token.STRING) {
+    else if([Token.STRING, Token.NUMBER].indexOf(this.look.type()) > -1) {
       return this.match();
     }
     return this.jsxelem();

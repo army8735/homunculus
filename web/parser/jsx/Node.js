@@ -15,6 +15,7 @@ var Node = Es6Node.extend(function(type, children) {
   JSXMemberExpression: 'JSXMemberExpression',
   JSXAttributes: 'JSXAttributes',
   JSXSpreadAttribute: 'JSXSpreadAttribute',
+  JSXAttributeValue: 'JSXAttributeValue',
   getKey: function(s) {
     if(!s) {
       throw new Error('empty value');
