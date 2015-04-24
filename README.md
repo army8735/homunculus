@@ -39,6 +39,7 @@ npm install homunculus
     * css
     * html
     * htm
+    * jsx
 * getLexer(lan:String):lexer/Lexer
  * lan:
    * js
@@ -54,8 +55,9 @@ npm install homunculus
    * c++
    * cpp
    * cplusplus
-    * html
-    * htm
+   * html
+   * htm
+   * jsx
 * getParser(lan:String):parser/Parser
   * lan:
     * js
@@ -67,6 +69,7 @@ npm install homunculus
     * css
     * html
     * htm
+    * jsx
 * getContext(lan:String):parser/Context
   * lan:
     * js
@@ -74,6 +77,7 @@ npm install homunculus
     * es
     * es5
     * ecmascript
+    * jsx
 * reset():void 重置Token的tid
 
 ### lexer/Lexer
