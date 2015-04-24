@@ -35,6 +35,12 @@ test-htmllexer:
 test-htmlparser:
 	@mocha tests/htmlparser.js -R spec
 
+test-jsxlexer:
+	@mocha tests/jsxlexer.js -R spec
+
+test-jsxlexer2:
+	@mocha tests/jsxlexer2.js -R spec
+
 test-walk:
 	@mocha tests/walk.js -R spec
 

@@ -17,7 +17,11 @@
         "src/lexer/Lexer",
         "src/lexer/CssLexer",
         "src/lexer/HtmlLexer",
+        "src/lexer/JSXLexer",
         "src/lexer/Token",
+        "src/lexer/CssToken",
+        "src/lexer/HtmlToken",
+        "src/lexer/JSXToken",
         "src/lexer/match",
         "src/lexer/rule/Rule",
         "src/lexer/rule/EcmascriptRule",
@@ -39,7 +43,8 @@
     "html",
     "css",
     "es5",
-    "es6"
+    "es6",
+    "jsx"
   ],
   "author": "army8735",
   "license": "MIT",
