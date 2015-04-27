@@ -3,7 +3,7 @@ define(function(require, exports, module) {var Token = require('./Token');
 var HtmlToken = Token.extend(function(type, content, val, sIndex) {
   Token.call(this, type, content, val, sIndex);
 }).statics({
-  DOC: 12,
+  DOC: 27,
   PROPERTY: 15,
   TEXT: 25,
   MARK: 26,

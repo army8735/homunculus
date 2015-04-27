@@ -51,10 +51,6 @@ var HtmlLexer = Lexer.extend(function(rule) {
               if(error) {
                 this.error(error, this.code.slice(this.index - matchLen, this.index));
               }
-              if(token.type() == Token.ID
-                && this.rule.keyWords().hasOwnProperty(token.content())) {
-                token.type(Token.KEYWORD);
-              }
               var n = character.count(token.val(), character.LINE);
               count += n;
               this.dealToken(token, matchLen, n, temp);
@@ -82,6 +78,7 @@ var HtmlLexer = Lexer.extend(function(rule) {
         }
         if(this.index && idx > this.index - 1) {
           this.addText(this.code.slice(this.index - 1, idx), temp);
+          this.readch();
         }
         var s = this.code.slice(idx, idx + 4).toLowerCase();
         var c1 = this.code.charAt(idx + 1);
@@ -105,7 +102,6 @@ var HtmlLexer = Lexer.extend(function(rule) {
           this.state = true;
           var token = new Token(Token.MARK, '</', '</', this.index - 1);
           this.dealToken(token, 2, 0, temp);
-          this.index++;
           this.readch();
           //\w elem
           this.dealTag(temp);
@@ -119,6 +115,11 @@ var HtmlLexer = Lexer.extend(function(rule) {
           //\w elem
           this.dealTag(temp);
         }
+        else if(c1 == '!') {
+          this.state = true;
+          var token = new Token(Token.MARK, '<', '<', this.index - 1);
+          this.dealToken(token, 1, 0, temp);
+        }
       }
     }
     return this;
@@ -129,8 +130,8 @@ var HtmlLexer = Lexer.extend(function(rule) {
       if(this.code.charAt(i) == '<') {
         if(reg.test(this.code.slice(i + 1, i + 8))) {
           var s = this.code.slice(this.index, i);
-          this.index = i;
           this.addText(s, temp);
+          this.index = i;
           return;
         }
       }
@@ -149,6 +150,13 @@ var HtmlLexer = Lexer.extend(function(rule) {
     var token = new Token(ELEM.tokenType(), ELEM.content(), ELEM.val(), this.index - 1);
     var matchLen = ELEM.content().length;
     this.dealToken(token, matchLen, 0, temp);
+    var s = ELEM.content().toLowerCase();
+    if(s == 'style') {
+      this.style = true;
+    }
+    else if(s == 'script') {
+      this.script = true;
+    }
   }
 });
 module.exports = HtmlLexer;});

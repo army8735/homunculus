@@ -14,7 +14,7 @@ var HtmlRule = Rule.extend(function() {
   self.addMatch(new CompleteEqual(Token.LINE, character.ENTER));
   self.addMatch(new CompleteEqual(Token.LINE, character.LINE));
 
-  self.addMatch(new CompleteEqual(Token.HEAD, '!DOCTYPE', null, true));
+  self.addMatch(new CompleteEqual(Token.DOC, '!DOCTYPE', null, true));
   self.addMatch(new LineSearch(Token.STRING, '"', '"', true));
   self.addMatch(new LineSearch(Token.STRING, "'", "'", true));
   self.addMatch(new CompleteEqual(Token.SIGN, '=', null, true));
