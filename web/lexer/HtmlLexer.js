@@ -95,7 +95,6 @@ var HtmlLexer = Lexer.extend(function(rule) {
           var token = new Token(Token.COMMENT, s, s, this.index - 1);
           var n = character.count(s, character.LINE);
           this.dealToken(token, s.length, n, temp);
-          this.index++;
         }
         //</\w
         else if(c1 == '/' && character.isLetter(c2)) {

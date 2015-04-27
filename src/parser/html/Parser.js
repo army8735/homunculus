@@ -74,80 +74,59 @@ var Parser = IParser.extend(function(lexer) {
     return node;
   },
   element: function(first) {
-    var node;
-    if(this.look.type() == Token.TEXT || this.look.type() == Token.COMMENT) {
+    if(this.look.type() == Token.TEXT) {
       return this.match();
     }
-    else if(this.look.type() == Token.MARK) {
-      return this.mark(first);
+    else {
+      var node = new Node(Node.OpeningElement);
+      node.add(
+        this.match('<'),
+        this.elemname(first)
+      );
+      var name = node.last().token().content();
+      while(this.look && this.look.type() == Token.PROPERTY) {
+        node.add(this.attr());
+      }
+      if(!this.look) {
+        this.error();
+      }
+      if(this.look.content() == '/>') {
+        node.add(this.match());
+        node.name(Node.SelfClosingElement);
+        return node;
+      }
+      node.add(this.match('>'));
+      if(name.toLowerCase() == '!doctype') {
+        node.name(Node.SelfClosingElement);
+        return node;
+      }
+      else if(SINGLE.hasOwnProperty(name.toLowerCase())) {
+        node.name(Node.SelfClosingElement);
+        return node;
+      }
+      var n = new Node(Node.ELEMENT);
+      n.add(node);
+      while(this.look && this.look.content() != '</') {
+        n.add(this.element());
+      }
+      n.add(this.close(name));
+      return n;
     }
-    return node;
   },
-  mark: function(first) {
-    var node = new Node(Node.MARK);
-    node.add(this.match('<'));
+  elemname: function(first) {
     if(!this.look) {
       this.error();
     }
-    var tagName = this.look;
-    if(first && this.look.type() == Token.HEAD) {
-      node.add(this.match());
+    if(first && this.look.type() == Token.DOC) {
+      return this.match();
     }
-    else {
-      node.add(this.match(Token.ELEM));
-    }
-    tagName = tagName.content().toLowerCase();
-    while(this.look
-      && this.look.type() != Token.MARK
-      && this.look.type() != Token.ELEM) {
-      node.add(this.attr());
-    }
-    if(!this.look) {
-      this.error();
-    }
-    if(SINGLE.hasOwnProperty(tagName)) {
-      if(this.look.content() == '/>') {
-        node.add(this.match('/>'));
-      }
-      else {
-        node.add(this.match('>'));
-      }
-    }
-    else {
-      if(this.look.content() == '/>') {
-        node.add(this.match('/>'));
-      }
-      else {
-        node.add(this.match('>'));
-        if(!this.look) {
-          this.error();
-        }
-        if(this.look.type() == Token.TEXT) {
-          node.add(this.match());
-        }
-        if(this.look && this.look.content() == '<') {
-          node.add(this.element());
-          if(this.look && this.look.type() == Token.TEXT) {
-            node.add(this.match());
-          }
-        }
-        node.add(this.match('</'));
-        node.add(this.match(tagName));
-        node.add(this.match('>'));
-      }
-    }
-    return node;
+    return this.match(Token.ELEM);
   },
   attr: function() {
-    var node = new Node(Node.ATTR);
-    if(this.look.type() == Token.PROPERTY) {
-      node.add(this.match());
-    }
-    else {
-      node.add(this.match(Token.DATA));
-    }
+    var node = new Node(Node.Attribute);
+    node.add(this.match(Token.PROPERTY));
     if(this.look && this.look.content() == '=') {
-      node.add(this.match('='));
+      node.add(this.match());
       if(!this.look) {
         this.error();
       }
@@ -161,6 +140,15 @@ var Parser = IParser.extend(function(lexer) {
           this.error();
       }
     }
+    return node;
+  },
+  close: function(name) {
+    var node = new Node(Node.ClosingElement);
+    node.add(
+      this.match('</'),
+      this.match(name),
+      this.match('>')
+    );
     return node;
   },
   match: function(type, line, msg) {

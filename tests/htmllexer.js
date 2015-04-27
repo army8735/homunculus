@@ -5,7 +5,6 @@ var path = require('path');
 var fs = require('fs');
 
 var Token = homunculus.getClass('token', 'html');
-var HtmlLexer = homunculus.getClass('lexer', 'html');
 
 function join(tokens) {
   var arr = tokens.map(function(token) {

@@ -4,12 +4,11 @@ var Node = INode.extend(function(type, children) {
   return this;
 }).statics({
   DOCUMENT: 'document',
-  Element: 'Element',
+  ELEMENT: 'element',
   SelfClosingElement: 'SelfClosingElement',
   OpeningElement: 'OpeningElement',
   ClosingElement: 'ClosingElement',
   Attribute: 'Attribute',
-  Attributes: 'Attributes',
   getKey: function(s) {
     if(!s) {
       throw new Error('empty value');
