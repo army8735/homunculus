@@ -117,6 +117,16 @@ describe('htmlparser', function() {
       var node = parser.parse('<input checked>');
       expect(tree(node)).to.eql([HtmlNode.DOCUMENT,[HtmlNode.SelfClosingElement,["<","input",HtmlNode.Attribute,["checked"],">"]]]);
     });
+    it('attr no quote', function() {
+      var parser = homunculus.getParser('html');
+      var node = parser.parse('<input checked=checked>');
+      expect(tree(node)).to.eql([HtmlNode.DOCUMENT,[HtmlNode.SelfClosingElement,["<","input",HtmlNode.Attribute,["checked","=","checked"],">"]]]);
+    });
+    it('attr number', function() {
+      var parser = homunculus.getParser('html');
+      var node = parser.parse('<input num=3>');
+      expect(tree(node)).to.eql([HtmlNode.DOCUMENT,[HtmlNode.SelfClosingElement,["<","input",HtmlNode.Attribute,["num","=","3"],">"]]]);
+    });
     it('single before couple', function() {
       var parser = homunculus.getParser('html');
       var node = parser.parse('<img/><div></div>');
