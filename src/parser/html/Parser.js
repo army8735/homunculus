@@ -12,7 +12,6 @@ var SINGLE = {
   'link': true,
   '!doctype': true,
   'br': true,
-  '!doctype': true,
   'basefont': true,
   'base': true,
   'col': true,
