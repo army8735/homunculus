@@ -88,6 +88,16 @@ describe('jsxlexer2', function() {
       var tokens = lexer.parse('<a:b></a:b>');
       expect(join(tokens)).to.eql(['<', 'a', ':', 'b', '>', '</', 'a', ':', 'b', '>']);
     });
+    it('nest mark', function() {
+      var lexer = homunculus.getLexer('jsx');
+      var tokens = lexer.parse('<a><b></b></a>');
+      expect(join(tokens)).to.eql(['<', 'a', '>', '<', 'b', '>', '</', 'b', '>', '</', 'a', '>']);
+    });
+    it('nest mark with text', function() {
+      var lexer = homunculus.getLexer('jsx');
+      var tokens = lexer.parse('<a><b><c>123</c>456</b></a>,<d><e></e></d>');
+      expect(join(tokens)).to.eql(['<', 'a', '>', '<', 'b', '>', '<', 'c', '>', '123', '</', 'c', '>', '456', '</', 'b', '>', '</', 'a', '>', ',', '<', 'd', '>', '<', 'e', '>', '</', 'e', '>', '</', 'd', '>']);
+    });
   });
   describe('line && col', function() {
     it('normal', function() {

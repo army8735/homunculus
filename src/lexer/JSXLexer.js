@@ -129,6 +129,7 @@ var JSXLexer = Lexer.extend(function(rule) {
               if(c1 == '/' && character.isLetter(c2)) {
                 if(idx > this.index - 1) {
                   this.addText(this.code.slice(this.index - 1, idx), temp);
+                  this.index = idx;
                 }
                 this.state = true;
                 this.hStack[this.hStack.length - 1]--;
@@ -144,13 +145,14 @@ var JSXLexer = Lexer.extend(function(rule) {
               else if(character.isLetter(c1)) {
                 if(idx > this.index - 1) {
                   this.addText(this.code.slice(this.index - 1, idx), temp);
+                  this.index = idx;
                 }
                 this.state = true;
                 this.hStack[this.hStack.length - 1]++;
                 //<
                 var token = new JSXToken(JSXToken.MARK, '<', '<', this.index - 1);
                 this.dealToken(token, 1, 0, temp);
-                this.index++;
+                this.index = idx + 1;
                 this.readch();
                 //\w elem
                 this.dealTag(temp);

@@ -118,6 +118,16 @@ describe('jsxparser2', function() {
       var node = parser.parse('<a>111{[<b/>,"",<span>{test}</span>]}222</a>');
       expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.JSXElement,[JsNode.JSXOpeningElement,["<","a",">"],"111",JsNode.JSXChild,["{",JsNode.PRMREXPR,[JsNode.ARRLTR,["[",JsNode.JSXSelfClosingElement,["<","b","/>"],",",JsNode.PRMREXPR,["\"\""],",",JsNode.JSXElement,[JsNode.JSXOpeningElement,["<","span",">"],JsNode.JSXChild,["{",JsNode.PRMREXPR,["test"],"}"],JsNode.JSXClosingElement,["</","span",">"]],"]"]],"}"],"222",JsNode.JSXClosingElement,["</","a",">"]]]]]]);
     });
+    it('nest mark', function() {
+      var parser = homunculus.getParser('jsx');
+      var node = parser.parse('<a><b></b></a>');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.JSXElement,[JsNode.JSXOpeningElement,["<","a",">"],JsNode.JSXElement,[JsNode.JSXOpeningElement,["<","b",">"],JsNode.JSXClosingElement,["</","b",">"]],JsNode.JSXClosingElement,["</","a",">"]]]]]]);
+    });
+    it('nest mark with text', function() {
+      var parser = homunculus.getParser('jsx');
+      var node = parser.parse('<a><b><c>123</c>456</b></a>,<d><e></e></d>');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.EXPR,[JsNode.JSXElement,[JsNode.JSXOpeningElement,["<","a",">"],JsNode.JSXElement,[JsNode.JSXOpeningElement,["<","b",">"],JsNode.JSXElement,[JsNode.JSXOpeningElement,["<","c",">"],"123",JsNode.JSXClosingElement,["</","c",">"]],"456",JsNode.JSXClosingElement,["</","b",">"]],JsNode.JSXClosingElement,["</","a",">"]],",",JsNode.JSXElement,[JsNode.JSXOpeningElement,["<","d",">"],JsNode.JSXElement,[JsNode.JSXOpeningElement,["<","e",">"],JsNode.JSXClosingElement,["</","e",">"]],JsNode.JSXClosingElement,["</","d",">"]]]]]]]);
+    });
     it('member mark', function() {
       var parser = homunculus.getParser('jsx');
       var node = parser.parse('<a.b></a.b>');
