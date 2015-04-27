@@ -52,7 +52,7 @@ test-walk:
 	@mocha tests/walk.js -R spec
 
 coveralls:
-	@mocha tests/api.js tests/jslexer.js tests/jsparser.js tests/jscontext.js tests/es6parser.js tests/csslexer.js tests/cssparser.js tests/htmllexer.js tests/htmlparser.js tests/jsxlexer.js tests/jsxlexer2.js tests/jsxparser.js test-jsxparser2 tests/walk.js --require blanket --reporter mocha-lcov-reporter | ./node_modules/coveralls/bin/coveralls.js
+	@mocha tests/api.js tests/jslexer.js tests/jsparser.js tests/jscontext.js tests/es6parser.js tests/csslexer.js tests/cssparser.js tests/htmllexer.js tests/htmlparser.js tests/jsxlexer.js tests/jsxlexer2.js tests/jsxparser.js tests/jsxparser2 tests/walk.js --require blanket --reporter mocha-lcov-reporter | ./node_modules/coveralls/bin/coveralls.js
 
 test-cov:
-	@mocha tests/api.js tests/jslexer.js tests/jsparser.js tests/jscontext.js tests/es6parser.js tests/csslexer.js tests/cssparser.js tests/htmllexer.js tests/htmlparser.js tests/jsxlexer.js tests/jsxlexer2.js tests/jsxparser.js test-jsxparser2 tests/walk.js --require blanket -R html-cov > tests/covrage.html
+	@mocha tests/api.js tests/jslexer.js tests/jsparser.js tests/jscontext.js tests/es6parser.js tests/csslexer.js tests/cssparser.js tests/htmllexer.js tests/htmlparser.js tests/jsxlexer.js tests/jsxlexer2.js tests/jsxparser.js tests/jsxparser2 tests/walk.js --require blanket -R html-cov > tests/covrage.html
