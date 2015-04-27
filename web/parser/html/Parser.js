@@ -96,11 +96,7 @@ var Parser = IParser.extend(function(lexer) {
         return node;
       }
       node.add(this.match('>'));
-      if(name.toLowerCase() == '!doctype') {
-        node.name(Node.SelfClosingElement);
-        return node;
-      }
-      else if(SINGLE.hasOwnProperty(name.toLowerCase())) {
+      if(SINGLE.hasOwnProperty(name.toLowerCase())) {
         node.name(Node.SelfClosingElement);
         return node;
       }
