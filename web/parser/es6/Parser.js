@@ -2311,5 +2311,7 @@ var Parser = IParser.extend(function(lexer) {
     msg = 'SyntaxError: ' + (msg || ' syntax error');
     throw new Error(msg + ' line ' + this.lastLine + ' col ' + this.lastCol);
   }
+}).statics({
+  S: S
 });
 module.exports = Parser;});

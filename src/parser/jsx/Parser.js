@@ -209,7 +209,7 @@ var Parser = Es6Parser.extend(function(lexer) {
         || (this.look.content() != type && this.hasMoveLine)
         || this.look.content() == '}')
       ) {
-        if(this.look && S[this.look.type()]) {
+        if(this.look && Es6Parser.S[this.look.type()]) {
           this.move();
         }
         return this.virtual(';');

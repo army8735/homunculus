@@ -157,4 +157,12 @@ describe('jsxparser2', function() {
       }).to.throwError();
     });
   });
+  describe('file', function() {
+    it('1', function() {
+      var s = fs.readFileSync(path.join(__dirname, './lib/jsx.js'), { encoding: 'utf-8' });
+      var parser = homunculus.getParser('jsx');
+      var node = parser.parse(s);
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.JSXElement,[JsNode.JSXOpeningElement,["<","div",">"],"\n  ",JsNode.JSXChild,["{",JsNode.CALLEXPR,[JsNode.MMBEXPR,[JsNode.PRMREXPR,["names"],".","map"],JsNode.ARGS,["(",JsNode.ARGLIST,[JsNode.PRMREXPR,[JsNode.FNEXPR,["function","(",JsNode.FMPARAMS,[JsNode.SINGLENAME,[JsNode.BINDID,["name"]]],")","{",JsNode.FNBODY,[JsNode.RETSTMT,["return",JsNode.JSXElement,[JsNode.JSXOpeningElement,["<","div",">"],"Hello, ",JsNode.JSXChild,["{",JsNode.PRMREXPR,["name"],"}"],"!",JsNode.JSXClosingElement,["</","div",">"]]]],"}"]]],")"]],"}"],"\n",JsNode.JSXClosingElement,["</","div",">"]]]]]]);
+    });
+  });
 });
