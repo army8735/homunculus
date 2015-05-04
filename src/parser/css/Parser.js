@@ -387,6 +387,9 @@ var Parser = IParser.extend(function(lexer) {
     var node = new Node(Node.KEYFRAMES);
     node.add(this.match());
     node.add(this.match(Token.ID));
+    while(this.look && [Token.ID, Token.VARS].indexOf(this.look.type()) > -1) {
+      node.add(this.match());
+    }
     node.add(this.block(true));
     return node;
   },

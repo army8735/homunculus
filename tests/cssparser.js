@@ -305,6 +305,11 @@ describe('cssparser', function() {
       var node = parser.parse('@keyframes testanimations{10%{width:0}}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.KEYFRAMES,["@keyframes","testanimations",CssNode.BLOCK,["{",CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["10","%"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["width"],":",CssNode.VALUE,["0"]],"}"]],"}"]]]]);
     });
+    it('@keyframes width var', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('@keyframes bn$j{}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.KEYFRAMES,["@keyframes","bn","$j",CssNode.BLOCK,["{","}"]]]]);
+    });
     it('@keyframes error 1', function() {
       var parser = homunculus.getParser('css');
       expect(function() {
