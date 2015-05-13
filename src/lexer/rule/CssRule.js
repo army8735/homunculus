@@ -69,7 +69,7 @@ var CssRule = Rule.extend(function() {
   self.addMatch(new RegMatch(Token.STRING, /^(\\[a-z\d]{4})+/i));
   self.addMatch(new CompleteEqual(Token.IMPORTANT, '!important', null, true));
   self.addMatch(new RegMatch(Token.HACK, /^![a-z]+/i));
-  self.addMatch(new RegMatch(Token.PSEUDO, /^::?(?:-(?:moz|webkit|ms|o)-)?[a-z]+(?:-[a-z]+)*(?:\(:?[\[\]+*\w\-]+\))?/i));
+  self.addMatch(new RegMatch(Token.PSEUDO, /^::?(?:-(?:moz|webkit|ms|o)-)?[a-z]+(?:-[a-z]+)*/i));
   ['$=', '|=', '*=', '~=', '^=', '>=', '<=', '!=', '==', '++', '--'].forEach(function(o) {
     self.addMatch(new CompleteEqual(Token.SIGN, o));
   });

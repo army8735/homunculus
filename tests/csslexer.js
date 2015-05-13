@@ -163,8 +163,8 @@ describe('csslexer', function() {
       it('pseudo', function() {
         var lexer = homunculus.getLexer('css');
         var tokens = lexer.parse('a:hover{}p:not(:first){}');
-        expect(join(tokens)).to.eql(['a', ':hover', '{', '}', 'p', ':not(:first)', '{', '}']);
-        expect(type(tokens)).to.eql([21, 19, 8, 8, 21, 19, 8, 8]);
+        expect(join(tokens)).to.eql(['a', ':hover', '{', '}', 'p', ':not', '(', ':first', ')', '{', '}']);
+        expect(type(tokens)).to.eql([21, 19, 8, 8, 21, 19, 8, 19, 8, 8, 8]);
       });
       it('pseudo at start', function() {
         var lexer = homunculus.getLexer('css');
@@ -178,6 +178,30 @@ describe('csslexer', function() {
         expect(join(tokens)).to.eql(['p', ',', ':root', '{', '}']);
         expect(type(tokens)).to.eql([21, 8, 19, 8, 8]);
       });
+      it('pseudo pseudo', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse(':root:not(:first)');
+        expect(join(tokens)).to.eql([':root', ':not', '(', ':first', ')']);
+        expect(type(tokens)).to.eql([19, 19, 8, 19, 8]);
+      });
+      it('pseudo attr', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse(':not([data="123"])');
+        expect(join(tokens)).to.eql([':not', '(', '[', 'data', '=', '"123"', ']', ')']);
+        expect(type(tokens)).to.eql([19, 8, 8, 22, 8, 7, 8, 8]);
+      });
+      it('pseudo before attr', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse(':not([data="123"])[disabled]');
+        expect(join(tokens)).to.eql([':not', '(', '[', 'data', '=', '"123"', ']', ')', '[', 'disabled', ']']);
+        expect(type(tokens)).to.eql([19, 8, 8, 22, 8, 7, 8, 8, 8, 22, 8]);
+      });
+      it('pseudo after attr', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('[disabled]:not(:first)[checked]:not([data="123"])');
+        expect(join(tokens)).to.eql(['[', 'disabled', ']', ':not', '(', ':first', ')', '[', 'checked', ']', ':not', '(', '[', 'data', '=', '"123"', ']', ')']);
+        expect(type(tokens)).to.eql([8, 22, 8, 19, 8, 19, 8, 8, 22, 8, 19, 8, 8, 22, 8, 7, 8, 8]);
+      });
       it('* and pseudo', function() {
         var lexer = homunculus.getLexer('css');
         var tokens = lexer.parse('*:first-child+html');
@@ -187,8 +211,8 @@ describe('csslexer', function() {
       it('pseudo with ()', function() {
         var lexer = homunculus.getLexer('css');
         var tokens = lexer.parse('body:not(:-moz-handler-blocked)');
-        expect(join(tokens)).to.eql(['body', ':not(:-moz-handler-blocked)']);
-        expect(type(tokens)).to.eql([21, 19]);
+        expect(join(tokens)).to.eql(['body', ':not', '(', ':-moz-handler-blocked', ')']);
+        expect(type(tokens)).to.eql([21, 19, 8, 19, 8]);
       });
       it('attr 1', function() {
         var lexer = homunculus.getLexer('css');

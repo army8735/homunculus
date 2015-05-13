@@ -601,6 +601,11 @@ describe('cssparser', function() {
       var node = parser.parse(':hover{margin:0}');
       expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,[":hover"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["margin"],":",CssNode.VALUE,["0"]],"}"]]]]);
     });
+    it('pseudo complex', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('[disabled]:not(:first)[checked]:not([data="123"]){}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["[","disabled","]",":not","(",":first",")","[","checked","]",":not","(","[","data","=","\"123\"","]",")"]],CssNode.BLOCK,["{","}"]]]]);
+    });
     it('hack', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse('p{[;width:0;];}');
@@ -1401,6 +1406,14 @@ describe('cssparser', function() {
     it('gumby', function() {
       var parser = homunculus.getParser('css');
       var code = fs.readFileSync(path.join(__dirname, './lib/gumby.css'), { encoding: 'utf-8' });
+      var node = parser.parse(code);
+      var ignore = parser.ignore();
+      var str = jion(node, ignore);
+      expect(str).to.eql(code);
+    });
+    it('pure', function() {
+      var parser = homunculus.getParser('css');
+      var code = fs.readFileSync(path.join(__dirname, './lib/pure.css'), { encoding: 'utf-8' });
       var node = parser.parse(code);
       var ignore = parser.ignore();
       var str = jion(node, ignore);

@@ -334,7 +334,6 @@ var CssLexer = Lexer.extend(function(rule) {
                       }
                     }
                   }
-                  this.sel = false;
                   break;
                 case ')':
                   if(this.media || this.import || this.doc) {
@@ -342,7 +341,6 @@ var CssLexer = Lexer.extend(function(rule) {
                   }
                   this.url = false;
                   this.parenthese = false;
-                  this.sel = false;
                   this.var = false;
                   //)之后可能跟单位，比如margin:(1+2)px
                   this.number = true;

@@ -589,22 +589,17 @@ var Parser = IParser.extend(function(lexer) {
     else {
       var s = this.look.content().toLowerCase();
       if(s == '[' && this.look.type() != Token.HACK) {
-        node.add(this.match());
-        while(this.look && this.look.content() != ']') {
-          node.add(this.match([Token.ATTR, Token.SIGN, Token.VARS, Token.NUMBER, Token.UNITS, Token.STRING]));
-        }
-        node.add(this.match(']'));
+        this.bracket1(node);
       }
       else {
         node.add(this.match([Token.SELECTOR, Token.PSEUDO, Token.HACK, Token.VARS]));
       }
       while(this.look && [',', ';', '{', '}'].indexOf(this.look.content()) == -1) {
         if(this.look.content() == '[' && this.look.type() != Token.HACK) {
-          node.add(this.match());
-          while(this.look && this.look.content() != ']') {
-            node.add(this.match([Token.ATTR, Token.SIGN, Token.VARS, Token.NUMBER, Token.UNITS, Token.STRING]));
-          }
-          node.add(this.match(']'));
+          this.bracket1(node);
+        }
+        else if(this.look.content() == '(') {
+          this.bracket2(node);
         }
         else {
           node.add(this.match([Token.SELECTOR, Token.PSEUDO, Token.SIGN, Token.HACK, Token.VARS]));
@@ -612,6 +607,25 @@ var Parser = IParser.extend(function(lexer) {
       }
     }
     return node;
+  },
+  bracket1: function(node) {
+    node.add(this.match());
+    while(this.look && [']', '(', ')'].indexOf(this.look.content()) == -1) {
+      node.add(this.match([Token.ATTR, Token.SIGN, Token.VARS, Token.NUMBER, Token.UNITS, Token.STRING]));
+    }
+    node.add(this.match(']'));
+  },
+  bracket2: function(node) {
+    node.add(this.match());
+    while(this.look && this.look.content() != ')') {
+      if(this.look.content() == '[') {
+        this.bracket1(node);
+      }
+      if(this.look && this.look.content() == ')') {
+        break;
+      }
+      node.add(this.match([Token.SELECTOR, Token.PSEUDO, Token.VARS, Token.NUMBER, Token.UNITS]));
+    }
   },
   block: function(kf) {
     var node = new Node(Node.BLOCK);
