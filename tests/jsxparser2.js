@@ -138,6 +138,18 @@ describe('jsxparser2', function() {
       var node = parser.parse('<a:b></a:b>');
       expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.JSXElement,[JsNode.JSXOpeningElement,["<",JsNode.JSXMemberExpression,["a",":","b"],">"],JsNode.JSXClosingElement,["</",JsNode.JSXMemberExpression,["a",":","b"],">"]]]]]]);
     });
+    it('self close', function() {
+      var parser = homunculus.getParser('jsx');
+      expect(function() {
+        parser.parse('<img>');
+      }).to.throwError();
+    });
+    it('mark missing', function() {
+      var parser = homunculus.getParser('jsx');
+      expect(function() {
+        parser.parse('<a>');
+      }).to.throwError();
+    });
     it('mark mismatching', function() {
       var parser = homunculus.getParser('jsx');
       expect(function() {

@@ -21,6 +21,12 @@ describe('jsxlexer2', function() {
       var tokens = lexer.parse('<a/>');
       expect(join(tokens)).to.eql(['<', 'a', '/>']);
     });
+    it('self close', function() {
+      var lexer = homunculus.getLexer('jsx');
+      expect(function() {
+        lexer.parse('<img>');
+      }).to.throwError();
+    });
     it('with one attr', function() {
       var lexer = homunculus.getLexer('jsx');
       var tokens = lexer.parse('<a href="#"/>');

@@ -2,6 +2,7 @@ var Es6Parser = require('../es6/Parser');
 var Node = require('./Node');
 var Token = require('../../lexer/JSXToken');
 var character = require('../../util/character');
+var Lexer = require('../../lexer/JSXLexer');
 
 var Parser = Es6Parser.extend(function(lexer) {
   Es6Parser.call(this, lexer);
@@ -234,6 +235,8 @@ var Parser = Es6Parser.extend(function(lexer) {
       }
     }
   }
+}).statics({
+  SELF_CLOSE: Lexer.SELF_CLOSE
 });
 
 module.exports = Parser;
