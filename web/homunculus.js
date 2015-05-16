@@ -218,4 +218,5 @@ exports.getContext = function (lan) {
 
 exports.reset = function() {
   Token.reset();
-};});
+};
+});

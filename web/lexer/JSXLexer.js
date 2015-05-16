@@ -22,6 +22,25 @@ var JSXMatch = [
   new RegMatch(JSXToken.PROPERTY, /^[a-z]+(?:-\w+)*/i)
 ];
 
+var SELF_CLOSE = {
+  'img': true,
+  'meta': true,
+  'link': true,
+  'br': true,
+  'basefont': true,
+  'base': true,
+  'col': true,
+  'embed': true,
+  'frame': true,
+  'hr': true,
+  'input': true,
+  'keygen': true,
+  'area': true,
+  'param': true,
+  'source': true,
+  'track': true
+};
+
 var JSXLexer = Lexer.extend(function(rule) {
   Lexer.call(this, rule);
 }).methods({
@@ -31,6 +50,7 @@ var JSXLexer = Lexer.extend(function(rule) {
     this.state = false; //是否在<>中
     this.hStack = []; //当mark开始时++，减少时--，以此得知jsx部分结束回归js
     this.jStack = []; //当{开始时++，减少时--，以此得知js部分结束回归jsx
+    this.selfClose = false; //当前jsx标签是否是自闭和
   },
   scan: function(temp) {
     var perlReg = this.rule.perlReg();
@@ -66,6 +86,9 @@ var JSXLexer = Lexer.extend(function(rule) {
             }
             //>
             else if(this.peek == '>') {
+              if(this.selfClose) {
+                this.error('self-close tag needs />');
+              }
               this.state = false;
               //>结束时，html深度若为0，说明html状态结束，或者栈最后一个计数器为0，也结束
               if(!this.hStack.length || !this.hStack[this.hStack.length - 1]) {
@@ -257,6 +280,12 @@ var JSXLexer = Lexer.extend(function(rule) {
     var token = new JSXToken(ELEM.tokenType(), ELEM.content(), ELEM.val(), this.index - 1);
     var matchLen = ELEM.content().length;
     this.dealToken(token, matchLen, 0, temp);
+    //自闭和没有.和:
+    if(SELF_CLOSE.hasOwnProperty(token.content().toLowerCase())) {
+      this.selfClose = true;
+      return;
+    }
+    this.selfClose = false;
     var c = this.code.charAt(this.index);
     if(c == '.') {
       while(true) {
@@ -313,5 +342,7 @@ var JSXLexer = Lexer.extend(function(rule) {
       }
     }
   }
+}).statics({
+  SELF_CLOSE: SELF_CLOSE
 });
 module.exports = JSXLexer;});
