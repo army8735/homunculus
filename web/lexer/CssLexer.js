@@ -287,6 +287,10 @@ var CssLexer = Lexer.extend(function(rule) {
               this.doc = false;
               break;
             case Token.SELECTOR:
+              if(this.value) {
+                token.cancel();
+                continue;
+              }
               this.sel = true;
               this.kw = false;
               this.number = false;

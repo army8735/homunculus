@@ -437,9 +437,8 @@ describe('csslexer', function() {
       it('filter', function() {
         var lexer = homunculus.getLexer('css');
         var tokens = lexer.parse('.a{filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);}');
-        expect(join(tokens)).to.eql(['.a', '{', 'filter', ':', ' ', 'progid', ':', 'DXImageTransform.Microsoft.gradient',
-          '(', 'enabled', ' ', '=', ' ', 'false', ')', ';', '}' ]);
-        expect(type(tokens)).to.eql([21, 8, 10, 8, 1, 5, 8, 5, 8, 15, 1, 8, 1, 15, 8, 8, 8]);
+        expect(join(tokens)).to.eql(['.a', '{', 'filter', ':', ' ', 'progid', ':', 'DXImageTransform', '.', 'Microsoft', '.', 'gradient', '(', 'enabled', ' ', '=', ' ', 'false', ')', ';', '}' ]);
+        expect(type(tokens)).to.eql([21, 8, 10, 8, 1, 5, 8, 5, 8, 5, 8, 5, 8, 15, 1, 8, 1, 15, 8, 8, 8]);
       });
       it('!ie like', function() {
         var lexer = homunculus.getLexer('css');

@@ -596,6 +596,11 @@ describe('cssparser', function() {
       var node = parser.parse('_:-ms-fullscreen,:root input[type="date"],_:-ms-fullscreen{}');
       expect(tree(node)).to.eql([CssNode.SHEET,["_",CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,[":-ms-fullscreen"],",",CssNode.SELECTOR,[":root","input","[","type","=","\"date\"","]"],",",CssNode.SELECTOR,["_",":-ms-fullscreen"]],CssNode.BLOCK,["{","}"]]]]);
     });
+    it('selector both name and class', function() {
+      var parser = homunculus.getParser('css');
+      var node = parser.parse('a.a{filter:progid:DXImageTransform.Microsoft.gradient(enabled = false)}');
+      expect(tree(node)).to.eql([CssNode.SHEET,[CssNode.STYLESET,[CssNode.SELECTORS,[CssNode.SELECTOR,["a",".a"]],CssNode.BLOCK,["{",CssNode.STYLE,[CssNode.KEY,["filter"],":",CssNode.VALUE,["progid",":","DXImageTransform",".","Microsoft",".",CssNode.BRACKET,["gradient","(","enabled","=","false",")"]]],"}"]]]]);
+    });
     it('pseudo first', function() {
       var parser = homunculus.getParser('css');
       var node = parser.parse(':hover{margin:0}');
