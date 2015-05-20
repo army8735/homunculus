@@ -12,7 +12,7 @@ var ADD_VALUE = new RegMatch(Token.ID, /^[a-z][\w\-\+\.]*/i);
 var CssLexer = Lexer.extend(function(rule) {
   Lexer.call(this, rule);
   this.media = false;
-  this.import = false;
+  this.impt = false;
   this.value = false;
   this.parenthese = false;
   this.bracket = false;
@@ -20,7 +20,7 @@ var CssLexer = Lexer.extend(function(rule) {
   this.url = false;
   this.kw = false;
   this.sel = true;
-  this.var = false;
+  this.va = false;
   this.cvar = false;
   this.page = false;
   this.kf = false;
@@ -84,10 +84,10 @@ var CssLexer = Lexer.extend(function(rule) {
               this.kw = false;
               this.value = true;
               this.number = false;
-              this.var = false;
+              this.va = false;
               switch(s) {
                 case '@import':
-                  this.import = true;
+                  this.impt = true;
                   break;
                 case '@media':
                   this.media = true;
@@ -118,7 +118,7 @@ var CssLexer = Lexer.extend(function(rule) {
               }
               this.sel = false;
               this.kw = false;
-              this.var = false;
+              this.va = false;
               this.number = false;
               this.page = false;
               this.kf = false;
@@ -129,7 +129,7 @@ var CssLexer = Lexer.extend(function(rule) {
               if(!this.value || this.supports) {
                 this.kw = true;
                 this.url = false;
-                this.var = false;
+                this.va = false;
                 this.sel = false;
                 this.number = false;
                 this.page = false;
@@ -149,7 +149,7 @@ var CssLexer = Lexer.extend(function(rule) {
               if(this.bracket && this.sel) {
                 token.type(Token.ATTR);
                 this.url = false;
-                this.var = false;
+                this.va = false;
               }
               else if(this.extend) {
                 token.type(Token.SELECTOR);
@@ -158,19 +158,19 @@ var CssLexer = Lexer.extend(function(rule) {
                 token.type(Token.UNITS);
                 this.url = false;
                 this.kw = false;
-                this.var = false;
+                this.va = false;
               }
               else if(this.page || this.kf || this.ns) {
                 this.sel = true;
                 this.url = false;
                 this.kw = false;
-                this.var = false;
+                this.va = false;
                 this.value = false;
               }
-              else if(this.var) {
+              else if(this.va) {
                 token.type(Token.VARS);
                 this.url = false;
-                this.var = false;
+                this.va = false;
               }
               else if(this.supports) {
                 if(this.rule.keyWords().hasOwnProperty(s)) {
@@ -228,13 +228,13 @@ var CssLexer = Lexer.extend(function(rule) {
                 if(this.rule.colors().hasOwnProperty(s)) {
                   token.type(Token.COLOR);
                   this.url = false;
-                  this.var = false;
+                  this.va = false;
                 }
                 else if(this.rule.keyWords().hasOwnProperty(s)
                   || this.rule.values().hasOwnProperty(s)) {
                   token.type(Token.PROPERTY);
                   this.url = ['url', 'format', 'url-prefix', 'domain', 'regexp'].indexOf(s) > -1;
-                  this.var = s == 'var';
+                  this.va = s == 'var';
                 }
                 this.kw = false;
                 this.sel = false;
@@ -266,7 +266,7 @@ var CssLexer = Lexer.extend(function(rule) {
                   this.kw = false;
                 }
                 this.url = false;
-                this.var = false;
+                this.va = false;
               }
               this.number = false;
               this.page = false;
@@ -280,7 +280,7 @@ var CssLexer = Lexer.extend(function(rule) {
                 token.cancel();
                 continue;
               }
-              this.var = false;
+              this.va = false;
               this.page = false;
               this.kf = false;
               this.ns = false;
@@ -294,7 +294,7 @@ var CssLexer = Lexer.extend(function(rule) {
               this.sel = true;
               this.kw = false;
               this.number = false;
-              this.var = false;
+              this.va = false;
               this.page = false;
               this.kf = false;
               this.ns = false;
@@ -302,7 +302,7 @@ var CssLexer = Lexer.extend(function(rule) {
               break;
             case Token.IMPORTANT:
               this.url = false;
-              this.var = false;
+              this.va = false;
               this.page = false;
               this.kf = false;
               this.ns = false;
@@ -317,11 +317,11 @@ var CssLexer = Lexer.extend(function(rule) {
                   }
                   this.url = false;
                   this.sel = false;
-                  this.var = false;
+                  this.va = false;
                   break;
                 case '(':
                   this.parenthese = true;
-                  if(this.media || this.import || this.doc) {
+                  if(this.media || this.impt || this.doc) {
                     this.value = false;
                   }
                   //fncall只会出现在block中
@@ -340,12 +340,12 @@ var CssLexer = Lexer.extend(function(rule) {
                   }
                   break;
                 case ')':
-                  if(this.media || this.import || this.doc) {
+                  if(this.media || this.impt || this.doc) {
                     this.value = true;
                   }
                   this.url = false;
                   this.parenthese = false;
-                  this.var = false;
+                  this.va = false;
                   //)之后可能跟单位，比如margin:(1+2)px
                   this.number = true;
                   this.param = false;
@@ -366,7 +366,7 @@ var CssLexer = Lexer.extend(function(rule) {
                   }
                   this.bracket = true;
                   this.url = false;
-                  this.var = false;
+                  this.va = false;
                   break;
                 case ']':
                   if(!this.value && !this.sel) {
@@ -374,17 +374,17 @@ var CssLexer = Lexer.extend(function(rule) {
                   }
                   this.bracket = false;
                   this.url = false;
-                  this.var = false;
+                  this.va = false;
                   break;
                 case ';':
                   if(this.bracket && !this.sel) {
                     token.type(Token.HACK);
                   }
                   this.value = false;
-                  this.import = false;
+                  this.impt = false;
                   this.url = false;
                   this.sel = false;
-                  this.var = false;
+                  this.va = false;
                   this.cvar = false;
                   this.extend = false;
                   this.param = false;
@@ -393,10 +393,10 @@ var CssLexer = Lexer.extend(function(rule) {
                   this.depth++;
                   this.value = false;
                   this.media = false;
-                  this.import = false;
+                  this.impt = false;
                   this.url = false;
                   this.sel = true;
-                  this.var = false;
+                  this.va = false;
                   this.supports = false;
                   this.cvar = false;
                   this.extend = false;
@@ -405,11 +405,11 @@ var CssLexer = Lexer.extend(function(rule) {
                 case '}':
                   this.value = false;
                   this.media = false;
-                  this.import = false;
+                  this.impt = false;
                   this.url = false;
                   this.sel = true;
                   this.depth--;
-                  this.var = false;
+                  this.va = false;
                   this.cvar = false;
                   this.extend = false;
                   this.param = false;
@@ -451,7 +451,7 @@ var CssLexer = Lexer.extend(function(rule) {
                     token.type(Token.SELECTOR);
                     this.sel = true;
                   }
-                  this.var = false;
+                  this.va = false;
                   break;
                 case '-':
                 case '/':
@@ -460,7 +460,7 @@ var CssLexer = Lexer.extend(function(rule) {
                   }
                   this.url = false;
                   this.sel = false;
-                  this.var = false;
+                  this.va = false;
                   break;
                 case '~':
                   if(!this.value && ['"', "'", '@', '$'].indexOf(this.code.charAt(this.index)) == -1) {
@@ -468,7 +468,7 @@ var CssLexer = Lexer.extend(function(rule) {
                   }
                 default:
                   this.url = false;
-                  this.var = false;
+                  this.va = false;
                   break;
               }
               this.kw = false;
@@ -480,7 +480,7 @@ var CssLexer = Lexer.extend(function(rule) {
             case Token.NUMBER:
               this.number = true;
               this.url = false;
-              this.var = false;
+              this.va = false;
               this.page = false;
               this.kf = false;
               this.ns = false;
@@ -498,7 +498,7 @@ var CssLexer = Lexer.extend(function(rule) {
               this.sel = false;
               this.url = false;
               this.number = false;
-              this.var = false;
+              this.va = false;
               this.page = false;
               this.kf = false;
               this.ns = false;
