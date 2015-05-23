@@ -1169,6 +1169,7 @@ var Parser = IParser.extend(function(lexer) {
         this.match(),
         this.proptname(noIn, noOf),
         this.match('('),
+        this.fmparams(),
         this.match(')'),
         this.match('{'),
         this.fnbody(),

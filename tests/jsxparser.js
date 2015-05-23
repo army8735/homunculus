@@ -560,7 +560,7 @@ describe('jsxparser', function() {
     it('keyword after get/set', function() {
       var parser = homunculus.getParser('es6');
       var node = parser.parse('~{get var(){}}');
-      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.UNARYEXPR,["~",JsNode.PRMREXPR,[JsNode.OBJLTR,["{",JsNode.PROPTDEF,[JsNode.METHOD,["get",JsNode.PROPTNAME,[JsNode.LTRPROPT,["var"]],"(",")","{",JsNode.FNBODY,[],"}"]],"}"]]]]]]]);
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.UNARYEXPR,["~",JsNode.PRMREXPR,[JsNode.OBJLTR,["{",JsNode.PROPTDEF,[JsNode.METHOD,["get",JsNode.PROPTNAME,[JsNode.LTRPROPT,["var"]],"(",JsNode.FMPARAMS,[],")","{",JsNode.FNBODY,[],"}"]],"}"]]]]]]]);
     });
     it('newexpr 1', function() {
       var parser = homunculus.getParser('es6');
@@ -1417,7 +1417,7 @@ describe('jsxparser', function() {
     it('class get', function() {
       var parser= homunculus.getParser('es6');
       var node = parser.parse('class A{get a(){return}}');
-      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.CLASSDECL,["class",JsNode.BINDID,["A"],"{",JsNode.CLASSBODY,[JsNode.CLASSELEM,[JsNode.METHOD,["get",JsNode.PROPTNAME,[JsNode.LTRPROPT,["a"]],"(",")","{",JsNode.FNBODY,[JsNode.RETSTMT,["return"]],"}"]]],"}"]]]]);
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.CLASSDECL,["class",JsNode.BINDID,["A"],"{",JsNode.CLASSBODY,[JsNode.CLASSELEM,[JsNode.METHOD,["get",JsNode.PROPTNAME,[JsNode.LTRPROPT,["a"]],"(",JsNode.FMPARAMS,[],")","{",JsNode.FNBODY,[JsNode.RETSTMT,["return"]],"}"]]],"}"]]]]);
     });
     it('class set', function() {
       var parser= homunculus.getParser('es6');
@@ -1649,8 +1649,7 @@ describe('jsxparser', function() {
     it('getter', function() {
       var parser = homunculus.getParser('es6');
       var node = parser.parse('var o = {get a(){}}');
-      expect(tree(node)).to.eql(
-        [JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.VARSTMT,["var",JsNode.VARDECL,[JsNode.BINDID,["o"],JsNode.INITLZ,["=",JsNode.PRMREXPR,[JsNode.OBJLTR,["{",JsNode.PROPTDEF,[JsNode.METHOD,["get",JsNode.PROPTNAME,[JsNode.LTRPROPT,["a"]],"(",")","{",JsNode.FNBODY,[],"}"]],"}"]]]]]]]]);
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.VARSTMT,["var",JsNode.VARDECL,[JsNode.BINDID,["o"],JsNode.INITLZ,["=",JsNode.PRMREXPR,[JsNode.OBJLTR,["{",JsNode.PROPTDEF,[JsNode.METHOD,["get",JsNode.PROPTNAME,[JsNode.LTRPROPT,["a"]],"(",JsNode.FMPARAMS,[],")","{",JsNode.FNBODY,[],"}"]],"}"]]]]]]]]);
     });
     it('get be an property', function() {
       var parser = homunculus.getParser('es6');
