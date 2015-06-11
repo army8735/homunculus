@@ -892,6 +892,12 @@ describe('csslexer', function() {
       expect(join(tokens)).to.eql(['a', '~', 'b', '{', '}']);
       expect(type(tokens)).to.eql([21, 8, 21, 8, 8]);
     });
+    it('in media', function() {
+      var lexer = homunculus.getLexer('css');
+      var tokens = lexer.parse('@media all and (~margin:0){}');
+      expect(join(tokens)).to.eql(['@media', ' ', 'all', ' ', 'and', ' ', '(', '~', 'margin', ':', '0', ')', '{', '}']);
+      expect(type(tokens)).to.eql([12, 1, 15, 1, 15, 1, 8, 17, 10, 8, 4, 8, 8, 8]);
+    });
   });
   describe('index test', function() {
     var lexer = homunculus.getLexer('css');
