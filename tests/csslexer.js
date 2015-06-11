@@ -886,6 +886,12 @@ describe('csslexer', function() {
       expect(join(tokens)).to.eql(['.a', '{', '$fn', '(', '~', '""', ')', '}']);
       expect(type(tokens)).to.eql([21, 8, 16, 8, 8, 7, 8, 8]);
     });
+    it('in selector', function() {
+      var lexer = homunculus.getLexer('css');
+      var tokens = lexer.parse('a~b{}');
+      expect(join(tokens)).to.eql(['a', '~', 'b', '{', '}']);
+      expect(type(tokens)).to.eql([21, 8, 21, 8, 8]);
+    });
   });
   describe('index test', function() {
     var lexer = homunculus.getLexer('css');

@@ -1,6 +1,6 @@
 {
   "name": "homunculus",
-  "version": "0.9.7",
+  "version": "0.9.8",
   "description": "A lexer&parser by Javascript",
   "maintainers": [
     {
@@ -59,14 +59,14 @@
   "readmeFilename": "README.md",
   "devDependencies": {
     "blanket": "^1.1.6",
-    "coveralls": "^2.10.0",
+    "coveralls": "^2.11.2",
     "expect.js": "^0.3.1",
-    "gulp": "^3.8.1",
+    "gulp": "^3.8.11",
     "gulp-clean": "^0.2.4",
-    "gulp-util": "^2.2.14",
-    "mocha": "^1.18.2",
-    "mocha-lcov-reporter": "0.0.1",
-    "through2": "^0.4.2",
+    "gulp-util": "^3.0.1",
+    "mocha": "^2.2.4",
+    "mocha-lcov-reporter": "^0.0.2",
+    "through2": "^0.6.1",
     "unicode-7.0.0": "^0.1.5"
   }
 }
