@@ -5,7 +5,6 @@ var fs = require('fs');
 var path = require('path');
 
 var Token = homunculus.getClass('token', 'jsx');
-var Parser = homunculus.getClass('parser', 'jsx');
 var JsNode = homunculus.getClass('node', 'jsx');
 
 var res;
@@ -167,6 +166,16 @@ describe('jsxparser2', function() {
       expect(function() {
         parser.parse('<a:b></b>');
       }).to.throwError();
+    });
+    it('attr with [', function() {
+      var parser = homunculus.getParser('jsx');
+      var node = parser.parse('<div a=[1]/>');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.JSXSelfClosingElement,["<","div",JsNode.JSXAttribute,["a","=",JsNode.JSXAttributeValue,["[",JsNode.PRMREXPR,["1"],"]"]],"/>"]]]]]);
+    });
+    it('attr with [ & [', function() {
+      var parser = homunculus.getParser('jsx');
+      var node = parser.parse('<div a=[{},[]]/>');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.JSXSelfClosingElement,["<","div",JsNode.JSXAttribute,["a","=",JsNode.JSXAttributeValue,["[",JsNode.PRMREXPR,[JsNode.OBJLTR,["{","}"]],",",JsNode.PRMREXPR,[JsNode.ARRLTR,["[","]"]],"]"]],"/>"]]]]]);
     });
   });
   describe('file', function() {

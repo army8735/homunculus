@@ -49,7 +49,8 @@ var JSXLexer = Lexer.extend(function(rule) {
     this.html = false; //目前是否为解析html状态
     this.state = false; //是否在<>中
     this.hStack = []; //当mark开始时++，减少时--，以此得知jsx部分结束回归js
-    this.jStack = []; //当{开始时++，减少时--，以此得知js部分结束回归jsx
+    this.jStack = []; //当{开始时++，}减少时--，以此得知js部分结束回归jsx
+    this.aStack = []; //当[开始时++，]减少时--，以此得知js部分结束回归jsx
     this.selfClose = false; //当前jsx标签是否是自闭和
   },
   scan: function(temp) {
@@ -109,6 +110,14 @@ var JSXLexer = Lexer.extend(function(rule) {
               var token = new JSXToken(JSXToken.SIGN, this.peek, this.peek);
               this.dealToken(token, 1, 0, temp);
               this.stateBrace(this.peek);
+            }
+            //[递归进入js状态
+            else if(this.peek == '[') {
+              this.html = false;
+              this.braceState = false;
+              this.aStack.push(1);
+              var token = new JSXToken(JSXToken.SIGN, this.peek, this.peek);
+              this.dealToken(token, 1, 0, temp);
             }
             else {
               for(var i = 0, len = JSXMatch.length; i < len; i++) {
@@ -257,7 +266,7 @@ var JSXLexer = Lexer.extend(function(rule) {
               if(perlReg && match.perlReg() != Lexer.IGNORE) {
                 this.stateReg(match);
               }
-              //处理{
+              //处理{和[
               this.stateBrace(match.content(), token.type());
               this.xBrace(match.content());
 
@@ -338,6 +347,20 @@ var JSXLexer = Lexer.extend(function(rule) {
         if(this.jStack[this.jStack.length - 1] == 0) {
           this.html = true;
           this.jStack.pop();
+        }
+      }
+    }
+    else if(content == '[') {
+      if(this.aStack.length) {
+        this.aStack[this.aStack.length - 1]++;
+      }
+    }
+    else if(content == ']') {
+      if(this.aStack.length) {
+        this.aStack[this.aStack.length - 1]--;
+        if(this.aStack[this.aStack.length - 1] == 0) {
+          this.html = true;
+          this.aStack.pop();
         }
       }
     }

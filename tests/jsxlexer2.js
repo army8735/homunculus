@@ -104,6 +104,16 @@ describe('jsxlexer2', function() {
       var tokens = lexer.parse('<a><b><c>123</c>456</b></a>,<d><e></e></d>');
       expect(join(tokens)).to.eql(['<', 'a', '>', '<', 'b', '>', '<', 'c', '>', '123', '</', 'c', '>', '456', '</', 'b', '>', '</', 'a', '>', ',', '<', 'd', '>', '<', 'e', '>', '</', 'e', '>', '</', 'd', '>']);
     });
+    it('attr with [', function() {
+      var lexer = homunculus.getLexer('jsx');
+      var tokens = lexer.parse('<div a=[1]/>');
+      expect(join(tokens)).to.eql(['<', 'div', ' ', 'a', '=', '[', '1', ']', '/>']);
+    });
+    it('attr with [ & [', function() {
+      var lexer = homunculus.getLexer('jsx');
+      var tokens = lexer.parse('<div a=[{},[]]/>');
+      expect(join(tokens)).to.eql(['<', 'div', ' ', 'a', '=', '[', '{', '}', ',', '[', ']', ']', '/>']);
+    });
   });
   describe('line && col', function() {
     it('normal', function() {

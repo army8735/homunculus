@@ -1,6 +1,6 @@
 {
   "name": "homunculus",
-  "version": "0.9.9",
+  "version": "0.10.0",
   "description": "A lexer&parser by Javascript",
   "maintainers": [
     {

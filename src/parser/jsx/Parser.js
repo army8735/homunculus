@@ -144,11 +144,23 @@ var Parser = Es6Parser.extend(function(lexer) {
     }
     if(this.look.content() == '{') {
       var node = new Node(Node.JSXAttributeValue);
-      node.add(this.match('{'));
+      node.add(this.match());
       if(this.look && this.look.content() != '}') {
         node.add(this.assignexpr());
       }
       node.add(this.match('}'));
+      return node;
+    }
+    else if(this.look.content() == '[') {
+      var node = new Node(Node.JSXAttributeValue);
+      node.add(this.match());
+      while(this.look && this.look.content() != ']') {
+        node.add(this.assignexpr());
+        if(this.look && this.look.content() == ',') {
+          node.add(this.match());
+        }
+      }
+      node.add(this.match(']'));
       return node;
     }
     else if([Token.STRING, Token.NUMBER].indexOf(this.look.type()) > -1) {
