@@ -184,6 +184,11 @@ describe('jsparser', function() {
       var node = parser.parse('a++');
       expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.EXPRSTMT,[JsNode.POSTFIXEXPR,[JsNode.PRMREXPR,["a"],"++"]]]]);
     });
+    it('postfixexpr 5', function() {
+      var parser = homunculus.getParser('js');
+      var node = parser.parse('{a:a++\n}');
+      expect(tree(node)).to.eql([JsNode.PROGRAM,[JsNode.BLOCK,["{",JsNode.LABSTMT,["a",":",JsNode.EXPRSTMT,[JsNode.POSTFIXEXPR,[JsNode.PRMREXPR,["a"],"++"]]],"}"]]]);
+    });
     it('postfixexpr error 1', function() {
       var parser = homunculus.getParser('js');
       expect(function() {

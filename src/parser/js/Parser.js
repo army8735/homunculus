@@ -829,7 +829,7 @@ var Parser = IParser.extend(function(lexer) {
     if(this.look && ['++', '--'].indexOf(this.look.content()) > -1 && !this.hasMoveLine) {
       node.add(
         leftexpr,
-        this.match(undefined, true)
+        this.match()
       );
     }
     else {
