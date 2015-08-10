@@ -292,6 +292,7 @@ var JSXLexer = Lexer.extend(function(rule) {
       }
       this.selfClose = false;
     }
+    this.selfClose = false;
     var c = this.code.charAt(this.index);
     if(c == '.') {
       while(true) {

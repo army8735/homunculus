@@ -172,6 +172,11 @@ describe('jsxparser2', function() {
       var node = parser.parse('<a attr={<b attr2={<c/>}>1</b>} attr3="2">3</a>');
       expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.JSXElement,[JsNode.JSXOpeningElement,["<","a",JsNode.JSXAttribute,["attr","=",JsNode.JSXAttributeValue,["{",JsNode.JSXElement,[JsNode.JSXOpeningElement,["<","b",JsNode.JSXAttribute,["attr2","=",JsNode.JSXAttributeValue,["{",JsNode.JSXSelfClosingElement,["<","c","/>"],"}"]],">"],"1",JsNode.JSXClosingElement,["</","b",">"]],"}"]],JsNode.JSXAttribute,["attr3","=","\"2\""],">"],"3",JsNode.JSXClosingElement,["</","a",">"]]]]]]);
     });
+    it('embed self-close', function() {
+      var parser = homunculus.getParser('jsx');
+      var node = parser.parse('<div><input/></div>');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.JSXElement,[JsNode.JSXOpeningElement,["<","div",">"],JsNode.JSXSelfClosingElement,["<","input","/>"],JsNode.JSXClosingElement,["</","div",">"]]]]]]);
+    });
   });
   describe('file', function() {
     it('1', function() {
