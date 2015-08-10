@@ -104,15 +104,10 @@ describe('jsxlexer2', function() {
       var tokens = lexer.parse('<a><b><c>123</c>456</b></a>,<d><e></e></d>');
       expect(join(tokens)).to.eql(['<', 'a', '>', '<', 'b', '>', '<', 'c', '>', '123', '</', 'c', '>', '456', '</', 'b', '>', '</', 'a', '>', ',', '<', 'd', '>', '<', 'e', '>', '</', 'e', '>', '</', 'd', '>']);
     });
-    it('attr with [', function() {
+    it('long', function() {
       var lexer = homunculus.getLexer('jsx');
-      var tokens = lexer.parse('<div a=[1]/>');
-      expect(join(tokens)).to.eql(['<', 'div', ' ', 'a', '=', '[', '1', ']', '/>']);
-    });
-    it('attr with [ & [', function() {
-      var lexer = homunculus.getLexer('jsx');
-      var tokens = lexer.parse('<div a=[{},[]]/>');
-      expect(join(tokens)).to.eql(['<', 'div', ' ', 'a', '=', '[', '{', '}', ',', '[', ']', ']', '/>']);
+      var tokens = lexer.parse('<a attr={<b attr2={<c/>}>1</b>} attr3="2">3</a>');
+      expect(join(tokens)).to.eql(['<', 'a', ' ', 'attr', '=', '{', '<', 'b', ' ', 'attr2', '=', '{', '<', 'c', '/>', '}', '>', '1', '</', 'b', '>', '}', ' ', 'attr3', '=', '"2"', '>', '3', '</', 'a', '>']);
     });
   });
   describe('line && col', function() {

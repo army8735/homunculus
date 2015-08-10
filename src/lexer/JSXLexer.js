@@ -19,7 +19,7 @@ var JSXMatch = [
   new LineSearch(JSXToken.STRING, "'", "'", true),
   new CharacterSet(JSXToken.SIGN, '=:'),
   new RegMatch(JSXToken.NUMBER, /^\d+(?:\.\d*)?/),
-  new RegMatch(JSXToken.PROPERTY, /^[a-z]+(?:-\w+)*/i)
+  new RegMatch(JSXToken.PROPERTY, /^[a-z]\w*(?:-\w+)*/i)
 ];
 
 var SELF_CLOSE = {
@@ -50,7 +50,8 @@ var JSXLexer = Lexer.extend(function(rule) {
     this.state = false; //是否在<>中
     this.hStack = []; //当mark开始时++，减少时--，以此得知jsx部分结束回归js
     this.jStack = []; //当{开始时++，}减少时--，以此得知js部分结束回归jsx
-    this.aStack = []; //当[开始时++，]减少时--，以此得知js部分结束回归jsx
+    this.aStack = []; //html和js互相递归时，记录当前层是否在attr状态中
+    this.cStack = []; //html和js互相递归时，记录当前jsx标签是否是自闭和
     this.selfClose = false; //当前jsx标签是否是自闭和
   },
   scan: function(temp) {
@@ -107,17 +108,11 @@ var JSXLexer = Lexer.extend(function(rule) {
               this.html = false;
               this.braceState = false;
               this.jStack.push(1);
+              this.cStack.push(this.selfClose);
+              this.aStack.push(this.state);
               var token = new JSXToken(JSXToken.SIGN, this.peek, this.peek);
               this.dealToken(token, 1, 0, temp);
               this.stateBrace(this.peek);
-            }
-            //[递归进入js状态
-            else if(this.peek == '[') {
-              this.html = false;
-              this.braceState = false;
-              this.aStack.push(1);
-              var token = new JSXToken(JSXToken.SIGN, this.peek, this.peek);
-              this.dealToken(token, 1, 0, temp);
             }
             else {
               for(var i = 0, len = JSXMatch.length; i < len; i++) {
@@ -171,7 +166,7 @@ var JSXLexer = Lexer.extend(function(rule) {
                 this.index = idx + 2;
                 this.readch();
                 //\w elem
-                this.dealTag(temp);
+                this.dealTag(temp, true);
               }
               //<\w
               else if(character.isLetter(c1)) {
@@ -266,7 +261,7 @@ var JSXLexer = Lexer.extend(function(rule) {
               if(perlReg && match.perlReg() != Lexer.IGNORE) {
                 this.stateReg(match);
               }
-              //处理{和[
+              //处理{
               this.stateBrace(match.content(), token.type());
               this.xBrace(match.content());
 
@@ -284,17 +279,19 @@ var JSXLexer = Lexer.extend(function(rule) {
     var n = character.count(token.val(), character.LINE);
     this.dealToken(token, s.length, n, temp);
   },
-  dealTag: function(temp) {
+  dealTag: function(temp, end) {
     ELEM.match(this.peek, this.code, this.index);
     var token = new JSXToken(ELEM.tokenType(), ELEM.content(), ELEM.val(), this.index - 1);
     var matchLen = ELEM.content().length;
     this.dealToken(token, matchLen, 0, temp);
-    //自闭和没有.和:
-    if(SELF_CLOSE.hasOwnProperty(token.content().toLowerCase())) {
-      this.selfClose = true;
-      return;
+    if(!end) {
+      //自闭和没有.和:
+      if(SELF_CLOSE.hasOwnProperty(token.content().toLowerCase())) {
+        this.selfClose = true;
+        return;
+      }
+      this.selfClose = false;
     }
-    this.selfClose = false;
     var c = this.code.charAt(this.index);
     if(c == '.') {
       while(true) {
@@ -346,21 +343,9 @@ var JSXLexer = Lexer.extend(function(rule) {
         this.jStack[this.jStack.length - 1]--;
         if(this.jStack[this.jStack.length - 1] == 0) {
           this.html = true;
+          this.selfClose = this.cStack.pop();
+          this.state = this.aStack.pop();
           this.jStack.pop();
-        }
-      }
-    }
-    else if(content == '[') {
-      if(this.aStack.length) {
-        this.aStack[this.aStack.length - 1]++;
-      }
-    }
-    else if(content == ']') {
-      if(this.aStack.length) {
-        this.aStack[this.aStack.length - 1]--;
-        if(this.aStack[this.aStack.length - 1] == 0) {
-          this.html = true;
-          this.aStack.pop();
         }
       }
     }

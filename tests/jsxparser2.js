@@ -167,15 +167,10 @@ describe('jsxparser2', function() {
         parser.parse('<a:b></b>');
       }).to.throwError();
     });
-    it('attr with [', function() {
+    it('long', function() {
       var parser = homunculus.getParser('jsx');
-      var node = parser.parse('<div a=[1]/>');
-      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.JSXSelfClosingElement,["<","div",JsNode.JSXAttribute,["a","=",JsNode.JSXAttributeValue,["[",JsNode.PRMREXPR,["1"],"]"]],"/>"]]]]]);
-    });
-    it('attr with [ & [', function() {
-      var parser = homunculus.getParser('jsx');
-      var node = parser.parse('<div a=[{},[]]/>');
-      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.JSXSelfClosingElement,["<","div",JsNode.JSXAttribute,["a","=",JsNode.JSXAttributeValue,["[",JsNode.PRMREXPR,[JsNode.OBJLTR,["{","}"]],",",JsNode.PRMREXPR,[JsNode.ARRLTR,["[","]"]],"]"]],"/>"]]]]]);
+      var node = parser.parse('<a attr={<b attr2={<c/>}>1</b>} attr3="2">3</a>');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.JSXElement,[JsNode.JSXOpeningElement,["<","a",JsNode.JSXAttribute,["attr","=",JsNode.JSXAttributeValue,["{",JsNode.JSXElement,[JsNode.JSXOpeningElement,["<","b",JsNode.JSXAttribute,["attr2","=",JsNode.JSXAttributeValue,["{",JsNode.JSXSelfClosingElement,["<","c","/>"],"}"]],">"],"1",JsNode.JSXClosingElement,["</","b",">"]],"}"]],JsNode.JSXAttribute,["attr3","=","\"2\""],">"],"3",JsNode.JSXClosingElement,["</","a",">"]]]]]]);
     });
   });
   describe('file', function() {
