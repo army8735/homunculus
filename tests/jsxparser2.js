@@ -86,11 +86,10 @@ describe('jsxparser2', function() {
       var node = parser.parse('<a href="#" data={a++}/>');
       expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.JSXSelfClosingElement,["<","a",JsNode.JSXAttribute,["href","=","\"#\""],JsNode.JSXAttribute,["data","=",JsNode.JSXAttributeValue,["{",JsNode.POSTFIXEXPR,[JsNode.PRMREXPR,["a"],"++"],"}"]],"/>"]]]]]);
     });
-    it('spread must be last', function() {
+    it('spread multi', function() {
       var parser = homunculus.getParser('jsx');
-      expect(function() {
-        parser.parse('<a {...spread}href="#"/>');
-      }).to.throwError();
+      var node = parser.parse('<a {...spread}href="#"{...spread2}/>');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.JSXSelfClosingElement,["<","a",JsNode.JSXSpreadAttribute,["{","...",JsNode.PRMREXPR,["spread"],"}"],JsNode.JSXAttribute,["href","=","\"#\""],JsNode.JSXSpreadAttribute,["{","...",JsNode.PRMREXPR,["spread2"],"}"],"/>"]]]]]);
     });
     it('empty text with js', function() {
       var parser = homunculus.getParser('jsx');

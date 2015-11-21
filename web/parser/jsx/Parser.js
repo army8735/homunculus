@@ -35,11 +35,16 @@ var Parser = Es6Parser.extend(function(lexer) {
     else {
       name = node.last().token().content();
     }
-    while(this.look && this.look.type() == Token.PROPERTY) {
-      node.add(this.attr());
-    }
-    if(this.look && this.look.content() == '{') {
-      node.add(this.spreadattr());
+    while(this.look) {
+      if(this.look.type() == Token.PROPERTY) {
+        node.add(this.attr());
+      }
+      else if(this.look.content() == '{') {
+        node.add(this.spreadattr());
+      }
+      else {
+        break;
+      }
     }
     if(!this.look) {
       this.error();
