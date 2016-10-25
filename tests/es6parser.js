@@ -1714,6 +1714,11 @@ describe('es6parser', function() {
         parser.parse('var o = {set 3(){}}');
       }).to.throwError();
     });
+    it('annot', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('class A{@bind test(){} @link(a,b) get v(){}}');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.CLASSDECL,["class",JsNode.BINDID,["A"],"{",JsNode.CLASSBODY,[JsNode.CLASSELEM,[JsNode.ANNOT,["@bind"]],JsNode.CLASSELEM,[JsNode.METHOD,[JsNode.PROPTNAME,[JsNode.LTRPROPT,["test"]],"(",JsNode.FMPARAMS,[],")","{",JsNode.FNBODY,[],"}"]],JsNode.CLASSELEM,[JsNode.ANNOT,["@link","(",JsNode.FMPARAMS,[JsNode.SINGLENAME,[JsNode.BINDID,["a"]],",",JsNode.SINGLENAME,[JsNode.BINDID,["b"]]],")"]],JsNode.CLASSELEM,[JsNode.METHOD,["get",JsNode.PROPTNAME,[JsNode.LTRPROPT,["v"]],"(",JsNode.FMPARAMS,[],")","{",JsNode.FNBODY,[],"}"]]],"}"]]]]);
+    });
   });
   describe('js lib exec test', function() {
     it('jquery 1.11.0', function() {

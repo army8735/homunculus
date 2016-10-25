@@ -1157,8 +1157,23 @@ var Parser = IParser.extend(function(lexer) {
         this.method(noIn, noOf)
       );
     }
+    else if(this.look.type() == Token.ANNOT) {
+      node.add(this.annot());
+    }
     else {
       node.add(this.method(noIn, noOf));
+    }
+    return node;
+  },
+  annot: function() {
+    var node = new Node(Node.ANNOT);
+    node.add(this.match());
+    if(this.look && this.look.content() == '(') {
+      node.add(
+        this.match('('),
+        this.fmparams(),
+        this.match(')')
+      );
     }
     return node;
   },

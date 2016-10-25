@@ -239,6 +239,16 @@ describe('jsxlexer', function() {
       var tokens = lexer.parse('()=>{}/1/');
       expect(join(tokens)).to.eql(['(', ')', '=>', '{', '}', '/1/']);
     });
+    it('annot 1', function() {
+      var lexer = homunculus.getLexer('js');
+      var tokens = lexer.parse('@bind');
+      expect(join(tokens)).to.eql(['@bind']);
+    });
+    it('annot 2', function() {
+      var lexer = homunculus.getLexer('js');
+      var tokens = lexer.parse('@link(a,b)');
+      expect(join(tokens)).to.eql(['@link', '(', 'a', ',', 'b', ')']);
+    });
   });
   describe('complex test', function() {
     it('test 1', function() {
