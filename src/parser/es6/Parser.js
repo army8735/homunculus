@@ -1162,7 +1162,6 @@ var Parser = IParser.extend(function(lexer) {
     }
     else if(['[', '{'].indexOf(this.look.content()) != -1) {
       node.add(this.lexbind());
-      node.add(this.match(';'));
     }
     else if(this.look.type() == Token.ID && ['get', 'set'].indexOf(this.look.content()) == -1) {
       //LL2区分新增语法classbody内赋值
@@ -1174,7 +1173,6 @@ var Parser = IParser.extend(function(lexer) {
           }
           else {
             node.add(this.lexbind());
-            node.add(this.match(';'));
           }
           return node;
         }

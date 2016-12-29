@@ -1734,11 +1734,6 @@ describe('es6parser', function() {
       var node = parser.parse('class A{{b}={b:1}}');
       expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.CLASSDECL,["class",JsNode.BINDID,["A"],"{",JsNode.CLASSBODY,[JsNode.CLASSELEM,[JsNode.LEXBIND,[JsNode.OBJBINDPAT,["{",JsNode.BINDPROPT,[JsNode.SINGLENAME,[JsNode.BINDID,["b"]]],"}"],JsNode.INITLZ,["=",JsNode.PRMREXPR,[JsNode.OBJLTR,["{",JsNode.PROPTDEF,[JsNode.PROPTNAME,[JsNode.LTRPROPT,["b"]],":",JsNode.PRMREXPR,["1"]],"}"]]]]]],"}"]]]]);
     });
-    it('class lexbind 4', function() {
-      var parser = homunculus.getParser('es6');
-      var node = parser.parse('class A{b=1;c=2}');
-      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.CLASSDECL,["class",JsNode.BINDID,["A"],"{",JsNode.CLASSBODY,[JsNode.CLASSELEM,[JsNode.LEXBIND,[JsNode.BINDID,["b"],JsNode.INITLZ,["=",JsNode.PRMREXPR,["1"]]],";"],JsNode.CLASSELEM,[JsNode.LEXBIND,[JsNode.BINDID,["c"],JsNode.INITLZ,["=",JsNode.PRMREXPR,["2"]]]]],"}"]]]]);
-    });
   });
   describe('js lib exec test', function() {
     it('jquery 1.11.0', function() {
