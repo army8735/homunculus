@@ -1719,6 +1719,21 @@ describe('es6parser', function() {
       var node = parser.parse('class A{@bind test(){} @link(a,b) get v(){}}');
       expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.CLASSDECL,["class",JsNode.BINDID,["A"],"{",JsNode.CLASSBODY,[JsNode.CLASSELEM,[JsNode.ANNOT,["@bind"]],JsNode.CLASSELEM,[JsNode.METHOD,[JsNode.PROPTNAME,[JsNode.LTRPROPT,["test"]],"(",JsNode.FMPARAMS,[],")","{",JsNode.FNBODY,[],"}"]],JsNode.CLASSELEM,[JsNode.ANNOT,["@link","(",JsNode.FMPARAMS,[JsNode.SINGLENAME,[JsNode.BINDID,["a"]],",",JsNode.SINGLENAME,[JsNode.BINDID,["b"]]],")"]],JsNode.CLASSELEM,[JsNode.METHOD,["get",JsNode.PROPTNAME,[JsNode.LTRPROPT,["v"]],"(",JsNode.FMPARAMS,[],")","{",JsNode.FNBODY,[],"}"]]],"}"]]]]);
     });
+    it('class lexbind', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('class A{b=1}');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.CLASSDECL,["class",JsNode.BINDID,["A"],"{",JsNode.CLASSBODY,[JsNode.CLASSELEM,[JsNode.LEXBIND,[JsNode.BINDID,["b"],JsNode.INITLZ,["=",JsNode.PRMREXPR,["1"]]]]],"}"]]]]);
+    });
+    it('class lexbind 2', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('class A{[b]=[1]}');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.CLASSDECL,["class",JsNode.BINDID,["A"],"{",JsNode.CLASSBODY,[JsNode.CLASSELEM,[JsNode.LEXBIND,[JsNode.ARRBINDPAT,["[",JsNode.SINGLENAME,[JsNode.BINDID,["b"]],"]"],JsNode.INITLZ,["=",JsNode.PRMREXPR,[JsNode.ARRLTR,["[",JsNode.PRMREXPR,["1"],"]"]]]]]],"}"]]]]);
+    });
+    it('class lexbind 3', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('class A{{b}={b:1}}');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.CLASSDECL,["class",JsNode.BINDID,["A"],"{",JsNode.CLASSBODY,[JsNode.CLASSELEM,[JsNode.LEXBIND,[JsNode.OBJBINDPAT,["{",JsNode.BINDPROPT,[JsNode.SINGLENAME,[JsNode.BINDID,["b"]]],"}"],JsNode.INITLZ,["=",JsNode.PRMREXPR,[JsNode.OBJLTR,["{",JsNode.PROPTDEF,[JsNode.PROPTNAME,[JsNode.LTRPROPT,["b"]],":",JsNode.PRMREXPR,["1"]],"}"]]]]]],"}"]]]]);
+    });
   });
   describe('js lib exec test', function() {
     it('jquery 1.11.0', function() {

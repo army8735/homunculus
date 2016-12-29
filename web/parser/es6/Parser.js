@@ -1160,6 +1160,24 @@ var Parser = IParser.extend(function(lexer) {
     else if(this.look.type() == Token.ANNOT) {
       node.add(this.annot());
     }
+    else if(['[', '{'].indexOf(this.look.content()) != -1) {
+      node.add(this.lexbind());
+    }
+    else if(this.look.type() == Token.ID && ['get', 'set'].indexOf(this.look.content()) == -1) {
+      //LL2区分新增语法classbody内赋值
+      for(var i = this.index; i < this.length; i++) {
+        var next = this.tokens[i];
+        if(!S[next.type()]) {
+          if(next.content() == '(') {
+            node.add(this.method(noIn, noOf));
+          }
+          else {
+            node.add(this.lexbind());
+          }
+          return node;
+        }
+      }
+    }
     else {
       node.add(this.method(noIn, noOf));
     }
