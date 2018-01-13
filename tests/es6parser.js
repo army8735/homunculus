@@ -1277,6 +1277,11 @@ describe('es6parser', function() {
       var node = parser.parse('switch(a){case 1:case 2:;break;default:;}');
       expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.SWCHSTMT,["switch","(",JsNode.PRMREXPR,["a"],")",JsNode.CASEBLOCK,["{",JsNode.CASECLAUSE,["case",JsNode.PRMREXPR,["1"],":"],JsNode.CASECLAUSE,["case",JsNode.PRMREXPR,["2"],":",JsNode.EMPTSTMT,[";"],JsNode.BRKSTMT,["break",";"]],JsNode.DFTCLAUSE,["default",":",JsNode.EMPTSTMT,[";"]],"}"]]]]]);
     });
+    it('caseclause', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('switch(a){case 1:let a=1}');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.SWCHSTMT,["switch","(",JsNode.PRMREXPR,["a"],")",JsNode.CASEBLOCK,["{",JsNode.CASECLAUSE,["case",JsNode.PRMREXPR,["1"],":",JsNode.LEXDECL,["let",JsNode.LEXBIND,[JsNode.BINDID,["a"],JsNode.INITLZ,["=",JsNode.PRMREXPR,["1"]]]]],"}"]]]]]);
+    });
     it('defaultstmt', function() {
       var parser = homunculus.getParser('es6');
       var node = parser.parse('switch(a){default:case 1:break;}');

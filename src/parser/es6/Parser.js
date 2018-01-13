@@ -317,7 +317,7 @@ var Parser = IParser.extend(function(lexer) {
       case 'with':
         return this.withstmt(yYield);
       case 'switch':
-        return this.swchstmt(yYield);
+        return this.swchstmt(yYield, isConstructor);
       case 'throw':
         return this.thrstmt(yYield);
       case 'try':
@@ -846,26 +846,26 @@ var Parser = IParser.extend(function(lexer) {
     );
     return node;
   },
-  swchstmt: function(yYield) {
+  swchstmt: function(yYield, isConstructor) {
     var node = new Node(Node.SWCHSTMT);
     node.add(
       this.match('switch'),
       this.match('('),
       this.expr(),
       this.match(')'),
-      this.caseblock(yYield)
+      this.caseblock(yYield, isConstructor)
     );
     return node;
   },
-  caseblock: function(yYield) {
+  caseblock: function(yYield, isConstructor) {
     var node = new Node(Node.CASEBLOCK);
     node.add(this.match('{'));
     while(this.look && this.look.content() != '}') {
       if(this.look.content() == 'case') {
-        node.add(this.caseclause(yYield));
+        node.add(this.caseclause(yYield, isConstructor));
       }
       else if(this.look.content() == 'default') {
-        node.add(this.dftclause(yYield));
+        node.add(this.dftclause(yYield, isConstructor));
       }
       else {
         this.error('invalid switch statement');
@@ -874,7 +874,7 @@ var Parser = IParser.extend(function(lexer) {
     node.add(this.match('}'));
     return node;
   },
-  caseclause: function(yYield) {
+  caseclause: function(yYield, isConstructor) {
     var node = new Node(Node.CASECLAUSE);
     node.add(
       this.match('case'),
@@ -885,11 +885,11 @@ var Parser = IParser.extend(function(lexer) {
       && this.look.content() != 'case'
       && this.look.content() != 'default'
       && this.look.content() != '}') {
-      node.add(this.stmt(yYield));
+      node.add(this.stmtlitem(yYield, isConstructor));
     }
     return node;
   },
-  dftclause: function(yYield) {
+  dftclause: function(yYield, isConstructor) {
     var node = new Node(Node.DFTCLAUSE);
     node.add(
       this.match('default'),
@@ -903,7 +903,7 @@ var Parser = IParser.extend(function(lexer) {
       );
     }
     while(this.look && this.look.content() != '}') {
-      node.add(this.stmt(yYield));
+      node.add(this.stmtlitem(yYield, isConstructor));
     }
     return node;
   },
