@@ -32,8 +32,11 @@ npm install homunculus
     * javascript
     * es 
     * es5
-    * ecmascript
     * es6
+    * es7
+    * es2015
+    * es2016
+    * ecmascript
     * as
     * actionscript
     * css
@@ -48,6 +51,9 @@ npm install homunculus
    * es5
    * ecmascript
    * es6
+   * es7
+   * es2015
+   * es2016
    * as
    * actionscript
    * css
