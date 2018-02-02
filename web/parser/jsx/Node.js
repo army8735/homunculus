@@ -10,6 +10,7 @@ var Node = Es6Node.extend(function(type, children) {
   JSXChild: 'JSXChild',
   JSXSpreadAttribute: 'JSXSpreadAttribute',
   JSXAttribute: 'JSXAttribute',
+  JSXBindAttribute: 'JSXBindAttribute',
   JSXNamespacedName: 'JSXNamespacedName',
   JSXMemberExpression: 'JSXMemberExpression',
   JSXAttributes: 'JSXAttributes',

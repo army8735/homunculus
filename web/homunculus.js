@@ -40,8 +40,11 @@ exports.getClass = function (type, lan) {
         case 'javascript':
         case 'es':
         case 'es5':
-        case 'ecmascript':
         case 'es6':
+        case 'es7':
+        case 'es2015':
+        case 'es2016':
+        case 'ecmascript':
         case 'as':
         case 'actionscript':
           return Lexer;
@@ -65,6 +68,9 @@ exports.getClass = function (type, lan) {
         case 'ecmascript':
           return JsParser;
         case 'es6':
+        case 'es7':
+        case 'es2015':
+        case 'es2016':
           return Es6Parser;
         case 'css':
           return CssParser;

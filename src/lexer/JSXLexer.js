@@ -19,6 +19,7 @@ var JSXMatch = [
   new LineSearch(JSXToken.STRING, "'", "'", true),
   new CharacterSet(JSXToken.SIGN, '=:'),
   new RegMatch(JSXToken.NUMBER, /^\d+(?:\.\d*)?/),
+  new RegMatch(JSXToken.BIND_PROPERTY, /^@[a-z]\w*/i),
   new RegMatch(JSXToken.PROPERTY, /^[a-z]\w*(?:-\w+)*/i)
 ];
 
@@ -51,8 +52,8 @@ var JSXLexer = Lexer.extend(function(rule) {
     this.hStack = []; //当mark开始时++，减少时--，以此得知jsx部分结束回归js
     this.jStack = []; //当{开始时++，}减少时--，以此得知js部分结束回归jsx
     this.aStack = []; //html和js互相递归时，记录当前层是否在attr状态中
-    this.cStack = []; //html和js互相递归时，记录当前jsx标签是否是自闭和
-    this.selfClose = false; //当前jsx标签是否是自闭和
+    this.cStack = []; //html和js互相递归时，记录当前jsx标签是否是自闭合
+    this.selfClose = false; //当前jsx标签是否是自闭合
   },
   scan: function(temp) {
     var perlReg = this.rule.perlReg();
@@ -285,7 +286,7 @@ var JSXLexer = Lexer.extend(function(rule) {
     var matchLen = ELEM.content().length;
     this.dealToken(token, matchLen, 0, temp);
     if(!end) {
-      //自闭和没有.和:
+      //自闭合没有.和:
       if(SELF_CLOSE.hasOwnProperty(token.content().toLowerCase())) {
         this.selfClose = true;
         return;

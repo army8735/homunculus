@@ -109,6 +109,11 @@ describe('jsxlexer2', function() {
       var tokens = lexer.parse('<a attr={<b attr2={<c/>}>1</b>} attr3="2">3</a>');
       expect(join(tokens)).to.eql(['<', 'a', ' ', 'attr', '=', '{', '<', 'b', ' ', 'attr2', '=', '{', '<', 'c', '/>', '}', '>', '1', '</', 'b', '>', '}', ' ', 'attr3', '=', '"2"', '>', '3', '</', 'a', '>']);
     });
+    it('bind property', function() {
+      var lexer = homunculus.getLexer('jsx');
+      var tokens = lexer.parse('<a @n="1" @m={t}/>');
+      expect(join(tokens)).to.eql(['<', 'a', ' ', '@n', '=', '"1"', ' ', '@m', '=', '{', 't', '}', '/>']);
+    });
   });
   describe('line && col', function() {
     it('normal', function() {

@@ -36,7 +36,10 @@ var Parser = Es6Parser.extend(function(lexer) {
       name = node.last().token().content();
     }
     while(this.look) {
-      if(this.look.type() == Token.PROPERTY) {
+      if(this.look.type() == Token.BIND_PROPERTY) {
+        node.add(this.bindAttr());
+      }
+      else if(this.look.type() == Token.PROPERTY) {
         node.add(this.attr());
       }
       else if(this.look.content() == '{') {
@@ -110,6 +113,15 @@ var Parser = Es6Parser.extend(function(lexer) {
     names.forEach(function(name) {
       node.add(this.match(name));
     });
+    return node;
+  },
+  bindAttr: function() {
+    var node = new Node(Node.JSXBindAttribute);
+    node.add(
+      this.match(Token.BIND_PROPERTY),
+      this.match('='),
+      this.attrval()
+    );
     return node;
   },
   attr: function() {
@@ -218,6 +230,25 @@ var Parser = Es6Parser.extend(function(lexer) {
       else {
         this.error('syntax error' + (msg || ''));
       }
+    }
+    //数组为其中一个即可
+    else if(Array.isArray(type)) {
+      if(this.look) {
+        for(var i = 0, len = type.length; i < len; i++) {
+          var t = type[i];
+          if(typeof t == 'string' && this.look.content() == t) {
+            var l = this.look;
+            this.move();
+            return new Node(Node.TOKEN, l);
+          }
+          else if(typeof t == 'number' && this.look.type() == t) {
+            var l = this.look;
+            this.move();
+            return new Node(Node.TOKEN, l);
+          }
+        }
+      }
+      this.error('missing ' + type.join('|') + (msg || ''));
     }
     //或者根据token的type或者content匹配
     else if(typeof type == 'string') {

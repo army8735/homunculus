@@ -6,7 +6,8 @@ var JSXToken = Token.extend(function(type, content, val, sIndex) {
   MARK: 26,
   ELEM: 24,
   PROPERTY: 15,
-  TEXT: 25
+  TEXT: 25,
+  BIND_PROPERTY: 28,
 });
 
 module.exports = JSXToken;});
