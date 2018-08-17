@@ -3,6 +3,7 @@ var homunculus = require('../');
 var expect = require('expect.js');
 
 var Lexer = require('../src/lexer/Lexer');
+var EcmascriptLexer = require('../src/lexer/EcmascriptLexer');
 var CssLexer = require('../src/lexer/CssLexer');
 var JsParser = require('../src/parser/js/Parser');
 var Es6Parser = require('../src/parser/es6/Parser');
@@ -18,14 +19,14 @@ var walk = require('../src/util/walk');
 
 describe('api of homunculus', function() {
   it('#getClass', function() {
-    expect(homunculus.getClass('lexer', 'js')).to.be(Lexer);
-    expect(homunculus.getClass('lexer', 'javascript')).to.be(Lexer);
-    expect(homunculus.getClass('lexer', 'es')).to.be(Lexer);
-    expect(homunculus.getClass('lexer', 'es5')).to.be(Lexer);
-    expect(homunculus.getClass('lexer', 'ecmascript')).to.be(Lexer);
-    expect(homunculus.getClass('lexer', 'es6')).to.be(Lexer);
-    expect(homunculus.getClass('lexer', 'as')).to.be(Lexer);
-    expect(homunculus.getClass('lexer', 'actionscript')).to.be(Lexer);
+    expect(homunculus.getClass('lexer', 'js')).to.be(EcmascriptLexer);
+    expect(homunculus.getClass('lexer', 'javascript')).to.be(EcmascriptLexer);
+    expect(homunculus.getClass('lexer', 'es')).to.be(EcmascriptLexer);
+    expect(homunculus.getClass('lexer', 'es5')).to.be(EcmascriptLexer);
+    expect(homunculus.getClass('lexer', 'ecmascript')).to.be(EcmascriptLexer);
+    expect(homunculus.getClass('lexer', 'es6')).to.be(EcmascriptLexer);
+    expect(homunculus.getClass('lexer', 'as')).to.be(EcmascriptLexer);
+    expect(homunculus.getClass('lexer', 'actionscript')).to.be(EcmascriptLexer);
 
     expect(homunculus.getClass('lexer', 'css')).to.be(CssLexer);
 

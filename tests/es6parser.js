@@ -1739,6 +1739,31 @@ describe('es6parser', function() {
       var node = parser.parse('class A{{b}={b:1}}');
       expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.CLASSDECL,["class",JsNode.BINDID,["A"],"{",JsNode.CLASSBODY,[JsNode.CLASSELEM,[JsNode.LEXBIND,[JsNode.OBJBINDPAT,["{",JsNode.BINDPROPT,[JsNode.SINGLENAME,[JsNode.BINDID,["b"]]],"}"],JsNode.INITLZ,["=",JsNode.PRMREXPR,[JsNode.OBJLTR,["{",JsNode.PROPTDEF,[JsNode.PROPTNAME,[JsNode.LTRPROPT,["b"]],":",JsNode.PRMREXPR,["1"]],"}"]]]]]],"}"]]]]);
     });
+    it('template', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('`template`');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.PRMREXPR,["`template`"]]]]]);
+    });
+    it('template middle', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('`template${a}`');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.TEMPLATE,["`template${",JsNode.PRMREXPR,["a"],"}`"]]]]]);
+    });
+    it('template middle2', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('`template${a}end`');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.TEMPLATE,["`template${",JsNode.PRMREXPR,["a"],"}end`"]]]]]);
+    });
+    it('template multi middle', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('`template${a}`');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.TEMPLATE,["`template${",JsNode.PRMREXPR,["a"],"}b${",JsNode.PRMREXPR,["c"],"}${",JsNode.PRMREXPR,["d"],"}${","}`"]]]]]);
+    });
+    it('template in template', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('`template${a+`t${b}`}${c}`');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.TEMPLATE,["`template${",JsNode.ADDEXPR,[JsNode.PRMREXPR,["a"],"+",JsNode.TEMPLATE,["`t${",JsNode.PRMREXPR,["b"],"}`"]],"}${",JsNode.PRMREXPR,["c"],"}`"]]]]]);
+    });
   });
   describe('js lib exec test', function() {
     it('jquery 1.11.0', function() {

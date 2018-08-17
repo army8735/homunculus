@@ -107,6 +107,7 @@ var Node = INode.extend(function(type, children) {
   EXPORTCAULSE: 'exportcaulse',
   EXPORTSPEC: 'exportspec',
   ANNOT: 'annot',
+  TEMPLATE: 'template',
   getKey: function(s) {
     if(!s) {
       throw new Error('empty value');

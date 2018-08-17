@@ -109,6 +109,9 @@ var Token = Class(function(type, content, val, sIndex) {
   ANNOT: 11,
   //基本无用
   ENTER: 14,
+  TEMPLATE_HEAD: 29,
+  TEMPLATE_MIDDLE: 30,
+  TEMPLATE_TAIL: 31,
   type: function(tag) {
     var self = this;
     if(character.isUndefined(types)) {

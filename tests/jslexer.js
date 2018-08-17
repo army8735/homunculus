@@ -26,6 +26,11 @@ describe('jslexer', function() {
       var tokens = lexer.parse('"string\\\\""str"');
       expect(join(tokens)).to.eql(['"string\\\\"', '"str"']);
     });
+    it('string div', function() {
+      var lexer = homunculus.getLexer('js');
+      var tokens = lexer.parse('"string"/123');
+      expect(join(tokens)).to.eql(['"string"', '/', '123']);
+    });
     it('string literal no end', function() {
       var lexer = homunculus.getLexer('js');
       expect(function() {
@@ -151,6 +156,32 @@ describe('jslexer', function() {
       var lexer = homunculus.getLexer('js');
       var tokens = lexer.parse('`template`');
       expect(join(tokens)).to.eql(['`template`']);
+    });
+    it('template literal no end', function() {
+      var lexer = homunculus.getLexer('js');
+      expect(function() {
+        lexer.parse('`template');
+      }).to.throwError();
+    });
+    it('template middle', function() {
+      var lexer = homunculus.getLexer('js');
+      var tokens = lexer.parse('`template${a}`');
+      expect(join(tokens)).to.eql(['`template${', 'a', '}`']);
+    });
+    it('template middle2', function() {
+      var lexer = homunculus.getLexer('js');
+      var tokens = lexer.parse('`template${a}end`');
+      expect(join(tokens)).to.eql(['`template${', 'a', '}end`']);
+    });
+    it('template multi middle', function() {
+      var lexer = homunculus.getLexer('js');
+      var tokens = lexer.parse('`template${a}b${c}${d}${}`');
+      expect(join(tokens)).to.eql(['`template${', 'a', '}b${', 'c', '}${', 'd', '}${', '}`']);
+    });
+    it('template in template', function() {
+      var lexer = homunculus.getLexer('js');
+      var tokens = lexer.parse('`template${a+`t${b}`}${c}`');
+      expect(join(tokens)).to.eql(['`template${', 'a', '+', '`t${', 'b', '}`', '}${', 'c', '}`']);
     });
     it('number', function() {
       var lexer = homunculus.getLexer('js');

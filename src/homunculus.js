@@ -1,6 +1,7 @@
 var Lexer = require('./lexer/Lexer');
 var CssLexer = require('./lexer/CssLexer');
 var HtmlLexer = require('./lexer/HtmlLexer');
+var EcmascriptLexer = require('./lexer/EcmascriptLexer');
 var JSXLexer = require('./lexer/JSXLexer');
 
 var EcmascriptRule = require('./lexer/rule/EcmascriptRule');
@@ -47,7 +48,7 @@ exports.getClass = function (type, lan) {
         case 'ecmascript':
         case 'as':
         case 'actionscript':
-          return Lexer;
+          return EcmascriptLexer;
         case 'css':
           return CssLexer;
         case 'html':
@@ -165,7 +166,7 @@ exports.getLexer = function (lan) {
     case 'es6':
     case 'as':
     case 'actionscript':
-      return new Lexer(new EcmascriptRule());
+      return new EcmascriptLexer(new EcmascriptRule());
     case 'css':
       return new CssLexer(new CssRule());
     case "java":

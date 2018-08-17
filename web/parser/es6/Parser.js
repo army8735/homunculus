@@ -1,6 +1,6 @@
 define(function(require, exports, module) {var IParser = require('../Parser');
 var character = require('../../util/character');
-var Lexer = require('../../lexer/Lexer');
+var Lexer = require('../../lexer/EcmascriptLexer');
 var Rule = require('../../lexer/rule/EcmascriptRule');
 var Token = require('../../lexer/Token');
 var Node = require('./Node');
@@ -1905,6 +1905,8 @@ var Parser = IParser.extend(function(lexer) {
       case Token.TEMPLATE:
         node.add(this.match());
       break;
+      case Token.TEMPLATE_HEAD:
+        return this.template(noIn, noOf, yYield);
       default:
         switch(this.look.content()) {
           //LL2是否为*区分fnexpr和genexpr
@@ -1956,6 +1958,19 @@ var Parser = IParser.extend(function(lexer) {
             this.error();
         }
     }
+    return node;
+  },
+  template: function(noIn, noOf, yYield) {
+    var node = new Node(Node.TEMPLATE);
+    node.add(this.match());
+    while(this.look && this.look.type() != Token.TEMPLATE_TAIL) {
+      node.add(this.expr(noIn, noOf, yYield));
+      if(this.look && this.look.type() == Token.TEMPLATE_TAIL) {
+        break;
+      }
+      node.add(this.match(Token.TEMPLATE_MIDDLE));
+    }
+    node.add(this.match());
     return node;
   },
   arrinit: function(noIn, noOf) {

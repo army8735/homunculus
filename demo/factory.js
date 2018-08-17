@@ -1,5 +1,6 @@
 define(function(require, exports) {
 	var Lexer = require('./lexer/Lexer'),
+		EcmascriptLexer = require('./lexer/EcmascriptLexer'),
 		CssLexer = require('./lexer/CssLexer'),
     HtmlLexer = require('./lexer/HtmlLexer'),
     JSXLexer = require('./lexer/JSXLexer'),
@@ -18,7 +19,7 @@ define(function(require, exports) {
 			case "as3":
 			case "actionscript":
 			case "actionscript3":
-				return new Lexer(new EcmascriptRule());
+				return new EcmascriptLexer(new EcmascriptRule());
 			case "css":
 			case "css2":
 			case "css3":

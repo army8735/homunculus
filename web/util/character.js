@@ -12,12 +12,15 @@ exports.BACK_SLASH = '\\';
 exports.DECIMAL = '.';
 exports.LEFT_BRACKET = '[';
 exports.RIGHT_BRACKET = ']';
+exports.LEFT_BRACE = '{';
+exports.RIGHT_BRACE = '}';
 exports.STAR = '*';
 exports.LEFT_PARENTHESE = '(';
 exports.RIGHT_PARENTHESE = ')';
 exports.COMMA = ',';
 exports.SEMICOLON = ';';
 exports.EQUAL = '=';
+exports.GRAVE = '`';
 exports.isDigit = function(c) {
   return c >= '0' && c <= '9';
 };

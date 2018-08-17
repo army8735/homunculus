@@ -278,7 +278,7 @@ var Lexer = Class(function(rule) {
   col: function() {
     return this.colMax;
   },
-  error: function(s, str) {
+  error: function(s, str) {console.log(arguments.callee.caller)
     if(character.isUndefined(str)) {
       str = this.code.substr(this.index - 1, 20);
     }
