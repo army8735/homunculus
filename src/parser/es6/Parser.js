@@ -1101,6 +1101,9 @@ var Parser = IParser.extend(function(lexer) {
         if(next.content() == '(' || next.content() != 'function') {
           return this.asyncarrowfn();
         }
+        else {
+          break;
+        }
       }
     }
     node.add(
@@ -2048,11 +2051,6 @@ var Parser = IParser.extend(function(lexer) {
       break;
       case Token.TEMPLATE_HEAD:
         return this.template(noIn, noOf, yYield);
-      case Token.KEYWORD:
-        if(this.look.content() == 'async') {
-          return this.asyncexpr();
-        }
-        this.error();
       default:
         switch(this.look.content()) {
           //LL2是否为*区分fnexpr和genexpr
@@ -2070,6 +2068,8 @@ var Parser = IParser.extend(function(lexer) {
               }
             }
           break;
+          case 'async':
+            return this.asyncexpr();
           case 'class':
             node.add(this.classexpr(noIn, noOf));
           break;
