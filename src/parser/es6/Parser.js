@@ -257,7 +257,7 @@ var Parser = IParser.extend(function(lexer) {
     return node;
   },
   stmtlitem: function(yYield, isConstructor) {
-    if(['function', 'class', 'let', 'const'].indexOf(this.look.content()) > -1) {
+    if(['function', 'class', 'let', 'const', 'async'].indexOf(this.look.content()) > -1) {
       return this.decl(yYield);
     }
     else {
@@ -285,6 +285,8 @@ var Parser = IParser.extend(function(lexer) {
           }
         }
         return this.fndecl();
+      case 'async':
+        return this.asyncdecl();
       case 'class':
         return this.classdecl();
       default:
@@ -1090,6 +1092,35 @@ var Parser = IParser.extend(function(lexer) {
     }
     return node;
   },
+  asyncdecl: function() {
+    var node = new Node(Node.ASYNCDECL);
+    node.add(
+      this.match('async', true),
+      this.match('function'),
+      this.bindid('async function statement requires a name'),
+      this.match('(', 'missing ( before formal parameters'),
+      this.fmparams(),
+      this.match(')', 'missing ) after formal parameters'),
+      this.match('{'),
+      this.fnbody(),
+      this.match('}', 'missing } after function body')
+    );
+    return node;
+  },
+  asyncexpr: function() {
+    var node = new Node(Node.ASYNCEXPR);
+    node.add(
+      this.match('async', true),
+      this.match('function'),
+      this.match('(', 'missing ( before formal parameters'),
+      this.fmparams(),
+      this.match(')', 'missing ) after formal parameters'),
+      this.match('{'),
+      this.fnbody(),
+      this.match('}', 'missing } after function body')
+    );
+    return node;
+  },
   classdecl: function() {
     var node = new Node(Node.CLASSDECL);
     node.add(
@@ -1224,6 +1255,9 @@ var Parser = IParser.extend(function(lexer) {
     else if(this.look.content() == '*') {
       return this.genmethod(noIn, noOf);
     }
+    else if(this.look.content() == 'async') {
+      return this.asyncmethod(noIn, noOf);
+    }
     else {
       var isConstructor = this.look.type() == Token.ID && this.look.content() == 'constructor';
       node.add(
@@ -1242,6 +1276,20 @@ var Parser = IParser.extend(function(lexer) {
     var node = new Node(Node.GENMETHOD);
     node.add(
       this.match('*'),
+      this.proptname(noIn, noOf),
+      this.match('('),
+      this.fmparams(),
+      this.match(')'),
+      this.match('{'),
+      this.fnbody(),
+      this.match('}')
+    );
+    return node;
+  },
+  asyncmethod: function(noIn, noOf) {
+    var node = new Node(Node.ASYNCMETHOD);
+    node.add(
+      this.match('async', true),
       this.proptname(noIn, noOf),
       this.match('('),
       this.fmparams(),
@@ -1636,6 +1684,7 @@ var Parser = IParser.extend(function(lexer) {
       case '-':
       case '~':
       case '!':
+      case 'await':
         node.add(
           this.match(),
           this.unaryexpr(noIn, noOf, yYield, isConstructor)
@@ -1907,6 +1956,11 @@ var Parser = IParser.extend(function(lexer) {
       break;
       case Token.TEMPLATE_HEAD:
         return this.template(noIn, noOf, yYield);
+      case Token.KEYWORD:
+        if(this.look.content() == 'async') {
+          return this.asyncexpr();
+        }
+        this.error();
       default:
         switch(this.look.content()) {
           //LL2是否为*区分fnexpr和genexpr

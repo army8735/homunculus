@@ -1756,7 +1756,7 @@ describe('es6parser', function() {
     });
     it('template multi middle', function() {
       var parser = homunculus.getParser('es6');
-      var node = parser.parse('`template${a}`');
+      var node = parser.parse('`template${a}b${c}${d}${}``');
       expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.TEMPLATE,["`template${",JsNode.PRMREXPR,["a"],"}b${",JsNode.PRMREXPR,["c"],"}${",JsNode.PRMREXPR,["d"],"}${","}`"]]]]]);
     });
     it('template in template', function() {
