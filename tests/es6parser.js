@@ -1782,20 +1782,15 @@ describe('es6parser', function() {
     });
     it('asyncarrowfn', function() {
       var parser = homunculus.getParser('es6');
-      var node = parser.parse('async a() {}');
+      var node = parser.parse('async a => {}');
       expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.ASYNCARROWFN,["async",JsNode.BINDID,["a"],"=>","{",JsNode.FNBODY,[],"}"]]]]);
     });
     it('asyncarrowfn2', function() {
       var parser = homunculus.getParser('es6');
-      var node = parser.parse('async a => {}');
-      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.ASYNCARROWFN,["async",JsNode.BINDID,["a"],"=>","{",JsNode.FNBODY,[],"}"]]]]);
-    });
-    it('asyncarrowfn3', function() {
-      var parser = homunculus.getParser('es6');
       var node = parser.parse('async () => {}');
       expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.ASYNCARROWFN,["async","(",")","=>","{",JsNode.FNBODY,[],"}"]]]]);
     });
-    it('asyncarrowfn4', function() {
+    it('asyncarrowfn3', function() {
       var parser = homunculus.getParser('es6');
       var node = parser.parse('async (a) => {}');
       expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.ASYNCARROWFN,["async","(",JsNode.BINDID,["a"],")","=>","{",JsNode.FNBODY,[],"}"]]]]);
@@ -1828,7 +1823,7 @@ describe('es6parser', function() {
     });
     it('asyncexpr5', function() {
       var parser = homunculus.getParser('es6');
-      var node = parser.parse('var a = async () => {}');
+      var node = parser.parse('var a = async (b) => {}');
       expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.VARSTMT,["var",JsNode.VARDECL,[JsNode.BINDID,["a"],JsNode.INITLZ,["=",JsNode.ASSIGNEXPR,[JsNode.ASYNCARROWFN,["async","(",JsNode.BINDID,["b"],")","=>","{",JsNode.FNBODY,[],"}"]]]]]]]]);
     });
     it('asyncmethod', function() {
