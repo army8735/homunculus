@@ -1756,7 +1756,7 @@ describe('es6parser', function() {
     });
     it('template multi middle', function() {
       var parser = homunculus.getParser('es6');
-      var node = parser.parse('`template${a}b${c}${d}${}``');
+      var node = parser.parse('`template${a}b${c}${d}${}`');
       expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.TEMPLATE,["`template${",JsNode.PRMREXPR,["a"],"}b${",JsNode.PRMREXPR,["c"],"}${",JsNode.PRMREXPR,["d"],"}${","}`"]]]]]);
     });
     it('template in template', function() {
@@ -1766,23 +1766,18 @@ describe('es6parser', function() {
     });
     it('asyncdecl', function() {
       var parser = homunculus.getParser('es6');
-      var node = parser.parse('async a() {}');
-      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.ASYNCARROWFN,["async",JsNode.PRMREXPR,["a"],JsNode.ARGS,["(",JsNode.ARGLIST,[],")"],"{",JsNode.FNBODY,[],"}"]]]]);
+      var node = parser.parse('async function a() {}');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.ASYNCDECL,["async","function",JsNode.BINDID,["a"],"(",JsNode.FMPARAMS,[],")","{",JsNode.FNBODY,[],"}"]]]]);
     });
     it('asyncdecl2', function() {
       var parser = homunculus.getParser('es6');
-      var node = parser.parse('async a(b) {}');
-      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.ASYNCARROWFN,["async",JsNode.PRMREXPR,["a"],JsNode.ARGS,["(",JsNode.ARGLIST,[JsNode.PRMREXPR,["b"]],")"],"{",JsNode.FNBODY,[],"}"]]]]);
-    });
-    it('asyncdecl2', function() {
-      var parser = homunculus.getParser('es6');
-      var node = parser.parse('async a(b,c) {}');
-      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.ASYNCARROWFN,["async",JsNode.PRMREXPR,["a"],JsNode.ARGS,["(",JsNode.ARGLIST,[JsNode.PRMREXPR,["b"],",",JsNode.PRMREXPR,["c"]],")"],"{",JsNode.FNBODY,[],"}"]]]]);
+      var node = parser.parse('async function a(b) {}');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.ASYNCDECL,["async","function",JsNode.BINDID,["a"],"(",JsNode.FMPARAMS,[JsNode.SINGLENAME,[JsNode.BINDID,["b"]]],")","{",JsNode.FNBODY,[],"}"]]]]);
     });
     it('asyncdecl error', function() {
       var parser = homunculus.getParser('es6');
       expect(function() {
-        parser.parse('async a {}');
+        parser.parse('async function a {}');
       }).to.throwError();
     });
     it('asyncarrowfn', function() {
