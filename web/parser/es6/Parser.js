@@ -1479,7 +1479,8 @@ var Parser = IParser.extend(function(lexer) {
         '&=': true,
         '^=': true,
         '|=': true,
-        '=': true
+        '=': true,
+        '**': true,
       }.hasOwnProperty(this.look.content())
       && !NOASSIGN.hasOwnProperty(cndt.name())) {
       node.add(cndt, this.match(), this.assignexpr(noIn, noOf, yYield, isConstructor));
