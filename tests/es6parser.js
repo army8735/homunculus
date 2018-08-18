@@ -1764,6 +1764,83 @@ describe('es6parser', function() {
       var node = parser.parse('`template${a+`t${b}`}${c}`');
       expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.TEMPLATE,["`template${",JsNode.ADDEXPR,[JsNode.PRMREXPR,["a"],"+",JsNode.TEMPLATE,["`t${",JsNode.PRMREXPR,["b"],"}`"]],"}${",JsNode.PRMREXPR,["c"],"}`"]]]]]);
     });
+    it('asyncdecl', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('async a() {}');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.ASYNCARROWFN,["async",JsNode.PRMREXPR,["a"],JsNode.ARGS,["(",JsNode.ARGLIST,[],")"],"{",JsNode.FNBODY,[],"}"]]]]);
+    });
+    it('asyncdecl2', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('async a(b) {}');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.ASYNCARROWFN,["async",JsNode.PRMREXPR,["a"],JsNode.ARGS,["(",JsNode.ARGLIST,[JsNode.PRMREXPR,["b"]],")"],"{",JsNode.FNBODY,[],"}"]]]]);
+    });
+    it('asyncdecl2', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('async a(b,c) {}');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.ASYNCARROWFN,["async",JsNode.PRMREXPR,["a"],JsNode.ARGS,["(",JsNode.ARGLIST,[JsNode.PRMREXPR,["b"],",",JsNode.PRMREXPR,["c"]],")"],"{",JsNode.FNBODY,[],"}"]]]]);
+    });
+    it('asyncdecl error', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('async a {}');
+      }).to.throwError();
+    });
+    it('asyncarrowfn', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('async a() {}');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.ASYNCARROWFN,["async",JsNode.BINDID,["a"],"=>","{",JsNode.FNBODY,[],"}"]]]]);
+    });
+    it('asyncarrowfn2', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('async a => {}');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.ASYNCARROWFN,["async",JsNode.BINDID,["a"],"=>","{",JsNode.FNBODY,[],"}"]]]]);
+    });
+    it('asyncarrowfn3', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('async () => {}');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.ASYNCARROWFN,["async","(",")","=>","{",JsNode.FNBODY,[],"}"]]]]);
+    });
+    it('asyncarrowfn4', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('async (a) => {}');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.ASYNCARROWFN,["async","(",JsNode.BINDID,["a"],")","=>","{",JsNode.FNBODY,[],"}"]]]]);
+    });
+    it('asyncarrowfn error', function() {
+      var parser = homunculus.getParser('es6');
+      expect(function() {
+        parser.parse('async a() {}');
+      }).to.throwError();
+    });
+    it('asyncexpr', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('var a = async function() {}');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.VARSTMT,["var",JsNode.VARDECL,[JsNode.BINDID,["a"],JsNode.INITLZ,["=",JsNode.ASYNCEXPR,["async","function","(",JsNode.FMPARAMS,[],")","{",JsNode.FNBODY,[],"}"]]]]]]]);
+    });
+    it('asyncexpr2', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('var a = async function(b) {}');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.VARSTMT,["var",JsNode.VARDECL,[JsNode.BINDID,["a"],JsNode.INITLZ,["=",JsNode.ASYNCEXPR,["async","function","(",JsNode.FMPARAMS,[JsNode.SINGLENAME,[JsNode.BINDID,["b"]]],")","{",JsNode.FNBODY,[],"}"]]]]]]]);
+    });
+    it('asyncexpr3', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('var a = async b => {}');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.VARSTMT,["var",JsNode.VARDECL,[JsNode.BINDID,["a"],JsNode.INITLZ,["=",JsNode.ASSIGNEXPR,[JsNode.ASYNCARROWFN,["async",JsNode.BINDID,["b"],"=>","{",JsNode.FNBODY,[],"}"]]]]]]]]);
+    });
+    it('asyncexpr4', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('var a = async () => {}');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.VARSTMT,["var",JsNode.VARDECL,[JsNode.BINDID,["a"],JsNode.INITLZ,["=",JsNode.ASSIGNEXPR,[JsNode.ASYNCARROWFN,["async","(",")","=>","{",JsNode.FNBODY,[],"}"]]]]]]]]);
+    });
+    it('asyncexpr5', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('var a = async () => {}');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.VARSTMT,["var",JsNode.VARDECL,[JsNode.BINDID,["a"],JsNode.INITLZ,["=",JsNode.ASSIGNEXPR,[JsNode.ASYNCARROWFN,["async","(",JsNode.BINDID,["b"],")","=>","{",JsNode.FNBODY,[],"}"]]]]]]]]);
+    });
+    it('asyncmethod', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('class A{async a(){}}');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.CLASSDECL,["class",JsNode.BINDID,["A"],"{",JsNode.CLASSBODY,[JsNode.CLASSELEM,[JsNode.ASYNCMETHOD,["async",JsNode.PROPTNAME,[JsNode.LTRPROPT,["a"]],"(",JsNode.FMPARAMS,[],")","{",JsNode.FNBODY,[],"}"]]],"}"]]]]);
+    });
   });
   describe('js lib exec test', function() {
     it('jquery 1.11.0', function() {

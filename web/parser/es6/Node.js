@@ -109,7 +109,7 @@ var Node = INode.extend(function(type, children) {
   ANNOT: 'annot',
   TEMPLATE: 'template',
   ASYNCDECL: 'asyncdecl',
-  ASYNCARRFN: 'asyncarrfn',
+  ASYNCARROWFN: 'asyncarrowfn',
   ASYNCEXPR: 'asyncexpr',
   ASYNCMETHOD: 'asyncmethod',
   getKey: function(s) {

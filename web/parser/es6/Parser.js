@@ -1094,6 +1094,15 @@ var Parser = IParser.extend(function(lexer) {
   },
   asyncdecl: function() {
     var node = new Node(Node.ASYNCDECL);
+    //LL2判断是否是async arrow fn
+    for(var i = this.index + 1; i < this.length; i++) {
+      var next = this.tokens[i];
+      if(!S[next.type()] && next.content() != character.ENTER && next.content() != character.LINE) {
+        if(next.content() == '(' || next.content() != 'function') {
+          return this.asyncarrowfn();
+        }
+      }
+    }
     node.add(
       this.match('async', true),
       this.match('function'),
@@ -1111,14 +1120,67 @@ var Parser = IParser.extend(function(lexer) {
     var node = new Node(Node.ASYNCEXPR);
     node.add(
       this.match('async', true),
-      this.match('function'),
-      this.match('(', 'missing ( before formal parameters'),
-      this.fmparams(),
-      this.match(')', 'missing ) after formal parameters'),
-      this.match('{'),
-      this.fnbody(),
-      this.match('}', 'missing } after function body')
+      this.match('function')
     );
+    if(this.look && this.look.content() == '(') {
+      node.add(
+        this.match('(', 'missing ( before formal parameters'),
+        this.fmparams(),
+        this.match(')', 'missing ) after formal parameters'),
+        this.match('{'),
+        this.fnbody(),
+        this.match('}', 'missing } after function body')
+      );
+    }
+    else {
+      node.add(
+        this.bindid(),
+        this.match('{'),
+        this.fnbody(),
+        this.match('}', 'missing } after function body')
+      );
+    }
+    return node;
+  },
+  asyncarrowfn: function(noIn, noOf, yYield) {
+    var node = new Node(Node.ASYNCARROWFN);
+    node.add(this.match('async', true));
+    if(this.look && this.look.content() == '(') {
+      node.add(this.match());
+      if(this.look && this.look.content() != ')') {
+        node.add(this.bindid());
+      }
+      node.add(
+        this.match(')'),
+        this.match('=>')
+      );
+      if(this.look && this.look.content() == '{') {
+        node.add(
+          this.match(),
+          this.fnbody(),
+          this.match('}')
+        )
+      }
+      else {
+        node.add(this.assignexpr());
+      }
+    }
+    else {
+      node.add(
+        this.bindid('', noIn, noOf),
+        this.match('=>')
+      );
+      if(this.look && this.look.content() == '{') {
+        node.add(
+          this.match(),
+          this.fnbody(),
+          this.match('}')
+        )
+      }
+      else {
+        node.add(this.assignexpr());
+      }
+    }
     return node;
   },
   classdecl: function() {
@@ -1209,9 +1271,26 @@ var Parser = IParser.extend(function(lexer) {
         }
       }
     }
+    else if(this.look.content() == 'async') {
+      node.add(this.asyncmethod(noIn, noOf));
+    }
     else {
       node.add(this.method(noIn, noOf));
     }
+    return node;
+  },
+  asyncmethod: function(noIn, noOf) {
+    var node = new Node(Node.ASYNCMETHOD);
+    node.add(
+      this.match('async', true),
+      this.proptname(),
+      this.match('('),
+      this.fmparams(),
+      this.match(')'),
+      this.match('{'),
+      this.fnbody(),
+      this.match('}')
+    );
     return node;
   },
   annot: function() {
@@ -1352,6 +1431,19 @@ var Parser = IParser.extend(function(lexer) {
         this.error('yield not in generator function');
       }
       return this.yieldexpr(noIn, noOf, yYield);
+    }
+    //LL2判断async arrow fn提前
+    if(this.look.content() == 'async') {
+      for(var i = this.index; i < this.length; i++) {
+        var next = this.tokens[i];
+        if(!S[next.type()]) {
+          if(next.content() == '(' || next.type() == Token.ID) {
+            node.add(this.asyncarrowfn(noIn, noOf, yYield));
+            return node;
+          }
+          break;
+        }
+      }
     }
     var cndt = this.cndtexpr(noIn, noOf, yYield, isConstructor);
     if(this.look
