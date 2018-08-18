@@ -1831,6 +1831,11 @@ describe('es6parser', function() {
       var node = parser.parse('class A{async a(){}}');
       expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.CLASSDECL,["class",JsNode.BINDID,["A"],"{",JsNode.CLASSBODY,[JsNode.CLASSELEM,[JsNode.ASYNCMETHOD,["async",JsNode.PROPTNAME,[JsNode.LTRPROPT,["a"]],"(",JsNode.FMPARAMS,[],")","{",JsNode.FNBODY,[],"}"]]],"}"]]]]);
     });
+    it('await', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('await a()');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.UNARYEXPR,["await",JsNode.CALLEXPR,[JsNode.PRMREXPR,["a"],JsNode.ARGS,["(",JsNode.ARGLIST,[],")"]]]]]]]);
+    });
   });
   describe('js lib exec test', function() {
     it('jquery 1.11.0', function() {
