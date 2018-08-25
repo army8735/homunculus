@@ -152,6 +152,11 @@ describe('jsxlexer', function() {
       var tokens = lexer.parse('`template`');
       expect(join(tokens)).to.eql(['`template`']);
     });
+    it('template middle', function() {
+      var lexer = homunculus.getLexer('jsx');
+      var tokens = lexer.parse('`template${a}`');
+      expect(join(tokens)).to.eql(['`template${', 'a', '}`']);
+    });
     it('number', function() {
       var lexer = homunculus.getLexer('jsx');
       var tokens = lexer.parse('0.541 .32E+8 123E9 45.2E-10');

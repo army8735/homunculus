@@ -1,6 +1,6 @@
 define(function(require, exports, module) {var character = require('../util/character');
 var JSXToken = require('./JSXToken');
-var Lexer = require('./Lexer');
+var EcmascriptLexer = require('./EcmascriptLexer');
 
 var RegMatch = require('./match/RegMatch');
 var CompleteEqual = require('./match/CompleteEqual');
@@ -42,11 +42,11 @@ var SELF_CLOSE = {
   'track': true
 };
 
-var JSXLexer = Lexer.extend(function(rule) {
-  Lexer.call(this, rule);
+var JSXLexer = EcmascriptLexer.extend(function(rule) {
+  EcmascriptLexer.call(this, rule);
 }).methods({
   init: function() {
-    Lexer.prototype.init.call(this);
+    EcmascriptLexer.prototype.init.call(this);
     this.html = false; //目前是否为解析html状态
     this.state = false; //是否在<>中
     this.hStack = []; //当mark开始时++，减少时--，以此得知jsx部分结束回归js
@@ -228,6 +228,15 @@ var JSXLexer = Lexer.extend(function(rule) {
           this.dealReg(temp, length);
           this.isReg = JSXLexer.NOT_REG;
         }
+        //template特殊语法
+        else if(this.peek == character.GRAVE) {
+          this.dealGrave(temp, length);
+          this.isReg = EcmascriptLexer.NOT_REG;
+        }
+        //递归解析template中的expr时结束跳出
+        else if(this.inTemplate && this.peek == '}') {
+          return this;
+        }
         //依次遍历匹配规则，命中则继续
         else {
           for(var i = 0, matches = this.rule.matches(), len = matches.length; i < len; i++) {
@@ -259,7 +268,7 @@ var JSXLexer = Lexer.extend(function(rule) {
               //处理token
               this.dealToken(token, matchLen, n, temp);
               //支持perl正则需判断关键字、圆括号对除号语义的影响
-              if(perlReg && match.perlReg() != Lexer.IGNORE) {
+              if(perlReg && match.perlReg() != EcmascriptLexer.IGNORE) {
                 this.stateReg(match);
               }
               //处理{
