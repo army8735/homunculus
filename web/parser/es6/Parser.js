@@ -260,6 +260,9 @@ var Parser = IParser.extend(function(lexer) {
     if(['function', 'class', 'let', 'const', 'async'].indexOf(this.look.content()) > -1) {
       return this.decl(yYield);
     }
+    else if(this.look.type() == Token.ANNOT) {
+      return this.annot();
+    }
     else {
       return this.stmt(yYield, isConstructor);
     }
