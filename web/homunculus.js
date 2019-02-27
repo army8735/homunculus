@@ -3,6 +3,7 @@ var CssLexer = require('./lexer/CssLexer');
 var HtmlLexer = require('./lexer/HtmlLexer');
 var EcmascriptLexer = require('./lexer/EcmascriptLexer');
 var JSXLexer = require('./lexer/JSXLexer');
+var CSXLexer = require('./lexer/CSXLexer');
 
 var EcmascriptRule = require('./lexer/rule/EcmascriptRule');
 var CssRule = require('./lexer/rule/CssRule');
@@ -14,18 +15,21 @@ var Token = require('./lexer/Token');
 var CssToken = require('./lexer/CssToken');
 var HtmlToken = require('./lexer/HtmlToken');
 var JSXToken = require('./lexer/JSXToken');
+var CSXToken = require('./lexer/CSXToken');
 
 var JsParser = require('./parser/js/Parser');
 var Es6Parser = require('./parser/es6/Parser');
 var CssParser = require('./parser/css/Parser');
 var HtmlParser = require('./parser/html/Parser');
 var JSXParser = require('./parser/jsx/Parser');
+var CSXParser = require('./parser/csx/Parser');
 
 var JsNode = require('./parser/js/Node');
 var Es6Node = require('./parser/es6/Node');
 var CssNode = require('./parser/css/Node');
 var HtmlNode = require('./parser/html/Node');
 var JSXNode = require('./parser/jsx/Node');
+var CSXNode = require('./parser/csx/Node');
 
 var JsContext = require('./parser/js/Context');
 
@@ -56,6 +60,8 @@ exports.getClass = function (type, lan) {
           return HtmlLexer;
         case 'jsx':
           return JSXLexer;
+        case 'csx':
+          return CSXLexer;
         default:
           throw new Error('Unsupport Language Lexer: ' + lan);
       }
@@ -80,6 +86,8 @@ exports.getClass = function (type, lan) {
           return HtmlParser;
         case 'jsx':
           return JSXParser;
+        case 'csx':
+          return CSXParser;
         default:
           throw new Error('Unsupport Language Parser: ' + lan);
       }
@@ -105,6 +113,8 @@ exports.getClass = function (type, lan) {
           return HtmlNode;
         case 'jsx':
           return JSXNode;
+        case 'csx':
+          return CSXNode;
         default:
           throw new Error('Unsupport Language Node: ' + lan);
       }
@@ -135,6 +145,8 @@ exports.getClass = function (type, lan) {
           return HtmlToken;
         case 'jsx':
           return JSXToken;
+        case 'csx':
+          return CSXToken;
         default:
           return Token;
       }
@@ -157,6 +169,8 @@ exports.getClass = function (type, lan) {
         case 'html':
           return HtmlRule;
         case 'jsx':
+          return EcmascriptRule;
+        case 'csx':
           return EcmascriptRule;
         default:
           throw new Error('Unsupport Language Context: ' + lan);
@@ -198,6 +212,8 @@ exports.getLexer = function (lan) {
       return new HtmlLexer(new HtmlRule());
     case 'jsx':
       return new JSXLexer(new EcmascriptRule());
+    case 'csx':
+      return new CSXLexer(new EcmascriptRule());
     default:
       throw new Error('Unsupport Language Lexer: ' + lan);
   }
@@ -225,6 +241,8 @@ exports.getParser = function (lan) {
       return new HtmlParser(exports.getLexer(lan));
     case 'jsx':
       return new JSXParser(exports.getLexer(lan));
+    case 'csx':
+      return new CSXParser(exports.getLexer(lan));
     default:
       throw new Error('Unsupport Language Parser: ' + lan);
   }

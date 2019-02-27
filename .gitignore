@@ -133,7 +133,6 @@ publish/
 #packages/
 
 # Windows Azure Build Output
-csx
 *.build.csdef
 
 # Windows Store app package directory

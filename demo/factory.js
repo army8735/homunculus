@@ -4,6 +4,7 @@ define(function(require, exports) {
 		CssLexer = require('./lexer/CssLexer'),
     HtmlLexer = require('./lexer/HtmlLexer'),
     JSXLexer = require('./lexer/JSXLexer'),
+		CSXLexer = require('./lexer/CSXLexer'),
 		EcmascriptRule = require('./lexer/rule/EcmascriptRule'),
 		CssRule = require('./lexer/rule/CssRule'),
     HtmlRule = require('./lexer/rule/HtmlRule'),
@@ -11,40 +12,33 @@ define(function(require, exports) {
     CRule = require('./lexer/rule/CRule');
 	exports.lexer = function(syntax) {
 		switch(syntax.toLowerCase()) {
-			case "js":
-			case "javascript":
-			case "ecmascript":
-			case "jscript":
-			case "as":
-			case "as3":
-			case "actionscript":
-			case "actionscript3":
+			case 'js':
+			case 'javascript':
+			case 'ecmascript':
+			case 'jscript':
+			case 'as':
+			case 'as3':
+			case 'actionscript':
+			case 'actionscript3':
 				return new EcmascriptLexer(new EcmascriptRule());
-			case "css":
-			case "css2":
-			case "css3":
+			case 'css':
+			case 'css2':
+			case 'css3':
 				return new CssLexer(new CssRule());
-			case "java":
+			case 'java':
 				return new Lexer(new JavaRule());
-			case "c":
-			case "c++":
-			case "cpp":
-			case "cplusplus":
+			case 'c':
+			case 'c++':
+			case 'cpp':
+			case 'cplusplus':
 				return new Lexer(new CRule());
-      case "htm":
-      case "html":
+      case 'htm':
+      case 'html':
         return new HtmlLexer(new HtmlRule());
-      case "jsx":
+      case 'jsx':
         return new JSXLexer(new EcmascriptRule());
-			/*case "py":
-			case "python":
-				return new PythonLexer(new PythonRule());
-			case "xml":
-				return new XmlLexer();
-			case "php":
-				return new PhpLexer();
-			default:
-				return new LanguageLexer(new UnknowRule());*/
+			case 'csx':
+				return new CSXLexer(new EcmascriptRule());
 		}
 	};
 });
