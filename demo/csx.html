@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>csx</title>
+  <style>
+    body{margin:0;padding:10px;font:12px/1.25 arail;background-color:#fff;line-height:1.25;overflow-y:scroll;}
+    .kineticjs-content{margin:10px 0;}
+    textarea{position:absolute;top:24px;right:0;padding:5px;width:50%;height:300px;z-index:99;background:#252;border:1px solid #333;opacity:0.1;color:#FFF;font-size:13px;font-family:Consolas,momospace,"宋体","Courier New";border-radius:5px;}
+    textarea:hover{opacity:0.8;}
+    #btn{position:absolute;top:0;right:0;width:50px;z-index:99;}
+
+    .jssc .col{margin-left:12px;color:#CCC;cursor:default;}
+    .jssc .col em{position:relative;font-style:normal;}
+    .jssc .col em small{position:absolute;top:-10px;left:0;color:#A0A080;}
+    .jssc .col,.jssc ol{font-family:Consolas,momospace,"宋体","Courier New";font-size:12px;}
+    .jssc li:hover{background:#FF9;}
+    .jssc .number{color:#088;}
+    .jssc .keyword{color:#33f;}
+    .jssc .comment{color:#393;}
+    .jssc .string{color:#a33;}
+    .jssc .template,.jssc .mark{color:#993;}
+    .jssc .reg, .jssc .annot, .jssc .head, .jssc .declare{color:#999;}
+    .jssc .annot{font-style:italic;}
+    .jssc .attr{color:#909;}
+    .jssc .property{color:#F33;}
+    .jssc .selector{font-weight:700;}
+    .jssc .units{color:#9c0;}
+    .jssc .important{text-decoration:underline;}
+    .jssc .pseudo{font-style:italic;}
+    .jssc .tags, .jssc .cdata{color:#c96;}
+    .jssc .hack{color:#ccc;}
+    .jssc .namespace{color:#f00;}
+    .jssc .depth,.jssc .elem{color:#fc0;}
+    .jssc .java .keyword{color:#909;}
+    .jssc .text{color:#600;}
+
+    .jssc{position:relative;}
+    .jssc p{margin:10px 0;color:#79a;text-indent:2em;font-weight:700;font-family:"Verdana","\5b8b\4f53";}
+    .jssc .error{color:#f33;}
+    .jssc .copy{display:block;position:absolute;top:0;right:0;cursor:pointer;color:#39f;}
+    .jssc ol{margin:0;padding:0;overflow:auto;border:1px solid #ccc;background-color:#eee;clear:both;}
+    .jssc ol li{margin:0;padding-left:10px;border-left:1px solid #abc;background-color:#fff;color:#333;word-wrap:break-word;word-break:break-all;}
+    .jssc ol li:hover{background-color:#ff9;}
+    .jssc ol li.even{background-color:#eee;}
+    .jssc ol li .error{background-color:#f33;}
+    .jssc ol .fold{background:#eee;font-style:italic;}
+    .jssc ol .fold:after{content:"...";}
+    .jssc ol .hide{position:absolute;visibility:hidden;}
+  </style>
+</head>
+<body>
+<pre>
+<code class="brush:csx;max-height:400;">
+</code>
+</pre>
+<textarea id="ta" autocomplete="true"></textarea>
+<input id="btn" type="button" value="ok"/>
+<div id="ui" class="kineticjs-content"></div>
+<script src="sea.js"></script>
+<script src="kinetic-v4.4.0.min.js"></script>
+<script src="jquery.js"></script>
+<script>
+  var w = 0, h = 0;
+  function draw(ast) {
+    $('#ui').html('');
+    w = h = 0;
+    if(typeof ast == 'string') {
+      return;
+    }
+    var stage = new Kinetic.Stage({
+        container: 'ui',
+        width: 0,
+        height: 0
+      }),
+      layer = new Kinetic.Layer();
+    drawNode(layer, ast, 0, 0, 0, 0);
+    stage.add(layer);
+    stage.setWidth(w);
+    stage.setHeight(h + 30);
+  }
+  function drawNode(layer, node, x, index, parent, sibling) {
+    if(index > 0) {
+      h += 24;
+    }
+    var isToken = node.name() == 'token',
+      isVirtual = isToken && node.leaves().type() == -1,
+      text = new Kinetic.Text({
+        x: x + 5,
+        y: h + 6,
+        text: isToken ? node.token().content() : node.name(),
+        width: 68,
+        height: 16,
+        align: 'center',
+        fill: isToken ? (isVirtual ? '#F33' : '#6CF') : '#F60',
+        fontSize: 12,
+        fontFamily: 'Tahoma'
+      }),
+      rect = new Kinetic.Rect({
+        x: x + 2,
+        y: h + 2,
+        width: 74,
+        height: 20,
+        fill: isToken ? (isVirtual ? '#FCC' : '#FFF') : '#F6F6F6',
+        stroke: isToken ? '#CCC' : '#F93',
+        cornerRadius: 10
+      });
+    layer.add(rect);
+    layer.add(text);
+    var x2 = x + 88;
+    if(parent) {
+      var line = new Kinetic.Line({
+        points: [x - 10, parent.getY() + 10, x + 2, rect.getY() + 10],
+        stroke: '#6F9',
+        strokeWidth: 1,
+        lineJion: 'round',
+        dashArray: [1, 1]
+      });
+      layer.add(line);
+    }
+    if(!isToken) {
+      var sib = null;
+      node.leaves().forEach(function(leaf, index) {
+        drawNode(layer, leaf, x2, index, rect, sib);
+        sib = leaf;
+      });
+    }
+    w = Math.max(w, x2);
+  }
+  seajs.config({
+    map: [function(url) {
+      return url.replace('demo/lexer/', '/web/lexer/');
+    }]
+  });
+  seajs.use(['../index.js', './jssc'], function(Homunculus, jssc) {
+    var ta = document.getElementById('ta');
+    var input = document.getElementById('btn');
+    input.onclick = function() {
+      console.clear();
+      var s = ta.value;
+      $('code').text(s);
+      $('div.jssc').remove();
+      location.hash = encodeURIComponent(s);
+      jssc.cache(100).time(10).exec();
+      var parser = Homunculus.getParser('csx');
+      var JsNode = Homunculus.getClass('node', 'csx');
+      var Token = Homunculus.getClass('token');
+      var ast = parser.parse(s);
+      draw(ast);
+      var s = JSON.stringify(tree(ast));
+      s = s.replace(/(['"])(JsNode\.\w+)\1/g, '$2');
+      console.log(s);
+      function tree(node, arr) {
+        arr = arr || [];
+        var isToken = node.name() == JsNode.TOKEN;
+        var isVirtual = isToken && node.token().type() == Token.VIRTUAL;
+        if(isToken) {
+          if(!isVirtual) {
+            var token = node.token();
+            arr.push(token.content());
+          }
+        }
+        else {
+          arr.push("JsNode." + JsNode.getKey(node.name()));
+          var childs = [];
+          arr.push(childs);
+          node.leaves().forEach(function(leaf, i) {
+            tree(leaf, childs);
+          });
+        }
+        return arr;
+      }
+    }
+    function hashChange() {
+      var s = location.hash.replace(/^#/, '');
+      if(s) {
+        s = decodeURIComponent(s);
+        ta.value = s;
+        input.onclick();
+      }
+    }
+    hashChange();
+    window.onhashchange = hashChange;
+  });
+</script>
+</body>
+</html>
