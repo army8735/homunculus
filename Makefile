@@ -1,13 +1,14 @@
 web:
 	@gulp
 
-test: web test-api test-js test-jscontext test-es6parser test-css test-html test-jsx
+test: web test-api test-js test-jscontext test-es6parser test-css test-html test-jsx test-csx
 
 test-js: test-jslexer test-jsparser
 test-es6: test-jslexer test-es6parser
 test-css: test-csslexer test-cssparser
 test-html: test-htmllexer test-htmlparser
 test-jsx: test-jsxlexer test-jsxlexer2 test-jsxparser test-jsxparser2
+test-csx: test-csxlexer test-csxlexer2 test-csxparser test-csxparser2
 
 test-api:
 	@mocha tests/api.js -R spec
@@ -47,6 +48,18 @@ test-jsxparser:
 
 test-jsxparser2:
 	@mocha tests/jsxparser2.js -R spec
+
+test-csxlexer:
+	@mocha tests/csxlexer.js -R spec
+
+test-csxlexer2:
+	@mocha tests/csxlexer2.js -R spec
+
+test-csxparser:
+	@mocha tests/csxparser.js -R spec
+
+test-csxparser2:
+	@mocha tests/csxparser2.js -R spec
 
 test-walk:
 	@mocha tests/walk.js -R spec
