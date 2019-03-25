@@ -276,6 +276,12 @@ describe('csslexer', function() {
         expect(join(tokens)).to.eql(['p', '{', 'margin', ':', '0', '!important', '}']);
         expect(type(tokens)).to.eql([21, 8, 10, 8, 4, 18, 8]);
       });
+      it('! important', function() {
+        var lexer = homunculus.getLexer('css');
+        var tokens = lexer.parse('p{margin:0! important}');
+        expect(join(tokens)).to.eql(['p', '{', 'margin', ':', '0', '! important', '}']);
+        expect(type(tokens)).to.eql([21, 8, 10, 8, 4, 18, 8]);
+      });
       it('!important out of {}', function() {
         var lexer = homunculus.getLexer('css');
         var tokens = lexer.parse('margin:0!important');

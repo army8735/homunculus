@@ -67,7 +67,7 @@ var CssRule = Rule.extend(function() {
   self.addMatch(new CompleteEqual(Token.KEYWORD, 'max--moz-device-pixel-ratio'));
   self.addMatch(new RegMatch(Token.ID, /^[a-z][\w\-]*/i));
   self.addMatch(new RegMatch(Token.STRING, /^(\\[a-z\d]{4})+/i));
-  self.addMatch(new CompleteEqual(Token.IMPORTANT, '!important', null, true));
+  self.addMatch(new RegMatch(Token.IMPORTANT, /^!\s*important/i));
   self.addMatch(new RegMatch(Token.HACK, /^![a-z]+/i));
   self.addMatch(new RegMatch(Token.PSEUDO, /^::?(?:-(?:moz|webkit|ms|o)-)?[a-z]+(?:-[a-z]+)*/i));
   ['$=', '|=', '*=', '~=', '^=', '>=', '<=', '!=', '==', '++', '--'].forEach(function(o) {
