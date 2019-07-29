@@ -181,6 +181,11 @@ describe('jsxparser2', function() {
       var node = parser.parse('<a @n="1" @m={t} test=2/>');
       expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.JSXSelfClosingElement,["<","a",JsNode.JSXBindAttribute,["@n","=","\"1\""],JsNode.JSXBindAttribute,["@m","=",JsNode.JSXAttributeValue,["{",JsNode.PRMREXPR,["t"],"}"]],JsNode.JSXAttribute,["test","=","2"],"/>"]]]]]);
     });
+    it('fragment', function() {
+      var parser = homunculus.getParser('jsx');
+      var node = parser.parse('<>123</>');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.JSXFragment,["<",">","123","</",">"],";"]]]]);
+    });
   });
   describe('file', function() {
     it('1', function() {

@@ -84,7 +84,7 @@ var JSXLexer = EcmascriptLexer.extend(function(rule) {
                 this.dealToken(token, 2, 0, temp);
               }
               else {
-                this.error('unknow jsx token: / ');
+                this.error('unknow jsx token: ' + this.code.charAt(this.index));
               }
             }
             //>
@@ -104,10 +104,30 @@ var JSXLexer = EcmascriptLexer.extend(function(rule) {
               var token = new JSXToken(JSXToken.MARK, this.peek, this.peek, this.index - 1);
               this.dealToken(token, 1, 0, temp);
             }
+            //<>和</>
+            else if(this.peek == '<') {
+              if(this.code.charAt(this.index) == '>') {
+                var token = new JSXToken(JSXToken.MARK, this.peek, this.peek, this.index - 1);
+                this.dealToken(token, 1, 0, temp);
+                this.readch();
+                token = new JSXToken(JSXToken.MARK, this.peek, this.peek, this.index - 1);
+                this.dealToken(token, 1, 0, temp);
+              }
+              else if(this.code.charAt(this.index) == '/' && this.code.charAt(this.index + 1) == '>') {
+                var token = new JSXToken(JSXToken.MARK, this.peek, this.peek, this.index - 1);
+                this.dealToken(token, 1, 0, temp);
+                this.readch();
+                token = new JSXToken(JSXToken.MARK, '</', '</', this.index - 1);
+                this.dealToken(token, 2, 0, temp);
+                this.index += 2;
+              }
+              else {
+                this.error('unknow jsx token: ' + this.code.charAt(this.index));
+              }
+            }
             //{递归进入js状态
             else if(this.peek == '{') {
               this.html = false;
-              this.braceState = false;
               this.jStack.push(1);
               this.cStack.push(this.selfClose);
               this.aStack.push(this.state);
@@ -169,6 +189,19 @@ var JSXLexer = EcmascriptLexer.extend(function(rule) {
                 //\w elem
                 this.dealTag(temp, true);
               }
+              //</>
+              else if(c1 == '/' && c2 == '>') {
+                if(idx > this.index - 1) {
+                  this.addText(this.code.slice(this.index - 1, idx), temp);
+                  this.index = idx;
+                }
+                this.state = true;
+                this.hStack[this.hStack.length - 1]--;
+                //</
+                var token = new JSXToken(JSXToken.MARK, '</', '</', this.index - 1);
+                this.dealToken(token, 2, 0, temp);
+                this.index = idx + 2;
+              }
               //<\w
               else if(character.isLetter(c1)) {
                 if(idx > this.index - 1) {
@@ -197,7 +230,6 @@ var JSXLexer = EcmascriptLexer.extend(function(rule) {
               }
               this.jStack.push(1);
               this.html = false;
-              this.braceState = false;
               var token = new JSXToken(JSXToken.SIGN, this.peek, this.peek, this.index - 1);
               this.dealToken(token, 1, 0, temp);
               this.stateBrace(this.peek);
@@ -218,7 +250,20 @@ var JSXLexer = EcmascriptLexer.extend(function(rule) {
           this.readch();
           //\w elem
           this.dealTag(temp);
-          this.braceState = false;
+        }
+        //<>则jsx，fragment出现
+        else if(this.isReg == JSXLexer.IS_REG
+          && this.peek == '<'
+          && this.code.charAt(this.index) == '>') {
+          //新的jsx开始，html深度++，html状态开始，同时为非text状态
+          this.hStack.push(1);
+          this.html = true;
+          //<>
+          var token = new JSXToken(JSXToken.MARK, this.peek, this.peek, this.index - 1);
+          this.dealToken(token, 1, 0, temp);
+          this.readch();
+          token = new JSXToken(JSXToken.MARK, this.peek, this.peek, this.index - 1);
+          this.dealToken(token, 1, 0, temp);
         }
         //perl风格正则
         else if(perlReg
@@ -364,4 +409,5 @@ var JSXLexer = EcmascriptLexer.extend(function(rule) {
 }).statics({
   SELF_CLOSE: SELF_CLOSE
 });
-module.exports = JSXLexer;});
+module.exports = JSXLexer;
+});

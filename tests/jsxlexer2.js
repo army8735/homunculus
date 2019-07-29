@@ -114,6 +114,11 @@ describe('jsxlexer2', function() {
       var tokens = lexer.parse('<a @n="1" @m={t}/>');
       expect(join(tokens)).to.eql(['<', 'a', ' ', '@n', '=', '"1"', ' ', '@m', '=', '{', 't', '}', '/>']);
     });
+    it('<>', function() {
+      var lexer = homunculus.getLexer('jsx');
+      var tokens = lexer.parse('<>123</>');
+      expect(join(tokens)).to.eql(['<', '>', '123', '</', '>']);
+    });
   });
   describe('line && col', function() {
     it('normal', function() {

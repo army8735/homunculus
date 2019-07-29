@@ -1,6 +1,6 @@
 {
   "name": "homunculus",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "description": "A lexer&parser by Javascript",
   "maintainers": [
     {
@@ -9,7 +9,9 @@
     }
   ],
   "scripts": {
-    "test": "make test"
+    "test": "make test",
+    "build": "gulp build",
+    "watch": "gulp watch"
   },
   "config": {
     "blanket": {

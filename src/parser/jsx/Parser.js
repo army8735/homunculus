@@ -11,11 +11,30 @@ var Parser = Es6Parser.extend(function(lexer) {
 }).methods({
   prmrexpr: function() {
     if(this.look.type() == Token.MARK) {
+      var next = this.tokens[this.index];
+      if(next && next.content() == '>') {
+        return this.jsxfragment();
+      }
       return this.jsxelem();
     }
     else {
       return Es6Parser.prototype.prmrexpr.call(this);
     }
+  },
+  jsxfragment: function() {
+    var node = new Node(Node.JSXFragment);
+    node.add(
+      this.match('<'),
+      this.match('>')
+    );
+    while(this.look && this.look.content() != '</') {
+      node.add(this.jsxchild());
+    }
+    node.add(
+      this.match('</'),
+      this.match('>')
+    );
+    return node;
   },
   jsxelem: function() {
     var node = new Node(Node.JSXOpeningElement);
@@ -183,6 +202,9 @@ var Parser = Es6Parser.extend(function(lexer) {
     else if([Token.STRING, Token.NUMBER].indexOf(this.look.type()) > -1) {
       return this.match();
     }
+    else if(this.look.content() == '<') {
+      return this.jsxfragment();
+    }
     return this.jsxelem();
   },
   jsxchild: function() {
@@ -190,6 +212,10 @@ var Parser = Es6Parser.extend(function(lexer) {
       case Token.TEXT:
         return this.match();
       case Token.MARK:
+        var next = this.tokens[this.index + 1];
+        if(next && next.content() == '>') {
+          return this.jsxfragment();
+        }
         return this.jsxelem();
       default:
         var node = new Node(Node.JSXChild);

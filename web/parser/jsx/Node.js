@@ -15,6 +15,7 @@ var Node = Es6Node.extend(function(type, children) {
   JSXMemberExpression: 'JSXMemberExpression',
   JSXAttributes: 'JSXAttributes',
   JSXAttributeValue: 'JSXAttributeValue',
+  JSXFragment: 'JSXFragment',
   getKey: function(s) {
     if(!s) {
       throw new Error('empty value');
@@ -31,4 +32,5 @@ var Node = Es6Node.extend(function(type, children) {
   }
 });
 var keys;
-module.exports = Node;});
+module.exports = Node;
+});
