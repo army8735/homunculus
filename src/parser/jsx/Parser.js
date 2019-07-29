@@ -212,7 +212,7 @@ var Parser = Es6Parser.extend(function(lexer) {
       case Token.TEXT:
         return this.match();
       case Token.MARK:
-        var next = this.tokens[this.index + 1];
+        var next = this.tokens[this.index];
         if(next && next.content() == '>') {
           return this.jsxfragment();
         }

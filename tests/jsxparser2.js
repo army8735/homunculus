@@ -184,7 +184,7 @@ describe('jsxparser2', function() {
     it('fragment', function() {
       var parser = homunculus.getParser('jsx');
       var node = parser.parse('<>123</>');
-      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.JSXFragment,["<",">","123","</",">"],";"]]]]);
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.JSXFragment,["<",">","123","</",">"]]]]]);
     });
   });
   describe('file', function() {
