@@ -3,11 +3,13 @@ define(function(require, exports) {
 		EcmascriptLexer = require('./lexer/EcmascriptLexer'),
 		CssLexer = require('./lexer/CssLexer'),
     HtmlLexer = require('./lexer/HtmlLexer'),
+		AxmlLexer = require('./lexer/AxmlLexer'),
     JSXLexer = require('./lexer/JSXLexer'),
 		CSXLexer = require('./lexer/CSXLexer'),
 		EcmascriptRule = require('./lexer/rule/EcmascriptRule'),
 		CssRule = require('./lexer/rule/CssRule'),
     HtmlRule = require('./lexer/rule/HtmlRule'),
+		AxmlRule = require('./lexer/rule/AxmlRule'),
     JavaRule = require('./lexer/rule/JavaRule'),
     CRule = require('./lexer/rule/CRule');
 	exports.lexer = function(syntax) {
@@ -35,6 +37,8 @@ define(function(require, exports) {
       case 'htm':
       case 'html':
         return new HtmlLexer(new HtmlRule());
+			case 'axml':
+				return new AxmlLexer(new AxmlRule());
       case 'jsx':
         return new JSXLexer(new EcmascriptRule());
 			case 'csx':
