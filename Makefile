@@ -9,6 +9,7 @@ test-css: test-csslexer test-cssparser
 test-html: test-htmllexer test-htmlparser
 test-jsx: test-jsxlexer test-jsxlexer2 test-jsxparser test-jsxparser2
 test-csx: test-csxlexer test-csxlexer2 test-csxparser test-csxparser2
+test-axml: test-axmllexer test-axmlparser
 
 test-api:
 	@mocha tests/api.js -R spec
@@ -60,6 +61,12 @@ test-csxparser:
 
 test-csxparser2:
 	@mocha tests/csxparser2.js -R spec
+
+test-axmllexer:
+	@mocha tests/axmllexer.js -R spec
+
+test-axmlparser:
+	@mocha tests/axmlparser.js -R spec
 
 test-walk:
 	@mocha tests/walk.js -R spec

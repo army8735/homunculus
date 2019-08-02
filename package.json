@@ -1,6 +1,6 @@
 {
   "name": "homunculus",
-  "version": "1.4.3",
+  "version": "1.5.0",
   "description": "A lexer&parser by Javascript",
   "maintainers": [
     {
@@ -19,16 +19,19 @@
         "src/lexer/Lexer",
         "src/lexer/CssLexer",
         "src/lexer/HtmlLexer",
+        "src/lexer/AxmlLexer",
         "src/lexer/JSXLexer",
         "src/lexer/Token",
         "src/lexer/CssToken",
         "src/lexer/HtmlToken",
+        "src/lexer/AxmlToken",
         "src/lexer/JSXToken",
         "src/lexer/match",
         "src/lexer/rule/Rule",
         "src/lexer/rule/EcmascriptRule",
         "src/lexer/rule/CssRule",
         "src/lexer/rule/HtmlRule",
+        "src/lexer/rule/AxmlRule",
         "src/parser",
         "src/util/walk"
       ]
@@ -47,7 +50,8 @@
     "es5",
     "es6",
     "jsx",
-    "csx"
+    "csx",
+    "axml"
   ],
   "author": "army8735",
   "license": "MIT",
