@@ -131,11 +131,11 @@
     }
     w = Math.max(w, x2);
   }
-  // seajs.config({
-  //   map: [function(url) {
-  //     return url.replace('demo/lexer/', '/web/lexer/');
-  //   }]
-  // });
+  seajs.config({
+    map: [function(url) {
+      return url.replace('demo/lexer/', '/web/lexer/');
+    }]
+  });
   seajs.use(['./jssc'], function(jssc) {
     var ta = document.getElementById('ta');
     var input = document.getElementById('btn');
