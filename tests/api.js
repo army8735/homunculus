@@ -27,12 +27,8 @@ describe('api of homunculus', function() {
     expect(homunculus.getClass('lexer', 'es6')).to.be(EcmascriptLexer);
     expect(homunculus.getClass('lexer', 'as')).to.be(EcmascriptLexer);
     expect(homunculus.getClass('lexer', 'actionscript')).to.be(EcmascriptLexer);
-
     expect(homunculus.getClass('lexer', 'css')).to.be(CssLexer);
-
-    expect(function() {
-      homunculus.getClass('lexer', 'unknow');
-    }).to.throwError();
+    expect(homunculus.getClass('lexer')).to.be(Lexer);
 
     expect(homunculus.getClass('parser', 'js')).to.be(JsParser);
     expect(homunculus.getClass('parser', 'javascript')).to.be(JsParser);
@@ -40,7 +36,6 @@ describe('api of homunculus', function() {
     expect(homunculus.getClass('parser', 'es5')).to.be(JsParser);
     expect(homunculus.getClass('parser', 'ecmascript')).to.be(JsParser);
     expect(homunculus.getClass('parser', 'es6')).to.be(Es6Parser);
-
     expect(homunculus.getClass('parser', 'css')).to.be(CssParser);
 
     expect(function() {
@@ -53,7 +48,6 @@ describe('api of homunculus', function() {
     expect(homunculus.getClass('node', 'es5')).to.be(JsNode);
     expect(homunculus.getClass('node', 'ecmascript')).to.be(JsNode);
     expect(homunculus.getClass('node', 'es6')).to.be(Es6Node);
-
     expect(homunculus.getClass('node', 'css')).to.be(CssNode);
 
     expect(function() {
@@ -88,7 +82,6 @@ describe('api of homunculus', function() {
     expect(homunculus.getLexer('es6')).to.be.a(Lexer);
     expect(homunculus.getLexer('as')).to.be.a(Lexer);
     expect(homunculus.getLexer('actionscript')).to.be.a(Lexer);
-
     expect(homunculus.getLexer('css')).to.be.a(CssLexer);
 
     expect(function() {
@@ -102,7 +95,6 @@ describe('api of homunculus', function() {
     expect(homunculus.getParser('es5')).to.be.a(JsParser);
     expect(homunculus.getParser('ecmascript')).to.be.a(JsParser);
     expect(homunculus.getParser('es6')).to.be.a(Es6Parser);
-
     expect(homunculus.getParser('css')).to.be.a(CssParser);
 
     expect(function() {
