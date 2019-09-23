@@ -59,6 +59,7 @@ textarea:hover{opacity:0.8;}
 <script src="sea.js"></script>
 <script src="kinetic-v4.4.0.min.js"></script>
 <script src="jquery.js"></script>
+<script src="../homunculus.js"></script>
 <script>
 var w = 0, h = 0;
 function draw(ast) {
@@ -131,9 +132,10 @@ seajs.config({
     return url.replace('demo/lexer/', '/web/lexer/');
   }]
 });
-seajs.use(['../index.js', './jssc'], function(Homunculus, jssc) {
+seajs.use(['./jssc'], function(jssc) {
   var ta = document.getElementById('ta');
   var input = document.getElementById('btn');
+  var Homunculus = homunculus;
   input.onclick = function() {
     console.clear();
     var s = ta.value;

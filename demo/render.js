@@ -1,9 +1,9 @@
 define(function(require, exports, module) {
-	var Token = require('lexer/Token');
-	var CssToken = require('./lexer/CssToken');
-	var HtmlToken = require('./lexer/HtmlToken');
-	var JSXToken = require('./lexer/JSXToken');
-	var CSXToken = require('./lexer/CSXToken');
+	var Token = homunculus.getClass('token');
+	var CssToken = homunculus.getClass('token', 'css');
+	var HtmlToken = homunculus.getClass('token', 'html');
+	var JSXToken = homunculus.getClass('token', 'jsx');
+	var CSXToken = homunculus.getClass('token', 'csx');
 	Object.keys(CssToken).forEach(function(k) {
 		Token[k] = Token[k] || CssToken[k];
 	});

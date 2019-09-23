@@ -1,17 +1,17 @@
 define(function(require, exports) {
-	var Lexer = require('./lexer/Lexer'),
-		EcmascriptLexer = require('./lexer/EcmascriptLexer'),
-		CssLexer = require('./lexer/CssLexer'),
-    HtmlLexer = require('./lexer/HtmlLexer'),
-		AxmlLexer = require('./lexer/AxmlLexer'),
-    JSXLexer = require('./lexer/JSXLexer'),
-		CSXLexer = require('./lexer/CSXLexer'),
-		EcmascriptRule = require('./lexer/rule/EcmascriptRule'),
-		CssRule = require('./lexer/rule/CssRule'),
-    HtmlRule = require('./lexer/rule/HtmlRule'),
-		AxmlRule = require('./lexer/rule/AxmlRule'),
-    JavaRule = require('./lexer/rule/JavaRule'),
-    CRule = require('./lexer/rule/CRule');
+	var Lexer = homunculus.getClass('lexer'),
+		EcmascriptLexer = homunculus.getClass('lexer', 'ecmascript'),
+		CssLexer = homunculus.getClass('lexer', 'css'),
+    HtmlLexer = homunculus.getClass('lexer', 'html'),
+		AxmlLexer = homunculus.getClass('lexer', 'axml'),
+    JSXLexer = homunculus.getClass('lexer', 'jsx'),
+		CSXLexer = homunculus.getClass('lexer', 'csx'),
+		EcmascriptRule = homunculus.getClass('rule', 'ecmascript'),
+		CssRule = homunculus.getClass('rule', 'css'),
+    HtmlRule = homunculus.getClass('rule', 'html'),
+		AxmlRule = homunculus.getClass('rule', 'axml'),
+    JavaRule = homunculus.getClass('rule', 'java'),
+    CRule = homunculus.getClass('rule', 'c');
 	exports.lexer = function(syntax) {
 		switch(syntax.toLowerCase()) {
 			case 'js':

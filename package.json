@@ -1,6 +1,6 @@
 {
   "name": "homunculus",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "A lexer&parser by Javascript",
   "maintainers": [
     {
@@ -10,8 +10,9 @@
   ],
   "scripts": {
     "test": "make test",
-    "build": "gulp build",
-    "watch": "gulp watch"
+    "build": "gulp",
+    "watch": "gulp watch",
+    "pack": "rollup -c rollup.config.js"
   },
   "config": {
     "blanket": {
@@ -70,6 +71,10 @@
     "gulp-util": "^3.0.1",
     "mocha": "^2.2.4",
     "mocha-lcov-reporter": "^0.0.2",
+    "rollup": "^1.21.2",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-sourcemaps": "^0.4.2",
+    "rollup-plugin-uglify": "^6.0.3",
     "through2": "^0.6.1",
     "unicode-7.0.0": "^0.1.5"
   }

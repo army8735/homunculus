@@ -1,4 +1,5 @@
 define(function(require, exports, module) {var Lexer = require('./lexer/Lexer');
+var Rule = require('./lexer/rule/Rule');
 var CssLexer = require('./lexer/CssLexer');
 var HtmlLexer = require('./lexer/HtmlLexer');
 var EcmascriptLexer = require('./lexer/EcmascriptLexer');
@@ -70,7 +71,7 @@ exports.getClass = function (type, lan) {
         case 'csx':
           return CSXLexer;
         default:
-          throw new Error('Unsupport Language Lexer: ' + lan);
+          return Lexer;
       }
       break;
     case 'parser':
@@ -187,8 +188,10 @@ exports.getClass = function (type, lan) {
           return EcmascriptRule;
         case 'csx':
           return EcmascriptRule;
+        case 'java':
+          return JavaRule;
         default:
-          throw new Error('Unsupport Language Context: ' + lan);
+          return Rule;
       }
     case 'walk':
       return walk;

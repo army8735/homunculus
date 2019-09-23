@@ -1,6 +1,6 @@
 define(function(require, exports) {
 	var factory = require('./factory'),
-		Token = require('./lexer/Token'),
+		Token = homunculus.getClass('token'),
 		render = require('./render'),
 		cacheLine = 0,
 		cacheTime = 0,
