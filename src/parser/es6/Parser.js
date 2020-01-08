@@ -2265,6 +2265,12 @@ var Parser = IParser.extend(function(lexer) {
         node.add(cmpt);
       }
     }
+    else if(this.look.content() == '...') {
+      node.add(
+        this.match(),
+        this.assignexpr()
+      );
+    }
     else {
       switch(this.look.type()) {
         case Token.ID:

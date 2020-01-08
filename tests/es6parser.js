@@ -1841,6 +1841,11 @@ describe('es6parser', function() {
       var node = parser.parse('@test var a=1;');
       expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.ANNOT,["@test"],JsNode.VARSTMT,["var",JsNode.VARDECL,[JsNode.BINDID,["a"],JsNode.INITLZ,["=",JsNode.PRMREXPR,["1"]]],";"]]]]);
     });
+    it('decorator', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('a={...b}');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.ASSIGNEXPR,[JsNode.PRMREXPR,["a"],"=",JsNode.PRMREXPR,[JsNode.OBJLTR,["{",JsNode.PROPTDEF,["...",JsNode.PRMREXPR,["b"]],"}"]]]]]]]);
+    });
   });
   describe('js lib exec test', function() {
     it('jquery 1.11.0', function() {

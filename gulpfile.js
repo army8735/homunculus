@@ -2,6 +2,7 @@ var gulp = require('gulp');
 var clean = require('gulp-clean');
 var util = require('gulp-util');
 var through2 = require('through2');
+var watch = require("gulp-watch");
 
 var fs = require('fs');
 var path = require('path');
@@ -28,14 +29,14 @@ function cb(file, enc, cb) {
   cb(null, file);
 }
 
-gulp.task('default', ['clean-web'], function() {
-  gulp.src('./src/**/*.js')
+gulp.task('default', gulp.series('clean-web', function() {
+  return gulp.src('./src/**/*.js')
     .pipe(through2.obj(cb))
     .pipe(gulp.dest('./web/'));
-});
+}));
 
 gulp.task('watch', function() {
-  gulp.watch('./src/**/*.js', function(file) {
+  return watch('./src/**/*.js', function(file) {
     var to = file.path.replace(path.sep + 'src' + path.sep,  path.sep + 'web' + path.sep);
     to = path.dirname(to);
     gulp.src(file.path)

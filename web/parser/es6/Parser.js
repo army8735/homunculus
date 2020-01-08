@@ -2249,6 +2249,7 @@ var Parser = IParser.extend(function(lexer) {
     if(!this.look) {
       this.error();
     }
+    debugger;
     if(this.look.content() == '[') {
       var cmpt = this.cmptpropt(noIn, noOf);
       if(!this.look) {
@@ -2264,6 +2265,12 @@ var Parser = IParser.extend(function(lexer) {
       else {
         node.add(cmpt);
       }
+    }
+    else if(this.look.content() == '...') {
+      node.add(
+        this.match(),
+        this.assignexpr()
+      );
     }
     else {
       switch(this.look.type()) {
@@ -2513,4 +2520,5 @@ var Parser = IParser.extend(function(lexer) {
 }).statics({
   S: S
 });
-module.exports = Parser;});
+module.exports = Parser;
+});

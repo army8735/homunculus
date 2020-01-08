@@ -53,8 +53,12 @@ exports.getClass = function (type, lan) {
         case 'es5':
         case 'es6':
         case 'es7':
+        case 'es8':
+        case 'es9':
         case 'es2015':
         case 'es2016':
+        case 'es2017':
+        case 'es2018':
         case 'ecmascript':
         case 'as':
         case 'actionscript':
