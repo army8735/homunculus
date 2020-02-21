@@ -641,7 +641,7 @@
 	  col: function() {
 	    return this.colMax;
 	  },
-	  error: function(s, str) {console.log(arguments.callee.caller);
+	  error: function(s, str) {
 	    if(character.isUndefined(str)) {
 	      str = this.code.substr(this.index - 1, 20);
 	    }
@@ -3307,7 +3307,6 @@
 	  ITERSTMT: 'iterstmt',
 	  FNPARAMS: 'fnparams',
 	  EXPR: 'expr',
-	  PROGRAM: 'program',
 	  STMT: 'stmt',
 	  ASSIGN: 'assign',
 	  EMPTSTMT: 'emptstmt',
@@ -6030,20 +6029,6 @@
 	    else {
 	      node.add(this.method(noIn, noOf));
 	    }
-	    return node;
-	  },
-	  asyncmethod: function(noIn, noOf) {
-	    var node = new Node_1$2(Node_1$2.ASYNCMETHOD);
-	    node.add(
-	      this.match('async', true),
-	      this.proptname(),
-	      this.match('('),
-	      this.fmparams(),
-	      this.match(')'),
-	      this.match('{'),
-	      this.fnbody(),
-	      this.match('}')
-	    );
 	    return node;
 	  },
 	  annot: function() {

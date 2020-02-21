@@ -215,3 +215,4 @@ pip-log.txt
 .idea/
 node_modules/
 tests/covrage.html
+homunculus.min.js*

@@ -12,7 +12,6 @@ var Node = INode.extend(function(type, children) {
   ITERSTMT: 'iterstmt',
   FNPARAMS: 'fnparams',
   EXPR: 'expr',
-  PROGRAM: 'program',
   STMT: 'stmt',
   ASSIGN: 'assign',
   EMPTSTMT: 'emptstmt',
@@ -73,4 +72,5 @@ var Node = INode.extend(function(type, children) {
   }
 });
 var keys;
-module.exports = Node;});
+module.exports = Node;
+});

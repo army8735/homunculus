@@ -1285,20 +1285,6 @@ var Parser = IParser.extend(function(lexer) {
     }
     return node;
   },
-  asyncmethod: function(noIn, noOf) {
-    var node = new Node(Node.ASYNCMETHOD);
-    node.add(
-      this.match('async', true),
-      this.proptname(),
-      this.match('('),
-      this.fmparams(),
-      this.match(')'),
-      this.match('{'),
-      this.fnbody(),
-      this.match('}')
-    );
-    return node;
-  },
   annot: function() {
     var node = new Node(Node.ANNOT);
     node.add(this.match());
