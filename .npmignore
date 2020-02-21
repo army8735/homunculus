@@ -10,3 +10,6 @@ gulpfile.js
 README.md
 lib/
 homunculus.min.js*
+.idea/
+.tranvis.yml
+.coveralls.yml
