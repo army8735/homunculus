@@ -4981,8 +4981,8 @@
 	  },
 	  exportcaulse: function() {
 	    var node = new Node_1$2(Node_1$2.EXPORTCAULSE);
+	    node.add(this.match('{'));
 	    while(this.look && this.look.content() != '}') {
-	      node.add(this.match('{'));
 	      node.add(this.exportspec());
 	      if(this.look && this.look.content() == ',') {
 	        node.add(this.match());
