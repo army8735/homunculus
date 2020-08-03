@@ -4995,9 +4995,20 @@
 	    var node = new Node_1$2(Node_1$2.EXPORTSPEC);
 	    node.add(this.idref());
 	    if(this.look && this.look.content() == 'as') {
+	      //as后一般是id，也可以是关键字，LL2来特殊处理
+	      var type = Token_1.ID;
+	      for(var i = this.index; i < this.length; i++) {
+	        var next = this.tokens[i];
+	        if(!S$2[next.type()]) {
+	          if(next.type() == Token_1.KEYWORD) {
+	            type = Token_1.KEYWORD;
+	          }
+	          break;
+	        }
+	      }
 	      node.add(
 	        this.match('as'),
-	        this.match(Token_1.ID)
+	        this.match(type)
 	      );
 	    }
 	    return node;

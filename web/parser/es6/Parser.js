@@ -249,9 +249,20 @@ var Parser = IParser.extend(function(lexer) {
     var node = new Node(Node.EXPORTSPEC);
     node.add(this.idref());
     if(this.look && this.look.content() == 'as') {
+      //as后一般是id，也可以是关键字，LL2来特殊处理
+      var type = Token.ID;
+      for(var i = this.index; i < this.length; i++) {
+        var next = this.tokens[i];
+        if(!S[next.type()]) {
+          if(next.type() == Token.KEYWORD) {
+            type = Token.KEYWORD;
+          }
+          break;
+        }
+      }
       node.add(
         this.match('as'),
-        this.match(Token.ID)
+        this.match(type)
       );
     }
     return node;
