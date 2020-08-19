@@ -235,8 +235,8 @@ var Parser = IParser.extend(function(lexer) {
   },
   exportcaulse: function() {
     var node = new Node(Node.EXPORTCAULSE);
+    node.add(this.match('{'));
     while(this.look && this.look.content() != '}') {
-      node.add(this.match('{'));
       node.add(this.exportspec());
       if(this.look && this.look.content() == ',') {
         node.add(this.match());

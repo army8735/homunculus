@@ -186,6 +186,11 @@ describe('csxparser2', function() {
       var node = parser.parse('<$line/>');
       expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.CSXSelfClosingElement,["<","$line","/>"]]]]]);
     });
+    it('fragment', function() {
+      var parser = homunculus.getParser('csx');
+      var node = parser.parse('<>123</>');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.EXPRSTMT,[JsNode.CSXFragment,["<",">","123","</",">"]]]]]);
+    });
   });
   describe('file', function() {
     it('1', function() {

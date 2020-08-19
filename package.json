@@ -1,6 +1,6 @@
 {
   "name": "homunculus",
-  "version": "1.6.4",
+  "version": "1.6.5",
   "description": "A lexer&parser by Javascript",
   "maintainers": [
     {
@@ -12,6 +12,7 @@
     "test": "make test",
     "build": "gulp",
     "watch": "gulp watch",
+    "dev": "rollup -c rollup.config.js --watch",
     "pack": "rollup -c rollup.config.js"
   },
   "config": {

@@ -2408,18 +2408,18 @@
 	  'track': true
 	};
 
-	var JSXLexer$1 = EcmascriptLexer_1.extend(function(rule) {
+	var CSXLexer = EcmascriptLexer_1.extend(function(rule) {
 	  EcmascriptLexer_1.call(this, rule);
 	}).methods({
 	  init: function() {
 	    EcmascriptLexer_1.prototype.init.call(this);
 	    this.html = false; //目前是否为解析html状态
 	    this.state = false; //是否在<>中
-	    this.hStack = []; //当mark开始时++，减少时--，以此得知jsx部分结束回归js
-	    this.jStack = []; //当{开始时++，}减少时--，以此得知js部分结束回归jsx
+	    this.hStack = []; //当mark开始时++，减少时--，以此得知csx部分结束回归js
+	    this.jStack = []; //当{开始时++，}减少时--，以此得知js部分结束回归csx
 	    this.aStack = []; //html和js互相递归时，记录当前层是否在attr状态中
-	    this.cStack = []; //html和js互相递归时，记录当前jsx标签是否是自闭合
-	    this.selfClose = false; //当前jsx标签是否是自闭合
+	    this.cStack = []; //html和js互相递归时，记录当前csx标签是否是自闭合
+	    this.selfClose = false; //当前csx标签是否是自闭合
 	  },
 	  scan: function(temp) {
 	    var perlReg = this.rule.perlReg();
@@ -2450,7 +2450,7 @@
 	                this.dealToken(token, 2, 0, temp);
 	              }
 	              else {
-	                this.error('unknow jsx token: / ');
+	                this.error('unknow csx token: ' + this.code.charAt(this.index));
 	              }
 	            }
 	            //>
@@ -2470,10 +2470,30 @@
 	              var token = new CSXToken_1(CSXToken_1.MARK, this.peek, this.peek, this.index - 1);
 	              this.dealToken(token, 1, 0, temp);
 	            }
+	            //<>和</>
+	            else if(this.peek == '<') {
+	              if(this.code.charAt(this.index) == '>') {
+	                var token = new CSXToken_1(CSXToken_1.MARK, this.peek, this.peek, this.index - 1);
+	                this.dealToken(token, 1, 0, temp);
+	                this.readch();
+	                token = new CSXToken_1(CSXToken_1.MARK, this.peek, this.peek, this.index - 1);
+	                this.dealToken(token, 1, 0, temp);
+	              }
+	              else if(this.code.charAt(this.index) == '/' && this.code.charAt(this.index + 1) == '>') {
+	                var token = new CSXToken_1(CSXToken_1.MARK, this.peek, this.peek, this.index - 1);
+	                this.dealToken(token, 1, 0, temp);
+	                this.readch();
+	                token = new CSXToken_1(CSXToken_1.MARK, '</', '</', this.index - 1);
+	                this.dealToken(token, 2, 0, temp);
+	                this.index += 2;
+	              }
+	              else {
+	                this.error('unknow csx token: ' + this.code.charAt(this.index));
+	              }
+	            }
 	            //{递归进入js状态
 	            else if(this.peek == '{') {
 	              this.html = false;
-	              this.braceState = false;
 	              this.jStack.push(1);
 	              this.cStack.push(this.selfClose);
 	              this.aStack.push(this.state);
@@ -2498,7 +2518,7 @@
 	                }
 	              }
 	              //如果有未匹配的，说明规则不完整，抛出错误
-	              this.error('unknow jsx token');
+	              this.error('unknow csx token');
 	            }
 	          }
 	          //<>外面
@@ -2535,6 +2555,19 @@
 	                //\w elem
 	                this.dealTag(temp, true);
 	              }
+	              //</>
+	              else if(c1 == '/' && c2 == '>') {
+	                if(idx > this.index - 1) {
+	                  this.addText(this.code.slice(this.index - 1, idx), temp);
+	                  this.index = idx;
+	                }
+	                this.state = true;
+	                this.hStack[this.hStack.length - 1]--;
+	                //</
+	                var token = new CSXToken_1(CSXToken_1.MARK, '</', '</', this.index - 1);
+	                this.dealToken(token, 2, 0, temp);
+	                this.index = idx + 2;
+	              }
 	              //<\w
 	              else if(character.isLetter(c1) || character.DOLLAR == c1) {
 	                if(idx > this.index - 1) {
@@ -2563,18 +2596,17 @@
 	              }
 	              this.jStack.push(1);
 	              this.html = false;
-	              this.braceState = false;
 	              var token = new CSXToken_1(CSXToken_1.SIGN, this.peek, this.peek, this.index - 1);
 	              this.dealToken(token, 1, 0, temp);
 	              this.stateBrace(this.peek);
 	            }
 	          }
 	        }
-	        //<\w开始则jsx，<作为mark开头和识别正则/开头上下文语意相同
-	        else if(this.isReg == JSXLexer$1.IS_REG
+	        //<\w开始则csx，<作为mark开头和识别正则/开头上下文语意相同
+	        else if(this.isReg == CSXLexer.IS_REG
 	          && this.peek == '<'
 	          && (character.isLetter(this.code.charAt(this.index)) || character.DOLLAR == this.code.charAt(this.index))) {
-	          //新的jsx开始，html深度++，html状态开始，同时为非text状态
+	          //新的csx开始，html深度++，html状态开始，同时为非text状态
 	          this.hStack.push(1);
 	          this.html = true;
 	          this.state = true;
@@ -2584,15 +2616,28 @@
 	          this.readch();
 	          //\w elem
 	          this.dealTag(temp);
-	          this.braceState = false;
+	        }
+	        //<>则csx，fragment出现
+	        else if(this.isReg == CSXLexer.IS_REG
+	          && this.peek == '<'
+	          && this.code.charAt(this.index) == '>') {
+	          //新的csx开始，html深度++，html状态开始，同时为非text状态
+	          this.hStack.push(1);
+	          this.html = true;
+	          //<>
+	          var token = new CSXToken_1(CSXToken_1.MARK, this.peek, this.peek, this.index - 1);
+	          this.dealToken(token, 1, 0, temp);
+	          this.readch();
+	          token = new CSXToken_1(CSXToken_1.MARK, this.peek, this.peek, this.index - 1);
+	          this.dealToken(token, 1, 0, temp);
 	        }
 	        //perl风格正则
 	        else if(perlReg
-	          && this.isReg == JSXLexer$1.IS_REG
+	          && this.isReg == CSXLexer.IS_REG
 	          && this.peek == character.SLASH
 	          && !{ '/': true, '*': true }[this.code.charAt(this.index)]) {
 	          this.dealReg(temp, length);
-	          this.isReg = JSXLexer$1.NOT_REG;
+	          this.isReg = CSXLexer.NOT_REG;
 	        }
 	        //template特殊语法
 	        else if(this.peek == character.GRAVE) {
@@ -2677,7 +2722,7 @@
 	        this.dealToken(token, 1, 0, temp);
 	        this.readch();
 	        if(!character.isLetter(this.peek)) {
-	          this.error('missing jsx identifier');
+	          this.error('missing csx identifier');
 	        }
 	        ELEM$2.match(this.peek, this.code, this.index);
 	        token = new CSXToken_1(ELEM$2.tokenType(), ELEM$2.content(), ELEM$2.val(), this.index - 1);
@@ -2696,7 +2741,7 @@
 	        this.dealToken(token, 1, 0, temp);
 	        this.readch();
 	        if(!character.isLetter(this.peek)) {
-	          this.error('missing jsx identifier');
+	          this.error('missing csx identifier');
 	        }
 	        ELEM$2.match(this.peek, this.code, this.index);
 	        token = new CSXToken_1(ELEM$2.tokenType(), ELEM$2.content(), ELEM$2.val(), this.index - 1);
@@ -2730,7 +2775,7 @@
 	}).statics({
 	  SELF_CLOSE: SELF_CLOSE$1
 	});
-	var CSXLexer = JSXLexer$1;
+	var CSXLexer_1 = CSXLexer;
 
 	var AxmlToken = Token_1.extend(function(type, content, val, sIndex) {
 	  Token_1.call(this, type, content, val, sIndex);
@@ -9896,6 +9941,7 @@
 	  CSXMemberExpression: 'CSXMemberExpression',
 	  CSXAttributes: 'CSXAttributes',
 	  CSXAttributeValue: 'CSXAttributeValue',
+	  CSXFragment: 'CSXFragment',
 	  getKey: function(s) {
 	    if(!s) {
 	      throw new Error('empty value');
@@ -9921,17 +9967,36 @@
 	}).methods({
 	  prmrexpr: function() {
 	    if(this.look.type() == CSXToken_1.MARK) {
-	      return this.CSXelem();
+	      var next = this.tokens[this.index];
+	      if(next && next.content() == '>') {
+	        return this.csxfragment();
+	      }
+	      return this.csxelem();
 	    }
 	    else {
 	      return Parser_1$2.prototype.prmrexpr.call(this);
 	    }
 	  },
-	  CSXelem: function() {
+	  csxfragment: function() {
+	    var node = new Node_1$6(Node_1$6.CSXFragment);
+	    node.add(
+	      this.match('<'),
+	      this.match('>')
+	    );
+	    while(this.look && this.look.content() != '</') {
+	      node.add(this.csxchild());
+	    }
+	    node.add(
+	      this.match('</'),
+	      this.match('>')
+	    );
+	    return node;
+	  },
+	  csxelem: function() {
 	    var node = new Node_1$6(Node_1$6.CSXOpeningElement);
 	    node.add(
 	      this.match(),
-	      this.CSXelemname()
+	      this.csxelemname()
 	    );
 	    //id只有1个，member和namespace有多个
 	    var type = node.last().size() > 1 ? node.last().name() : null;
@@ -9971,12 +10036,12 @@
 	    var n = new Node_1$6(Node_1$6.CSXElement);
 	    n.add(node);
 	    while(this.look && this.look.content() != '</') {
-	      n.add(this.CSXchild());
+	      n.add(this.csxchild());
 	    }
 	    n.add(this.close(name, type));
 	    return n;
 	  },
-	  CSXelemname: function(name, type) {
+	  csxelemname: function(name, type) {
 	    if(name) {
 	      if(type) {
 	        var node = new Node_1$6(type);
@@ -10018,7 +10083,7 @@
 	      return node;
 	    }
 	  },
-	  CSXmember: function(names) {
+	  csxmember: function(names) {
 	    var node = new Node_1$6(Node_1$6.CSXMemberExpression);
 	    names.forEach(function(name) {
 	      node.add(this.match(name));
@@ -10093,14 +10158,21 @@
 	    else if([CSXToken_1.STRING, CSXToken_1.NUMBER].indexOf(this.look.type()) > -1) {
 	      return this.match();
 	    }
-	    return this.CSXelem();
+	    else if(this.look.content() == '<') {
+	      return this.csxfragment();
+	    }
+	    return this.csxelem();
 	  },
-	  CSXchild: function() {
+	  csxchild: function() {
 	    switch(this.look.type()) {
 	      case CSXToken_1.TEXT:
 	        return this.match();
 	      case CSXToken_1.MARK:
-	        return this.CSXelem();
+	        var next = this.tokens[this.index];
+	        if(next && next.content() == '>') {
+	          return this.csxfragment();
+	        }
+	        return this.csxelem();
 	      default:
 	        var node = new Node_1$6(Node_1$6.CSXChild);
 	        node.add(this.match('{'));
@@ -10115,7 +10187,7 @@
 	    var node = new Node_1$6(Node_1$6.CSXClosingElement);
 	    node.add(
 	      this.match('</'),
-	      this.CSXelemname(name, type),
+	      this.csxelemname(name, type),
 	      this.match('>')
 	    );
 	    return node;
@@ -10165,8 +10237,8 @@
 	      //特殊处理;，不匹配但有换行或者末尾时自动补全，还有受限行
 	      if(type == ';'
 	        && (!this.look
-	        || (this.look.content() != type && this.hasMoveLine)
-	        || this.look.content() == '}')
+	          || (this.look.content() != type && this.hasMoveLine)
+	          || this.look.content() == '}')
 	      ) {
 	        if(this.look && Parser_1$2.S[this.look.type()]) {
 	          this.move();
@@ -10194,7 +10266,7 @@
 	    }
 	  }
 	}).statics({
-	  SELF_CLOSE: CSXLexer.SELF_CLOSE
+	  SELF_CLOSE: CSXLexer_1.SELF_CLOSE
 	});
 
 	var Parser_1$6 = Parser$6;
@@ -10868,7 +10940,7 @@
 	        case 'jsx':
 	          return JSXLexer_1;
 	        case 'csx':
-	          return CSXLexer;
+	          return CSXLexer_1;
 	        default:
 	          return Lexer_1;
 	      }
@@ -11032,7 +11104,7 @@
 	    case 'jsx':
 	      return new JSXLexer_1(new EcmascriptRule_1());
 	    case 'csx':
-	      return new CSXLexer(new EcmascriptRule_1());
+	      return new CSXLexer_1(new EcmascriptRule_1());
 	    default:
 	      throw new Error('Unsupport Language Lexer: ' + lan);
 	  }

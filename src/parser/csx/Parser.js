@@ -11,17 +11,36 @@ var Parser = Es6Parser.extend(function(lexer) {
 }).methods({
   prmrexpr: function() {
     if(this.look.type() == Token.MARK) {
-      return this.CSXelem();
+      var next = this.tokens[this.index];
+      if(next && next.content() == '>') {
+        return this.csxfragment();
+      }
+      return this.csxelem();
     }
     else {
       return Es6Parser.prototype.prmrexpr.call(this);
     }
   },
-  CSXelem: function() {
+  csxfragment: function() {
+    var node = new Node(Node.CSXFragment);
+    node.add(
+      this.match('<'),
+      this.match('>')
+    );
+    while(this.look && this.look.content() != '</') {
+      node.add(this.csxchild());
+    }
+    node.add(
+      this.match('</'),
+      this.match('>')
+    );
+    return node;
+  },
+  csxelem: function() {
     var node = new Node(Node.CSXOpeningElement);
     node.add(
       this.match(),
-      this.CSXelemname()
+      this.csxelemname()
     );
     //id只有1个，member和namespace有多个
     var type = node.last().size() > 1 ? node.last().name() : null;
@@ -61,12 +80,12 @@ var Parser = Es6Parser.extend(function(lexer) {
     var n = new Node(Node.CSXElement);
     n.add(node);
     while(this.look && this.look.content() != '</') {
-      n.add(this.CSXchild());
+      n.add(this.csxchild());
     }
     n.add(this.close(name, type));
     return n;
   },
-  CSXelemname: function(name, type) {
+  csxelemname: function(name, type) {
     if(name) {
       if(type) {
         var node = new Node(type);
@@ -108,7 +127,7 @@ var Parser = Es6Parser.extend(function(lexer) {
       return node;
     }
   },
-  CSXmember: function(names) {
+  csxmember: function(names) {
     var node = new Node(Node.CSXMemberExpression);
     names.forEach(function(name) {
       node.add(this.match(name));
@@ -183,14 +202,21 @@ var Parser = Es6Parser.extend(function(lexer) {
     else if([Token.STRING, Token.NUMBER].indexOf(this.look.type()) > -1) {
       return this.match();
     }
-    return this.CSXelem();
+    else if(this.look.content() == '<') {
+      return this.csxfragment();
+    }
+    return this.csxelem();
   },
-  CSXchild: function() {
+  csxchild: function() {
     switch(this.look.type()) {
       case Token.TEXT:
         return this.match();
       case Token.MARK:
-        return this.CSXelem();
+        var next = this.tokens[this.index];
+        if(next && next.content() == '>') {
+          return this.csxfragment();
+        }
+        return this.csxelem();
       default:
         var node = new Node(Node.CSXChild);
         node.add(this.match('{'));
@@ -205,7 +231,7 @@ var Parser = Es6Parser.extend(function(lexer) {
     var node = new Node(Node.CSXClosingElement);
     node.add(
       this.match('</'),
-      this.CSXelemname(name, type),
+      this.csxelemname(name, type),
       this.match('>')
     )
     return node;
@@ -255,8 +281,8 @@ var Parser = Es6Parser.extend(function(lexer) {
       //特殊处理;，不匹配但有换行或者末尾时自动补全，还有受限行
       if(type == ';'
         && (!this.look
-        || (this.look.content() != type && this.hasMoveLine)
-        || this.look.content() == '}')
+          || (this.look.content() != type && this.hasMoveLine)
+          || this.look.content() == '}')
       ) {
         if(this.look && Es6Parser.S[this.look.type()]) {
           this.move();

@@ -42,18 +42,18 @@ var SELF_CLOSE = {
   'track': true
 };
 
-var JSXLexer = EcmascriptLexer.extend(function(rule) {
+var CSXLexer = EcmascriptLexer.extend(function(rule) {
   EcmascriptLexer.call(this, rule);
 }).methods({
   init: function() {
     EcmascriptLexer.prototype.init.call(this);
     this.html = false; //目前是否为解析html状态
     this.state = false; //是否在<>中
-    this.hStack = []; //当mark开始时++，减少时--，以此得知jsx部分结束回归js
-    this.jStack = []; //当{开始时++，}减少时--，以此得知js部分结束回归jsx
+    this.hStack = []; //当mark开始时++，减少时--，以此得知csx部分结束回归js
+    this.jStack = []; //当{开始时++，}减少时--，以此得知js部分结束回归csx
     this.aStack = []; //html和js互相递归时，记录当前层是否在attr状态中
-    this.cStack = []; //html和js互相递归时，记录当前jsx标签是否是自闭合
-    this.selfClose = false; //当前jsx标签是否是自闭合
+    this.cStack = []; //html和js互相递归时，记录当前csx标签是否是自闭合
+    this.selfClose = false; //当前csx标签是否是自闭合
   },
   scan: function(temp) {
     var perlReg = this.rule.perlReg();
@@ -84,7 +84,7 @@ var JSXLexer = EcmascriptLexer.extend(function(rule) {
                 this.dealToken(token, 2, 0, temp);
               }
               else {
-                this.error('unknow jsx token: / ');
+                this.error('unknow csx token: ' + this.code.charAt(this.index));
               }
             }
             //>
@@ -104,10 +104,30 @@ var JSXLexer = EcmascriptLexer.extend(function(rule) {
               var token = new CSXToken(CSXToken.MARK, this.peek, this.peek, this.index - 1);
               this.dealToken(token, 1, 0, temp);
             }
+            //<>和</>
+            else if(this.peek == '<') {
+              if(this.code.charAt(this.index) == '>') {
+                var token = new CSXToken(CSXToken.MARK, this.peek, this.peek, this.index - 1);
+                this.dealToken(token, 1, 0, temp);
+                this.readch();
+                token = new CSXToken(CSXToken.MARK, this.peek, this.peek, this.index - 1);
+                this.dealToken(token, 1, 0, temp);
+              }
+              else if(this.code.charAt(this.index) == '/' && this.code.charAt(this.index + 1) == '>') {
+                var token = new CSXToken(CSXToken.MARK, this.peek, this.peek, this.index - 1);
+                this.dealToken(token, 1, 0, temp);
+                this.readch();
+                token = new CSXToken(CSXToken.MARK, '</', '</', this.index - 1);
+                this.dealToken(token, 2, 0, temp);
+                this.index += 2;
+              }
+              else {
+                this.error('unknow csx token: ' + this.code.charAt(this.index));
+              }
+            }
             //{递归进入js状态
             else if(this.peek == '{') {
               this.html = false;
-              this.braceState = false;
               this.jStack.push(1);
               this.cStack.push(this.selfClose);
               this.aStack.push(this.state);
@@ -132,7 +152,7 @@ var JSXLexer = EcmascriptLexer.extend(function(rule) {
                 }
               }
               //如果有未匹配的，说明规则不完整，抛出错误
-              this.error('unknow jsx token');
+              this.error('unknow csx token');
             }
           }
           //<>外面
@@ -154,7 +174,7 @@ var JSXLexer = EcmascriptLexer.extend(function(rule) {
               var c1 = this.code.charAt(idx + 1);
               var c2 = this.code.charAt(idx + 2);
               //</\w
-              if(c1 == '/' && (character.isLetter(c2) || character.DOLLAR == c2)) {
+              if(c1 == '/' && character.isLetter(c2)) {
                 if(idx > this.index - 1) {
                   this.addText(this.code.slice(this.index - 1, idx), temp);
                   this.index = idx;
@@ -169,8 +189,21 @@ var JSXLexer = EcmascriptLexer.extend(function(rule) {
                 //\w elem
                 this.dealTag(temp, true);
               }
+              //</>
+              else if(c1 == '/' && c2 == '>') {
+                if(idx > this.index - 1) {
+                  this.addText(this.code.slice(this.index - 1, idx), temp);
+                  this.index = idx;
+                }
+                this.state = true;
+                this.hStack[this.hStack.length - 1]--;
+                //</
+                var token = new CSXToken(CSXToken.MARK, '</', '</', this.index - 1);
+                this.dealToken(token, 2, 0, temp);
+                this.index = idx + 2;
+              }
               //<\w
-              else if(character.isLetter(c1) || character.DOLLAR == c1) {
+              else if(character.isLetter(c1)) {
                 if(idx > this.index - 1) {
                   this.addText(this.code.slice(this.index - 1, idx), temp);
                   this.index = idx;
@@ -197,18 +230,17 @@ var JSXLexer = EcmascriptLexer.extend(function(rule) {
               }
               this.jStack.push(1);
               this.html = false;
-              this.braceState = false;
               var token = new CSXToken(CSXToken.SIGN, this.peek, this.peek, this.index - 1);
               this.dealToken(token, 1, 0, temp);
               this.stateBrace(this.peek);
             }
           }
         }
-        //<\w开始则jsx，<作为mark开头和识别正则/开头上下文语意相同
-        else if(this.isReg == JSXLexer.IS_REG
+        //<\w开始则csx，<作为mark开头和识别正则/开头上下文语意相同
+        else if(this.isReg == CSXLexer.IS_REG
           && this.peek == '<'
-          && (character.isLetter(this.code.charAt(this.index)) || character.DOLLAR == this.code.charAt(this.index))) {
-          //新的jsx开始，html深度++，html状态开始，同时为非text状态
+          && character.isLetter(this.code.charAt(this.index))) {
+          //新的csx开始，html深度++，html状态开始，同时为非text状态
           this.hStack.push(1);
           this.html = true;
           this.state = true;
@@ -218,15 +250,28 @@ var JSXLexer = EcmascriptLexer.extend(function(rule) {
           this.readch();
           //\w elem
           this.dealTag(temp);
-          this.braceState = false;
+        }
+        //<>则csx，fragment出现
+        else if(this.isReg == CSXLexer.IS_REG
+          && this.peek == '<'
+          && this.code.charAt(this.index) == '>') {
+          //新的csx开始，html深度++，html状态开始，同时为非text状态
+          this.hStack.push(1);
+          this.html = true;
+          //<>
+          var token = new CSXToken(CSXToken.MARK, this.peek, this.peek, this.index - 1);
+          this.dealToken(token, 1, 0, temp);
+          this.readch();
+          token = new CSXToken(CSXToken.MARK, this.peek, this.peek, this.index - 1);
+          this.dealToken(token, 1, 0, temp);
         }
         //perl风格正则
         else if(perlReg
-          && this.isReg == JSXLexer.IS_REG
+          && this.isReg == CSXLexer.IS_REG
           && this.peek == character.SLASH
           && !{ '/': true, '*': true }[this.code.charAt(this.index)]) {
           this.dealReg(temp, length);
-          this.isReg = JSXLexer.NOT_REG;
+          this.isReg = CSXLexer.NOT_REG;
         }
         //template特殊语法
         else if(this.peek == character.GRAVE) {
@@ -311,7 +356,7 @@ var JSXLexer = EcmascriptLexer.extend(function(rule) {
         this.dealToken(token, 1, 0, temp);
         this.readch();
         if(!character.isLetter(this.peek)) {
-          this.error('missing jsx identifier');
+          this.error('missing csx identifier');
         }
         ELEM.match(this.peek, this.code, this.index);
         token = new CSXToken(ELEM.tokenType(), ELEM.content(), ELEM.val(), this.index - 1);
@@ -330,7 +375,7 @@ var JSXLexer = EcmascriptLexer.extend(function(rule) {
         this.dealToken(token, 1, 0, temp);
         this.readch();
         if(!character.isLetter(this.peek)) {
-          this.error('missing jsx identifier');
+          this.error('missing csx identifier');
         }
         ELEM.match(this.peek, this.code, this.index);
         token = new CSXToken(ELEM.tokenType(), ELEM.content(), ELEM.val(), this.index - 1);
@@ -364,4 +409,5 @@ var JSXLexer = EcmascriptLexer.extend(function(rule) {
 }).statics({
   SELF_CLOSE: SELF_CLOSE
 });
-module.exports = JSXLexer;});
+module.exports = CSXLexer;
+});
