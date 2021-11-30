@@ -5400,7 +5400,7 @@
 	          this.match('('),
 	          this.expr(),
 	          this.match(')'),
-	          this.match(';')
+	          this.match(';', false, '', true)
 	        );
 	      break;
 	      case 'while':
@@ -7202,7 +7202,7 @@
 	  virtual: function(s) {
 	    return new Node_1$2(Node_1$2.TOKEN, new Token_1(Token_1.VIRTUAL, s));
 	  },
-	  match: function(type, line, msg) {
+	  match: function(type, line, msg, autoSemicolon) {
 	    if(typeof type == 'boolean') {
 	      msg = line;
 	      line = type;
@@ -7228,7 +7228,7 @@
 	      //特殊处理;，不匹配但有换行或者末尾时自动补全，还有受限行
 	      if(type == ';'
 	        && (!this.look
-	          || (this.look.content() != type && this.hasMoveLine)
+	          || (this.look.content() != type && (this.hasMoveLine || autoSemicolon))
 	          || this.look.content() == '}')
 	      ) {
 	        if(this.look && S$2[this.look.type()]) {

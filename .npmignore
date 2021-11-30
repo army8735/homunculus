@@ -6,6 +6,7 @@ Makefile
 tests/
 demo/
 node_modules/
+web/
 gulpfile.js
 README.md
 lib/

@@ -1084,6 +1084,11 @@ describe('es6parser', function() {
       var node = parser.parse('do{}while(false)');
       expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.ITERSTMT,["do",JsNode.BLOCKSTMT,[JsNode.BLOCK,["{","}"]],"while","(",JsNode.PRMREXPR,["false"],")"]]]]);
     });
+    it('dowhilestmt 3', function() {
+      var parser = homunculus.getParser('es6');
+      var node = parser.parse('do{}while(g)/g/g');
+      expect(tree(node)).to.eql([JsNode.SCRIPT,[JsNode.SCRIPTBODY,[JsNode.ITERSTMT,["do",JsNode.BLOCKSTMT,[JsNode.BLOCK,["{","}"]],"while","(",JsNode.PRMREXPR,["g"],")"],JsNode.EXPRSTMT,[JsNode.PRMREXPR,["/g/g"]]]]]);
+    });
     it('forstmt 1', function() {
       var parser = homunculus.getParser('es6');
       var node = parser.parse('for(;;){}');
