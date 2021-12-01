@@ -174,7 +174,7 @@ var CSXLexer = EcmascriptLexer.extend(function(rule) {
               var c1 = this.code.charAt(idx + 1);
               var c2 = this.code.charAt(idx + 2);
               //</\w
-              if(c1 == '/' && character.isLetter(c2)) {
+              if(c1 == '/' && (character.isLetter(c2) || character.DOLLAR == c2)) {
                 if(idx > this.index - 1) {
                   this.addText(this.code.slice(this.index - 1, idx), temp);
                   this.index = idx;
@@ -203,7 +203,7 @@ var CSXLexer = EcmascriptLexer.extend(function(rule) {
                 this.index = idx + 2;
               }
               //<\w
-              else if(character.isLetter(c1)) {
+              else if(character.isLetter(c1) || character.DOLLAR == c1) {
                 if(idx > this.index - 1) {
                   this.addText(this.code.slice(this.index - 1, idx), temp);
                   this.index = idx;
@@ -239,7 +239,7 @@ var CSXLexer = EcmascriptLexer.extend(function(rule) {
         //<\w开始则csx，<作为mark开头和识别正则/开头上下文语意相同
         else if(this.isReg == CSXLexer.IS_REG
           && this.peek == '<'
-          && character.isLetter(this.code.charAt(this.index))) {
+          && (character.isLetter(this.code.charAt(this.index)) || character.DOLLAR == this.code.charAt(this.index))) {
           //新的csx开始，html深度++，html状态开始，同时为非text状态
           this.hStack.push(1);
           this.html = true;

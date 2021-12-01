@@ -609,7 +609,7 @@ var Parser = IParser.extend(function(lexer) {
           this.match('('),
           this.expr(),
           this.match(')'),
-          this.match(';')
+          this.match(';', false, '', true)
         );
       break;
       case 'while':
@@ -2411,7 +2411,7 @@ var Parser = IParser.extend(function(lexer) {
   virtual: function(s) {
     return new Node(Node.TOKEN, new Token(Token.VIRTUAL, s));
   },
-  match: function(type, line, msg) {
+  match: function(type, line, msg, autoSemicolon) {
     if(typeof type == 'boolean') {
       msg = line;
       line = type;
@@ -2437,7 +2437,7 @@ var Parser = IParser.extend(function(lexer) {
       //特殊处理;，不匹配但有换行或者末尾时自动补全，还有受限行
       if(type == ';'
         && (!this.look
-          || (this.look.content() != type && this.hasMoveLine)
+          || (this.look.content() != type && (this.hasMoveLine || autoSemicolon))
           || this.look.content() == '}')
       ) {
         if(this.look && S[this.look.type()]) {
