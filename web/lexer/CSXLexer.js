@@ -7,7 +7,7 @@ var CompleteEqual = require('./match/CompleteEqual');
 var LineSearch = require('./match/LineSearch');
 var CharacterSet = require('./match/CharacterSet');
 
-var ELEM = new RegMatch(CSXToken.ELEM, /^\$?[a-z]\w*(?:-\w+)*/i);
+var ELEM = new RegMatch(CSXToken.ELEM, /^[$a-z_]\w*(?:-\w+)*/i);
 var CSXMatch = [
   new CompleteEqual(CSXToken.BLANK, character.BLANK),
   new CompleteEqual(CSXToken.TAB, character.TAB),

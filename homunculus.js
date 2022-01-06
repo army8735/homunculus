@@ -2373,7 +2373,7 @@
 
 	var CSXToken_1 = CSXToken;
 
-	var ELEM$2 = new RegMatch_1(CSXToken_1.ELEM, /^\$?[a-z]\w*(?:-\w+)*/i);
+	var ELEM$2 = new RegMatch_1(CSXToken_1.ELEM, /^[$a-z_]\w*(?:-\w+)*/i);
 	var CSXMatch = [
 	  new CompleteEqual_1(CSXToken_1.BLANK, character.BLANK),
 	  new CompleteEqual_1(CSXToken_1.TAB, character.TAB),
