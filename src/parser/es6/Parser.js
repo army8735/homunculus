@@ -1967,7 +1967,7 @@ var Parser = IParser.extend(function(lexer) {
     if(this.look.content() == 'super') {
       mmb = this.match();
       if(!this.look || ['.', '['].indexOf(this.look.content()) == -1) {
-        this.error();
+        return mmb;
       }
     }
     else {
